@@ -1,5 +1,4 @@
 import { h, mount } from 'destam-dom';
-import { MDCRipple } from '@material/ripple';
 
 import { Icon, Button } from '../src';
 
@@ -12,7 +11,7 @@ const Example = () => {
         <Button label="Click Me" type="outlined" onClick={handleClick} />
         <Button
             label="Button"
-            type="outlined"
+            type="icon-outlined"
             onClick={handleClick}
             Icon={
                 <Icon libraryName="feather" iconName="feather" />
@@ -31,7 +30,3 @@ const Example = () => {
 };
 
 mount(document.body, <Example />);
-
-document.querySelectorAll('.mdc-button').forEach(button => {
-    new MDCRipple(button);
-});
