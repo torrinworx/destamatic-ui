@@ -15,8 +15,7 @@ const useRipples = () => {
         const opacity = Observer.mutable(1);
         const scale = Observer.mutable(0);
 
-        const circle = document.createElement('span');
-        ripples.push(html`<${circle}
+        ripples.push(html`<span
             $style=${{
                 position: 'absolute',
                 borderRadius: '50%',
@@ -31,15 +30,14 @@ const useRipples = () => {
             }}
         />`);
 
-        // Force re-layout to trigger the animation
-        circle.getBoundingClientRect();
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            opacity.set(0);
+            scale.set(4);
 
-        opacity.set(0);
-        scale.set(4);
-
-        setTimeout(() => {
-            ripples.splice(0, 1);
-        }, 500); // Clean up the ripple after the animation
+            setTimeout(() => {
+                ripples.splice(0, 1);
+            }, 800); // Clean up the ripple after the animation
+        }));
     };
 
     return [ripples, createRipple];
