@@ -1,4 +1,4 @@
-import { html, Observer } from 'destam-dom';
+import { html, OArray, Observer } from 'destam-dom';
 
 const Button = ({ label = "Button", type = "text", onClick, Icon }) => {
     let Class = "";
@@ -14,9 +14,10 @@ const Button = ({ label = "Button", type = "text", onClick, Icon }) => {
             break;
     }
 
+    const ripples = OArray();
+
     const createRipple = (event) => {
         const button = event.currentTarget;
-        const circle = document.createElement('span');
         const diameter = Math.max(button.clientWidth, button.clientHeight);
         const radius = diameter / 2;
         const rect = button.getBoundingClientRect();
@@ -24,20 +25,33 @@ const Button = ({ label = "Button", type = "text", onClick, Icon }) => {
         const rippleX = event.clientX - rect.left - radius;
         const rippleY = event.clientY - rect.top - radius;
 
-        const rippleStyle = `position: absolute; border-radius: 50%; width: ${diameter}px; height: ${diameter}px; top: ${rippleY}px; left: ${rippleX}px; background: rgba(0, 0, 0, 0.3); transform: scale(0); transition: transform 0.8s, opacity 0.8s;`;
+        const opacity = Observer.mutable(1);
+        const scale = Observer.mutable(0);
 
-        circle.style.cssText = rippleStyle;
-
-        button.appendChild(circle);
+        const circle = document.createElement('span');
+        ripples.push(html`<${circle}
+            $style=${{
+                position: 'absolute',
+                borderRadius: '50%',
+                width: diameter + 'px',
+                height: diameter + 'px',
+                top: rippleY + 'px',
+                left: rippleX + 'px',
+                background: 'rgba(0, 0, 0, 0.3)',
+                transform: scale.map(scale => `scale(${scale})`),
+                opacity: opacity,
+                transition: 'transform 0.8s, opacity 0.8s',
+            }}
+        />`);
 
         // Force re-layout to trigger the animation
         circle.getBoundingClientRect();
 
-        circle.style.transform = 'scale(4)';
-        circle.style.opacity = '0';
+        opacity.set(0);
+        scale.set(4);
 
         setTimeout(() => {
-            button.removeChild(circle);
+            ripples.splice(0, 1);
         }, 500); // Clean up the ripple after the animation
     };
 
@@ -51,6 +65,7 @@ const Button = ({ label = "Button", type = "text", onClick, Icon }) => {
     >
         ${Icon ? html`<i class="material-icons mdc-button__icon" aria-hidden="true">${Icon}</i>` : null}
         ${!["icon", "icon-outlined", "icon-contained"].includes(type) ? html`<span class="mdc-button__label">${label}</span>` : null}
+        ${ripples}
     </button>`;
 };
 
