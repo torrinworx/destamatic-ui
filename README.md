@@ -2,7 +2,7 @@
 
 # Destamatic UI
 
-A lightweight material component library built on `destam` and `destam-dom`.
+A lightweight material component library powered by `destam` and `destam-dom`.
 
 </div>
 
