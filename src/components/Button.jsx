@@ -1,4 +1,4 @@
-import { html } from 'destam-dom';
+import { h } from 'destam-dom';
 import useRipples from '../util/ripple.js';
 
 const Button = ({ label = "Button", type = "text", onClick, Icon }) => {
@@ -17,9 +17,9 @@ const Button = ({ label = "Button", type = "text", onClick, Icon }) => {
 
     const [ripples, createRipple] = useRipples();
 
-    return html`<button
-        class=${`mdc-button ${Class} ${Icon && "mdc-button--icon-leading"}`}
-        $onclick=${(event) => {
+    return <button
+        class={`mdc-button ${Class} ${Icon && "mdc-button--icon-leading"}`}
+        $onclick={(event) => {
             createRipple(event);
             onClick && onClick(event);
         }}
@@ -28,7 +28,7 @@ const Button = ({ label = "Button", type = "text", onClick, Icon }) => {
         ${Icon ? html`<i class="material-icons mdc-button__icon" aria-hidden="true">${Icon}</i>` : null}
         ${!["icon", "icon-outlined", "icon-contained"].includes(type) ? html`<span class="mdc-button__label">${label}</span>` : null}
         ${ripples}
-    </button>`;
+    </button>;
 };
 
 export default Button;

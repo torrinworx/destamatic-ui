@@ -1,4 +1,4 @@
-import { html, OArray, Observer } from 'destam-dom';
+import { h, OArray, Observer } from 'destam-dom';
 
 const useRipples = () => {
     const ripples = OArray();
@@ -15,8 +15,8 @@ const useRipples = () => {
         const opacity = Observer.mutable(1);
         const scale = Observer.mutable(0);
 
-        ripples.push(html`<span
-            $style=${{
+        ripples.push(<span
+            $style={{
                 position: 'absolute',
                 borderRadius: '50%',
                 width: diameter + 'px',
@@ -28,7 +28,7 @@ const useRipples = () => {
                 opacity: opacity,
                 transition: 'transform 0.8s, opacity 0.8s',
             }}
-        />`);
+        />);
 
         requestAnimationFrame(() => requestAnimationFrame(() => {
             opacity.set(0);
