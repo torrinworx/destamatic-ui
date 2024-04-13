@@ -25,9 +25,9 @@ const Button = ({ label = "Button", type = "text", onClick, Icon }) => {
         }}
         style="position: relative; overflow: hidden;"
     >
-        ${Icon ? html`<i class="material-icons mdc-button__icon" aria-hidden="true">${Icon}</i>` : null}
-        ${!["icon", "icon-outlined", "icon-contained"].includes(type) ? html`<span class="mdc-button__label">${label}</span>` : null}
-        ${ripples}
+        {Icon ? <i class="material-icons mdc-button__icon" aria-hidden="true">{Icon}</i> : null}
+        {!["icon", "icon-outlined", "icon-contained"].includes(type) ? <span class="mdc-button__label">{label}</span> : null}
+        {ripples}
     </button>;
 };
 
