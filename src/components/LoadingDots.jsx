@@ -1,0 +1,32 @@
+import h from './h'
+
+import { colours } from './Theme';
+
+const LoadingDots = () => {
+    const dotStyle = {
+        display: 'inline-block',
+        width: '8px',
+        height: '8px',
+        backgroundColor: colours.primary.base,
+        borderRadius: '50%',
+        animationName: 'dotFlashing',
+        animationDuration: '1s',
+        animationIterationCount: 'infinite',
+        animationTimingFunction: 'ease-in-out',
+        margin: '20px 4px',
+    };
+
+    return <div $style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <span $style={{ ...dotStyle, animationDelay: '0s' }}></span>
+        <span $style={{ ...dotStyle, animationDelay: '.2s' }}></span>
+        <span $style={{ ...dotStyle, animationDelay: '.4s' }}></span>
+        <style>{`
+            @keyframes dotFlashing {
+                0%, 100% { opacity: 0; }
+                50% { opacity: 1; }
+            }
+        `}</style>
+    </div>
+}
+
+export default LoadingDots;

@@ -1,4 +1,6 @@
-import { h, Observer } from 'destam-dom';
+import h from './h';
+
+import Observer from 'destam/Observer';
 
 // Async function to load icons
 const loadIcon = async (libraryName, iconName, style) => {
@@ -15,16 +17,17 @@ const loadIcon = async (libraryName, iconName, style) => {
                 console.error(error.message);
                 throw new Error(`Failed to load ${libraryName} or icon ${iconName} not found.`);
             }
-        // Add cases for other icon libraries here
+        // Cases for other icon libraries here
         default:
             throw new Error(`The library ${libraryName} is not supported.`);
     }
 }
 
-const Icon = ({ libraryName, iconName, style = {} }) => {
+const Icon = ({ libraryName, iconName, size='20', style, ...props }) => {
     let Svg = Observer.mutable('');
+    const styleObject = {marginTop: '4px', height: size, width: size, ...style}
 
-    loadIcon(libraryName, iconName, style)
+    loadIcon(libraryName, iconName, styleObject)
         .then(svgContent => {
             Svg.set(svgContent);
         })
@@ -32,7 +35,7 @@ const Icon = ({ libraryName, iconName, style = {} }) => {
             console.error(error.message);
         });
 
-    return <div $innerHTML={Svg} />;
+    return <div style={{display: 'inline-block', ...style}} {...props} $innerHTML={Svg} />;
 };
 
 export default Icon;

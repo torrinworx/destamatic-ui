@@ -1,6 +1,9 @@
-import { h, OArray, Observer } from 'destam-dom';
+import h from './h';
 
-const useRipples = () => {
+import { OArray, Observer } from 'destam-dom';
+import { colours } from './Theme'
+
+const useRipples = (background = colours.ripple.dark) => {
     const ripples = OArray();
 
     const createRipple = (event) => {
@@ -23,7 +26,7 @@ const useRipples = () => {
                 height: diameter + 'px',
                 top: rippleY + 'px',
                 left: rippleX + 'px',
-                background: 'rgba(0, 0, 0, 0.3)',
+                background: background,
                 transform: scale.map(scale => `scale(${scale})`),
                 opacity: opacity,
                 transition: 'transform 0.8s, opacity 0.8s',

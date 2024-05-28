@@ -1,4 +1,6 @@
-import { h, mount } from 'destam-dom';
+import H from '../src';
+
+import { mount } from 'destam-dom';
 
 import { Icon, Button } from '../src';
 

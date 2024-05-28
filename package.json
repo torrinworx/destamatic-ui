@@ -29,8 +29,8 @@
     "webpack-hot-middleware": "^2.26.1"
   },
   "dependencies": {
-    "destam-dom": "^0.4.0",
-    "material-components-web": "^14.0.0"
+    "destam": "^0.2.0",
+    "destam-dom": "^0.7.2"
   },
   "optionalDependencies": {
     "feather-icons": "^4.29.1",
