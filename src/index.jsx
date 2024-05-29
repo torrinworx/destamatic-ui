@@ -9,4 +9,5 @@ export { default as LoadingDots } from './components/LoadingDots';
 export { default as Ripple } from './components/Ripple';
 export { updateStateTree, replaceStateTree } from './components/stateTree';
 export { default as TextArea } from './components/TextArea';
+import { h } from './components/h';
 export * from './components/Theme';
