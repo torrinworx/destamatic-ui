@@ -2,6 +2,8 @@ import h from './h';
 
 import Observer from 'destam/Observer';
 
+// https://feathericons.com/ -  catalogue of icons
+
 // Async function to load icons
 const loadIcon = async (libraryName, iconName, style) => {
     switch (libraryName) {
