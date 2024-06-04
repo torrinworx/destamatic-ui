@@ -1,4 +1,5 @@
 import h from './h';
+import Shown from './Shown';
 
 import { Observer } from 'destam-dom';
 
@@ -17,7 +18,7 @@ const DropDown = ({ children, label }) => {
                 </i>
             </div>
         </div>
-        {isDropedDown.map((show) => show ? children : null)}
+        <Shown value={isDropedDown} children={children} />
     </div>
 }
 
