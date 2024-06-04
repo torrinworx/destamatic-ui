@@ -13,8 +13,9 @@ const KebabMenu = ({state}, _, mount) => {
 
     // Close if not clicking kebab
     window.addEventListener('click', e => {
+        if (!state._kebab) return;
         const coords = kebab.get().coords
-        if ((e.pageX > coords[0] + 20 || e.pageX < coords[0] - 20) || (e.pageY > coords[1] + 20 || e.pageY < coords[1] - 20)){
+        if (e.pageX !== coords[0] || e.pageY !== coords[1]){
             state._kebab = null
         }
     });
