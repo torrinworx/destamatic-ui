@@ -1,9 +1,9 @@
 import h from './h';
 
 import { OArray, Observer } from 'destam-dom';
-import { colours } from './Theme'
+import Theme from './Theme'
 
-const useRipples = (background = colours.ripple.dark) => {
+const useRipples = (background = Theme.colours.ripple.dark) => {
     const ripples = OArray();
 
     const createRipple = (event) => {

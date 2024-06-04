@@ -1,7 +1,7 @@
 import h from './h';
 
 import { Observer } from 'destam-dom';
-import { borderRadius, colours, outline, height, padding } from './Theme';
+import Theme from './Theme';
 
 const Input = ({value, type='text', placeholder = '', style, ...props}) => {
     const isFocused = Observer.mutable(false)
@@ -17,11 +17,11 @@ const Input = ({value, type='text', placeholder = '', style, ...props}) => {
             ...style,
             minwidth: '100px',
             fontSize: '14px',
-            padding: `0px ${padding} 0px ${padding}`,
-            height: height,
-            border: `${outline} ${colours.secondary.base}`,
-            borderRadius: borderRadius,
-            outline: isFocused.map(f => f ? `${outline} ${colours.primary.base}` : null)
+            padding: `0px ${Theme.padding} 0px ${Theme.padding}`,
+            height: Theme.height,
+            border: `${Theme.outline} ${Theme.colours.secondary.base}`,
+            borderRadius: Theme.borderRadius,
+            outline: isFocused.map(f => f ? `${Theme.outline} ${Theme.colours.primary.base}` : null)
         }}
         {...props}
     />

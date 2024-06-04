@@ -4,7 +4,7 @@ import { Observer } from "destam-dom";
 
 import Button from "../Button";
 import Icon from '../Icon';
-import { colours, borderRadius, boxShadow, height } from '../Theme';
+import Theme from '../Theme';
 
 
 const Drawer = ({ children, open, ...props }) => {
@@ -42,10 +42,10 @@ const Drawer = ({ children, open, ...props }) => {
             >
                 <div $style={{ boxSizing: 'border-box', padding: '20px', height: '100%'}}>
                     <div $style={{
-                        boxShadow: boxShadow,
-                        borderRadius: borderRadius,
+                        boxShadow: Theme.boxShadow,
+                        borderRadius: Theme.borderRadius,
                         boxSizing: 'border-box',
-                        border: `1px solid ${colours.secondary.base}`,
+                        border: `1px solid ${Theme.colours.secondary.base}`,
                         height: '100%',
                         padding: '10px',
                         overflowY: 'hidden'
