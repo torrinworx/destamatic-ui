@@ -1,6 +1,6 @@
 import { h, Observer } from 'destam-dom';
 
-import { borderRadius, height, padding, colours, outline } from './Theme';
+import Theme from './Theme';
 
 const Textarea = ({value, style, maxHeight = 200, id, onkeydown, placeholder, ...props}, _, mounted) => {
 	const Ref = <textarea />;
@@ -20,13 +20,13 @@ const Textarea = ({value, style, maxHeight = 200, id, onkeydown, placeholder, ..
 			resize: 'none',
 			overflowY: 'auto',
 			flexGrow: 1,
-			height: height,
-			padding: padding,
-			borderRadius: borderRadius,
-			border: `${outline} ${colours.secondary.base}`,
+			height: Theme.height,
+			padding: Theme.padding,
+			borderRadius: Theme.borderRadius,
+			border: `${Theme.outline} ${Theme.colours.secondary.base}`,
 			fontSize: '14px',
 			...style,
-			outline: isFocused.map(f => f ? `${outline} ${colours.primary.base}` : null),
+			outline: isFocused.map(f => f ? `${Theme.outline} ${Theme.colours.primary.base}` : null),
 			height: isMounted.map(mounted => {
 				if (!mounted) return 'auto';
 

@@ -1,34 +1,83 @@
-import H from '../src';
+import { h } from 'destam-dom';
+import { Observer, mount } from 'destam-dom';
+import {
+    Theme,
+    Typography,
+    Button,
+    Icon,
+    LoadingDots,
+    DropDown,
+    Input,
+    TextArea,
+    Drawer,
+    Chevron
+} from '../src';
 
-import { mount } from 'destam-dom';
-
-import { Icon, Button } from '../src';
-
-const Example = () => {
+const DemoPage = () => {
     const handleClick = () => {
         console.log('Button clicked');
     };
-    return <div>
-        <Button label="Click Me" onClick={handleClick} />
-        <Button label="Click Me" type="outlined" onClick={handleClick} />
-        <Button
-            label="Button"
-            type="icon-outlined"
-            onClick={handleClick}
-            Icon={
-                <Icon libraryName="feather" iconName="feather" />
-            }
-        />
-        <Button
-            label="Button"
-            type="contained"
-            onClick={handleClick}
-            Icon={
-                <Icon libraryName="feather" iconName="feather" />
-            }
-        />
 
+    const drawerOpen = Observer.mutable(false);
+
+    return <div $style={{
+        fontFamily: 'Roboto, sans-serif',
+        padding: '20px',
+    }}>
+        <Typography variant="h1">Destamatic UI Demo</Typography>
+        <Typography variant="h2">Typography</Typography>
+        <Typography variant="h3">Heading 3 Regular</Typography>
+        <Typography variant="h3" bold>Heading 3 Bold</Typography>
+        <Typography variant="p1">Paragraph 1 Regular</Typography>
+        <Typography variant="p1" bold>Paragraph 1 Bold</Typography>
+        <Typography variant="p2">Paragraph 2 Regular</Typography>
+        <Typography variant="p2" bold>Paragraph 2 Bold</Typography>
+
+        <Typography variant="h2" $style={{marginTop: '20px'}}>Buttons</Typography>
+        <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            <Button label="Text Button" type="text" onClick={handleClick} />
+            <Button label="Contained Button" type="contained" onClick={handleClick} />
+            <Button label="Outlined Button" type="outlined" onClick={handleClick} />
+            <Button
+                label="Icon Outline"
+                type="outlined"
+                onClick={handleClick}
+                Icon={<Icon libraryName="feather" iconName="feather" />}
+            />
+            <Button
+                label="Icon Contained"
+                type="contained"
+                onClick={handleClick}
+                Icon={<Icon libraryName="feather" iconName="feather" />}
+            />
+        </div>
+
+        <Typography variant="h2" $style={{marginTop: '20px'}}>Loading Dots</Typography>
+        <LoadingDots />
+
+        <Typography variant="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
+        <DropDown label="Click to Toggle">
+            <div $style={{ padding: '10px', border: `1px solid ${Theme.colours.secondary.base}` }}>
+                Dropdown Content
+            </div>
+        </DropDown>
+
+        <Typography variant="h2" $style={{marginTop: '20px'}}>Inputs</Typography>
+        <Input placeholder="Type here..." $style={{ marginBottom: '10px' }} />
+        <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} />
+
+        <Typography variant="h2" $style={{marginTop: '20px'}}>Drawer</Typography>
+        <Drawer open={drawerOpen}>
+            <div>
+                <Typography variant="p1">Drawer Content</Typography>
+            </div>
+        </Drawer>
+
+        <Typography variant="h2" $style={{marginTop: '20px'}}>Chevron</Typography>
+        <div>
+            <Chevron />
+        </div>
     </div>;
 };
 
-mount(document.body, <Example />);
+mount(document.body, <DemoPage />);

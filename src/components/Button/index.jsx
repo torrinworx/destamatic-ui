@@ -3,7 +3,7 @@ import h from '../h';
 import Observer from 'destam/Observer';
 
 import useRipples from '../Ripple.jsx';
-import { colours, borderRadius, boxShadow, transition  } from '../Theme.jsx';
+import Theme from '../Theme.jsx';
 
 const buttonStyles = {
     base: {
@@ -19,26 +19,26 @@ const buttonStyles = {
         userSelect: 'none',
         border: 'none',
         outline: 'none',
-        borderRadius: borderRadius,
+        borderRadius: Theme.borderRadius,
         lineHeight: '2.25rem',
         cursor: 'pointer',
         textDecoration: 'none',
         position: 'relative',
         overflow: 'hidden',
-        transition: transition
+        transition: Theme.transition
     },
     text: {
         backgroundColor: 'transparent',
         color: 'black',
     },
     contained: {
-        backgroundColor: colours.primary.base,
-        color: colours.primary.onPrimary,
+        backgroundColor: Theme.colours.primary.base,
+        color: Theme.colours.primary.onPrimary,
     },
     outlined: {
         backgroundColor: 'transparent',
-        border: `2px solid ${colours.primary.lighter}`,
-        color: colours.primary.base,
+        border: `2px solid ${Theme.colours.primary.lighter}`,
+        color: Theme.colours.primary.base,
     },
     icon: {
         margin: '0px 6px 0px 6px',
@@ -58,7 +58,7 @@ const getStyles = (style, disabled, type, hover) => {
         ...(type === 'text' && buttonStyles.text),
         ...(type === 'contained' && buttonStyles.contained),
         ...(type === 'outlined' && buttonStyles.outlined),
-        boxShadow: hover.map(h => h ? boxShadow : null),
+        boxShadow: hover.map(h => h ? Theme.boxShadow : null),
         filter: disabled?.map(d => d ? 'grayscale(100%)' : null),
         pointerEvents: disabled?.map(d => d ? 'none' : buttonStyles.base.pointerEvents)
     };
@@ -71,9 +71,9 @@ const getStyles = (style, disabled, type, hover) => {
                     case 'text':
                         return 'transparent'
                     case 'contained':
-                        return colours.primary.darker
+                        return Theme.colours.primary.darker
                     case 'outlined':
-                        return colours.primary.baseTrans
+                        return Theme.colours.primary.baseTrans
                 }
             } else {
                 return styleContainer.backgroundColor
@@ -83,7 +83,7 @@ const getStyles = (style, disabled, type, hover) => {
             if (h) {
                 switch (type) {
                     case 'text':
-                        return colours.primary.base
+                        return Theme.colours.primary.base
                     case 'contained':
                         return styleContainer.color
                     case 'outlined':
@@ -117,19 +117,19 @@ const Button = ({
     const rippleColour  = (() => {
         switch (type) {
             case 'text':
-                return colours.ripple.dark
+                return Theme.colours.ripple.dark
             case 'contained':
-                return colours.ripple.light
+                return Theme.colours.ripple.light
             case 'outlined':
-                return colours.ripple.dark
+                return Theme.colours.ripple.dark
         }
     })();
 
     const [ripples, createRipple] = useRipples(rippleColour);
 
     return <div style={{
-        transition: transition,
-        borderRadius: borderRadius,
+        transition: Theme.transition,
+        borderRadius: Theme.borderRadius,
         display: 'inline-block',
     }} {...props}>
         <button

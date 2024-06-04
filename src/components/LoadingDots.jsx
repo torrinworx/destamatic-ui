@@ -1,13 +1,13 @@
 import h from './h'
 
-import { colours } from './Theme';
+import Theme from './Theme';
 
 const LoadingDots = () => {
     const dotStyle = {
         display: 'inline-block',
         width: '8px',
         height: '8px',
-        backgroundColor: colours.primary.base,
+        backgroundColor: Theme.colours.primary.base,
         borderRadius: '50%',
         animationName: 'dotFlashing',
         animationDuration: '1s',
