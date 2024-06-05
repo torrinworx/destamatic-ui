@@ -1,6 +1,7 @@
 import h from './h';
 
 import Button from './Button';
+import Shown from './Shown';
 import Theme from './Theme';
 
 const KebabMenu = ({state}, cleanup) => {
@@ -28,20 +29,22 @@ const KebabMenu = ({state}, cleanup) => {
     }
 
     // Create menu where user clicked
-    return kebab.map(kebab => kebab ?
-    <div $style={{
-        position: 'absolute',
-        left: `${kebab.coords[0]}px`,
-        top: `${kebab.coords[1]}px`,
-        zIndex: 2, 
-        border: `1px solid ${Theme.colours.secondary.base}`,
-        backgroundColor: 'white',
-        borderRadius: Theme.borderRadius, display: 'flex',
-        flexDirection: 'column'
-    }}>
-        <Item each={kebab.items} />
-    </div> : null
-    )
+    return <Shown value={kebab}>
+        {kebab.map(kebab => {
+            return <div $style={{
+                position: 'absolute',
+                left: `${kebab?.coords[0]}px`,
+                top: `${kebab?.coords[1]}px`,
+                zIndex: 2, 
+                border: `1px solid ${Theme.colours.secondary.base}`,
+                backgroundColor: 'white',
+                borderRadius: Theme.borderRadius, display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <Item each={kebab?.items} />
+            </div>
+        })}
+    </Shown>
 }
 
 export default KebabMenu;
