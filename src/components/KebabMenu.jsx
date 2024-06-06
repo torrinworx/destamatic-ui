@@ -1,60 +1,64 @@
 import h from './h';
 import { Observer } from 'destam-dom';
 
-import Button from './Button';
 import Shown from './Shown';
-import Theme from './Theme';
+import Popup from './Popup';
+import Button from './Button';
 
-const KebabMenu = ({value, items, closeOnClick = true}, cleanup, mount) => {
+import IconComponent from './Icon';
 
-    if (!value) {
-        value = Observer.mutable(false);
-    };
+const KebabMenu = ({Icon, children, anchor}) => {
+    if (!Icon) {
+        Icon = <IconComponent libraryName='feather' iconName='more-vertical' />
+    }
 
-    const Div = <div />;
+    const shown = Observer.mutable(false);
+    const ref = <div />;
+    const button = <div />;
 
     // Close if not clicking kebab
     const close = e => {
-        if (!value.get() || e.pageX === value.get().x || e.pageY === value.get().y) return
         let current = e.target;
-        while (current && current !==  Div){
+        while (current && current !== ref){
             current = current.parentElement;
         }
-        if (!current) value.set(false);
-    }
-
-    const Item = ({ each: item }) => {
-        return <Button label={item.label} style={{ width: '100%' }} onClick={() => {
-            if (closeOnClick) value.set(false)
-            item.onClick()
-        }}/>
-    }
+        if (!current) shown.set(false);
+    };
 
     // Listen for click events only when mounted
     const ClickHandler = ({}, cleanup, mount) => {
-        mount(window.addEventListener('click', close));
+        mount(() => {
+            setTimeout(() => {
+                window.addEventListener('click', close);
+            }, 0);
+        });
         cleanup(() => window.removeEventListener('click', close));
 
         return null;
-    }
+    };
 
-    // Create menu where user clicked
-    return <Shown value={value}>
-        <Div $style={{
-            position: 'absolute',
-            left: value.map(value => value?.x + 'px'),
-            top: value.map(value => value?.y + 'px'),
-            zIndex: 2, 
-            border: `1px solid ${Theme.colours.secondary.base}`,
-            backgroundColor: 'white',
-            borderRadius: Theme.borderRadius,
-            display: 'flex',
-            flexDirection: 'column'
-        }}>
+    return <>
+        <Button Icon={Icon} ref={button} onClick={e => {
+            if (shown.get()) {
+                shown.set(false);
+            } else {
+                let bounds = button.getBoundingClientRect();
+
+                switch (anchor) {
+                case 'down-left':
+                    shown.set({right: window.innerWidth - bounds.right, top: bounds.top + bounds.height});
+                    break;
+                default:
+                    shown.set({left: bounds.left, top: bounds.bottom});
+                }
+
+            }
+        }} />
+        <Shown value={shown}>
             <ClickHandler />
-            <Item each={items} />
-        </Div>
-    </Shown>
-}
+            <Popup placement={shown} ref={ref}>{children}</Popup>
+        </Shown>
+    </>;
+};
 
 export default KebabMenu;

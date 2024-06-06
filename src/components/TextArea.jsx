@@ -3,6 +3,8 @@ import { h, Observer } from 'destam-dom';
 import Theme from './Theme';
 
 const Textarea = ({value, style, maxHeight = 200, id, onkeydown, placeholder, ...props}, _, mounted) => {
+	if (!value) value = Observer.mutable('');
+
 	const Ref = <textarea />;
 	const isMounted = Observer.mutable(false);
 	const isFocused = Observer.mutable(false)

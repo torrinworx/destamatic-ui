@@ -95,7 +95,6 @@ const getStyles = (style, disabled, type, hover) => {
 }
 
 const Button = ({
-    children,
     label='',
     type='text',
     onClick,
@@ -103,6 +102,7 @@ const Button = ({
     style,
     disabled,
     hover,
+    ref: Ref,
     ...props
 }) => {
     /*
@@ -125,7 +125,11 @@ const Button = ({
 
     const [ripples, createRipple] = useRipples(rippleColour);
 
-    return <div style={{
+    if (!Ref) {
+        Ref = <div />;
+    }
+
+    return <Ref style={{
         transition: Theme.transition,
         borderRadius: Theme.borderRadius,
         display: 'inline-block',
@@ -144,7 +148,7 @@ const Button = ({
             {label ? <div style={{margin: '10px 20px'}}>{label}</div>: null}
             {ripples}
         </button>
-    </div>;
+    </Ref>;
 };
 
 export default Button;

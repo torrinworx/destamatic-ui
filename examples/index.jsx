@@ -1,5 +1,6 @@
 import { h } from 'destam-dom';
 import { Observer, mount } from 'destam-dom';
+import Popup, {popups} from '../src/components/Popup';
 import {
     Theme,
     Typography,
@@ -10,7 +11,8 @@ import {
     Input,
     TextArea,
     Drawer,
-    Chevron
+    Chevron,
+    KebabMenu,
 } from '../src';
 
 const DemoPage = () => {
@@ -20,10 +22,25 @@ const DemoPage = () => {
 
     const drawerOpen = Observer.mutable(false);
 
+    const kebabValue = Observer.mutable({x: 0, y: 0});
+
     return <div $style={{
         fontFamily: 'Roboto, sans-serif',
         padding: '20px',
+        inset: '0px',
+        position: 'absolute',
     }}>
+        <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
+            <Typography variant="h1">Destamatic UI Demo</Typography>
+            <Typography variant="h2">Typography</Typography>
+            <Typography variant="h3">Heading 3 Regular</Typography>
+            <Typography variant="h3" bold>Heading 3 Bold</Typography>
+            <Typography variant="p1">Paragraph 1 Regular</Typography>
+            <Typography variant="p1" bold>Paragraph 1 Bold</Typography>
+            <Typography variant="p2">Paragraph 2 Regular</Typography>
+            <Typography variant="p2" bold>Paragraph 2 Bold</Typography>
+        </Popup>
+
         <Typography variant="h1">Destamatic UI Demo</Typography>
         <Typography variant="h2">Typography</Typography>
         <Typography variant="h3">Heading 3 Regular</Typography>
@@ -77,7 +94,27 @@ const DemoPage = () => {
         <div>
             <Chevron />
         </div>
+
+        <div $style={{
+            position: 'absolute',
+            top: '0px',
+            right: '0px',
+        }}>
+            <KebabMenu anchor='down-left'>
+                <div $style={{
+                    background: 'grey',
+                    borderRadius: '10px',
+                }}>
+                    <Button label='hello' />
+                    <br />
+                    <Button label='world' />
+                </div>
+            </KebabMenu>
+        </div>
     </div>;
 };
 
-mount(document.body, <DemoPage />);
+mount(document.body, <>
+    <DemoPage />
+    {popups}
+</>);
