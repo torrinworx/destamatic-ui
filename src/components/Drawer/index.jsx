@@ -6,27 +6,41 @@ import Button from "../Button";
 import Icon from '../Icon';
 import Theme from '../Theme';
 
-
-const Drawer = ({ children, open, ...props }) => {
+const Drawer = ({ children, open, ...props }, cleanup) => {
     const width = '25vw';
     if (!open) {
         open = Observer.mutable(false);
     }
 
-    // TODO: Need to make sure the width ease/transform thingy isn't applied when the screen is getting
-    // resized by the user because it looks weird.
+    const resizing = Observer.mutable(false);
+    let resizeTimeout;
+
+    // Event handler to disable transitions during resize
+    const handleResize = () => {
+        resizing.set(true);
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            resizing.set(false);
+        }, 200);  // Adjust the timeout as needed
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup resize event listener when the component unmounts
+    cleanup(() => window.removeEventListener('resize', handleResize));
 
     return <div
         $style={{
             height: '100%',
             boxSizing: 'border-box',
         }}
+        {...props}
     >
         <div
             $style={{
                 height: '100%',
                 boxSizing: 'border-box',
-                transition: 'width 0.3s ease-in-out',
+                transition: resizing.map(r => r ? 'none' : 'width 0.3s ease-in-out'),
                 width: open.map(o => o ? width : '0px'),
             }}
         >
@@ -35,12 +49,12 @@ const Drawer = ({ children, open, ...props }) => {
                     width: width,
                     height: '100%',
                     boxSizing: 'border-box',
-                    transition: 'transform 0.3s ease-in-out',
+                    transition: resizing.map(r => r ? 'none' : 'transform 0.3s ease-in-out'),
                     transform: open.map(o => o ? 'translateX(0)' : `translateX(-${width})`),
                     overflow: 'auto',
                 }}
             >
-                <div $style={{ boxSizing: 'border-box', padding: '20px', height: '100%'}}>
+                <div $style={{ boxSizing: 'border-box', padding: '20px', height: '100%' }}>
                     <div $style={{
                         boxShadow: Theme.boxShadow,
                         borderRadius: Theme.borderRadius,
