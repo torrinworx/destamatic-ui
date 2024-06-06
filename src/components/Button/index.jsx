@@ -9,9 +9,7 @@ const buttonStyles = {
     base: {
         fontFamily: 'Roboto, sans-serif',
         fontSize: '0.875rem',
-        fontWeight: 500,
-        letterSpacing: '.0892857143em',
-        textTransform: 'uppercase',
+        fontWeight: 'bold',
         height: '40px',
         display: 'inline-flex',
         alignItems: 'center',
@@ -52,7 +50,6 @@ const buttonStyles = {
 const getStyles = (style, disabled, type, hover) => {
     // Internal wrapper for getting around issue where styles dictionary can't be observers
     const styleContainer = {
-        ...style,
         cursor: disabled?.map(d => d ? 'default' : buttonStyles.base.cursor),
         ...buttonStyles.base,
         ...(type === 'text' && buttonStyles.text),
@@ -60,7 +57,8 @@ const getStyles = (style, disabled, type, hover) => {
         ...(type === 'outlined' && buttonStyles.outlined),
         boxShadow: hover.map(h => h ? Theme.boxShadow : null),
         filter: disabled?.map(d => d ? 'grayscale(100%)' : null),
-        pointerEvents: disabled?.map(d => d ? 'none' : buttonStyles.base.pointerEvents)
+        pointerEvents: disabled?.map(d => d ? 'none' : buttonStyles.base.pointerEvents),
+        ...style,
     };
 
     return {
@@ -97,7 +95,6 @@ const getStyles = (style, disabled, type, hover) => {
 }
 
 const Button = ({
-    children,
     label='',
     type='text',
     onClick,
@@ -105,6 +102,7 @@ const Button = ({
     style,
     disabled,
     hover,
+    ref: Ref,
     ...props
 }) => {
     /*
@@ -127,7 +125,11 @@ const Button = ({
 
     const [ripples, createRipple] = useRipples(rippleColour);
 
-    return <div style={{
+    if (!Ref) {
+        Ref = <div />;
+    }
+
+    return <Ref style={{
         transition: Theme.transition,
         borderRadius: Theme.borderRadius,
         display: 'inline-block',
@@ -146,7 +148,7 @@ const Button = ({
             {label ? <div style={{margin: '10px 20px'}}>{label}</div>: null}
             {ripples}
         </button>
-    </div>;
+    </Ref>;
 };
 
 export default Button;

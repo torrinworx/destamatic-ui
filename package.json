@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "destam": "^0.2.0",
-    "destam-dom": "^0.7.2"
+    "destam-dom": "^0.7.3"
   },
   "optionalDependencies": {
     "feather-icons": "^4.29.1",
