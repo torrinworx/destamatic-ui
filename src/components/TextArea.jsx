@@ -2,7 +2,7 @@ import { h, Observer } from 'destam-dom';
 
 import Theme from './Theme';
 
-const Textarea = ({value, style, maxHeight = 200, id, onkeydown, placeholder, ...props}, _, mounted) => {
+const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, placeholder, ...props}, _, mounted) => {
 	if (!value) value = Observer.mutable('');
 
 	const Ref = <textarea />;
@@ -14,7 +14,7 @@ const Textarea = ({value, style, maxHeight = 200, id, onkeydown, placeholder, ..
 		$id={id}
 		$placeholder={placeholder}
 		$value={value}
-		$onkeydown={onkeydown}
+		$onkeydown={onKeyDown}
 		$oninput={e => value.set(e.target.value)}
 		$onfocus={() => isFocused.set(true)}
 		$onblur={() => isFocused.set(false)}
@@ -27,7 +27,6 @@ const Textarea = ({value, style, maxHeight = 200, id, onkeydown, placeholder, ..
 			borderRadius: Theme.borderRadius,
 			border: `${Theme.outline} ${Theme.colours.secondary.base}`,
 			fontSize: '14px',
-			...style,
 			outline: isFocused.map(f => f ? `${Theme.outline} ${Theme.colours.primary.base}` : null),
 			height: isMounted.map(mounted => {
 				if (!mounted) return 'auto';
@@ -52,6 +51,7 @@ const Textarea = ({value, style, maxHeight = 200, id, onkeydown, placeholder, ..
 					return calculatedHeight + 'px';
 				}).memo();
 			}).unwrap(),
+			...style
 		}}
 		{...props}
 	/>;

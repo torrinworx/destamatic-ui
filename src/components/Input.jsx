@@ -14,14 +14,17 @@ const Input = ({value, type='text', placeholder = '', style, ...props}) => {
 		$onfocus={() => isFocused.set(true)}
 		$onblur={() => isFocused.set(false)}
         $style={{
-            ...style,
             minwidth: '100px',
             fontSize: '14px',
             padding: `0px ${Theme.padding} 0px ${Theme.padding}`,
             height: Theme.height,
             border: `${Theme.outline} ${Theme.colours.secondary.base}`,
             borderRadius: Theme.borderRadius,
-            outline: isFocused.map(f => f ? `${Theme.outline} ${Theme.colours.primary.base}` : null)
+            outline: isFocused.map(f => 
+                f ? `${Theme.outline} ${Theme.colours.primary.base}` : null
+            ),
+            ...style,
+
         }}
         {...props}
     />
