@@ -2,19 +2,21 @@ import h from './h';
 import Shown from './Shown';
 
 import { Observer } from 'destam-dom';
+import Icon from './Icon';
 
 const DropDown = ({ children, label }) => {
     const isDropedDown = Observer.mutable(false)
 
     const toggle = () => isDropedDown.set(!isDropedDown.get())
 
-    return <div $onclick={toggle}>
-        <div $style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    return <div>
+        <div $style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} $onclick={toggle}>
             {label}
             <div $style={{ display: 'flex', alignItems: 'center' }}>
                 <i $class='chevron-icon' $style={{ cursor: 'pointer' }}>
-                    {/* replace with icon component: */}
-                    {isDropedDown.map((show) => show ? `⏶` : `⏷`)}
+                    {isDropedDown.map((show) => show ?
+                        <Icon size='20' libraryName='feather' iconName='chevron-down' /> :
+                        <Icon size='20' libraryName='feather' iconName='chevron-right' />)}
                 </i>
             </div>
         </div>
