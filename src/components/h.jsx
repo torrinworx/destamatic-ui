@@ -1,4 +1,4 @@
-import { h as destam_h, mount} from 'destam-dom';
+import { h as destam_h, mount, getFirst} from 'destam-dom';
 import Observer, {observerGetter, shallowListener} from 'destam/Observer';
 
 // This h element overrides the default behavoior that destam-dom gives for
@@ -145,7 +145,9 @@ const h = (name, props, ...children) => {
 		const rem = mount(elem, handler, before);
 		let sigs = signals.map(signal => signal());
 
-		return () => {
+		return arg => {
+			if (arg === getFirst) return rem(getFirst);
+
 			rem();
 			for (const sig of sigs) sig();
 		};
