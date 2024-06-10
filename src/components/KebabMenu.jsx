@@ -45,8 +45,11 @@ const KebabMenu = ({Icon, children, anchor}) => {
                 let bounds = button.getBoundingClientRect();
 
                 switch (anchor) {
+                case 'up-right':
+                    shown.set({left: bounds.left, bottom: window.innerHeight - bounds.bottom + bounds.height});
+                    break;
                 case 'down-left':
-                    shown.set({right: window.innerWidth - bounds.right, top: bounds.top + bounds.height});
+                    shown.set({right: window.innerWidth - bounds.right, top: bounds.bottom});
                     break;
                 default:
                     shown.set({left: bounds.left, top: bounds.bottom});
