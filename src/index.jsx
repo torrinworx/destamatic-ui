@@ -10,6 +10,7 @@ export { default as KebabMenu } from './components/KebabMenu'
 export { default as LoadingDots } from './components/LoadingDots';
 export { default as Ripple } from './components/Ripple';
 export { updateStateTree, replaceStateTree } from './components/stateTree';
+export { default as Shown } from './components/Shown'
 export { default as TextArea } from './components/TextArea';
 export { default as Theme } from './components/Theme';
 export { default as Typography } from './components/Typography';
