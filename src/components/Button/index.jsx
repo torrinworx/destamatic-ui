@@ -5,7 +5,9 @@ import Observer from 'destam/Observer';
 import useRipples from '../Ripple.jsx';
 import Theme from '../Theme.jsx';
 
-const buttonStyles = {
+let buttonStyles = {}
+
+const createButtonStyles = () => buttonStyles = {
     base: {
         fontFamily: 'Roboto, sans-serif',
         fontSize: '0.875rem',
@@ -105,6 +107,7 @@ const Button = ({
     ref: Ref,
     ...props
 }) => {
+    if (!Object.keys(buttonStyles).length) createButtonStyles()
     /*
     `disabled` is expected to be an observer.
     */
