@@ -6,7 +6,7 @@ import Button from "../Button";
 import Icon from '../Icon';
 import Theme from '../Theme';
 
-const Drawer = ({ children, open, ...props }, cleanup) => {
+const Drawer = ({ children, open, style, ...props }, cleanup) => {
     const width = '25vw';
     if (!open) {
         open = Observer.mutable(false);
@@ -54,18 +54,15 @@ const Drawer = ({ children, open, ...props }, cleanup) => {
                     overflow: 'auto',
                 }}
             >
-                <div $style={{ boxSizing: 'border-box', padding: '20px', height: '100%' }}>
                     <div $style={{
-                        boxShadow: Theme.boxShadow,
-                        borderRadius: Theme.borderRadius,
                         boxSizing: 'border-box',
                         border: `1px solid ${Theme.colours.secondary.base}`,
                         height: '100%',
                         padding: '10px',
-                        overflowY: 'hidden'
+                        overflowY: 'hidden',
+                        ...style
                     }}>
                         {children}
-                    </div>
                 </div>
             </div>
         </div>
