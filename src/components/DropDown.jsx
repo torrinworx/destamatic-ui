@@ -10,8 +10,7 @@ const DropDown = ({ children, label }) => {
     const toggle = () => isDropedDown.set(!isDropedDown.get())
 
     return <div>
-        <div $style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} $onclick={toggle}>
-            {label}
+        <div $style={{ display: 'flex', alignItems: 'center' }} $onclick={toggle}>
             <div $style={{ display: 'flex', alignItems: 'center' }}>
                 <i $class='chevron-icon' $style={{ cursor: 'pointer' }}>
                     {isDropedDown.map((show) => show ?
@@ -19,6 +18,7 @@ const DropDown = ({ children, label }) => {
                         <Icon size='20' libraryName='feather' iconName='chevron-right' />)}
                 </i>
             </div>
+            {label}
         </div>
         <Shown value={isDropedDown} children={children} />
     </div>
