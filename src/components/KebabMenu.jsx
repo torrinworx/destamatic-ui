@@ -13,7 +13,7 @@ const KebabMenu = ({Icon, shown, children, anchor}) => {
     }
 
     if (!shown){
-        const shown = Observer.mutable(false);
+        shown = Observer.mutable(false);
     }
 
     const ref = <div />;
