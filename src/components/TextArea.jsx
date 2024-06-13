@@ -32,7 +32,7 @@ const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, place
 		// Filter out suggestions that could be possible
 		const matches = suggestions.filter(suggestion => suggestion.startsWith(currentWord))
 		
-		// Dummy element to mimim location of text cursor
+		// Dummy element to mimic location of text cursor
 		let elem = <div $style={{
 			resize: 'none',
 			paddingTop: '0px',
@@ -126,7 +126,7 @@ const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, place
 			}}
 			{...props}
 		/>
-		<Shown value={autocomplete.map(match => match.matches)}>
+		<Shown value={autocomplete.map(match => match.matches.length)}>
 			<Popup placement={autocomplete}>
 				<div $style={{
                         background: 'white',
