@@ -45,7 +45,8 @@ const h = (name, props, ...children) => {
 		if (style) {
 			let apply = style => {
 				if (typeof style === 'string') {
-					return style;
+					name.setAttribute('style', style);
+					return;
 				}
 
 				let dynamicProps = [];
