@@ -30,7 +30,7 @@ const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, place
 		if (!currentWord) return
 
 		// Filter out suggestions that could be possible
-		const matches = suggestions.filter(suggestion => suggestion.startsWith(currentWord))
+		const matches = suggestions.get().filter(suggestion => suggestion.startsWith(currentWord))
 		
 		// Dummy element to mimic location of text cursor
 		let elem = <div $style={{
@@ -58,7 +58,12 @@ const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, place
 		autocomplete.set({matches, bottom: window.innerHeight - (top + ref.top), left: left + ref.left, top: null })
 	};
 
-	if (suggestions?.length) value.watch(() => checkMatches())
+	// only check list of suggestions if it exists
+	suggestions.watch(() => {
+		if (suggestions.get()?.length){
+			value.watch(() => checkMatches())
+		}
+	}).call()
 
 	autocompleteMatch = (match) => {
 		// Get current value and cursor(caret) position
@@ -73,7 +78,7 @@ const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, place
 
 		value.set(text.slice(0, startIndex + 1) + match + text.slice(cursorPos))
 		autocomplete.set({matches: [], bottom: 0, left: 0})
-		selectSuggestion.set(suggestions.indexOf(match))
+		selectSuggestion.set(suggestions.get().indexOf(match))
 	}
 	
 	const Suggestion = ({each: match}) => {
