@@ -5,7 +5,7 @@ import Popup from './Popup';
 import Shown from './Shown';
 import Button from './Button';
 
-const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, placeholder, suggestions, ...props}, _, mounted) => {
+const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, placeholder, suggestions, selectSuggestion, ...props}, _, mounted) => {
 	if (!value) value = Observer.mutable('');
 
 	const Ref = <textarea />;
@@ -73,6 +73,7 @@ const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, place
 
 		value.set(text.slice(0, startIndex + 1) + match + text.slice(cursorPos))
 		autocomplete.set({matches: [], bottom: 0, left: 0})
+		selectSuggestion.set(suggestions.indexOf(match))
 	}
 	
 	const Suggestion = ({each: match}) => {
