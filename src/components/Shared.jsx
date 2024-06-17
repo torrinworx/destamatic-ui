@@ -1,11 +1,14 @@
-import { OObject } from "destam-dom"
-import Theme from "./Theme"
-import Router from "./Router";
+import { OObject } from 'destam-dom';
+import Theme from './Theme';
+import { currentRoute } from './Router';
 
-// A simple way to have a standard shared object acrross destamatic-ui
+/**
+ * Global context observer for shared state across components.
+ * @type {Object}
+ */
 const Shared = OObject({
     Theme: Theme,
-    Router: Router
-})
+    currentRoute: currentRoute,
+});
 
 export default Shared;
