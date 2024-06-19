@@ -57,6 +57,8 @@ const getStyles = (style, disabled, type, hover) => {
         ...(type === 'text' && buttonStyles.text),
         ...(type === 'contained' && buttonStyles.contained),
         ...(type === 'outlined' && buttonStyles.outlined),
+        transition: Theme.transition,
+        borderRadius: Theme.borderRadius,
         boxShadow: hover.map(h => h ? Theme.boxShadow : null),
         filter: disabled?.map(d => d ? 'grayscale(100%)' : null),
         pointerEvents: disabled?.map(d => d ? 'none' : buttonStyles.base.pointerEvents),
@@ -132,11 +134,7 @@ const Button = ({
         Ref = <div />;
     }
 
-    return <Ref style={{
-        transition: Theme.transition,
-        borderRadius: Theme.borderRadius,
-        display: 'inline-block',
-    }} {...props}>
+    return <Ref style={style} {...props}>
         <button
             onClick={(event) => {
                 createRipple(event);
