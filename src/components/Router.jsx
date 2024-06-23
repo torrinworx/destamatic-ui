@@ -14,14 +14,14 @@ export const currentRoute = Observer.mutable('');
  * @param {Function} [NotFound] - Optional. A component to render when the route is not found.
  * @returns {HTMLElement} The component that matches the current route, or a 404 message if no match is found.
  */
-export const Router = ({ routes, Shared, NotFound }) => {
+export const Router = ({ routes, Shared, NotFound, ...props }) => {
     return currentRoute.map(route => {
         // Default to the root route if no path is provided
         if (!route) route = '/';
 
         const Component = routes[route];
         return Component 
-            ? <Component Shared={Shared} /> 
-            : (NotFound ? <NotFound /> : <div>404 - Not Found</div>);
+            ? <Component Shared={Shared} {...props} /> 
+            : (NotFound ? <NotFound Shared={Shared} {...props} /> : <div>404 - Not Found</div>);
     });
 };
