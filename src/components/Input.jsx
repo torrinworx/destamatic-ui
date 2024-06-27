@@ -3,10 +3,19 @@ import h from './h';
 import { Observer } from 'destam-dom';
 import Theme from './Theme';
 
-const Input = ({value, type='text', placeholder = '', style, ...props}) => {
+const Input = ({value, type='text', placeholder = '', style, ...props}, _, mount) => {
     const isFocused = Observer.mutable(false)
 
-    return <input
+    const Ref = <input />
+
+    mount(() => {
+        if (props.autoFocus){
+            Ref.focus()
+            isFocused.set(true)
+        }
+    })
+
+    return <Ref
         $value={value}
         $type={type}
         $placeholder={placeholder}
