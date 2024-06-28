@@ -143,10 +143,7 @@ const Button = ({
             onMouseEnter={() => hover.set(true)}
             onMouseLeave={() => hover.set(false)}
             style={getStyles(style, disabled, type, hover)}
-            disabled={disabled?.map(d =>{
-                if (label === 'Ask') console.log(Ref)
-                return d ? true : false
-            })}
+            disabled={disabled?.map(d =>  d ? true : false )}
         >
             {Icon ? <i style={buttonStyles.icon}>{Icon}</i> : null}
             {label ? <div style={{margin: '10px 20px'}}>{label}</div>: null}
