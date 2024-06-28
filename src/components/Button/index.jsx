@@ -61,7 +61,7 @@ const getStyles = (style, disabled, type, hover) => {
         borderRadius: Theme.borderRadius,
         boxShadow: hover.map(h => h ? Theme.boxShadow : null),
         filter: disabled?.map(d => d ? 'grayscale(100%)' : null),
-        pointerEvents: disabled?.map(d => d ? 'none' : buttonStyles.base.pointerEvents),
+        pointerEvents: disabled?.map(d => d ? 'none' : 'auto'),
         ...style,
     };
 
@@ -143,7 +143,10 @@ const Button = ({
             onMouseEnter={() => hover.set(true)}
             onMouseLeave={() => hover.set(false)}
             style={getStyles(style, disabled, type, hover)}
-            $disabled={disabled?.map(d => d ? true : false)}
+            disabled={disabled?.map(d =>{
+                if (label === 'Ask') console.log(Ref)
+                return d ? true : false
+            })}
         >
             {Icon ? <i style={buttonStyles.icon}>{Icon}</i> : null}
             {label ? <div style={{margin: '10px 20px'}}>{label}</div>: null}
