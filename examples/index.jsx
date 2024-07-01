@@ -74,7 +74,7 @@ const DemoPage = () => {
 
         <Typography variant="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
         <DropDown label="Click to Toggle">
-            <div $style={{ padding: '10px', border: `1px solid ${Theme.colours.secondary.base}` }}>
+            <div $style={{ padding: '10px', border: `1px solid ${Theme.Colours.secondary.base}` }}>
                 Dropdown Content
             </div>
         </DropDown>

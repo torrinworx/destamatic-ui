@@ -49,10 +49,10 @@ const Input = ({ value, type='text', placeholder = '', style, ...props }, _, mou
             font: Shared.Theme.Typography.p1.regular,
             padding: `0px ${Shared.Theme.padding} 0px ${Shared.Theme.padding}`,
             height: Shared.Theme.height,
-            border: `${Shared.Theme.outline} ${Shared.Theme.colours.secondary.base}`,
+            border: `${Shared.Theme.outline} ${Shared.Theme.Colours.secondary.base}`,
             borderRadius: Shared.Theme.borderRadius,
             outline: isFocused.map(f => 
-                f ? `${Shared.Theme.outline} ${Shared.Theme.colours.primary.base}` : null
+                f ? `${Shared.Theme.outline} ${Shared.Theme.Colours.primary.base}` : null
             ),
             ...style,
         }}

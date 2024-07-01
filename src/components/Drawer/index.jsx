@@ -56,7 +56,7 @@ const Drawer = ({ children, open, style, ...props }, cleanup) => {
             >
                     <div $style={{
                         boxSizing: 'border-box',
-                        border: `1px solid ${Theme.colours.secondary.base}`,
+                        border: `1px solid ${Theme.Colours.secondary.base}`,
                         height: '100%',
                         padding: '10px',
                         overflowY: 'hidden',

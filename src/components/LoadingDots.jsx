@@ -1,5 +1,5 @@
 import h from './h';
-import Theme from './Theme';
+import Shared from './Shared';
 
 /**
  * LoadingDots component - a loading indicator with three animated dots.
@@ -11,7 +11,7 @@ const LoadingDots = () => {
         display: 'inline-block',
         width: '8px',
         height: '8px',
-        backgroundColor: Theme.colours.primary.base,
+        backgroundColor: Shared.Theme.Colours.primary.base,
         borderRadius: '50%',
         animationName: 'dotFlashing',
         animationDuration: '1s',

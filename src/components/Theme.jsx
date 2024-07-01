@@ -22,7 +22,7 @@ const Theme = OObject({
     /**
      * Colours
      */
-    colours: OObject({
+    Colours: OObject({
         primary: OObject({
             base: '#02CA9F', // Main color for primary actions
             baseTrans: 'rgba(2, 202, 159, 0.1)', // Base but transparent
@@ -96,8 +96,6 @@ Theme.Typography = OObject({
 Theme.Button = OObject({
     base: OObject({
         fontFamily: Theme.font,
-        fontSize: '0.875rem',
-        fontWeight: 'bold',
         height: '40px',
         display: 'inline-flex',
         alignItems: 'center',
@@ -120,7 +118,7 @@ Theme.Button = OObject({
         }),
         hover: OObject({
             backgroundColor: 'transparent',
-            color: Theme.colours.primary.base,
+            color: Theme.Colours.primary.base,
         }),
         disabled: OObject({
             cursor: 'default',
@@ -130,12 +128,12 @@ Theme.Button = OObject({
     }),
     contained: OObject({
         base: OObject({
-            backgroundColor: Theme.colours.primary.base,
-            color: Theme.colours.primary.onPrimary,
+            backgroundColor: Theme.Colours.primary.base,
+            color: Theme.Colours.primary.onPrimary,
         }),
         hover: OObject({
-            backgroundColor: Theme.colours.primary.darker,
-            color: Theme.colours.primary.onPrimary,
+            backgroundColor: Theme.Colours.primary.darker,
+            color: Theme.Colours.primary.onPrimary,
         }),
         disabled: OObject({
             cursor: 'default',
@@ -146,12 +144,12 @@ Theme.Button = OObject({
     outlined: OObject({
         base: OObject({
             backgroundColor: 'transparent',
-            border: `2px solid ${Theme.colours.primary.lighter}`,
-            color: Theme.colours.primary.base,
+            border: `2px solid ${Theme.Colours.primary.lighter}`,
+            color: Theme.Colours.primary.base,
         }),
         hover: OObject({
-            backgroundColor: Theme.colours.primary.baseTrans,
-            color: Theme.colours.primary.base,
+            backgroundColor: Theme.Colours.primary.baseTrans,
+            color: Theme.Colours.primary.base,
         }),
         disabled: OObject({
             cursor: 'default',

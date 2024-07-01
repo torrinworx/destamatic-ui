@@ -22,18 +22,20 @@ import Typography from '../Typography.jsx';
  * 
  * @returns {JSX.Element} The rendered button element.
  */
-const Button = ({
-    label = '',
-    type = 'text',
-    onClick,
-    onMouseDown,
-    Icon,
-    style,
-    disabled,
-    hover,
-    ref: Ref,
-    ...props
-}) => {
+const Button = (
+    {
+        label = '',
+        type = 'text',
+        onClick,
+        onMouseDown,
+        Icon,
+        style,
+        disabled,
+        hover,
+        ref: Ref,
+        ...props
+    }
+) => {
     if (!disabled) disabled = Observer.mutable(false);
     if (!hover) hover = Observer.mutable(false);
     if (!Ref) Ref = <div />;
@@ -46,13 +48,13 @@ const Button = ({
     const [ripples, createRipple] = useRipples((() => {
         switch (type) {
             case 'text':
-                return Shared.Theme.colours.ripple.dark;
+                return Shared.Theme.Colours.ripple.dark;
             case 'contained':
-                return Shared.Theme.colours.ripple.light;
+                return Shared.Theme.Colours.ripple.light;
             case 'outlined':
-                return Shared.Theme.colours.ripple.dark;
+                return Shared.Theme.Colours.ripple.dark;
             default:
-                return Shared.Theme.colours.ripple.dark;
+                return Shared.Theme.Colours.ripple.dark;
         }
     })());
 

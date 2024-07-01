@@ -6,11 +6,11 @@ import Shared from './Shared';
 /**
  * Custom hook for creating ripple effects.
  * 
- * @param {string} [background=Shared.Theme.colours.ripple.dark] - The background color of the ripple effect.
+ * @param {string} [background=Shared.Theme.Colours.ripple.dark] - The background color of the ripple effect.
  * 
  * @returns {[Array<JSX.Element>, Function]} - Returns a tuple where the first element is the array of ripple elements and the second is the function to create a ripple.
  */
-const useRipples = (background = Shared.Theme.colours.ripple.dark) => {
+const useRipples = (background = Shared.Theme.Colours.ripple.dark) => {
     const ripples = OArray();
 
     /**

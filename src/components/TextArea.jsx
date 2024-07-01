@@ -55,9 +55,9 @@ const Textarea = (
             height: Shared.Theme.height,
             padding: Shared.Theme.padding,
             borderRadius: Shared.Theme.borderRadius,
-            border: `${Shared.Theme.outline} ${Shared.Theme.colours.secondary.base}`,
+            border: `${Shared.Theme.outline} ${Shared.Theme.Colours.secondary.base}`,
             font: Shared.Theme.Typography.p1.regular,
-            outline: isFocused.map(f => f ? `${Shared.Theme.outline} ${Shared.Theme.colours.primary.base}` : null),
+            outline: isFocused.map(f => f ? `${Shared.Theme.outline} ${Shared.Theme.Colours.primary.base}` : null),
             height: isMounted.map(mounted => {
                 if (!mounted) return 'auto';
 
