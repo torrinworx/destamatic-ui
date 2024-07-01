@@ -1,11 +1,23 @@
 import h from './h';
 
 import { OArray, Observer } from 'destam-dom';
-import Theme from './Theme'
+import Shared from './Shared';
 
-const useRipples = (background = Theme.colours.ripple.dark) => {
+/**
+ * Custom hook for creating ripple effects.
+ * 
+ * @param {string} [background=Shared.Theme.colours.ripple.dark] - The background color of the ripple effect.
+ * 
+ * @returns {[Array<JSX.Element>, Function]} - Returns a tuple where the first element is the array of ripple elements and the second is the function to create a ripple.
+ */
+const useRipples = (background = Shared.Theme.colours.ripple.dark) => {
     const ripples = OArray();
 
+    /**
+     * Creates a ripple effect at the location of the click event.
+     * 
+     * @param {MouseEvent} event - The click event triggering the ripple.
+     */
     const createRipple = (event) => {
         const button = event.currentTarget;
         const diameter = Math.max(button.clientWidth, button.clientHeight);

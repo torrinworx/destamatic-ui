@@ -1,7 +1,11 @@
-import h from './h'
-
+import h from './h';
 import Theme from './Theme';
 
+/**
+ * LoadingDots component - a loading indicator with three animated dots.
+ * 
+ * @returns {JSX.Element} The rendered loading dots component.
+ */
 const LoadingDots = () => {
     const dotStyle = {
         display: 'inline-block',
@@ -26,7 +30,7 @@ const LoadingDots = () => {
                 50% { opacity: 1; }
             }
         `}</style>
-    </div>
-}
+    </div>;
+};
 
 export default LoadingDots;
