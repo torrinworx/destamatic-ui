@@ -48,6 +48,88 @@ const Theme = OObject({
             bold: 'bold 16px Roboto, sans-serif'
         }),
     })
-})
+});
+
+Theme.Button = OObject({
+    base: OObject({
+        fontFamily: 'Roboto, sans-serif',
+        fontSize: '0.875rem',
+        fontWeight: 'bold',
+        height: '40px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        userSelect: 'none',
+        border: 'none',
+        outline: 'none',
+        borderRadius: Theme.borderRadius,
+        lineHeight: '2.25rem',
+        cursor: 'pointer',
+        textDecoration: 'none',
+        position: 'relative',
+        overflow: 'hidden',
+        transition: Theme.transition,
+    }),
+    text: OObject({
+        base: OObject({
+            backgroundColor: 'transparent',
+            color: 'black',
+        }),
+        hover: OObject({
+            backgroundColor: 'transparent',
+            color: Theme.colours.primary.base,
+        }),
+        disabled: OObject({
+            cursor: 'default',
+            filter: 'grayscale(100%)',
+            pointerEvents: 'none',
+        }),
+    }),
+    contained: OObject({
+        base: OObject({
+            backgroundColor: Theme.colours.primary.base,
+            color: Theme.colours.primary.onPrimary,
+        }),
+        hover: OObject({
+            backgroundColor: Theme.colours.primary.darker,
+            color: Theme.colours.primary.onPrimary,
+        }),
+        disabled: OObject({
+            cursor: 'default',
+            filter: 'grayscale(100%)',
+            pointerEvents: 'none',
+        }),
+    }),
+    outlined: OObject({
+        base: OObject({
+            backgroundColor: 'transparent',
+            border: `2px solid ${Theme.colours.primary.lighter}`,
+            color: Theme.colours.primary.base,
+        }),
+        hover: OObject({
+            backgroundColor: Theme.colours.primary.baseTrans,
+            color: Theme.colours.primary.base,
+        }),
+        disabled: OObject({
+            cursor: 'default',
+            filter: 'grayscale(100%)',
+            pointerEvents: 'none',
+        }),
+    }),
+    icon: OObject({
+        base: OObject({
+            margin: '0px 6px 0px 6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px',
+        }),
+        disabled: OObject({
+            cursor: 'default',
+            filter: 'grayscale(100%)',
+            pointerEvents: 'none',
+        }),
+    })
+});
 
 export default Theme;
