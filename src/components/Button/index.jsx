@@ -1,12 +1,15 @@
 import h from '../h';
 import Observer from 'destam/Observer';
-import useRipples from '../Ripple.jsx';
+
 import Shared from '../Shared.jsx';
+import useRipples from '../Ripple.jsx';
+import Typography from '../Typography.jsx';
 
 const Button = ({
     label = '',
     type = 'text',
     onClick,
+    onMouseDown,
     Icon,
     style,
     disabled,
@@ -43,24 +46,26 @@ const Button = ({
         pointerEvents: disabled.map(d => d ? Shared.Theme.Button[type].disabled.pointerEvents : 'auto'),
     }
 
-    return (
-        <Ref style={style} {...props}>
-            <button
-                onClick={(event) => {
-                    createRipple(event);
-                    onClick && onClick(event);
-                }}
-                onMouseEnter={() => hover.set(true)}
-                onMouseLeave={() => hover.set(false)}
-                style={buttonStyle}
-                disabled={disabled.map(d => d ? true : false)}
-            >
-                {Icon ? <i style={Shared.Theme.Button.icon.base}>{Icon}</i> : null}
-                {label ? <div style={{ margin: '10px 20px' }}>{label}</div> : null}
-                {ripples}
-            </button>
-        </Ref>
-    );
+    return <Ref style={style} {...props}>
+        <button
+            onClick={(event) => {
+                createRipple(event);
+                onClick && onClick(event);
+            }}
+            onMouseDown={(event) => {
+                createRipple(event);
+                onMouseDown && onMouseDown(event);
+            }}
+            onMouseEnter={() => hover.set(true)}
+            onMouseLeave={() => hover.set(false)}
+            style={buttonStyle}
+            disabled={disabled.map(d => d ? true : false)}
+        >
+            {Icon ? <i style={Shared.Theme.Button.icon.base}>{Icon}</i> : null}
+            {label ? <Typography style={{ margin: '10px 20px' }}>{label}</Typography> : null}
+            {ripples}
+        </button>
+    </Ref>;
 };
 
 export default Button;

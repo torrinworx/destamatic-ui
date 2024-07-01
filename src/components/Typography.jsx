@@ -1,27 +1,17 @@
 import { h } from 'destam-dom';
 
-import Theme from './Theme';
+import Shared from './Shared';
 
-const Typography = ({ variant, bold, children, style, ...props }) => {
-    const getTypographyStyle = () => {
-        const typographyStyles = Theme.typography[variant];
-        if (bold && typographyStyles.bold) {
-            return typographyStyles.bold;
-        }
-        return typographyStyles.regular || '';
-    };
-
-    return (
-        <div
-            $style={{
-                ...style,
-                font: getTypographyStyle(),
-            }}
-            {...props}
-        >
-            {children}
-        </div>
-    );
+const Typography = ({ variant, children, style, ...props }) => {
+    return <div
+        $style={{
+            ...style,
+            ...Shared.Theme.Typography[variant]
+        }}
+        {...props}
+    >
+        {children}
+    </div>;
 };
 
 export default Typography;

@@ -8,6 +8,7 @@ const Theme = OObject({
     padding: '10px',
     boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
     insetBoxShadow: 'inset -2px -2px 10px rgba(0,0,0,0.2)',
+    font: 'Roboto, sans-serif',
     colours: OObject({
         primary: OObject({
             base: '#02CA9F', // Main color for primary actions
@@ -24,35 +25,45 @@ const Theme = OObject({
             dark: 'rgba(0, 0, 0, 0.3)',
         }),
     }),
-    typography: OObject({
-        h1: OObject({
-            regular: '62px Roboto, sans-serif',
-            bold: 'bold 62px Roboto, sans-serif'
-        }),
-        h2: OObject({
-            regular: '56px Roboto, sans-serif',
-        }),
-        h3: OObject({
-            regular: '36px Roboto, sans-serif',
-            bold: 'bold 36px Roboto, sans-serif'
-        }),
-        h4: OObject({}),
-        h5: OObject({}),
-        h6: OObject({}),
-        p1: OObject({
-            regular: '24px Roboto, sans-serif',
-            bold: 'bold 24px Roboto, sans-serif'
-        }),
-        p2: OObject({
-            regular: '16px Roboto, sans-serif',
-            bold: 'bold 16px Roboto, sans-serif'
-        }),
-    })
 });
+
+Theme.Typography = OObject({
+    h1: OObject({
+        regular: `62px ${Theme.font}`,
+        bold: `bold 62px ${Theme.font}`
+    }),
+    h2: OObject({
+        regular: `56px ${Theme.font}`, 
+    }),
+    h3: OObject({
+        regular: `36px ${Theme.font}`,
+        bold: `bold 36px ${Theme.font}`
+    }),
+    h4: OObject({
+        regular: `30px ${Theme.font}`,
+        bold: `bold 30px ${Theme.font}`
+    }),
+    h5: OObject({
+        regular: `24px ${Theme.font}`,
+        bold: `bold 24px ${Theme.font}`
+    }),
+    h6: OObject({
+        regular: `20px ${Theme.font}`,
+        bold: `bold 20px ${Theme.font}`
+    }),
+    p1: OObject({
+        regular: `16px ${Theme.font}`,
+        bold: `bold 16px ${Theme.font}`
+    }),
+    p2: OObject({
+        regular: `14px ${Theme.font}`,
+        bold: `bold 14px ${Theme.font}`
+    }),
+})
 
 Theme.Button = OObject({
     base: OObject({
-        fontFamily: 'Roboto, sans-serif',
+        fontFamily: Theme.font,
         fontSize: '0.875rem',
         fontWeight: 'bold',
         height: '40px',

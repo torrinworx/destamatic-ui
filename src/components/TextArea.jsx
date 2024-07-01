@@ -2,7 +2,20 @@ import { h, Observer } from 'destam-dom';
 
 import Theme from './Theme';
 
-const Textarea = ({children, value, style, maxHeight = 200, id, onKeyDown, placeholder, ...props}, _, mounted) => {
+const Textarea = (
+	{ 
+		children,
+		value,
+		style,
+		maxHeight = 200,
+		id,
+		onKeyDown,
+		placeholder,
+		...props
+	},
+	_,
+	mounted
+) => {
 	if (!value) value = Observer.mutable('');
 
 	const Ref = <textarea />;
