@@ -39,7 +39,7 @@ const Button = (
     if (!disabled) disabled = Observer.mutable(false);
     if (!hover) hover = Observer.mutable(false);
     if (!Ref) Ref = <div />;
-    if (typeof label === 'string') {
+    if (label && typeof label === 'string') {
         label = <Typography style={{ margin: '10px 20px' }} type='p1' fontStyle='bold'>
             {label}
         </Typography>;
