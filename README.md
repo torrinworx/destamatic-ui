@@ -16,6 +16,20 @@ This library can be optionally installed with icon libraries like [Feather](http
 ### Installation
 TODO: Add npm repo and install stuff
 
-### Roadmap
+list of html Input components to wrap (https://www.w3schools.com/html/html_form_input_types.asp):
+- Button - [x]
+- Checkbox - [ ]
+- Color - [ ]
+- DateTime (local) - [ ] - Make single Date component where you can enable either time, date + time, or date.
+- File - [ ] - use current Button component, <input> tags so that this can have children
+- Radio - [x]
+- Range - [ ]
 
-## Development/demo setup
+Features to add to standard text input:
+- Tel - [ ] - simple built in phone number validation
+- Email - [ ] simple built in email validation
+
+list of other html tags to wrap possibly:
+
+list of other components to make from material ui:
+- Grid?
