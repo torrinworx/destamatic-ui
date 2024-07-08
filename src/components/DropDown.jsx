@@ -17,10 +17,15 @@ import Shown from './Shown';
  * 
  * @returns {JSX.Element} The rendered dropdown component.
  */
-const DropDown = ({ children, label, arrow = 'right', style }) => {
-    const isDropedDown = Observer.mutable(false);
+const DropDown = ({ children, label, arrow = 'right', style, open }) => {
 
-    const toggle = () => isDropedDown.set(!isDropedDown.get());
+    let isDroppedDown = open;
+
+    if (!isDroppedDown){
+        isDroppedDown = Observer.mutable(false);
+    }
+
+    const toggle = () => isDroppedDown.set(!isDroppedDown.get());
 
     return <div style={style}>
         <div
@@ -34,7 +39,7 @@ const DropDown = ({ children, label, arrow = 'right', style }) => {
             {arrow === 'right' ? label : null}
             <div $style={{ display: 'flex', alignItems: 'center' }}>
                 <i $class='chevron-icon' $style={{ cursor: 'pointer' }}>
-                    {isDropedDown.map((show) => show ? (
+                    {isDroppedDown.map((show) => show ? (
                         <Icon size='20' libraryName='feather' iconName='chevron-down' />
                     ) : (
                         <Icon size='20' libraryName='feather' iconName='chevron-right' />
@@ -43,7 +48,7 @@ const DropDown = ({ children, label, arrow = 'right', style }) => {
             </div>
             {arrow === 'left' ? label : null}
         </div>
-        <Shown value={isDropedDown} children={children} />
+        <Shown value={isDroppedDown} children={children} />
     </div>;
 };
 
