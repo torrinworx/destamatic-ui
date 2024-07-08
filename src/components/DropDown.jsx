@@ -17,12 +17,12 @@ import Shown from './Shown';
  * 
  * @returns {JSX.Element} The rendered dropdown component.
  */
-const DropDown = ({ children, label, arrow = 'right' }) => {
+const DropDown = ({ children, label, arrow = 'right', style }) => {
     const isDropedDown = Observer.mutable(false);
 
     const toggle = () => isDropedDown.set(!isDropedDown.get());
 
-    return <div>
+    return <div style={style}>
         <div
             $style={{
                 display: 'flex',
