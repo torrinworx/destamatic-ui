@@ -19,3 +19,4 @@ export { default as Shared } from './components/Shared';
 export { Router } from './components/Router';
 export { default as Radio } from './components/Radio';
 export { default as Checkbox } from './components/Checkbox';
+export { default as Tooltip } from './components/Tooltip';
