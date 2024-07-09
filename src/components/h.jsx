@@ -19,6 +19,7 @@ const sizeProperties = new Set([
 	'margin', 'marginTop', 'marginLeft', 'marginRight', 'marginBottom',
 	'padding', 'paddingTop', 'paddingLeft', 'paddingRight', 'paddingBottom',
 	'inset', 'borderRadius',
+	'fontSize',
 ]);
 
 const h = (name, props, ...children) => {
