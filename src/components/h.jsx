@@ -13,6 +13,14 @@ import Observer, {observerGetter, shallowListener} from 'destam/Observer';
 // 3. Numbers in the style will be interpreted as pxs
 // From: https://github.com/Nefsen402/destam-dom/blob/main/examples/custom-h.jsx
 
+const sizeProperties = new Set([
+	'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
+	'top', 'left', 'right', 'bottom',
+	'margin', 'marginTop', 'marginLeft', 'marginRight', 'marginBottom',
+	'padding', 'paddingTop', 'paddingLeft', 'paddingRight', 'paddingBottom',
+	'inset', 'borderRadius',
+]);
+
 const h = (name, props, ...children) => {
 	if (typeof name === 'string') {
 		name = document.createElement(name);
@@ -54,7 +62,7 @@ const h = (name, props, ...children) => {
 				const set = (key, value) => {
 					if (value instanceof Observer) {
 						dynamicProps.push([key, value]);
-					} else if (typeof value === 'number') {
+					} else if (typeof value === 'number' && sizeProperties.has(key)) {
 						name.style[key] = value + 'px';
 					} else {
 						name.style[key] = value;
