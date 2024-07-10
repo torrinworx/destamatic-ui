@@ -27,7 +27,7 @@ const Textarea = (
         maxHeight = 200,
         id,
         onKeyDown,
-        placeholder,
+        placeholder = '',
         ...props
     },
     _,
