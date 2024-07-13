@@ -6,7 +6,7 @@ const Element = ({ each: e }) => {
     const line = e.line;
     const block = e.block;
 
-    if (block === "code") {
+    if (block === "code" && Array.isArray(line)) {
         return <div $style={{backgroundColor: 'red'}}>{line.map(l => <pre><code>{l}</code></pre>)}</div>;
     }
 

@@ -13,6 +13,7 @@ import {
     Drawer,
     Chevron,
     KebabMenu,
+    Markdown
 } from '../src';
 
 const DemoPage = () => {
@@ -24,13 +25,22 @@ const DemoPage = () => {
 
     const kebabValue = Observer.mutable({x: 0, y: 0});
 
+    const markdown = Observer.mutable(`## Code Block
+\`\`\`
+console.log('Code inside fenced block');
+
+console.log('It's multi lined!')
+\`\`\``);
+
     return <div $style={{
         fontFamily: 'Roboto, sans-serif',
         padding: '20px',
         inset: '0px',
         position: 'absolute',
     }}>
-        <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
+        <Markdown markdown={markdown} />
+        <TextArea value={markdown} style={{width: "1000px", height: "500px"}}/>
+        {/* <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
             <Typography variant="h1">Destamatic UI Demo</Typography>
             <Typography variant="h2">Typography</Typography>
             <Typography variant="h3">Heading 3 Regular</Typography>
@@ -39,7 +49,7 @@ const DemoPage = () => {
             <Typography variant="p1" bold>Paragraph 1 Bold</Typography>
             <Typography variant="p2">Paragraph 2 Regular</Typography>
             <Typography variant="p2" bold>Paragraph 2 Bold</Typography>
-        </Popup>
+        </Popup> */}
 
         <Typography variant="h1">Destamatic UI Demo</Typography>
         <Typography variant="h2">Typography</Typography>
