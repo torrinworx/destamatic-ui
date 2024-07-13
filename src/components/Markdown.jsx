@@ -7,7 +7,7 @@ const Element = ({ each: e }) => {
     const block = e.block;
 
     if (block === "code") {
-        return <pre><code $style={{backgroundColor: "red"}}>{line}</code></pre>;
+        return <div $style={{backgroundColor: 'red'}}>{line.map(l => <pre><code>{l}</code></pre>)}</div>;
     }
 
     if (line.startsWith('# ')) {
@@ -30,13 +30,14 @@ const Element = ({ each: e }) => {
 
 // Function to determine the block context
 const determineBlockContext = (line, previousContext) => {
-    // Implement rules to determine the context based on the line content and previous context
     if (line.startsWith("```") && previousContext !== 'code') {
-        return 'code';
+        return { block: 'code', position: 'start' };
     } else if (line.startsWith("```") && previousContext === 'code') {
-        return null; // Exiting code block
+        return { block: null, position: 'end' }; // Exiting code block
+    } else if (previousContext === 'code') {
+        return { block: 'code', position: 'middle' };
     } else {
-        return previousContext; // Continue previous block context
+        return { block: previousContext, position: 'middle' }; // Continue previous block context
     }
 };
 
@@ -44,10 +45,50 @@ const determineBlockContext = (line, previousContext) => {
 const getElements = (markdown) => {
     const lines = markdown.split('\n');
     let currentBlock = null;
-    return lines.map(line => {
-        currentBlock = determineBlockContext(line, currentBlock);
-        return OObject({ line, block: currentBlock });
+    let currentPosition = 'middle';
+    const elements = [];
+    let buffer = [];
+
+    lines.forEach(line => {
+        const context = determineBlockContext(line, currentBlock);
+        currentBlock = context.block;
+        currentPosition = context.position;
+
+        if (currentBlock === 'code') {
+            if (currentPosition === 'start') {
+                buffer.push(line.slice(3) + '\n'); // Start a new buffer for block
+            } else if (currentPosition === 'middle') {
+                if (buffer.length > 0) {
+                    buffer.push(line + '\n'); // Accumulate lines in the buffer
+                } else {
+                    elements.push(OObject({ line, block: currentBlock, position: currentPosition }));
+                }
+            } else if (currentPosition === 'end') {
+                console.log(line)
+                if (buffer.length > 0) {
+                    buffer.push(line.slice(-3) + '\n'); // End the block and wrap accumulated lines
+                    elements.push(OObject({ line: buffer.join(''), block: 'code', position: 'single' }));
+                    buffer = []; // Clear the buffer
+                }
+            }
+        } else {
+            if (buffer.length > 0) {
+                elements.push(OObject({ line: buffer, block: 'code' }));
+                buffer = [];
+            }
+            elements.push(OObject({ line, block: currentBlock, position: currentPosition }));
+        }
     });
+
+    if (buffer.length > 0) {
+        // Flush remaining buffered block lines if the end wasn't found
+        buffer.forEach(bufferedLine => {
+            elements.push(OObject({ line: bufferedLine, block: 'code', position: 'middle' }));
+        });
+    }
+
+    console.log(elements)
+    return elements;
 };
 
 const Markdown = ({ markdown }) => {
@@ -68,11 +109,9 @@ const Markdown = ({ markdown }) => {
         newElements.forEach((newEl, i) => {
             if (i < elements.length) {
                 if (elements[i].line !== newEl.line) {
-                    console.log("update new elemenet", newEl)
                     elements[i] = newEl;
                 }
             } else {
-                console.log("push new element", newEl)
                 elements.push(newEl);
             }
         });
