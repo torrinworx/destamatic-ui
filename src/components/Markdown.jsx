@@ -5,9 +5,19 @@ import Theme from './Theme';
 const Element = ({ each: e }) => {
     const line = e.line;
     const block = e.block;
+    const position = e.position
 
-    if (block === "code" && Array.isArray(line)) {
-        return <div $style={{backgroundColor: 'red'}}>{line.map(l => <pre><code>{l}</code></pre>)}</div>;
+    if (position === 'end') return null;
+    
+    if (block === 'code' && Array.isArray(line)) {
+        return <div 
+            $style={{
+                backgroundColor: Theme.Colours.secondary.base,
+                borderRadius: Theme.borderRadius,
+            }}
+        >
+            {line.map(l => <pre><code>{l}</code></pre>)}
+        </div>;
     }
 
     if (line.startsWith('# ')) {
@@ -54,6 +64,7 @@ const getElements = (markdown) => {
         currentBlock = context.block;
         currentPosition = context.position;
 
+        console.log(context)
         if (currentBlock === 'code') {
             if (currentPosition === 'start') {
                 buffer.push(line.slice(3) + '\n'); // Start a new buffer for block
@@ -64,9 +75,8 @@ const getElements = (markdown) => {
                     elements.push(OObject({ line, block: currentBlock, position: currentPosition }));
                 }
             } else if (currentPosition === 'end') {
-                console.log(line)
                 if (buffer.length > 0) {
-                    buffer.push(line.slice(-3) + '\n'); // End the block and wrap accumulated lines
+                    buffer.push(line.slice(3) + '\n'); // End the block and wrap accumulated lines
                     elements.push(OObject({ line: buffer.join(''), block: 'code', position: 'single' }));
                     buffer = []; // Clear the buffer
                 }
