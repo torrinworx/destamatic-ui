@@ -28,6 +28,7 @@ const DemoPage = () => {
     const markdown = Observer.mutable(`# This is a markdown test
 
 > This is a quote block
+> This is part of the same quote block
 
 This is not a quote block
 

@@ -17,6 +17,7 @@ const Element = ({ each: e }) => {
                 backgroundColor: Theme.Colours.secondary.base,
                 borderRadius: Theme.borderRadius,
                 padding: '10px',
+                overflow: 'scroll'
             }}
         >
             {line.map((l) => <pre><code $style={Theme.Markdown.code}>{l}</code></pre>)}
@@ -25,7 +26,13 @@ const Element = ({ each: e }) => {
 
     if (block === 'quote' && Array.isArray(line)) {
         return <blockquote $style={Theme.Markdown.blockquote}>
-        {line.map((l) => l)}
+        {line.map((l, index) => {
+            if (l.startsWith('> ')) {
+                return l.slice(2);
+            } else {
+                return l;
+            }
+        }).join('\n')}
     </blockquote>;
     }
 
@@ -60,9 +67,7 @@ const determineBlockContext = (line, prevBlock, prevPosition) => {
         return { block: 'code', position: 'start' };
     } else if (line.startsWith("```") && prevBlock === 'code' && prevPosition === 'middle') {
         return { block: 'code', position: 'end' };
-
-    // All blocks:
-    } else if (prevBlock && prevPosition != 'end') {
+    } else if (prevBlock === 'code' && prevPosition !== 'end') {
         return { block: prevBlock, position: 'middle' };
 
     // Non block lines:
