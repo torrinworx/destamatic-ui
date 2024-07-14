@@ -5,53 +5,72 @@ import Theme from './Theme';
 const Element = ({ each: e }) => {
     const line = e.line;
     const block = e.block;
-    const position = e.position
+    const position = e.position;
 
     if (position === 'end') return null;
-    
+
     if (block === 'code' && Array.isArray(line)) {
+        line.shift()
+        line.pop()
         return <div 
             $style={{
                 backgroundColor: Theme.Colours.secondary.base,
                 borderRadius: Theme.borderRadius,
+                padding: '10px',
             }}
         >
-            {line.map(l => <pre><code>{l}</code></pre>)}
+            {line.map((l) => <pre><code $style={Theme.Markdown.code}>{l}</code></pre>)}
         </div>;
     }
 
+    if (block === 'quote' && Array.isArray(line)) {
+        return <blockquote $style={Theme.Markdown.blockquote}>
+        {line.map((l) => l)}
+    </blockquote>;
+    }
+
     if (line.startsWith('# ')) {
-        return <h1 $style={Theme.Typography.h1}>{line.slice(2)}</h1>;
+        return <h1 $style={Theme.Markdown.h1}>{line.slice(2)}</h1>;
     } else if (line.startsWith('## ')) {
-        return <h2 $style={Theme.Typography.h2.bold}>{line.slice(3)}</h2>;
+        return <h2 $style={Theme.Markdown.h2}>{line.slice(3)}</h2>;
     } else if (line.startsWith('### ')) {
-        return <h3 $style={Theme.Typography.h3}>{line.slice(4)}</h3>;
-    // h4, h5, h6 are not supported in destam-dom:
-    // } else if (line.startsWith('#### ')) {
-    //     return <h4 $style={Theme.Typography.h4}>{line.slice(5)}</h4>;
-    // } else if (line.startsWith('##### ')) {
-    //     return <h5 $style={Theme.Typography.h5}>{line.slice(6)}</h5>;
-    // } else if (line.startsWith('###### ')) {
-    //     return <h6 $style={Theme.Typography.h6}>{line.slice(7)}</h6>;
+        return <h3 $style={Theme.Markdown.h3}>{line.slice(4)}</h3>;
+    } else if (line.startsWith('#### ')) {
+        return <h3 $style={Theme.Markdown.h4}>{line.slice(5)}</h3>;
+    } else if (line.startsWith('##### ')) {
+        return <h3 $style={Theme.Markdown.h5}>{line.slice(6)}</h3>;
+    } else if (line.startsWith('###### ')) {
+        return <h3 $style={Theme.Markdown.h6}>{line.slice(7)}</h3>;
+    } else if (line.startsWith('> ')) {
+        return <blockquote $style={Theme.Markdown.blockquote}>{line.slice(2)}</blockquote>;
+    } else if (line.startsWith('- ')) {
+        return <ul $style={Theme.Markdown.ul}><li>{line.slice(2)}</li></ul>;
+    } else if (line.startsWith('* ')) {
+        return <ul $style={Theme.Markdown.ul}><li>{line.slice(2)}</li></ul>;
+    } else if (/^\d+\. /.test(line)) {
+        return <ol $style={Theme.Markdown.ol}><li>{line.slice(line.indexOf(' ') + 1)}</li></ol>;
     }
 
-    return <p $style={Theme.Typography.p1.regular}>{line}</p>;
+    return <p $style={Theme.Markdown.p}>{line}</p>;
 };
 
-// Function to determine the block context
-const determineBlockContext = (line, previousContext) => {
-    if (line.startsWith("```") && previousContext !== 'code') {
+const determineBlockContext = (line, prevBlock, prevPosition) => {
+    // Code Blocks:
+    if (line.startsWith("```") && prevBlock !== 'code') {
         return { block: 'code', position: 'start' };
-    } else if (line.startsWith("```") && previousContext === 'code') {
-        return { block: null, position: 'end' }; // Exiting code block
-    } else if (previousContext === 'code') {
-        return { block: 'code', position: 'middle' };
+    } else if (line.startsWith("```") && prevBlock === 'code' && prevPosition === 'middle') {
+        return { block: 'code', position: 'end' };
+
+    // All blocks:
+    } else if (prevBlock && prevPosition != 'end') {
+        return { block: prevBlock, position: 'middle' };
+
+    // Non block lines:
     } else {
-        return { block: previousContext, position: 'middle' }; // Continue previous block context
+        return { block: null, position: null }
     }
 };
 
-// Function to parse markdown text into elements
 const getElements = (markdown) => {
     const lines = markdown.split('\n');
     let currentBlock = null;
@@ -60,44 +79,28 @@ const getElements = (markdown) => {
     let buffer = [];
 
     lines.forEach(line => {
-        const context = determineBlockContext(line, currentBlock);
+        const context = determineBlockContext(line, currentBlock, currentPosition);
         currentBlock = context.block;
         currentPosition = context.position;
 
-        console.log(context)
-        if (currentBlock === 'code') {
-            if (currentPosition === 'start') {
-                buffer.push(line.slice(3) + '\n'); // Start a new buffer for block
-            } else if (currentPosition === 'middle') {
-                if (buffer.length > 0) {
-                    buffer.push(line + '\n'); // Accumulate lines in the buffer
-                } else {
-                    elements.push(OObject({ line, block: currentBlock, position: currentPosition }));
-                }
-            } else if (currentPosition === 'end') {
-                if (buffer.length > 0) {
-                    buffer.push(line.slice(3) + '\n'); // End the block and wrap accumulated lines
-                    elements.push(OObject({ line: buffer.join(''), block: 'code', position: 'single' }));
-                    buffer = []; // Clear the buffer
-                }
-            }
+        if (currentBlock && (currentPosition === 'start' || currentPosition === 'middle')) {
+            buffer.push(line);
+        } else if (currentBlock && currentPosition === 'end') {
+            buffer.push(line);
+            elements.push(OObject({ line: buffer, block: currentBlock }));
+            buffer = [];
         } else {
-            if (buffer.length > 0) {
-                elements.push(OObject({ line: buffer, block: 'code' }));
-                buffer = [];
-            }
-            elements.push(OObject({ line, block: currentBlock, position: currentPosition }));
+            elements.push(OObject({ line, block: currentBlock }));
         }
     });
 
+    // If items still in buffer and no end of block
     if (buffer.length > 0) {
-        // Flush remaining buffered block lines if the end wasn't found
         buffer.forEach(bufferedLine => {
-            elements.push(OObject({ line: bufferedLine, block: 'code', position: 'middle' }));
+            elements.push(OObject({ line: bufferedLine, block: null, position: null }));
         });
     }
 
-    console.log(elements)
     return elements;
 };
 
@@ -109,18 +112,20 @@ const Markdown = ({ markdown }) => {
     const elements = OArray(getElements(markdown.get()));
 
     markdown.watch(delta => {
-        const newElements = OArray(getElements(delta.value));
+        const newElements = getElements(delta.value);
 
-        // Adjust length of elements array
+        // Remove removed lines from elements
         if (newElements.length < elements.length) {
             elements.splice(newElements.length, elements.length - newElements.length);
         }
 
+        // Update updated lines in elements
         newElements.forEach((newEl, i) => {
             if (i < elements.length) {
                 if (elements[i].line !== newEl.line) {
                     elements[i] = newEl;
                 }
+            // If new line create new line in elements
             } else {
                 elements.push(newEl);
             }

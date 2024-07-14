@@ -25,12 +25,27 @@ const DemoPage = () => {
 
     const kebabValue = Observer.mutable({x: 0, y: 0});
 
-    const markdown = Observer.mutable(`## Code Block
-\`\`\`
-console.log('Code inside fenced block');
+    const markdown = Observer.mutable(`# This is a markdown test
 
-console.log('It's multi lined!')
-\`\`\``);
+> This is a quote block
+
+This is not a quote block
+
+\`\`\`
+This is a code block
+
+with multiple lines
+\`\`\`
+# This is a header inbetween two code blocks
+\`\`\`
+This is a code block
+
+with multiple lines
+\`\`\`
+
+**this is bold**
+- this is a point with a dash \`-\`
+* this is a point with a star \`*\``);
 
     return <div $style={{
         fontFamily: 'Roboto, sans-serif',

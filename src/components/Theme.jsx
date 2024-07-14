@@ -173,4 +173,85 @@ Theme.Button = OObject({
     })
 });
 
+/**
+ * Markdown styles for the Markdown component.
+ * 
+ * @type {Object}
+ */
+Theme.Markdown = OObject({
+    h1: {
+        fontSize: '2em',
+        fontWeight: 'bold',
+        margin: '0.67em 0',
+    },
+    h2: {
+        fontSize: '1.5em',
+        fontWeight: 'bold',
+        margin: '0.75em 0',
+    },
+    h3: {
+        fontSize: '1.17em',
+        fontWeight: 'bold',
+        margin: '0.83em 0',
+    },
+    h4: {
+        fontSize: '1em',
+        fontWeight: 'bold',
+        margin: '1.12em 0',
+    },
+    h5: {
+        fontSize: '0.83em',
+        fontWeight: 'bold',
+        margin: '1.5em 0',
+    },
+    h6: {
+        fontSize: '0.75em',
+        fontWeight: 'bold',
+        margin: '1.67em 0',
+    },
+    p: {
+        fontSize: '1em',
+        margin: '1em 0',
+    },
+    code: {
+        backgroundColor: Theme.Colours.secondary.base,
+        borderRadius: Theme.borderRadius,
+        padding: '2px 6px',
+        fontFamily: 'monospace',
+    },
+    inlineCode: {
+        backgroundColor: '#f8f8f8',
+        borderRadius: '3px',
+        padding: '0 0.2em',
+        fontFamily: 'monospace',
+    },
+    bold: {
+        fontWeight: 'bold',
+    },
+    italic: {
+        fontStyle: 'italic',
+    },
+    link: {
+        color: Theme.Colours.primary.base,
+        textDecoration: 'underline',
+    },
+    blockquote: {
+        borderLeft: `4px solid ${Theme.Colours.primary.base}`,
+        paddingLeft: '16px',
+        color: '#666',
+        margin: '1em 0',
+        fontSize: '1em',
+    },
+    ul: {
+        listStyleType: 'disc',
+        margin: '1em 0',
+        paddingLeft: '40px',
+    },
+    ol: {
+        listStyleType: 'decimal',
+        margin: '1em 0',
+        paddingLeft: '40px',
+    },
+});
+
 export default Theme;
