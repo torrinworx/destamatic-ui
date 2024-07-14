@@ -35,8 +35,7 @@ const Element = ({ each: e }) => {
         })}
     </blockquote>;
     }
-    console.log(line)
-    console.log(block)
+
     if (line.startsWith('# ')) {
         return <h1 $style={Theme.Markdown.h1}>{line.slice(2)}</h1>;
     } else if (line.startsWith('## ')) {
@@ -70,7 +69,8 @@ const determineBlockContext = (line, prevBlock, prevPosition) => {
         return { block: 'code', position: 'end' };
     } else if (prevBlock === 'code' && prevPosition !== 'end') {
         return { block: prevBlock, position: 'middle' };
-    
+
+    // Block Quotes:
     } else if (line.startsWith('> ')) {
         return {block: 'quote', position: 'floating'}
     } else if (prevBlock === 'floating' && line.startsWith('> ')) {
