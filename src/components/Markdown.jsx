@@ -125,7 +125,7 @@ const Element = ({ each: e }) => {
     return <Typography type='p1'>{emphasis(line)}</Typography>;
 };
 
-const determineBlockContext = (line, prevBlock, prevPosition) => {
+const blockContext = (line, prevBlock, prevPosition) => {
     // Code Blocks:
     if (line.startsWith('```') && prevBlock !== 'code') {
         return { block: 'code', position: 'start' };
@@ -136,8 +136,6 @@ const determineBlockContext = (line, prevBlock, prevPosition) => {
 
     // Block Quotes:
     } else if (line.startsWith('> ')) {
-        return { block: 'quote', position: 'floating' };
-    } else if (prevBlock === 'floating' && line.startsWith('> ')) {
         return { block: 'quote', position: 'floating' };
 
     // Non block lines:
@@ -154,7 +152,7 @@ const getElements = (markdown) => {
     let buffer = [];
 
     lines.forEach(line => {
-        const context = determineBlockContext(line, currentBlock, currentPosition);
+        const context = blockContext(line, currentBlock, currentPosition);
         currentBlock = context.block;
         currentPosition = context.position;
 
@@ -165,10 +163,11 @@ const getElements = (markdown) => {
             elements.push(OObject({ line: buffer, block: currentBlock }));
             buffer = [];
         } else if (currentBlock && currentPosition === 'floating') {
+            console.log(context)
             buffer.push(line);
         } else {
             if (buffer.length > 0) {
-                elements.push(OObject({ line: buffer, block: determineBlockContext(buffer[0]).block }));
+                elements.push(OObject({ line: buffer, block: blockContext(buffer[0]).block }));
                 buffer = [];
             }
             elements.push(OObject({ line, block: currentBlock }));
