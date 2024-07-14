@@ -3,6 +3,7 @@ import { OArray, OObject, Observer } from 'destam-dom';
 
 import Link from './Link';
 import Theme from './Theme';
+import Checkbox from './Checkbox';
 import Typography from './Typography';
 
 const emphasis = (line) => {
@@ -91,7 +92,6 @@ const Element = ({ each: e }) => {
     }
 
     if (line.startsWith('# ')) {
-        console.log(emphasis(line.slice(2)))
         return <Typography type='h1'>{emphasis(line.slice(2))}</Typography>;
     } else if (line.startsWith('## ')) {
         return <Typography type='h2'>{emphasis(line.slice(3))}</Typography>;
@@ -104,9 +104,14 @@ const Element = ({ each: e }) => {
     } else if (line.startsWith('###### ')) {
         return <Typography type='h6'>{emphasis(line.slice(7))}</Typography>;
     } else if (line.startsWith('- ')) {
-        return <ul $style={Theme.Markdown.ul}>
-            <li>{emphasis(line.slice(2))}</li>
-        </ul>;
+        if (line.startsWith('- [ ] ') || line.startsWith('- [x] ')) {
+            const checked = line.startsWith('- [x] ');
+            return <Checkbox items={[{label: emphasis(line.slice(6)), value: checked}]} />
+        } else {
+            return <ul $style={Theme.Markdown.ul}>
+                <li>{emphasis(line.slice(2))}</li>
+            </ul>;
+        }
     } else if (line.startsWith('* ')) {
         return <ul $style={Theme.Markdown.ul}>
             <li>{emphasis(line.slice(2))}</li>

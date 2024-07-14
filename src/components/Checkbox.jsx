@@ -35,7 +35,7 @@ const Checkbox = ({ items, OValue, onChange, style, ...props}) => {
             <label $style={{ display: 'block', margin: '5px 0' }} key={item.value}>
                 <input
                     type="checkbox"
-                    checked={OValue.map(vals => vals.includes(item.value))}
+                    checked={item.value}
                     $onchange={() => handleSelection(item.value)}
                 />
                 {item.label}
