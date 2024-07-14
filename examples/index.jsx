@@ -25,9 +25,12 @@ const DemoPage = () => {
 
     const kebabValue = Observer.mutable({x: 0, y: 0});
 
-    const markdown = Observer.mutable(`# This is a markdown test
+    const markdown = Observer.mutable(`# This is a markdown test **bold** *italic*
+**bold** *italic*
 
-> This is a quote block
+***bold and italic combined***
+
+> This is a quote block. 
 > This is part of the same quote block
 
 This is not a quote block
@@ -43,6 +46,8 @@ This is a code block
 
 with multiple lines
 \`\`\`
+
+My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").
 
 **this is bold**
 - this is a point with a dash \`-\`

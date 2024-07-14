@@ -2,8 +2,21 @@ import h from './h';
 import { OArray, OObject, Observer } from 'destam-dom';
 import Theme from './Theme';
 
+const emphasis = (line) => {
+    // bold and italic; ***text*** or ___text___
+    line = line.replace(/(\*\*\*|___)(.+?)(\*\*\*|___)/g, '<em><strong>$2</strong></em>');
+
+    // bold; **text** or __text__
+    line = line.replace(/(\*\*|__)(.+?)(\*\*|__)/g, '<strong>$2</strong>');
+
+    // italic; *text* or _text_
+    line = line.replace(/(\*|_)(.+?)(\*|_)/g, '<em>$2</em>');
+
+    return line;
+};
+
 const Element = ({ each: e }) => {
-    const line = e.line;
+    let line = e.line;
     const block = e.block;
     const position = e.position;
 
@@ -27,39 +40,37 @@ const Element = ({ each: e }) => {
     if (block === 'quote' && Array.isArray(line)) {
         return <blockquote $style={Theme.Markdown.blockquote}>
         {line.map(l => {
-            if (l.startsWith('> ')) {
-                return l.slice(2);
-            } else {
-                return l;
-            }
+            l = emphasis(l.startsWith('> ') ? l.slice(2) : l);
+            return l;
         })}
     </blockquote>;
     }
 
+    line = emphasis(line);
+
     if (line.startsWith('# ')) {
-        return <h1 $style={Theme.Markdown.h1}>{line.slice(2)}</h1>;
+        return <h1 $style={Theme.Markdown.h1} $innerHTML={line.slice(2)}/>;
     } else if (line.startsWith('## ')) {
-        return <h2 $style={Theme.Markdown.h2}>{line.slice(3)}</h2>;
+        return <h2 $style={Theme.Markdown.h2} $innerHTML={line.slice(3)}/>;
     } else if (line.startsWith('### ')) {
-        return <h3 $style={Theme.Markdown.h3}>{line.slice(4)}</h3>;
+        return <h3 $style={Theme.Markdown.h3} $innerHTML={line.slice(4)}/>;
     } else if (line.startsWith('#### ')) {
-        return <h3 $style={Theme.Markdown.h4}>{line.slice(5)}</h3>;
+        return <h3 $style={Theme.Markdown.h4} $innerHTML={line.slice(5)}/>;
     } else if (line.startsWith('##### ')) {
-        return <h3 $style={Theme.Markdown.h5}>{line.slice(6)}</h3>;
+        return <h3 $style={Theme.Markdown.h5} $innerHTML={line.slice(6)}/>;
     } else if (line.startsWith('###### ')) {
-        return <h3 $style={Theme.Markdown.h6}>{line.slice(7)}</h3>;
-    } else if (line.startsWith('> ')) {
-        return <blockquote $style={Theme.Markdown.blockquote}>{line.slice(2)}</blockquote>;
+        return <h3 $style={Theme.Markdown.h6} $innerHTML={line.slice(7)}/>;
     } else if (line.startsWith('- ')) {
-        return <ul $style={Theme.Markdown.ul}><li>{line.slice(2)}</li></ul>;
+        return <ul $style={Theme.Markdown.ul}><li $innerHTML={line.slice(2)}/></ul>;
     } else if (line.startsWith('* ')) {
-        return <ul $style={Theme.Markdown.ul}><li>{line.slice(2)}</li></ul>;
+        return <ul $style={Theme.Markdown.ul}><li $innerHTML={line.slice(2)}/></ul>;
     } else if (/^\d+\. /.test(line)) {
-        return <ol $style={Theme.Markdown.ol}><li>{line.slice(line.indexOf(' ') + 1)}</li></ol>;
+        return <ol $style={Theme.Markdown.ol}><li $innerHTML={line.slice(line.indexOf(' ') + 1)}/></ol>;
     }
 
-    return <p $style={Theme.Markdown.p}>{line}</p>;
+    return <p $style={Theme.Markdown.p} $innerHTML={line}/>;
 };
+
 
 const determineBlockContext = (line, prevBlock, prevPosition) => {
     // Code Blocks:
