@@ -27,24 +27,19 @@ const Link = ({ href, underline = true, onClick, children, style, ...props }) =>
         }
     };
 
-    const commonStyles = {
-        color: Shared.Theme.Colours.primary.base,
-        textDecoration: underline ? hover.map(h => (h ? 'underline' : 'none')) : 'none',
-        cursor: 'pointer',
-        ...style
-    };
-
-    const clickedStyles = {
-        color: Shared.Theme.Colours.secondary.base,
-        textDecoration: 'underline',
-    };
-
     return <a
         href={href}
         $onclick={handleClick}
         $onmouseenter={handleHover(true)}
         $onmouseleave={handleHover(false)}
-        $style={Object.assign({}, commonStyles, clicked.map(c => c ? clickedStyles : {}))}
+        $style={{
+            color: clicked.map(c => c
+                ? Shared.Theme.Colours.primary.darker
+                : Shared.Theme.Colours.primary.base
+            ),
+            textDecoration: underline ? hover.map(h => (h ? 'underline 2px' : 'none')) : 'none',
+            cursor: 'pointer'
+        }}
         {...props}
     >
         {children}
