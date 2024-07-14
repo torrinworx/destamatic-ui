@@ -26,16 +26,17 @@ const Element = ({ each: e }) => {
 
     if (block === 'quote' && Array.isArray(line)) {
         return <blockquote $style={Theme.Markdown.blockquote}>
-        {line.map((l, index) => {
+        {line.map(l => {
             if (l.startsWith('> ')) {
                 return l.slice(2);
             } else {
                 return l;
             }
-        }).join('\n')}
+        })}
     </blockquote>;
     }
-
+    console.log(line)
+    console.log(block)
     if (line.startsWith('# ')) {
         return <h1 $style={Theme.Markdown.h1}>{line.slice(2)}</h1>;
     } else if (line.startsWith('## ')) {
@@ -69,6 +70,11 @@ const determineBlockContext = (line, prevBlock, prevPosition) => {
         return { block: 'code', position: 'end' };
     } else if (prevBlock === 'code' && prevPosition !== 'end') {
         return { block: prevBlock, position: 'middle' };
+    
+    } else if (line.startsWith('> ')) {
+        return {block: 'quote', position: 'floating'}
+    } else if (prevBlock === 'floating' && line.startsWith('> ')) {
+        return { block: 'quote', position: 'floating' }
 
     // Non block lines:
     } else {
@@ -94,7 +100,13 @@ const getElements = (markdown) => {
             buffer.push(line);
             elements.push(OObject({ line: buffer, block: currentBlock }));
             buffer = [];
+        } else if (currentBlock && currentPosition === 'floating') {
+            buffer.push(line);
         } else {
+            if (buffer.length > 0) {
+                elements.push(OObject({ line: buffer, block: determineBlockContext(buffer[0]).block }));
+                buffer = [];
+            }
             elements.push(OObject({ line, block: currentBlock }));
         }
     });
