@@ -25,7 +25,14 @@ const DemoPage = () => {
 
     const kebabValue = Observer.mutable({x: 0, y: 0});
 
-    const markdown = Observer.mutable(`# This is a markdown test **bold** *italic*
+    const markdown = Observer.mutable(`
+# h1, **bold** *italic* ***bold and italic***
+## h2, **bold** *italic* ***bold and italic***
+### h3, **bold** *italic* ***bold and italic***
+#### h4, **bold** *italic* ***bold and italic***
+##### h5, **bold** *italic* ***bold and italic***
+###### h6, **bold** *italic* ***bold and italic***
+
 **bold** *italic*
 
 ***bold and italic combined***
@@ -62,26 +69,26 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
         <Markdown markdown={markdown} />
         <TextArea value={markdown} style={{width: "1000px", height: "500px"}}/>
         {/* <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
-            <Typography variant="h1">Destamatic UI Demo</Typography>
-            <Typography variant="h2">Typography</Typography>
-            <Typography variant="h3">Heading 3 Regular</Typography>
-            <Typography variant="h3" bold>Heading 3 Bold</Typography>
-            <Typography variant="p1">Paragraph 1 Regular</Typography>
-            <Typography variant="p1" bold>Paragraph 1 Bold</Typography>
-            <Typography variant="p2">Paragraph 2 Regular</Typography>
-            <Typography variant="p2" bold>Paragraph 2 Bold</Typography>
+            <Typography type="h1">Destamatic UI Demo</Typography>
+            <Typography type="h2">Typography</Typography>
+            <Typography type="h3">Heading 3 Regular</Typography>
+            <Typography type="h3" bold>Heading 3 Bold</Typography>
+            <Typography type="p1">Paragraph 1 Regular</Typography>
+            <Typography type="p1" bold>Paragraph 1 Bold</Typography>
+            <Typography type="p2">Paragraph 2 Regular</Typography>
+            <Typography type="p2" bold>Paragraph 2 Bold</Typography>
         </Popup> */}
 
-        <Typography variant="h1">Destamatic UI Demo</Typography>
-        <Typography variant="h2">Typography</Typography>
-        <Typography variant="h3">Heading 3 Regular</Typography>
-        <Typography variant="h3" bold>Heading 3 Bold</Typography>
-        <Typography variant="p1">Paragraph 1 Regular</Typography>
-        <Typography variant="p1" bold>Paragraph 1 Bold</Typography>
-        <Typography variant="p2">Paragraph 2 Regular</Typography>
-        <Typography variant="p2" bold>Paragraph 2 Bold</Typography>
+        <Typography type="h1">Destamatic UI Demo</Typography>
+        <Typography type="h2">Typography</Typography>
+        <Typography type="h3">Heading 3 Regular</Typography>
+        <Typography type="h3" bold>Heading 3 Bold</Typography>
+        <Typography type="p1">Paragraph 1 Regular</Typography>
+        <Typography type="p1" bold>Paragraph 1 Bold</Typography>
+        <Typography type="p2">Paragraph 2 Regular</Typography>
+        <Typography type="p2" bold>Paragraph 2 Bold</Typography>
 
-        <Typography variant="h2" $style={{marginTop: '20px'}}>Buttons</Typography>
+        <Typography type="h2" $style={{marginTop: '20px'}}>Buttons</Typography>
         <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <Button label="Text Button" type="text" onClick={handleClick} />
             <Button label="Contained Button" type="contained" onClick={handleClick} />
@@ -100,28 +107,28 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
             />
         </div>
 
-        <Typography variant="h2" $style={{marginTop: '20px'}}>Loading Dots</Typography>
+        <Typography type="h2" $style={{marginTop: '20px'}}>Loading Dots</Typography>
         <LoadingDots />
 
-        <Typography variant="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
+        <Typography type="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
         <DropDown label="Click to Toggle">
             <div $style={{ padding: '10px', border: `1px solid ${Theme.Colours.secondary.base}` }}>
                 Dropdown Content
             </div>
         </DropDown>
 
-        <Typography variant="h2" $style={{marginTop: '20px'}}>Inputs</Typography>
+        <Typography type="h2" $style={{marginTop: '20px'}}>Inputs</Typography>
         <Input placeholder="Type here..." $style={{ marginBottom: '10px' }} />
         <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} />
 
-        <Typography variant="h2" $style={{marginTop: '20px'}}>Drawer</Typography>
+        <Typography type="h2" $style={{marginTop: '20px'}}>Drawer</Typography>
         <Drawer open={drawerOpen}>
             <div>
-                <Typography variant="p1">Drawer Content</Typography>
+                <Typography type="p1">Drawer Content</Typography>
             </div>
         </Drawer>
 
-        <Typography variant="h2" $style={{marginTop: '20px'}}>Chevron</Typography>
+        <Typography type="h2" $style={{marginTop: '20px'}}>Chevron</Typography>
         <div>
             <Chevron />
         </div>

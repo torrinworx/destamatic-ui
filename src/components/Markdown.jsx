@@ -1,18 +1,62 @@
 import h from './h';
 import { OArray, OObject, Observer } from 'destam-dom';
+
+import Link from './Link';
 import Theme from './Theme';
+import Typography from './Typography';
 
 const emphasis = (line) => {
-    // bold and italic; ***text*** or ___text___
-    line = line.replace(/(\*\*\*|___)(.+?)(\*\*\*|___)/g, '<em><strong>$2</strong></em>');
+    const tokens = [];
+    const regex = /(\[([^\]]+)\]\((https?:\/\/[^\s)]+)(?:\s"([^"]+)")?\))|(\*\*\*|___)(.+?)(\*\*\*|___)|(\*\*|__)(.+?)(\*\*|__)|(\*|_)(.+?)(\*|_)/g;
+    let lastIndex = 0;
 
-    // bold; **text** or __text__
-    line = line.replace(/(\*\*|__)(.+?)(\*\*|__)/g, '<strong>$2</strong>');
+    // Match and process the line
+    line.replace(regex, (match, link, linkText, linkUrl, linkTitle, boldItalicStart, boldItalicText, boldItalicEnd, boldStart, boldText, boldEnd, italicStart, italicText, italicEnd, offset) => {
+        // Push the preceding plain text if any
+        if (lastIndex < offset) {
+            tokens.push(line.slice(lastIndex, offset));
+        }
 
-    // italic; *text* or _text_
-    line = line.replace(/(\*|_)(.+?)(\*|_)/g, '<em>$2</em>');
+        // Process and push the match
+        if (link) {
+            tokens.push(
+                <Link 
+                    href={linkUrl} 
+                    title={linkTitle || undefined} 
+                >
+                    {linkText}
+                </Link>
+            );
+        } else if (boldItalicStart) {
+            tokens.push(
+                <em key={offset}>
+                    <strong>{boldItalicText}</strong>
+                </em>
+            );
+        } else if (boldStart) {
+            tokens.push(
+                <strong key={offset}>
+                    {boldText}
+                </strong>
+            );
+        } else if (italicStart) {
+            tokens.push(
+                <em key={offset}>
+                    {italicText}
+                </em>
+            );
+        }
 
-    return line;
+        // Update the last index position
+        lastIndex = offset + match.length;
+    });
+
+    // Push any remaining plain text
+    if (lastIndex < line.length) {
+        tokens.push(line.slice(lastIndex));
+    }
+
+    return tokens;
 };
 
 const Element = ({ each: e }) => {
@@ -23,9 +67,9 @@ const Element = ({ each: e }) => {
     if (position === 'end') return null;
 
     if (block === 'code' && Array.isArray(line)) {
-        line.shift()
-        line.pop()
-        return <div 
+        line.shift();
+        line.pop();
+        return <div
             $style={{
                 backgroundColor: Theme.Colours.secondary.base,
                 borderRadius: Theme.borderRadius,
@@ -39,57 +83,61 @@ const Element = ({ each: e }) => {
 
     if (block === 'quote' && Array.isArray(line)) {
         return <blockquote $style={Theme.Markdown.blockquote}>
-        {line.map(l => {
-            l = emphasis(l.startsWith('> ') ? l.slice(2) : l);
-            return l;
-        })}
-    </blockquote>;
+            {line.map(l => {
+                l = emphasis(l.startsWith('> ') ? l.slice(2) : l);
+                return l;
+            })}
+        </blockquote>;
     }
-
-    line = emphasis(line);
 
     if (line.startsWith('# ')) {
-        return <h1 $style={Theme.Markdown.h1} $innerHTML={line.slice(2)}/>;
+        console.log(emphasis(line.slice(2)))
+        return <Typography type='h1'>{emphasis(line.slice(2))}</Typography>;
     } else if (line.startsWith('## ')) {
-        return <h2 $style={Theme.Markdown.h2} $innerHTML={line.slice(3)}/>;
+        return <Typography type='h2'>{emphasis(line.slice(3))}</Typography>;
     } else if (line.startsWith('### ')) {
-        return <h3 $style={Theme.Markdown.h3} $innerHTML={line.slice(4)}/>;
+        return <Typography type='h3'>{emphasis(line.slice(4))}</Typography>;
     } else if (line.startsWith('#### ')) {
-        return <h3 $style={Theme.Markdown.h4} $innerHTML={line.slice(5)}/>;
+        return <Typography type='h4'>{emphasis(line.slice(5))}</Typography>;
     } else if (line.startsWith('##### ')) {
-        return <h3 $style={Theme.Markdown.h5} $innerHTML={line.slice(6)}/>;
+        return <Typography type='h5'>{emphasis(line.slice(6))}</Typography>;
     } else if (line.startsWith('###### ')) {
-        return <h3 $style={Theme.Markdown.h6} $innerHTML={line.slice(7)}/>;
+        return <Typography type='h6'>{emphasis(line.slice(7))}</Typography>;
     } else if (line.startsWith('- ')) {
-        return <ul $style={Theme.Markdown.ul}><li $innerHTML={line.slice(2)}/></ul>;
+        return <ul $style={Theme.Markdown.ul}>
+            <li>{emphasis(line.slice(2))}</li>
+        </ul>;
     } else if (line.startsWith('* ')) {
-        return <ul $style={Theme.Markdown.ul}><li $innerHTML={line.slice(2)}/></ul>;
+        return <ul $style={Theme.Markdown.ul}>
+            <li>{emphasis(line.slice(2))}</li>
+        </ul>;
     } else if (/^\d+\. /.test(line)) {
-        return <ol $style={Theme.Markdown.ol}><li $innerHTML={line.slice(line.indexOf(' ') + 1)}/></ol>;
+        return <ol $style={Theme.Markdown.ol}>
+            <li>{emphasis(line.slice(line.indexOf(' ') + 1))}</li>
+        </ol>;
     }
 
-    return <p $style={Theme.Markdown.p} $innerHTML={line}/>;
+    return <Typography type='p1'>{emphasis(line)}</Typography>;
 };
-
 
 const determineBlockContext = (line, prevBlock, prevPosition) => {
     // Code Blocks:
-    if (line.startsWith("```") && prevBlock !== 'code') {
+    if (line.startsWith('```') && prevBlock !== 'code') {
         return { block: 'code', position: 'start' };
-    } else if (line.startsWith("```") && prevBlock === 'code' && prevPosition === 'middle') {
+    } else if (line.startsWith('```') && prevBlock === 'code' && prevPosition === 'middle') {
         return { block: 'code', position: 'end' };
     } else if (prevBlock === 'code' && prevPosition !== 'end') {
         return { block: prevBlock, position: 'middle' };
 
     // Block Quotes:
     } else if (line.startsWith('> ')) {
-        return {block: 'quote', position: 'floating'}
+        return { block: 'quote', position: 'floating' };
     } else if (prevBlock === 'floating' && line.startsWith('> ')) {
-        return { block: 'quote', position: 'floating' }
+        return { block: 'quote', position: 'floating' };
 
     // Non block lines:
     } else {
-        return { block: null, position: null }
+        return { block: null, position: null };
     }
 };
 
