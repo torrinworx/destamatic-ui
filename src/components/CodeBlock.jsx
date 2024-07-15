@@ -1,24 +1,48 @@
 import h from './h';
 import { Observer } from 'destam-dom';
-
 import Shared from './Shared';
 import Icon from './Icon';
 import Button from './Button';
 
+// Ran into issues finding prismjs node_module with require.context():
+const importLanguage = {
+    javascript: () => import('prismjs/components/prism-javascript'),
+    python: () => import('prismjs/components/prism-python'),
+    markdown: () => import('prismjs/components/prism-markdown'),
+    html: () => import('prismjs/components/prism-markup'),
+    sql: () => import('prismjs/components/prism-sql'),
+    css: () => import('prismjs/components/prism-css'),
+    ruby: () => import('prismjs/components/prism-ruby'),
+    php: () => import('prismjs/components/prism-php'),
+    java: () => import('prismjs/components/prism-java'),
+    csharp: () => import('prismjs/components/prism-csharp'),
+    cpp: () => import('prismjs/components/prism-cpp'),
+    bash: () => import('prismjs/components/prism-bash'),
+    go: () => import('prismjs/components/prism-go'),
+    json: () => import('prismjs/components/prism-json'),
+    xml: () => import('prismjs/components/prism-xml-doc'),
+    yaml: () => import('prismjs/components/prism-yaml'),
+    // Add more languages as needed
+};
+
 /**
- * Dynamically import Prism.js and load the appropriate language syntax.
+ * Asynchronously load Prism.js and the appropriate language syntax
+ * from the preloaded language map.
  * 
  * @param {string} language - The programming language for syntax highlighting.
+ * @param {string} mode - The theme mode ('dark' or 'light').
  * @returns {Promise} - A promise that resolves when the language syntax is loaded.
  */
 const loadPrismLanguage = async (language, mode) => {
     const prism = await import('prismjs');
-    try {
-        await import(`prismjs/components/prism-${language}.js`);
-    } catch (error) {
+
+    const importLanguageModule = importLanguage[language];
+    if (importLanguageModule) {
+        await importLanguageModule();
+    } else {
         console.warn(`Could not load the requested language: ${language}. Falling back to markdown.`);
         language = 'markdown';
-        await import(`prismjs/components/prism-markdown.js`);
+        await importLanguage[language]();
     }
 
     if (mode === 'dark') {
@@ -36,6 +60,7 @@ const loadPrismLanguage = async (language, mode) => {
  * @param {Object} props - The properties object.
  * @param {string} [props.language='markdown'] - The programming language for syntax highlighting.
  * @param {string} props.code - The code to be highlighted and rendered.
+ * @param {string} [props.mode='dark'] - The theme mode ('dark' or 'light').
  * @param {Object} [props.style] - Custom styles to apply to the code block.
  * @param {...Object} props - Additional properties to spread onto the pre element.
  * 
@@ -48,9 +73,6 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
         .then(({ prism, language }) => {
             highlightedCode.set(prism.highlight(code, prism.languages[language], language));
         })
-        .catch(error => {
-            console.error(`Failed to load syntax for language ${language}:`, error);
-        });
 
     return <div>
         <div $style={{
@@ -75,7 +97,7 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
                         }}
                     />
                 }
-                onClick={async () => {await navigator.clipboard.writeText(code);}}
+                onClick={async () => { await navigator.clipboard.writeText(code); }}
             />
         </div>
         <pre
