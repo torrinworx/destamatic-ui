@@ -4,6 +4,7 @@ import { OArray, OObject, Observer } from 'destam-dom';
 import Link from './Link';
 import Theme from './Theme';
 import Checkbox from './Checkbox';
+import CodeBlock from './CodeBlock';
 import Typography from './Typography';
 
 const emphasis = (line) => {
@@ -68,18 +69,10 @@ const Element = ({ each: e }) => {
     if (position === 'end') return null;
 
     if (block === 'code' && Array.isArray(line)) {
-        line.shift();
+        const first_line = line.shift();
+        const language = first_line.slice(3)
         line.pop();
-        return <div
-            $style={{
-                backgroundColor: Theme.Colours.secondary.base,
-                borderRadius: Theme.borderRadius,
-                padding: '10px',
-                overflow: 'scroll'
-            }}
-        >
-            {line.map((l) => <pre><code $style={Theme.Markdown.code}>{l}</code></pre>)}
-        </div>;
+        return <CodeBlock language={language} code={line.join('\n')}/>;
     }
 
     if (block === 'quote' && Array.isArray(line)) {
@@ -163,7 +156,6 @@ const getElements = (markdown) => {
             elements.push(OObject({ line: buffer, block: currentBlock }));
             buffer = [];
         } else if (currentBlock && currentPosition === 'floating') {
-            console.log(context)
             buffer.push(line);
         } else {
             if (buffer.length > 0) {

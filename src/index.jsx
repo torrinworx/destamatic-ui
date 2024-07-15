@@ -22,3 +22,4 @@ export { default as Checkbox } from './components/Checkbox';
 export { default as Tooltip } from './components/Tooltip';
 export { default as Markdown } from './components/Markdown';
 export { default as Link } from './components/Link';
+export { default as CodeBlock } from './components/CodeBlock';

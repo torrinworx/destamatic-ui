@@ -13,7 +13,8 @@ import {
     Drawer,
     Chevron,
     KebabMenu,
-    Markdown
+    Markdown,
+    CodeBlock
 } from '../src';
 
 const DemoPage = () => {
@@ -42,23 +43,68 @@ const DemoPage = () => {
 
 This is not a quote block
 
-\`\`\`
-This is a code block
+\`\`\`javascript
+// This is a code block
 
-with multiple lines
-\`\`\`
-# This is a header inbetween two code blocks
-\`\`\`
-This is a code block
+// with multiple lines
 
-with multiple lines
+const main = () => {
+    for (let i = 0; i < 100; i++) {
+        console.log("Hello World!");
+    };
+};
+
+main()
+
+\`\`\`
+
+# This is a header between two code blocks
+
+\`\`\`python
+# This is a code block
+
+# with multiple lines
+
+def main():
+    for i in 100:
+        print("Hello World!")
+
+main()
+
 \`\`\`
 
 My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").
 
+# This is a link in a header: [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy")
+
+# TODO:
+
+#### This is a bold link in a header: **[Duck Duck Go](https://duckduckgo.com "The best search engine for privacy")**
+
+#### This is an italic link in a header: *[Duck Duck Go](https://duckduckgo.com "The best search engine for privacy")*
+
+#### This is a bold italic link in a header ***[Duck Duck Go](https://duckduckgo.com "The best search engine for privacy")***
+
 **this is bold**
 - this is a point with a dash \`-\`
 * this is a point with a star \`*\``);
+    
+    const python = `
+def main():
+    for i in 100:
+        print("Hello World!")
+
+main()
+    `
+    const javascript = `
+const main = () => {
+    for (let i = 0; i < 100; i++) {
+        console.log("Hello World!");
+    };
+};
+
+main()
+    `
 
     return <div $style={{
         fontFamily: 'Roboto, sans-serif',
@@ -66,6 +112,9 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
         inset: '0px',
         position: 'absolute',
     }}>
+        <CodeBlock language='python' code={python} />
+        <CodeBlock language='javascript' code={javascript} />
+
         <Markdown markdown={markdown} />
         <TextArea value={markdown} style={{width: "1000px", height: "500px"}}/>
         {/* <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
