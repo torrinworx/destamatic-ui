@@ -79,6 +79,7 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            padding: '5px 15px 5px 15px',
             backgroundColor: mode === 'dark' ? '#333' : '#f5f5f5',
             borderTopLeftRadius: Shared.Theme.borderRadius,
             borderTopRightRadius: Shared.Theme.borderRadius
@@ -97,7 +98,7 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
                         }}
                     />
                 }
-                onClick={async () => { await navigator.clipboard.writeText(code); }}
+                onClick={async () => await navigator.clipboard.writeText(code)}
             />
         </div>
         <pre
@@ -106,6 +107,8 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
                 backgroundColor: mode === 'dark' ? 'black' : 'white',
                 borderBottomLeftRadius: Shared.Theme.borderRadius,
                 borderBottomRightRadius: Shared.Theme.borderRadius,
+                borderTopLeftRadius: '0',
+                borderTopRightRadius: '0',
                 padding: '10px',
                 margin: 0,
                 ...style,
