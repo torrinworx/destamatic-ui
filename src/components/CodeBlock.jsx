@@ -3,6 +3,7 @@ import { Observer } from 'destam-dom';
 import Shared from './Shared';
 import Icon from './Icon';
 import Button from './Button';
+import Typography from './Typography';
 
 // Ran into issues finding prismjs node_module with require.context():
 const importLanguage = {
@@ -84,9 +85,9 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
             borderTopLeftRadius: Shared.Theme.borderRadius,
             borderTopRightRadius: Shared.Theme.borderRadius
         }}>
-            <span $style={{ color: mode === 'dark' ? 'white' : 'black' }}>
+            <Typography type='p1' $style={{ color: mode === 'dark' ? 'white' : 'black' }}>
                 {language.toLowerCase()}
-            </span>
+            </Typography>
             <Button
                 label={
                     <Icon
@@ -102,7 +103,7 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
             />
         </div>
         <pre
-            style={{
+            $style={{
                 overflow: 'auto',
                 backgroundColor: mode === 'dark' ? 'black' : 'white',
                 borderBottomLeftRadius: Shared.Theme.borderRadius,
@@ -111,6 +112,7 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
                 borderTopRightRadius: '0',
                 padding: '10px',
                 margin: 0,
+                fontSize: '14px',
                 ...style,
             }}
             {...props}
@@ -118,7 +120,6 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
             <code
                 $innerHTML={highlightedCode}
                 class={`language-${language}`}
-                style={{ fontSize: '1em' }}
             />
         </pre>
     </div>;
