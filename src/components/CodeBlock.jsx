@@ -14,16 +14,17 @@ const importLanguage = {
     sql: () => import('prismjs/components/prism-sql'),
     css: () => import('prismjs/components/prism-css'),
     ruby: () => import('prismjs/components/prism-ruby'),
-    php: () => import('prismjs/components/prism-php'),
+    // php: () => import('prismjs/components/prism-php'),
     java: () => import('prismjs/components/prism-java'),
     csharp: () => import('prismjs/components/prism-csharp'),
-    cpp: () => import('prismjs/components/prism-cpp'),
+    // cpp: () => import('prismjs/components/prism-cpp'),
     bash: () => import('prismjs/components/prism-bash'),
     go: () => import('prismjs/components/prism-go'),
     json: () => import('prismjs/components/prism-json'),
     xml: () => import('prismjs/components/prism-xml-doc'),
     yaml: () => import('prismjs/components/prism-yaml'),
     // Add more languages as needed
+    // cpp and php throw prismjs errors for some reason so let's just disable them.
 };
 
 /**
