@@ -23,6 +23,7 @@ const importLanguage = {
     json: () => import('prismjs/components/prism-json'),
     xml: () => import('prismjs/components/prism-xml-doc'),
     yaml: () => import('prismjs/components/prism-yaml'),
+    jsx: () => import('prismjs/components/prism-jsx'),
     // Add more languages as needed
     // cpp and php throw prismjs errors for some reason so let's just disable them.
 };
