@@ -1,6 +1,5 @@
 import h from './h';
 import { Observer } from 'destam-dom';
-import Shared from './Shared';
 
 // Note: We are using a custom track and thumb component to get around the
 // destam-dom limitations with pseudo elements. Currently, we cannot style these.
@@ -69,9 +68,9 @@ const Track = ({ style, onMouseDown, hover }) => {
  * Slider component for selecting a value from a range.
  *
  * @param {Object} props - The properties object.
- * @param {number} [props.min=0] - The minimum value of the slider.
- * @param {number} [props.max=100] - The maximum value of the slider.
- * @param {Observer<number>} [props.OValue] - Observable value for the slider's position.
+ * @param {Observer<number>} [props.min=Observer.mutable(0)] - Observable minimum value of the slider.
+ * @param {Observer<number>} [props.max=Observer.mutable(100)] - Observable maximum value of the slider.
+ * @param {Observer<number>} [props.OValue=Observer.mutable(50)] - Observable value for the slider's position.
  * @param {Observer<boolean>} [props.disabled] - Observable boolean to determine if the slider is disabled.
  * @param {Object} [props.style] - Custom styles to apply to the slider container.
  * @param {Object} [props.trackStyle] - Custom styles to apply to the track element.
@@ -81,9 +80,9 @@ const Track = ({ style, onMouseDown, hover }) => {
  * @returns {JSX.Element} The rendered slider element.
  */
 const Slider = ({
-    min = 0,
-    max = 100,
-    OValue = Observer.mutable((min + max) / 2),
+    min = Observer.mutable(0),
+    max = Observer.mutable(100),
+    OValue = Observer.mutable(50),
     style,
     trackStyle,
     thumbStyle,
@@ -101,8 +100,10 @@ const Slider = ({
         const rect = trackElement.getBoundingClientRect();
         const trackWidth = rect.width;
         const clickX = event.clientX - rect.left;
-        const newValue = min + ((clickX / trackWidth) * (max - min));
-        OValue.set(Math.min(Math.max(newValue, min), max));
+        const minVal = min.get();
+        const maxVal = max.get();
+        const newValue = minVal + ((clickX / trackWidth) * (maxVal - minVal));
+        OValue.set(Math.min(Math.max(newValue, minVal), maxVal));
     };
 
     const handleMouseDown = (event) => {
@@ -125,8 +126,9 @@ const Slider = ({
     const percentage = OValue.map((value) => {
         const trackElement = trackRef.get();
         if (!trackElement) return '50%';
-
-        const ratio = (value - min) / (max - min);
+        const minVal = min.get();
+        const maxVal = max.get();
+        const ratio = (value - minVal) / (maxVal - minVal);
         const thumbOffsetPercentage = (25 / 2) / trackElement.getBoundingClientRect().width * 100;
         return Math.min(Math.max(ratio * 100, thumbOffsetPercentage), 100 - thumbOffsetPercentage) + '%';
     });
