@@ -90,6 +90,8 @@ const Slider = ({
     disabled = Observer.mutable(false),
     ...props
 }, _, mount) => {
+    if (!min) min = Observer.mutable(min);
+
     const trackRef = Observer.mutable(null);
     const dragging = Observer.mutable(false);
 

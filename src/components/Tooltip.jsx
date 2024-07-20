@@ -5,7 +5,9 @@ import Popup from './Popup';
 import Theme from './Theme';
 import Button from './Button';
 
-const Tooltip = ({hover, label, ...style}) => {
+const Tooltip = ({hover=Observer.mutable(''), label, ...style}) => {
+	if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
+
 	return <Shown value={hover}>
 		<Popup placement={hover}>
 			<div style={{

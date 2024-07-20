@@ -15,9 +15,18 @@ import Shared from './Shared';
  * 
  * @returns {JSX.Element} The rendered link component.
  */
-const Link = ({ href, underline = true, onClick, children, style, ...props }) => {
-    const hover = Observer.mutable(false);
-    const clicked = Observer.mutable(false);
+const Link = ({
+    href,
+    underline = true,
+    onClick,
+    hover=Observer.mutable(false),
+    clicked=Observer.mutable(false),
+    children,
+    style,
+    ...props
+}) => {
+    if (!(hover instanceof Observer )) hover = Observer.mutable(hover);
+    if (!(clicked instanceof Observer )) clicked = Observer.mutable(clicked);
 
     const handleHover = isHovered => () => hover.set(isHovered);
     const handleClick = (event) => {

@@ -12,10 +12,8 @@ import { Observer } from 'destam-dom';
  * 
  * @returns {JSX.Element} The rendered Checkbox component.
  */
-const Checkbox = ({ items, OValue, onChange, style, ...props}) => {
-    if (!OValue) {
-        OValue = Observer.mutable([]);
-    }
+const Checkbox = ({ items, OValue=Observer.mutable([]), onChange, style, ...props}) => {
+    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
 
     const handleSelection = (value) => {
         let newValues;

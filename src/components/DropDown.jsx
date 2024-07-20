@@ -17,15 +17,16 @@ import Shown from './Shown';
  * 
  * @returns {JSX.Element} The rendered dropdown component.
  */
-const DropDown = ({ children, label, arrow = 'right', style, open }) => {
+const DropDown = ({
+    children,
+    label,
+    arrow = 'right',
+    style,
+    open=Observer.mutable(false)
+}) => {
+    if (!(open instanceof Observer)) open = Observer.mutable(open);
 
-    let isDroppedDown = open;
-
-    if (!isDroppedDown){
-        isDroppedDown = Observer.mutable(false);
-    }
-
-    const toggle = () => isDroppedDown.set(!isDroppedDown.get());
+    const toggle = () => open.set(!open.get());
 
     return <div style={style}>
         <div
@@ -39,7 +40,7 @@ const DropDown = ({ children, label, arrow = 'right', style, open }) => {
             {arrow === 'right' ? label : null}
             <div $style={{ display: 'flex', alignItems: 'center' }}>
                 <i $class='chevron-icon' $style={{ cursor: 'pointer' }}>
-                    {isDroppedDown.map((show) => show ? (
+                    {open.map((show) => show ? (
                         <Icon size='20' libraryName='feather' iconName='chevron-down' />
                     ) : (
                         <Icon size='20' libraryName='feather' iconName='chevron-right' />
@@ -48,7 +49,7 @@ const DropDown = ({ children, label, arrow = 'right', style, open }) => {
             </div>
             {arrow === 'left' ? label : null}
         </div>
-        <Shown value={isDroppedDown} children={children} />
+        <Shown value={open} children={children} />
     </div>;
 };
 

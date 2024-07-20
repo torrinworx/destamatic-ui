@@ -44,8 +44,16 @@ const loadIcon = async (libraryName, iconName, style) => {
  * 
  * @returns {JSX.Element} The rendered icon element.
  */
-const Icon = ({ libraryName, iconName, size='20', style, ...props }) => {
-    let Svg = Observer.mutable('');
+const Icon = ({
+    libraryName,
+    iconName,
+    size='20',
+    style,
+    Svg=Observer.mutable(''),
+    ...props
+}) => {
+    if (!(Svg instanceof Observer)) Svg = Observer.mutable(Svg);
+
     const styleObject = { marginTop: '4px', height: size, width: size, ...style };
 
     loadIcon(libraryName, iconName, styleObject)

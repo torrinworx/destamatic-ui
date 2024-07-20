@@ -7,13 +7,15 @@ import Button from './Button';
 
 import IconComponent from './Icon';
 
-const KebabMenu = ({Icon, shown, children, anchor}) => {
+const KebabMenu = ({
+    Icon,
+    shown=Observer.mutable(false),
+    children,
+    anchor
+}) => {
+    if (!(shown instanceof Observer)) shown = Observer.mutable(false);
     if (!Icon) {
         Icon = <IconComponent libraryName='feather' iconName='more-vertical' />
-    }
-
-    if (!shown){
-        shown = Observer.mutable(false);
     }
 
     const ref = <div />;

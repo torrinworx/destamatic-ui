@@ -7,7 +7,7 @@ import Shared from './Shared';
  * 
  * @param {Object} props - The properties object.
  * @param {JSX.Element | string} [props.children] - Children elements to be included inside the textarea.
- * @param {Observer<string>} [props.value] - Observable value for the textarea content.
+ * @param {Observer<string>} [props.OValue] - Observable value for the textarea content.
  * @param {Object} [props.style] - Custom styles to apply to the textarea.
  * @param {number} [props.maxHeight=200] - Maximum height of the textarea before it starts to scroll.
  * @param {string} [props.id] - ID for the textarea element.
@@ -22,7 +22,7 @@ import Shared from './Shared';
 const Textarea = (
     { 
         children,
-        value,
+        OValue=Observer.mutable(''),
         style,
         maxHeight = 200,
         id,
@@ -33,7 +33,7 @@ const Textarea = (
     _,
     mounted
 ) => {
-    if (!value) value = Observer.mutable('');
+    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
 
     const Ref = <textarea />;
     const isMounted = Observer.mutable(false);
@@ -43,9 +43,9 @@ const Textarea = (
     return <Ref
         $id={id}
         $placeholder={placeholder}
-        $value={value}
+        $value={OValue}
         $onkeydown={onKeyDown}
-        $oninput={e => value.set(e.target.value)}
+        $oninput={e => OValue.set(e.target.value)}
         $onfocus={() => isFocused.set(true)}
         $onblur={() => isFocused.set(false)}
         $style={{
@@ -61,7 +61,7 @@ const Textarea = (
             height: isMounted.map(mounted => {
                 if (!mounted) return 'auto';
 
-                return value.map(val => {
+                return OValue.map(val => {
                     let elem = <textarea rows={1} $value={val} $style={{
                         resize: 'none',
                         paddingTop: '0px',

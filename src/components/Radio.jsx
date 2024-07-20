@@ -12,10 +12,8 @@ import { Observer } from 'destam-dom';
  * 
  * @returns {JSX.Element} The rendered Radio component.
  */
-const Radio = ({ items, OValue, onChange, style }) => {
-    if (!OValue) {
-        OValue = Observer.mutable('');
-    }
+const Radio = ({ items, OValue=Observer.mutable(''), onChange, style }) => {
+    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
 
     const handleSelection = (value) => {
         OValue.set(value);

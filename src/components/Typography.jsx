@@ -14,16 +14,16 @@ import Shared from './Shared';
  * @returns {JSX.Element} The rendered typography element.
  */
 const Typography = ({ type = 'h1', fontStyle = 'regular', children, style, ...props }) => {
-    const validTypes = Object.keys(Shared.Theme.Typography);
-    const validatedType = validTypes.includes(type) ? type : 'h1';
+    const validType = Object.keys(Shared.Theme.Typography)
+        .includes(type) ? type : 'h1';
 
-    const validStyles = Object.keys(Shared.Theme.Typography[validatedType]);
-    const validatedFontStyle = validStyles.includes(fontStyle) ? fontStyle : 'regular';
+    const validFontStyle = Object.keys(Shared.Theme.Typography[validType])
+        .includes(fontStyle) ? fontStyle : 'regular';
 
     return <div
         $style={{
             ...style,
-            font: Shared.Theme.Typography[validatedType][validatedFontStyle]
+            font: Shared.Theme.Typography[validType][validFontStyle]
         }}
         {...props}
     >
