@@ -63,7 +63,10 @@ const Button = (
         ...Shared.Theme.Button[type].base,
         transition: Shared.Theme.transition,
         borderRadius: Shared.Theme.borderRadius,
-        boxShadow: hover.map(h => h ? Shared.Theme.boxShadow : null),
+        boxShadow: disabled.map(d =>
+            d ? Shared.Theme.Button[type].disabled.boxShadow
+            : (hover.map(h => h ? Shared.Theme.boxShadow : null))
+        ),
         ...style,
         backgroundColor: disabled.map(d =>
             d ? Shared.Theme.Button[type].disabled.backgroundColor
@@ -84,8 +87,43 @@ const Button = (
         filter: disabled.map(d => (d ? Shared.Theme.Button[type].disabled.filter : 'none')),
         pointerEvents: disabled.map(d =>
             d ? Shared.Theme.Button[type].disabled.pointerEvents : 'auto'
-        )
+        ),
     };
+
+    if (Icon) return <Ref style={style} {...props}>
+        <i
+            style={{
+                ...Shared.Theme.Button.base,
+                ...Shared.Theme.Button.icon.base,
+                width: '50px',
+                height: '50px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: disabled.map(d =>
+                    d ? Shared.Theme.Button[type].disabled.color
+                    || Shared.Theme.Button[type].base.color
+                    : hover.map(h => (h ? Shared.Theme.Button[type].hover.color
+                        : Shared.Theme.Button[type].base.color))
+                ),
+            }}
+            onClick={(event) => {
+                if (!disabled.get()) {
+                    createRipple(event);
+                    onClick && onClick(event);
+                }
+            }}
+            onMouseDown={(event) => {
+                if (!disabled.get()) {
+                    createRipple(event);
+                    onMouseDown && onMouseDown(event);
+                }
+            }}
+            onMouseEnter={() => hover.set(true)}
+            onMouseLeave={() => hover.set(false)}
+            disabled={disabled.map(d => d ? true : false)}
+        >{Icon}</i>
+    </Ref>;
 
     return <Ref style={style} {...props}>
         <button
@@ -106,7 +144,6 @@ const Button = (
             style={buttonStyle}
             disabled={disabled.map(d => d ? true : false)}
         >
-            {Icon ? <i style={Shared.Theme.Button.icon.base}>{Icon}</i> : null}
             {label ? label : null}
             {ripples}
         </button>

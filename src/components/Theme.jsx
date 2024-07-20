@@ -118,7 +118,7 @@ Theme.Button = OObject({
             color: 'black',
         }),
         hover: OObject({
-            backgroundColor: 'transparent',
+            backgroundColor: Theme.Colours.primary.baseTrans,
             color: Theme.Colours.primary.base,
         }),
         disabled: OObject({
@@ -160,16 +160,23 @@ Theme.Button = OObject({
     }),
     icon: OObject({
         base: OObject({
+            backgroundColor: 'transparent',
             margin: '0px 6px 0px 6px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '24px',
+            color: 'black',
+        }),
+        hover: OObject({
+            backgroundColor: 'transparent',
+            color: Theme.Colours.primary.base,
         }),
         disabled: OObject({
             cursor: 'default',
             filter: 'grayscale(100%)',
             pointerEvents: 'none',
+            boxShadow: `inset 1px 1px 10px #333`
         }),
     })
 });
