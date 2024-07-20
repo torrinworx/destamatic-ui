@@ -90,7 +90,11 @@ const Slider = ({
     disabled = Observer.mutable(false),
     ...props
 }, _, mount) => {
-    if (!min) min = Observer.mutable(min);
+    if (!(min instanceof Observer)) min = Observer.mutable(min);
+    if (!(max instanceof Observer)) max = Observer.mutable(max);
+    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue) 
+    if (!(hover instanceof Observer)) hover = Observer.mutable(hover) 
+    if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled) 
 
     const trackRef = Observer.mutable(null);
     const dragging = Observer.mutable(false);
@@ -128,11 +132,11 @@ const Slider = ({
     const percentage = OValue.map((value) => {
         const trackElement = trackRef.get();
         if (!trackElement) return '50%';
+
         const minVal = min.get();
         const maxVal = max.get();
         const ratio = (value - minVal) / (maxVal - minVal);
-        const thumbOffsetPercentage = (25 / 2) / trackElement.getBoundingClientRect().width * 100;
-        return Math.min(Math.max(ratio * 100, thumbOffsetPercentage), 100 - thumbOffsetPercentage) + '%';
+        return Math.min(Math.max(ratio * 100, 0), 100) + '%';
     });
 
     const Ref = <div />;
