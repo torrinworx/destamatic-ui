@@ -31,7 +31,8 @@ const Theme = OObject({
             darker: '#02B891',  // Darker variant for primary
         }),
         secondary: OObject({
-            base: '#CCCCCC' // Main color for secondary actions
+            base: '#CCCCCC', // Main color for secondary actions
+            darker: '#A5A5A5' // Darker variant for secondary
         }),
         ripple: OObject({
             light: 'rgba(255, 255, 255, 0.8)', // Ripple effect color for light themes
