@@ -1,9 +1,10 @@
 import h from './h';
 import { Observer } from 'destam-dom';
 
+const thumbWidth = 25
+
 // Note: We are using a custom track and thumb component to get around the
 // destam-dom limitations with pseudo elements. Currently, we cannot style these.
-
 const Thumb = ({
     position,
     style,
@@ -22,8 +23,8 @@ const Thumb = ({
         position: 'absolute',
         top: '50%',
         left: position,
-        width: '25px',
-        height: '25px',
+        width: `${thumbWidth}px`,
+        height: `${thumbWidth}px`,
         backgroundColor,
         borderRadius: '50%',
         transform: 'translate(-50%, -50%)',
@@ -133,10 +134,15 @@ const Slider = ({
         const trackElement = trackRef.get();
         if (!trackElement) return '50%';
 
+        const trackWidth = trackElement.getBoundingClientRect().width;
+
         const minVal = min.get();
         const maxVal = max.get();
         const ratio = (value - minVal) / (maxVal - minVal);
-        return Math.min(Math.max(ratio * 100, 0), 100) + '%';
+
+        // Adjust the position to ensure the thumb stays within the track
+        const adjustedRatio = ratio * (trackWidth - thumbWidth) / trackWidth + thumbWidth / (2 * trackWidth);
+        return `${Math.min(Math.max(adjustedRatio * 100, 0), 100)}%`;
     });
 
     const Ref = <div />;
