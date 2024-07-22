@@ -1,5 +1,7 @@
 import h from './h';
 
+import { Observer } from 'destam-dom';
+
 import Shown from './Shown';
 import Popup from './Popup';
 import Theme from './Theme';
