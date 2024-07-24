@@ -95,8 +95,6 @@ const Button = (
             style={{
                 ...Shared.Theme.Button.base,
                 ...Shared.Theme.Button.icon.base,
-                width: '50px',
-                height: '50px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
