@@ -43,7 +43,6 @@ const loadPrismLanguage = async (language, mode) => {
     if (importLanguageModule) {
         await importLanguageModule();
     } else {
-        console.warn(`Could not load the requested language: ${language}. Falling back to markdown.`);
         language = 'markdown';
         await importLanguage[language]();
     }

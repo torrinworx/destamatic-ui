@@ -61,6 +61,33 @@ const emphasis = (line) => {
     return tokens;
 };
 
+const renderList = (lines) => {
+    let nestLevel = 0;
+    const nodes = lines.map(line => {
+        const currentLevel = line.search(/\S/) / 2;  // Assuming two spaces per indentation level
+
+        // Check if the line starts with a number followed by a dot and space, typical of Markdown ordered lists
+        if (/^\s*\d+\.\s/.test(line)) {
+            // Remove the numbering from the line
+            line = line.replace(/^\s*\d+\.\s/, '');
+        }
+
+        let listItem = <li>{emphasis(line.trim())}</li>;
+
+        // Logic to nest further if the detected indentation is deeper
+        if (currentLevel > nestLevel) {
+            listItem = <ul>{listItem}</ul>;  // Start a new nested list
+            nestLevel = currentLevel;  // Update the nesting level
+        } else if (currentLevel < nestLevel) {
+            nestLevel = currentLevel;  // Adjust nesting level if indentation decreases
+        }
+        
+        return listItem;
+    });
+
+    return nodes;
+};
+
 const Element = ({ each: e }) => {
     let line = e.line;
     const block = e.block;
@@ -70,10 +97,10 @@ const Element = ({ each: e }) => {
 
     if (block === 'code' && Array.isArray(line)) {
         const first_line = line.shift();
-        const language = first_line.slice(3)
+        const language = first_line.slice(3);
         line.pop();
         return <CodeBlock language={language} code={line.join('\n')}/>;
-    }
+    };
 
     if (block === 'quote' && Array.isArray(line)) {
         return <blockquote $style={Theme.Markdown.blockquote}>
@@ -82,7 +109,15 @@ const Element = ({ each: e }) => {
                 return l;
             })}
         </blockquote>;
-    }
+    };
+
+    if (block === 'ul' && Array.isArray(line)) {
+        return <ul>{renderList(line)}</ul>;
+    };
+
+    if (block === 'ol' && Array.isArray(line)) {
+        return <ol>{renderList(line)}</ol>;
+    };
 
     if (line.startsWith('# ')) {
         return <Typography type='h1'>{emphasis(line.slice(2))}</Typography>;
@@ -99,21 +134,11 @@ const Element = ({ each: e }) => {
     } else if (line.startsWith('- ')) {
         if (line.startsWith('- [ ] ') || line.startsWith('- [x] ')) {
             const checked = line.startsWith('- [x] ');
-            return <Checkbox items={[{label: emphasis(line.slice(6)), value: checked}]} />
-        } else {
-            return <ul $style={Theme.Markdown.ul}>
-                <li>{emphasis(line.slice(2))}</li>
-            </ul>;
-        }
-    } else if (line.startsWith('* ')) {
-        return <ul $style={Theme.Markdown.ul}>
-            <li>{emphasis(line.slice(2))}</li>
-        </ul>;
+            return <Checkbox items={[{label: emphasis(line.slice(6)), value: checked}]} />;
+        };
     } else if (/^\d+\. /.test(line)) {
-        return <ol $style={Theme.Markdown.ol}>
-            <li>{emphasis(line.slice(line.indexOf(' ') + 1))}</li>
-        </ol>;
-    }
+        return <Typography type='p1'>{emphasis(line.slice(line.indexOf(' ') + 1))}</Typography>;
+    };
 
     return <Typography type='p1'>{emphasis(line)}</Typography>;
 };
@@ -131,17 +156,29 @@ const blockContext = (line, prevBlock, prevPosition) => {
     } else if (line.startsWith('> ')) {
         return { block: 'quote', position: 'floating' };
 
+    // Ordered Lists with indentation handling:
+    } else if (/^\s*\d+\.\s/.test(line)) {
+        return { block: 'ol', position: 'middle' };
+    } else if (prevBlock === 'ol' && !/^\s*\d+\.\s/.test(line)) {
+        return { block: null, position: 'end' };
+
+    // Unordered Lists with indentation handling:
+    } else if (/^\s*-\s/.test(line)) {
+        return { block: 'ul', position: 'middle' };
+    } else if (prevBlock === 'ul' && !/^\s*-\s/.test(line)) {
+        return { block: null, position: 'end' };
+
     // Non block lines:
     } else {
         return { block: null, position: null };
     }
 };
 
-const getElements = (markdown) => {
-    const lines = markdown.split('\n');
+const elementsFromStr = (markdown) => {
+    const lines = markdown.split('\n')
     let currentBlock = null;
     let currentPosition = 'middle';
-    const elements = [];
+    const elements = OArray([]);
     let buffer = [];
 
     lines.forEach(line => {
@@ -176,21 +213,31 @@ const getElements = (markdown) => {
     return elements;
 };
 
-const Markdown = ({ markdown }) => {
-    // TODO: Accept OArray and markdown string.
-    if (typeof markdown === 'string') {
-        markdown = Observer.mutable(markdown);
-    }
+const elementsFromOArray = (markdown) => {
+};
 
-    const elements = OArray(getElements(markdown.get()));
+const getElements = (markdown) => {
+    if (markdown instanceof Observer) {
+        return elementsFromStr(markdown.get());
+    } else if (markdown instanceof OArray) {
+        return elementsFromOArray(markdown);
+    };
+};
+
+const Markdown = ({ markdown }) => {
+    if (!(markdown instanceof Observer) && markdown instanceof string) {
+        markdown = Observer.mutable(markdown);
+    };
+
+    const elements = OArray(getElements(markdown));
 
     markdown.watch(delta => {
-        const newElements = getElements(delta.value);
+        const newElements = elementsFromStr(delta.value);
 
         // Remove removed lines from elements
         if (newElements.length < elements.length) {
             elements.splice(newElements.length, elements.length - newElements.length);
-        }
+        };
 
         // Update updated lines in elements
         newElements.forEach((newEl, i) => {
@@ -201,7 +248,7 @@ const Markdown = ({ markdown }) => {
             // If new line create new line in elements
             } else {
                 elements.push(newEl);
-            }
+            };
         });
     });
 
