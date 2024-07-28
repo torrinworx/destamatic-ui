@@ -1,7 +1,9 @@
 import h from './h';
 import { Observer } from 'destam-dom';
 
-const thumbWidth = 25
+import Shared from './Shared';
+
+const thumbWidth = 25;
 
 // Note: We are using a custom track and thumb component to get around the
 // destam-dom limitations with pseudo elements. Currently, we cannot style these.
@@ -9,12 +11,13 @@ const Thumb = ({
     position,
     style,
     onDragStart,
+    onDragEnd,
     hover,
     disabled
 }) => {
     const backgroundColor = disabled.map(d =>
         d ? Shared.Theme.Colours.primary.disabled
-        : hover.get() ? Shared.Theme.Colours.primary.hover : Shared.Theme.Colours.primary.base
+            : hover.get() ? Shared.Theme.Colours.primary.hover : Shared.Theme.Colours.primary.base
     );
 
     const cursor = disabled.map(d => d ? 'not-allowed' : 'pointer');
@@ -38,6 +41,9 @@ const Thumb = ({
         onMouseEnter={() => hover.set(true)}
         onMouseLeave={() => hover.set(false)}
         onMouseDown={onDragStart}
+        onMouseUp={onDragEnd}
+        onTouchStart={onDragStart}
+        onTouchEnd={onDragEnd}
     ></div>;
 };
 
@@ -89,13 +95,17 @@ const Slider = ({
     thumbStyle,
     hover = Observer.mutable(false),
     disabled = Observer.mutable(false),
+    onMouseDown,
+    onDragStart,
+    onDrag,
+    onDragEnd,
     ...props
 }, _, mount) => {
     if (!(min instanceof Observer)) min = Observer.mutable(min);
     if (!(max instanceof Observer)) max = Observer.mutable(max);
-    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue) 
-    if (!(hover instanceof Observer)) hover = Observer.mutable(hover) 
-    if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled) 
+    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
+    if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
+    if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 
     const trackRef = Observer.mutable(null);
     const dragging = Observer.mutable(false);
@@ -113,21 +123,26 @@ const Slider = ({
         OValue.set(Math.min(Math.max(newValue, minVal), maxVal));
     };
 
-    const handleMouseDown = (event) => {
+    const handleMouseMove = (event) => {
+        if (dragging.get() && !disabled.get()) {
+            updateValueFromEvent(event);
+            onDrag && onDrag(event);
+        }
+    };
+
+    const handleMouseUp = (event) => {
+        if (dragging.get()) {
+            dragging.set(false);
+            onDragEnd && onDragEnd(event);
+        }
+    };
+
+    const handleDragStart = (event) => {
         event.preventDefault();
         if (disabled.get()) return;
         dragging.set(true);
         updateValueFromEvent(event);
-    };
-
-    const handleMouseMove = (event) => {
-        if (dragging.get() && !disabled.get()) {
-            updateValueFromEvent(event);
-        }
-    };
-
-    const handleMouseUp = () => {
-        dragging.set(false);
+        onDragStart && onDragStart(event);
     };
 
     const percentage = OValue.map((value) => {
@@ -169,13 +184,23 @@ const Slider = ({
     >
         <Track
             style={trackStyle}
-            onMouseDown={handleMouseDown}
+            onMouseDown={(event) => {
+                if (!disabled.get()) {
+                    handleDragStart(event);
+                    onMouseDown && onMouseDown(event);
+                }
+            }}
             ref={trackRef}
             hover={hover}
         />
         <Thumb
             position={percentage}
-            onDragStart={handleMouseDown}
+            onDragStart={(event) => {
+                handleDragStart(event);
+            }}
+            onDragEnd={(event) => {
+                handleMouseUp(event);
+            }}
             style={thumbStyle}
             hover={hover}
             disabled={disabled}
