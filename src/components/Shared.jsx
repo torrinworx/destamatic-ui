@@ -2,7 +2,6 @@ import h from './h';
 import { OObject } from 'destam-dom';
 
 import Theme from './Theme';
-import { currentRoute } from './Router';
 
 /**
  * Global context observer for shared state across components.
@@ -10,7 +9,6 @@ import { currentRoute } from './Router';
  */
 const Shared = OObject({
     Theme: Theme,
-    currentRoute: currentRoute,
 });
 
 export default Shared
