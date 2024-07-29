@@ -10,10 +10,7 @@ import { h, Observer } from 'destam-dom';
 export const Router = ({ currentRoute, routes, NotFound, ...props }) => {
     if (!(currentRoute instanceof Observer)) currentRoute = Observer.immutable('/');
 
-    return currentRoute.map(route => {
-        // Default to the root route if no path is provided
-        if (!route) route = '/';
-
+    return currentRoute.def('/').map(route => {
         const Component = routes[route];
         return Component
             ? <Component {...props} />
