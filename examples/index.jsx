@@ -155,6 +155,30 @@ main()
                 Icon={<Icon libraryName="feather" iconName="feather" />}
             />
         </div>
+        <Theme value={{
+            Button: {
+                contained: { base: { backgroundColor: 'pink' } },
+                outlined: { base: { backgroundColor: 'pink' } },
+            }
+        }}>
+           <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                <Button label="Text Button" type="text" onClick={handleClick} />
+                <Button label="Contained Button" type="contained" onClick={handleClick} />
+                <Button label="Outlined Button" type="outlined" onClick={handleClick} />
+                <Button
+                    label="Icon Outline"
+                    type="outlined"
+                    onClick={handleClick}
+                    Icon={<Icon libraryName="feather" iconName="feather" />}
+                />
+                <Button
+                    label="Icon Contained"
+                    type="contained"
+                    onClick={handleClick}
+                    Icon={<Icon libraryName="feather" iconName="feather" />}
+                />
+            </div>
+        </Theme>
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Loading Dots</Typography>
         <LoadingDots />
