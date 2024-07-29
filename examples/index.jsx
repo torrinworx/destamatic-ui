@@ -17,7 +17,7 @@ import {
     CodeBlock
 } from '../src';
 
-const DemoPage = () => {
+const DemoPage = Theme.use(theme => () => {
     const handleClick = () => {
         console.log('Button clicked');
     };
@@ -155,13 +155,37 @@ main()
                 Icon={<Icon libraryName="feather" iconName="feather" />}
             />
         </div>
+        <Theme value={{
+            Button: {
+                contained: { base: { backgroundColor: 'pink' } },
+                outlined: { base: { backgroundColor: 'pink' } },
+            }
+        }}>
+           <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                <Button label="Text Button" type="text" onClick={handleClick} />
+                <Button label="Contained Button" type="contained" onClick={handleClick} />
+                <Button label="Outlined Button" type="outlined" onClick={handleClick} />
+                <Button
+                    label="Icon Outline"
+                    type="outlined"
+                    onClick={handleClick}
+                    Icon={<Icon libraryName="feather" iconName="feather" />}
+                />
+                <Button
+                    label="Icon Contained"
+                    type="contained"
+                    onClick={handleClick}
+                    Icon={<Icon libraryName="feather" iconName="feather" />}
+                />
+            </div>
+        </Theme>
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Loading Dots</Typography>
         <LoadingDots />
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
         <DropDown label="Click to Toggle">
-            <div $style={{ padding: '10px', border: `1px solid ${Theme.Colours.secondary.base}` }}>
+            <div $style={{ padding: '10px', border: `1px solid ${theme.Colours.secondary.base}` }}>
                 Dropdown Content
             </div>
         </DropDown>
@@ -199,7 +223,7 @@ main()
             </KebabMenu>
         </div>
     </div>;
-};
+});
 
 mount(document.body, <>
     <DemoPage />

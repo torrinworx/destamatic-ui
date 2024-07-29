@@ -1,17 +1,17 @@
 import h from './h';
-import Shared from './Shared';
+import Theme from './Theme';
 
 /**
  * LoadingDots component - a loading indicator with three animated dots.
  * 
  * @returns {JSX.Element} The rendered loading dots component.
  */
-const LoadingDots = () => {
+const LoadingDots = Theme.use(theme => () => {
     const dotStyle = {
         display: 'inline-block',
         width: '8px',
         height: '8px',
-        backgroundColor: Shared.Theme.Colours.primary.base,
+        backgroundColor: theme.Colours.primary.base,
         borderRadius: '50%',
         animationName: 'dotFlashing',
         animationDuration: '1s',
@@ -31,6 +31,6 @@ const LoadingDots = () => {
             }
         `}</style>
     </div>;
-};
+});
 
 export default LoadingDots;

@@ -1,5 +1,5 @@
 import { h } from 'destam-dom';
-import Shared from './Shared';
+import Theme from './Theme';
 
 /**
  * Typography component for rendering text with different styles and types.
@@ -13,22 +13,22 @@ import Shared from './Shared';
  * 
  * @returns {JSX.Element} The rendered typography element.
  */
-const Typography = ({ type = 'h1', fontStyle = 'regular', children, style, ...props }) => {
-    const validType = Object.keys(Shared.Theme.Typography)
+const Typography = Theme.use(theme => ({ type = 'h1', fontStyle = 'regular', children, style, ...props }) => {
+    const validType = Object.keys(theme.Typography)
         .includes(type) ? type : 'h1';
 
-    const validFontStyle = Object.keys(Shared.Theme.Typography[validType])
+    const validFontStyle = Object.keys(theme.Typography[validType])
         .includes(fontStyle) ? fontStyle : 'regular';
 
     return <div
         $style={{
             ...style,
-            font: Shared.Theme.Typography[validType][validFontStyle]
+            font: theme.Typography[validType][validFontStyle]
         }}
         {...props}
     >
         {children}
     </div>;
-};
+});
 
 export default Typography;

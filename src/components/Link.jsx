@@ -1,6 +1,6 @@
 import h from './h';
 import { Observer } from 'destam-dom';
-import Shared from './Shared';
+import Theme from './Theme';
 
 /**
  * Link component for navigation with optional styles and typography integration.
@@ -15,7 +15,7 @@ import Shared from './Shared';
  * 
  * @returns {JSX.Element} The rendered link component.
  */
-const Link = ({
+const Link = Theme.use(theme => ({
     href,
     underline = true,
     onClick,
@@ -43,8 +43,8 @@ const Link = ({
         $onmouseleave={handleHover(false)}
         $style={{
             color: clicked.map(c => c
-                ? Shared.Theme.Colours.primary.darker
-                : Shared.Theme.Colours.primary.base
+                ? theme.Colours.primary.darker
+                : theme.Colours.primary.base
             ),
             textDecoration: underline ? hover.map(h => (h ? 'underline 2px' : 'none')) : 'none',
             cursor: 'pointer'
@@ -53,6 +53,6 @@ const Link = ({
     >
         {children}
     </a>;
-};
+});
 
 export default Link;

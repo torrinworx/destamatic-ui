@@ -1,7 +1,7 @@
 import h from './h';
 
 import { OArray, Observer } from 'destam-dom';
-import Shared from './Shared';
+import Theme from './Theme';
 
 /**
  * Custom hook for creating ripple effects.
@@ -10,7 +10,7 @@ import Shared from './Shared';
  * 
  * @returns {[Array<JSX.Element>, Function]} - Returns a tuple where the first element is the array of ripple elements and the second is the function to create a ripple.
  */
-const useRipples = (background = Shared.Theme.Colours.ripple.dark) => {
+const useRipples = background => {
     const ripples = OArray();
 
     /**

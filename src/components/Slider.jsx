@@ -1,7 +1,7 @@
 import h from './h';
 import { Observer } from 'destam-dom';
 
-import Shared from './Shared';
+import Theme from './Theme';
 
 const thumbWidth = 25;
 
@@ -16,8 +16,8 @@ const Thumb = ({
     disabled
 }) => {
     const backgroundColor = disabled.map(d =>
-        d ? Shared.Theme.Colours.primary.disabled
-            : hover.get() ? Shared.Theme.Colours.primary.hover : Shared.Theme.Colours.primary.base
+        d ? theme.Colours.primary.disabled
+            : hover.get() ? theme.Colours.primary.hover : theme.Colours.primary.base
     );
 
     const cursor = disabled.map(d => d ? 'not-allowed' : 'pointer');
@@ -32,7 +32,7 @@ const Thumb = ({
         borderRadius: '50%',
         transform: 'translate(-50%, -50%)',
         cursor,
-        transition: Shared.Theme.transition,
+        transition: theme.transition,
         ...style
     };
 
@@ -56,13 +56,13 @@ const Track = ({ style, onMouseDown, hover }) => {
             width: '100%',
             height: '8px',
             backgroundColor: hover.map(h => h
-                ? Shared.Theme.Colours.secondary.darker
-                : Shared.Theme.Colours.secondary.base
+                ? theme.Colours.secondary.darker
+                : theme.Colours.secondary.base
             ),
             borderRadius: '4px',
             transform: 'translateY(-50%)',
             cursor: 'pointer',
-            transition: Shared.Theme.transition,
+            transition: theme.transition,
             ...style,
         }}
         onMouseEnter={() => hover.set(true)}
@@ -86,7 +86,7 @@ const Track = ({ style, onMouseDown, hover }) => {
  * 
  * @returns {JSX.Element} The rendered slider element.
  */
-const Slider = ({
+const Slider = Theme.use(theme => ({
     min = Observer.mutable(0),
     max = Observer.mutable(100),
     OValue = Observer.mutable(50),
@@ -177,7 +177,7 @@ const Slider = ({
             position: 'relative',
             width: '100%',
             height: '40px',
-            transition: Shared.Theme.transition,
+            transition: theme.transition,
             ...style
         }}
         {...props}
@@ -206,6 +206,6 @@ const Slider = ({
             disabled={disabled}
         />
     </Ref>;
-};
+});
 
 export default Slider;

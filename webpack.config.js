@@ -42,7 +42,7 @@ const config = {
                             () => ({
                                 visitor: {
                                     Program: path => {
-                                        transformBabelAST(path.node);
+                                        transformBabelAST(path.node, {jsx_auto_import: {}});
                                     }
                                 }
                             })

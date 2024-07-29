@@ -1,9 +1,9 @@
 import h from './h';
 import { Observer } from 'destam-dom';
-import Shared from './Shared';
 import Icon from './Icon';
 import Button from './Button';
 import Typography from './Typography';
+import Theme from './Theme';
 
 // Ran into issues finding prismjs node_module with require.context():
 const importLanguage = {
@@ -68,7 +68,7 @@ const loadPrismLanguage = async (language, mode) => {
  * 
  * @returns {JSX.Element} The rendered code block component.
  */
-const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props }) => {
+const CodeBlock = Theme.use(theme => ({ language = 'markdown', code, mode = 'dark', style, ...props }) => {
     const highlightedCode = Observer.mutable('');
 
     loadPrismLanguage(language, mode)
@@ -83,8 +83,8 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
             alignItems: 'center',
             padding: '5px 15px 5px 15px',
             backgroundColor: mode === 'dark' ? '#333' : '#f5f5f5',
-            borderTopLeftRadius: Shared.Theme.borderRadius,
-            borderTopRightRadius: Shared.Theme.borderRadius
+            borderTopLeftRadius: theme.borderRadius,
+            borderTopRightRadius: theme.borderRadius
         }}>
             <Typography type='p1' $style={{ color: mode === 'dark' ? 'white' : 'black' }}>
                 {language.toLowerCase()}
@@ -107,8 +107,8 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
             $style={{
                 overflow: 'auto',
                 backgroundColor: mode === 'dark' ? 'black' : 'white',
-                borderBottomLeftRadius: Shared.Theme.borderRadius,
-                borderBottomRightRadius: Shared.Theme.borderRadius,
+                borderBottomLeftRadius: theme.borderRadius,
+                borderBottomRightRadius: theme.borderRadius,
                 borderTopLeftRadius: '0',
                 borderTopRightRadius: '0',
                 padding: '10px',
@@ -124,6 +124,6 @@ const CodeBlock = ({ language = 'markdown', code, mode = 'dark', style, ...props
             />
         </pre>
     </div>;
-};
+});
 
 export default CodeBlock;

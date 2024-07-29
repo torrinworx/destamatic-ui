@@ -1,7 +1,7 @@
 import h from '../h';
 import { Observer } from 'destam-dom';
 
-import Shared from '../Shared.jsx';
+import Theme from '../Theme.jsx';
 import useRipples from '../Ripple.jsx';
 import Typography from '../Typography.jsx';
 
@@ -22,7 +22,7 @@ import Typography from '../Typography.jsx';
  * 
  * @returns {JSX.Element} The rendered button element.
  */
-const Button = (
+const Button = Theme.use(theme => (
     {
         label = '',
         type = 'text',
@@ -48,61 +48,61 @@ const Button = (
     const [ripples, createRipple] = useRipples((() => {
         switch (type) {
             case 'text':
-                return Shared.Theme.Colours.ripple.dark;
+                return theme.Colours.ripple.dark;
             case 'contained':
-                return Shared.Theme.Colours.ripple.light;
+                return theme.Colours.ripple.light;
             case 'outlined':
-                return Shared.Theme.Colours.ripple.dark;
+                return theme.Colours.ripple.dark;
             default:
-                return Shared.Theme.Colours.ripple.dark;
+                return theme.Colours.ripple.dark;
         }
     })());
 
     const buttonStyle = {
-        ...Shared.Theme.Button.base,
-        ...Shared.Theme.Button[type].base,
-        transition: Shared.Theme.transition,
-        borderRadius: Shared.Theme.borderRadius,
+        ...theme.Button.base,
+        ...theme.Button[type].base,
+        transition: theme.transition,
+        borderRadius: theme.borderRadius,
         boxShadow: disabled.map(d =>
-            d ? Shared.Theme.Button[type].disabled.boxShadow
-            : (hover.map(h => h ? Shared.Theme.boxShadow : null))
+            d ? theme.Button[type].disabled.boxShadow
+            : (hover.map(h => h ? theme.boxShadow : null))
         ),
         ...style,
         backgroundColor: disabled.map(d =>
-            d ? Shared.Theme.Button[type].disabled.backgroundColor
-            || Shared.Theme.Button[type].base.backgroundColor
-            : hover.map(h => (h ? Shared.Theme.Button[type].hover.backgroundColor
-            : Shared.Theme.Button[type].base.backgroundColor))
+            d ? theme.Button[type].disabled.backgroundColor
+            || theme.Button[type].base.backgroundColor
+            : hover.map(h => (h ? theme.Button[type].hover.backgroundColor
+            : theme.Button[type].base.backgroundColor))
         ),
         color: disabled.map(d =>
-            d ? Shared.Theme.Button[type].disabled.color
-            || Shared.Theme.Button[type].base.color
-            : hover.map(h => (h ? Shared.Theme.Button[type].hover.color
-                : Shared.Theme.Button[type].base.color))
+            d ? theme.Button[type].disabled.color
+            || theme.Button[type].base.color
+            : hover.map(h => (h ? theme.Button[type].hover.color
+                : theme.Button[type].base.color))
         ),
         cursor: disabled.map(d =>
-            d ? Shared.Theme.Button[type].disabled.cursor
-            : Shared.Theme.Button.base.cursor
+            d ? theme.Button[type].disabled.cursor
+            : theme.Button.base.cursor
         ),
-        filter: disabled.map(d => (d ? Shared.Theme.Button[type].disabled.filter : 'none')),
+        filter: disabled.map(d => (d ? theme.Button[type].disabled.filter : 'none')),
         pointerEvents: disabled.map(d =>
-            d ? Shared.Theme.Button[type].disabled.pointerEvents : 'auto'
+            d ? theme.Button[type].disabled.pointerEvents : 'auto'
         ),
     };
 
     if (Icon) return <Ref style={style} {...props}>
         <i
             style={{
-                ...Shared.Theme.Button.base,
-                ...Shared.Theme.Button.icon.base,
+                ...theme.Button.base,
+                ...theme.Button.icon.base,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: disabled.map(d =>
-                    d ? Shared.Theme.Button[type].disabled.color
-                    || Shared.Theme.Button[type].base.color
-                    : hover.map(h => (h ? Shared.Theme.Button[type].hover.color
-                        : Shared.Theme.Button[type].base.color))
+                    d ? theme.Button[type].disabled.color
+                    || theme.Button[type].base.color
+                    : hover.map(h => (h ? theme.Button[type].hover.color
+                        : theme.Button[type].base.color))
                 ),
             }}
             onClick={(event) => {
@@ -146,6 +146,6 @@ const Button = (
             {ripples}
         </button>
     </Ref>;
-};
+});
 
 export default Button;

@@ -1,7 +1,7 @@
 import h from './h';
 
 import { Observer } from 'destam-dom';
-import Shared from './Shared';
+import Theme from './Theme';
 
 /**
  * Input component primarily for text input with dynamic styling and observable value.
@@ -25,7 +25,7 @@ import Shared from './Shared';
  * 
  * @returns {JSX.Element} The rendered input element.
  */
-const Input = ({ value, type='text', placeholder = '', style, ...props }, _, mount) => {
+const Input = Theme.use(theme => ({ value, type='text', placeholder = '', style, ...props }, _, mount) => {
     const isFocused = Observer.mutable(false);
 
     const Ref = <input />;
@@ -46,18 +46,18 @@ const Input = ({ value, type='text', placeholder = '', style, ...props }, _, mou
         $onblur={() => isFocused.set(false)}
         $style={{
             minWidth: '100px',
-            font: Shared.Theme.Typography.p1.regular,
-            padding: `0px ${Shared.Theme.padding} 0px ${Shared.Theme.padding}`,
-            height: Shared.Theme.height,
-            border: `${Shared.Theme.outline} ${Shared.Theme.Colours.secondary.base}`,
-            borderRadius: Shared.Theme.borderRadius,
-            outline: isFocused.map(f => 
-                f ? `${Shared.Theme.outline} ${Shared.Theme.Colours.primary.base}` : null
+            font: theme.Typography.p1.regular,
+            padding: `0px ${theme.padding} 0px ${theme.padding}`,
+            height: theme.height,
+            border: `${theme.outline} ${theme.Colours.secondary.base}`,
+            borderRadius: theme.borderRadius,
+            outline: isFocused.map(f =>
+                f ? `${theme.outline} ${theme.Colours.primary.base}` : null
             ),
             ...style,
         }}
         {...props}
     />;
-};
+});
 
 export default Input;
