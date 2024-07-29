@@ -15,7 +15,6 @@ export { default as Shown } from './components/Shown'
 export { default as TextArea } from './components/TextArea';
 export { default as Theme } from './components/Theme';
 export { default as Typography } from './components/Typography';
-export { default as Shared } from './components/Shared';
 export { Router } from './components/Router';
 export { default as Radio } from './components/Radio';
 export { default as Checkbox } from './components/Checkbox';
