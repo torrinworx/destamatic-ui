@@ -88,7 +88,7 @@ const renderList = (lines) => {
     return nodes;
 };
 
-const Element = ({ each: e }) => {
+const Element = Theme.use(theme => ({ each: e }) => {
     let line = e.line;
     const block = e.block;
     const position = e.position;
@@ -103,7 +103,7 @@ const Element = ({ each: e }) => {
     };
 
     if (block === 'quote' && Array.isArray(line)) {
-        return <blockquote $style={Theme.Markdown.blockquote}>
+        return <blockquote $style={theme.Markdown.blockquote}>
             {line.map(l => {
                 l = emphasis(l.startsWith('> ') ? l.slice(2) : l);
                 return l;
@@ -141,7 +141,7 @@ const Element = ({ each: e }) => {
     };
 
     return <Typography type='p1'>{emphasis(line)}</Typography>;
-};
+});
 
 const blockContext = (line, prevBlock, prevPosition) => {
     // Code Blocks:

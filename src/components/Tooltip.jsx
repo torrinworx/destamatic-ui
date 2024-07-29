@@ -7,16 +7,16 @@ import Popup from './Popup';
 import Theme from './Theme';
 import Button from './Button';
 
-const Tooltip = ({hover=Observer.mutable(''), label, ...style}) => {
+const Tooltip = Theme.use(theme => ({hover=Observer.mutable(''), label, ...style}) => {
 	if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
 	return <Shown value={hover}>
 		<Popup placement={hover}>
 			<div style={{
 				background: 'white',
-				borderRadius: Theme.borderRadius,
-				border: `1px solid ${Theme.Colours.secondary.base}`,
-				fontColor: Theme.Colours.primary.base,
+				borderRadius: theme.borderRadius,
+				border: `1px solid ${theme.Colours.secondary.base}`,
+				fontColor: theme.Colours.primary.base,
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',
@@ -27,6 +27,6 @@ const Tooltip = ({hover=Observer.mutable(''), label, ...style}) => {
 			</div>
 		</Popup>
 	</Shown>;
-};
+});
 
 export default Tooltip;

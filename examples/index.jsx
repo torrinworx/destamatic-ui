@@ -17,7 +17,7 @@ import {
     CodeBlock
 } from '../src';
 
-const DemoPage = () => {
+const DemoPage = Theme.use(theme => () => {
     const handleClick = () => {
         console.log('Button clicked');
     };
@@ -161,7 +161,7 @@ main()
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
         <DropDown label="Click to Toggle">
-            <div $style={{ padding: '10px', border: `1px solid ${Theme.Colours.secondary.base}` }}>
+            <div $style={{ padding: '10px', border: `1px solid ${theme.Colours.secondary.base}` }}>
                 Dropdown Content
             </div>
         </DropDown>
@@ -199,7 +199,7 @@ main()
             </KebabMenu>
         </div>
     </div>;
-};
+});
 
 mount(document.body, <>
     <DemoPage />

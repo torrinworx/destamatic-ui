@@ -1,4 +1,5 @@
 import { h, OObject } from "destam-dom";
+import createContext from './Context';
 
 /**
  * Global shared theme for the UI framework, accessible via Shared.
@@ -218,4 +219,4 @@ Theme.Markdown = OObject({
     },
 });
 
-export default Theme;
+export default createContext(Theme);

@@ -1,5 +1,5 @@
 import { h, Observer } from 'destam-dom';
-import Shared from './Shared';
+import Theme from './Theme';
 
 /**
  * Textarea component that provides a flexible and controllable text input area.
@@ -19,8 +19,8 @@ import Shared from './Shared';
  * 
  * @returns {JSX.Element} The rendered textarea element.
  */
-const Textarea = (
-    { 
+const Textarea = Theme.use(theme => (
+    {
         children,
         OValue=Observer.mutable(''),
         style,
@@ -52,12 +52,12 @@ const Textarea = (
             resize: 'none',
             overflowY: 'auto',
             flexGrow: 1,
-            height: Shared.Theme.height,
-            padding: Shared.Theme.padding,
-            borderRadius: Shared.Theme.borderRadius,
-            border: `${Shared.Theme.outline} ${Shared.Theme.Colours.secondary.base}`,
-            font: Shared.Theme.Typography.p1.regular,
-            outline: isFocused.map(f => f ? `${Shared.Theme.outline} ${Shared.Theme.Colours.primary.base}` : null),
+            height: theme.height,
+            padding: theme.padding,
+            borderRadius: theme.borderRadius,
+            border: `${theme.outline} ${theme.Colours.secondary.base}`,
+            font: theme.Typography.p1.regular,
+            outline: isFocused.map(f => f ? `${theme.outline} ${theme.Colours.primary.base}` : null),
             height: isMounted.map(mounted => {
                 if (!mounted) return 'auto';
 
@@ -85,6 +85,6 @@ const Textarea = (
         }}
         {...props}
     />;
-};
+});
 
 export default Textarea;
