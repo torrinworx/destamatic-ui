@@ -219,4 +219,39 @@ Theme.Markdown = OObject({
     },
 });
 
-export default createContext(Theme);
+export default createContext(Theme, customTheme => {
+    // The application may specify only a partial theme. We need to fill in
+    // the rest of the theme in this case from the defaults.
+
+    const createReactiveCopy = (a, b) => {
+        if (!(a instanceof OObject)) {
+            return b ?? a;
+        }
+
+        const out = OObject();
+
+        a.observer.shallow().watch(delta => {
+            const prop = delta.path()[0];
+
+            out[prop] = createReactiveCopy(a[prop], b[prop]);
+        });
+
+        b.observer?.shallow().watch(delta => {
+            const prop = delta.path()[0];
+
+            out[prop] = createReactiveCopy(a[prop], b[prop]);
+        });
+
+        for (let o in a) {
+            if (!(o in b)) {
+                out[o] = a[o];
+            } else {
+                out[o] = createReactiveCopy(a[o], b[o]);
+            }
+        }
+
+        return out;
+    };
+
+    return createReactiveCopy(Theme, customTheme);
+});
