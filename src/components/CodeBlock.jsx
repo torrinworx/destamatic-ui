@@ -45,7 +45,7 @@ const loadPrismLanguage = async (language, mode, code) => {
     } else if (mode === 'light') {
         await import('prismjs/themes/prism-solarizedlight.css');
     };
-    console.log(language)
+
     code.set(prism.highlight(code.get(), prism.languages[language], language));
 };
 
