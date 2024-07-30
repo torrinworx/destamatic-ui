@@ -11,7 +11,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.24.3",
     "@babel/plugin-syntax-jsx": "^7.24.1",
