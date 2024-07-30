@@ -116,7 +116,7 @@ main()
         <CodeBlock language='javascript' code={javascript} />
 
         <Markdown markdown={markdown} />
-        <TextArea value={markdown} style={{width: "1000px", height: "500px"}}/>
+        <TextArea OValue={markdown} style={{width: "1000px", height: "500px"}}/>
         {/* <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
             <Typography type="h1">Destamatic UI Demo</Typography>
             <Typography type="h2">Typography</Typography>

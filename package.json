@@ -1,6 +1,6 @@
 {
   "name": "destamatic-ui",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "./src/index.jsx",
   "type": "module",
@@ -30,11 +30,11 @@
   },
   "dependencies": {
     "destam": "^0.3.0",
-    "destam-dom": "^0.8.1",
-    "prismjs": "^1.29.0"
+    "destam-dom": "^0.8.1"
   },
   "optionalDependencies": {
     "feather-icons": "^4.29.1",
-    "material-icons": "^1.13.12"
+    "material-icons": "^1.13.12",
+    "prismjs": "^1.29.0"
   }
 }
