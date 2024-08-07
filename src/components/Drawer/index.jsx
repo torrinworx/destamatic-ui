@@ -74,7 +74,6 @@ const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup)
                 top: '50%',
                 left: '0',
                 transform: open.map(o => `translateX(${o ? width : '0px'}) translateY(-100%)`),
-                zIndex: 1, // Ensure the button is always clickable
             }}
             Icon={open.map(
                 o => o ? <Icon libraryName={'feather'} iconName={'chevron-left'} />
