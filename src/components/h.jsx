@@ -22,7 +22,7 @@ const sizeProperties = new Set([
 	'fontSize',
 ]);
 
-const h = (name, props, ...children) => {
+export const h = (name, props, ...children) => {
 	if (typeof name === 'string') {
 		name = document.createElement(name);
 	}
@@ -164,4 +164,10 @@ const h = (name, props, ...children) => {
 	};
 };
 
-export default h;
+export const mark = (name, props, ...children) => {
+	const obj = Object.create(mark.prototype);
+	obj.name = name;
+	obj.props = props;
+	obj.children = children;
+	return obj;
+};

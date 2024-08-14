@@ -1,4 +1,4 @@
-export { default as h } from './components/h';
+export * from './components/h';
 
 export { default as Button } from './components/Button';
 export { default as Drawer } from './components/Drawer';
