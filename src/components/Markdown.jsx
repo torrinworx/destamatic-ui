@@ -1,4 +1,4 @@
-import h from './h';
+import { h } from './h';
 import { OArray, OObject, Observer } from 'destam-dom';
 
 import Link from './Link';
