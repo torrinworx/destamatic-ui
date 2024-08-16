@@ -11,7 +11,8 @@ const KebabMenu = ({
     Icon,
     shown=Observer.mutable(false),
     children,
-    anchor
+    anchor,
+    ...props
 }) => {
     if (!(shown instanceof Observer)) shown = Observer.mutable(false);
     if (!Icon) {
@@ -43,7 +44,7 @@ const KebabMenu = ({
     };
 
     return <>
-        <Button Icon={Icon} ref={button} onClick={e => {
+        <Button Icon={Icon} ref={button} {...props} onClick={e => {
             if (shown.get()) {
                 shown.set(false);
             } else {
