@@ -167,7 +167,7 @@ export const h = (name, props, ...children) => {
 export const mark = (name, props, ...children) => {
 	const obj = Object.create(mark.prototype);
 	obj.name = name;
+	props.children = children;
 	obj.props = props;
-	obj.children = children;
 	return obj;
 };
