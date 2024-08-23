@@ -1,6 +1,7 @@
 import {mark} from './h';
+import Observer from 'destam/Observer';
 
-const Shown = ({children, value}) => {
+const Shown = ({children, invert = false, value}) => {
 	const [truthy, falsy] = children.reduce((a, c) => {
 		if (c instanceof mark) {
 			let m = 0;
@@ -16,7 +17,7 @@ const Shown = ({children, value}) => {
 		return a;
 	}, [[], []]);
 
-	return value.map(val => val ? truthy : falsy);
+	return Observer.immutable(value).map(val => (!!val ^ invert) ? truthy : falsy);
 };
 
 export default Shown;
