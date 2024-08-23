@@ -20,11 +20,9 @@ export const popups = OArray();
  * 
  * @returns {null} The popup component does not return a DOM element directly; it sets up an element in the global `popups` array.
  */
-const Popup = ({ children, style, placement, ref: Ref }, cleanup) => {
+const Popup = ({ children, style, placement, ref: Ref }, cleanup, mounted) => {
     if (!Ref) Ref = <div />;
-    if (!(placement instanceof Observer)) {
-        placement = Observer.immutable(placement);
-    }
+    if (!(placement instanceof Observer)) placement = Observer.immutable(placement);
 
     const dom = <Ref $style={{
         position: 'absolute',
@@ -37,11 +35,40 @@ const Popup = ({ children, style, placement, ref: Ref }, cleanup) => {
         {children}
     </Ref>;
 
+    let listener;
+    if (!placement.isImmutable()) {
+        listener = (e) => {
+            let target = e.target;
+            let found = false;
+            while (target) {
+                if (target === Ref) {
+                    found = true;
+                    break;
+                }
+                target = target.parentElement;
+            }
+
+            if (!found) {
+                placement.set(null);
+            }
+        };
+
+        mounted(() => {
+            setTimeout(() => {
+                document.body.addEventListener('click', listener);
+            }, 0);
+        });
+    }
+
     popups.push(dom);
 
     cleanup(() => {
         const index = popups.indexOf(dom);
         if (index >= 0) popups.splice(index, 1);
+
+        if (listener) {
+            document.body.removeEventListener('click', listener);
+        }
     });
 
     return null;
