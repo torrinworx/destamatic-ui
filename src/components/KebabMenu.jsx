@@ -9,7 +9,7 @@ import IconComponent from './Icon';
 
 const KebabMenu = ({
     Icon,
-    shown=Observer.mutable(false),
+    shown,
     children,
     anchor,
     ...props
