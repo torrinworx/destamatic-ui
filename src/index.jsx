@@ -25,3 +25,4 @@ export { default as CodeBlock } from './components/CodeBlock';
 export { default as Slider } from './components/Slider';
 export { default as createContext } from './components/Context';
 export { default as Paper } from './components/Paper';
+export { default as TextField } from './components/TextField';
