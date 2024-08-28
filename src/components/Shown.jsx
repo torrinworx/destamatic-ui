@@ -9,7 +9,7 @@ const Shown = ({children, invert = false, value}) => {
 			else if (c.name === 'else') m = 1;
 			else throw new Error("Unknown mark name for <Shown>: " + c.name);
 
-			a[m] = a[m].concat(c.children);
+			a[m] = a[m].concat(c.props.children);
 		} else {
 			a[0].push(c);
 		}
