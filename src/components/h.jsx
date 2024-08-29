@@ -164,6 +164,28 @@ export const h = (name, props, ...children) => {
 	};
 };
 
+/**
+ * The <mark:> tag can be used anytime where you have a component that might want
+ * to give special behaviour to only some of its children. The component that
+ * takes in the children should loop over the children, find all marks and do
+ * any processing it needs with them. It should throw an error if the component
+ * does not understand a given mark.
+ *
+ * Mark names can be anything <mark:birthdayparty> can be a mark and it will be
+ * valid. It's up to the component above it to make sure the mark is sane.
+ *
+ * Note that marks can also have props:
+ * <mark:birthdayparty cakeFlavour="cocholate">
+ *
+ * The return value of a mark component looks like this:
+ * {
+ *    name: string,
+ *    props: {
+ *       children: Array,
+ *       ...
+ *    }
+ * }
+ */
 export const mark = (name, props, ...children) => {
 	const obj = Object.create(mark.prototype);
 	obj.name = name;
