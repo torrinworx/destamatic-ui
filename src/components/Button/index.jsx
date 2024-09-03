@@ -13,6 +13,7 @@ import Typography from '../Typography.jsx';
  * @param {string} [props.type='text'] - The type of the button, which affects its style. Can be 'text', 'contained', 'outlined'.
  * @param {Function} [props.onClick] - The function to call when the button is clicked.
  * @param {Function} [props.onMouseDown] - The function to call when the mouse button is pressed down on the button.
+ * @param {Function} [props.onMouseUp] - The function to call when the mouse button is released on the button.
  * @param {JSX.Element} [props.Icon] - An optional icon element to display inside the button.
  * @param {Object} [props.style] - Custom styles to apply to the button.
  * @param {Observer<boolean>} [props.disabled] - Observable boolean to determine if the button is disabled.
@@ -28,6 +29,7 @@ const Button = Theme.use(theme => (
         type = 'text',
         onClick,
         onMouseDown,
+        onMouseUp,
         Icon,
         style,
         disabled = Observer.mutable(false),
@@ -117,6 +119,11 @@ const Button = Theme.use(theme => (
                     onMouseDown && onMouseDown(event);
                 }
             }}
+            onMouseUp={(event) => {
+                if (!disabled.get()) {
+                    onMouseUp && onMouseUp(event);
+                }
+            }}
             onMouseEnter={() => hover.set(true)}
             onMouseLeave={() => hover.set(false)}
             disabled={disabled.map(d => d ? true : false)}
@@ -135,6 +142,11 @@ const Button = Theme.use(theme => (
                 if (!disabled.get()) {
                     createRipple(event);
                     onMouseDown && onMouseDown(event);
+                }
+            }}
+            onMouseUp={(event) => {
+                if (!disabled.get()) {
+                    onMouseUp && onMouseUp(event);
                 }
             }}
             onMouseEnter={() => hover.set(true)}
