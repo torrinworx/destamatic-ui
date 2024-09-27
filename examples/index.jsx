@@ -8,7 +8,7 @@ import {
     Icon,
     LoadingDots,
     DropDown,
-    Input,
+    TextField,
     TextArea,
     Drawer,
     Chevron,
@@ -191,7 +191,7 @@ main()
         </DropDown>
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Inputs</Typography>
-        <Input placeholder="Type here..." $style={{ marginBottom: '10px' }} />
+        <TextField placeholder="Type here..." style={{ marginBottom: '10px' }} />
         <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} />
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Drawer</Typography>
