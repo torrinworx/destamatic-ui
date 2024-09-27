@@ -1,5 +1,6 @@
 import { h, Observer } from 'destam-dom';
 import Theme from './Theme';
+import FocusEffect from './FocusEffect';
 
 /**
  * Textarea component that provides a flexible and controllable text input area.
@@ -22,7 +23,7 @@ import Theme from './Theme';
 const Textarea = Theme.use(theme => (
     {
         children,
-        OValue=Observer.mutable(''),
+        value=Observer.mutable(''),
         style,
         maxHeight = 200,
         id,
@@ -33,58 +34,73 @@ const Textarea = Theme.use(theme => (
     _,
     mounted
 ) => {
-    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
+    if (!(value instanceof Observer)) value = Observer.mutable(value);
 
     const Ref = <textarea />;
     const isMounted = Observer.mutable(false);
     const isFocused = Observer.mutable(false);
     mounted(() => isMounted.set(true));
 
-    return <Ref
-        $id={id}
-        $placeholder={placeholder}
-        $value={OValue}
-        $onkeydown={onKeyDown}
-        $oninput={e => OValue.set(e.target.value)}
-        $onfocus={() => isFocused.set(true)}
-        $onblur={() => isFocused.set(false)}
-        $style={{
-            resize: 'none',
-            overflowY: 'auto',
-            flexGrow: 1,
-            height: theme.height,
-            padding: theme.padding,
-            borderRadius: theme.borderRadius,
-            border: `${theme.outline} ${theme.Colours.secondary.base}`,
-            font: theme.Typography.p1.regular,
-            outline: isFocused.map(f => f ? `${theme.outline} ${theme.Colours.primary.base}` : null),
-            height: isMounted.map(mounted => {
-                if (!mounted) return 'auto';
-
-                return OValue.map(val => {
-                    let elem = <textarea rows={1} $value={val} $style={{
-                        resize: 'none',
-                        paddingTop: '0px',
-                        paddingBottom: '0px',
-                        boxSizing: 'border-box',
-                        width: Ref.clientWidth + 'px'
-                    }} />;
-
-                    document.body.appendChild(elem);
-                    let calculatedHeight = elem.scrollHeight;
-                    document.body.removeChild(elem);
-
-                    if (calculatedHeight > maxHeight) {
-                        calculatedHeight = maxHeight;
-                    }
-
-                    return calculatedHeight + 'px';
-                }).memo();
-            }).unwrap(),
-            ...style
+    return <FocusEffect
+        enabled={isFocused}
+        style={{
+            padding: '10px'
         }}
-        {...props}
-    />;
+    >
+         <Ref
+            $id={id}
+            $placeholder={placeholder}
+            $value={value}
+            $onkeydown={onKeyDown}
+            $oninput={e => {
+                if (value.isImmutable()) {
+                    Input.value = value.get() || '';
+                    return;
+                }
+
+                value.set(e.target.value);
+            }}
+            $onfocus={() => isFocused.set(true)}
+            $onblur={() => isFocused.set(false)}
+            $style={{
+                border: 0,
+                outline: 0,
+                padding: 0,
+                fontSize: '1rem',
+                background: 'none',
+                display: 'block',
+                resize: 'none',
+                overflowY: 'auto',
+                flexGrow: 1,
+                font: theme.Typography.p1.regular,
+                height: isMounted.map(mounted => {
+                    if (!mounted) return 'auto';
+
+                    return value.map(val => {
+                        let elem = <textarea rows={1} $value={val} $style={{
+                            resize: 'none',
+                            padding: '0px',
+                            boxSizing: 'border-box',
+                            width: Ref.clientWidth + 'px',
+                            font: theme.Typography.p1.regular,
+                        }} />;
+
+                        document.body.appendChild(elem);
+                        let calculatedHeight = elem.scrollHeight;
+                        document.body.removeChild(elem);
+
+                        if (calculatedHeight > maxHeight) {
+                            calculatedHeight = maxHeight;
+                        }
+
+                        return calculatedHeight + 'px';
+                    }).memo();
+                }).unwrap(),
+                ...style
+            }}
+            {...props}
+        />
+    </FocusEffect>;
 });
 
 export default Textarea;
