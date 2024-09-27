@@ -34,6 +34,7 @@ const TextField = ({value, style, inline, expand, onEnter, error, autoselect, on
 			$value={value.def('')}
 			onInput={(e) => {
 				if (value.isImmutable()) {
+					Input.value = value.get() || '';
 					return;
 				}
 
