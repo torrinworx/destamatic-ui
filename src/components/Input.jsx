@@ -39,12 +39,12 @@ const Input = Theme.use(theme => ({ value, type='text', placeholder = '', style,
 
     return <Ref
         $value={value}
-        $type={type}
-        $placeholder={placeholder}
-        $oninput={e => value.set(e.target.value)}
-        $onfocus={() => isFocused.set(true)}
-        $onblur={() => isFocused.set(false)}
-        $style={{
+        type={type}
+        placeholder={placeholder}
+        onInput={e => value.set(e.target.value)}
+        onFocus={() => isFocused.set(true)}
+        onBlur={() => isFocused.set(false)}
+        style={{
             minWidth: '100px',
             font: theme.Typography.p1.regular,
             padding: `0px ${theme.padding} 0px ${theme.padding}`,

@@ -19,7 +19,6 @@ const Theme = OObject({
     boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
     insetBoxShadow: 'inset -2px -2px 10px rgba(0,0,0,0.2)',
     font: 'Roboto, sans-serif',
-    
     /**
      * Colours
      */
@@ -106,11 +105,10 @@ Theme.Button = OObject({
         border: 'none',
         outline: 'none',
         borderRadius: Theme.borderRadius,
-        lineHeight: '2.25rem',
         cursor: 'pointer',
         textDecoration: 'none',
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'clip',
         transition: Theme.transition,
     }),
     text: OObject({

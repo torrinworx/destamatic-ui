@@ -164,6 +164,11 @@ export const h = (name, props, ...children) => {
 	};
 };
 
+export const svg = (name, props, ...children) => {
+	name = document.createElementNS("http://www.w3.org/2000/svg", name);
+	return h(name, props, ...children);
+};
+
 /**
  * The <mark:> tag can be used anytime where you have a component that might want
  * to give special behaviour to only some of its children. The component that

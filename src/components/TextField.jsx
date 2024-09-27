@@ -3,7 +3,7 @@ import Observer from 'destam/Observer';
 import {h} from './h';
 
 // Takes value as an observer
-const TextField = ({value, style, expand, onEnter, error, autoselect, onFocus, ...props}) => {
+const TextField = ({value, style, inline, expand, onEnter, error, autoselect, onFocus, ...props}) => {
 	if (!(value instanceof Observer)) value = Observer.immutable(value);
 	expand = Observer.immutable(expand);
 
@@ -20,7 +20,7 @@ const TextField = ({value, style, expand, onEnter, error, autoselect, onFocus, .
 		style={{
 			flexGrow: expand.map(e => e ? 1 : ''),
 			height: expand.map(e => e ? '100%' : 'auto'),
-			display: 'flex',
+			display: inline ? 'inline-flex' : 'flex',
 			alignItems: 'center',
 			padding: 10,
 			marginTop: 10,
@@ -31,8 +31,8 @@ const TextField = ({value, style, expand, onEnter, error, autoselect, onFocus, .
 		}}
 	>
 		<Input
-			value={value.def('')}
-			onChange={(e) => {
+			$value={value.def('')}
+			onInput={(e) => {
 				if (value.isImmutable()) {
 					return;
 				}

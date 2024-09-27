@@ -1,4 +1,4 @@
-import { h } from 'destam-dom';
+import { h } from './h';
 import Theme from './Theme';
 
 /**
@@ -13,7 +13,7 @@ import Theme from './Theme';
  * 
  * @returns {JSX.Element} The rendered typography element.
  */
-const Typography = Theme.use(theme => ({ type = 'h1', fontStyle = 'regular', children, style, ...props }) => {
+const Typography = Theme.use(theme => ({ inline, type = 'h1', fontStyle = 'regular', children, style, ...props }) => {
     const validType = Object.keys(theme.Typography)
         .includes(type) ? type : 'h1';
 
@@ -21,8 +21,9 @@ const Typography = Theme.use(theme => ({ type = 'h1', fontStyle = 'regular', chi
         .includes(fontStyle) ? fontStyle : 'regular';
 
     return <div
-        $style={{
+        style={{
             ...style,
+            display: inline ? 'inline-block' : 'block',
             font: theme.Typography[validType][validFontStyle]
         }}
         {...props}

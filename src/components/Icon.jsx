@@ -1,5 +1,5 @@
-import { h } from './h';
-import { Observer } from 'destam-dom';
+import { h, svg } from './h';
+import { Observer, OObject } from 'destam-dom';
 
 /**
  * Asynchronous function to load icons from various libraries.
@@ -45,26 +45,44 @@ const loadIcon = async (libraryName, iconName, style) => {
  * @returns {JSX.Element} The rendered icon element.
  */
 const Icon = ({
+    lib,
     libraryName,
+    name,
     iconName,
     size='20',
     style,
-    Svg=Observer.mutable(''),
+    ref: Ref,
     ...props
 }) => {
-    if (!(Svg instanceof Observer)) Svg = Observer.mutable(Svg);
+    if (!Ref) Ref = <svg:svg />;
+
+    const svgChildren = Observer.mutable(null);
+    const svgProps = OObject();
 
     const styleObject = { marginTop: '4px', height: size, width: size, ...style };
 
-    loadIcon(libraryName, iconName, styleObject)
+    loadIcon(lib ?? libraryName, name ?? iconName, styleObject)
         .then(svgContent => {
-            Svg.set(svgContent);
+            const parser = new DOMParser();
+            const svg = parser.parseFromString(svgContent, 'image/svg+xml').children[0];
+
+            for (let i = 0; i < svg.attributes.length; i++) {
+                const attr = svg.attributes[i];
+                Ref.setAttribute(attr.nodeName, attr.nodeValue);
+            }
+
+            while (svg.firstElementChild) {
+                Ref.appendChild(svg.firstElementChild);
+            }
         })
         .catch(error => {
             console.error(error.message);
         });
 
-    return <div style={{ display: 'inline-block', ...style }} {...props} $innerHTML={Svg} />;
+    return <Ref
+        style={{ display: 'inline-block', ...style }}
+        {...props}
+    />;
 };
 
 export default Icon;
