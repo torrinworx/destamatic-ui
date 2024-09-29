@@ -1,6 +1,6 @@
 import { h } from 'destam-dom';
 import { Observer, mount } from 'destam-dom';
-import Popup, {popups} from '../src/components/Popup';
+import Popup, {popups} from '../src/Popup';
 import {
     Theme,
     Typography,

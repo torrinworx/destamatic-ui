@@ -1,27 +1,27 @@
-export * from './components/h';
+export * from './h';
 
-export { default as Button } from './components/Button';
-export { default as Drawer } from './components/Drawer';
-export { default as Chevron } from './components/Chevron';
-export { default as DropDown } from './components/DropDown';
-export { default as Icon } from './components/Icon';
-export { default as KebabMenu } from './components/KebabMenu'
-export { default as LoadingDots } from './components/LoadingDots';
-export { default as Popup } from './components/Popup'
-export { default as Ripple } from './components/Ripple';
-export { updateStateTree, replaceStateTree } from './components/stateTree';
-export { default as Shown } from './components/Shown'
-export { default as TextArea } from './components/TextArea';
-export { default as Theme } from './components/Theme';
-export { default as Typography } from './components/Typography';
-export { Router } from './components/Router';
-export { default as Radio } from './components/Radio';
-export { default as Checkbox } from './components/Checkbox';
-export { default as Tooltip } from './components/Tooltip';
-export { default as Markdown } from './components/Markdown';
-export { default as Link } from './components/Link';
-export { default as CodeBlock } from './components/CodeBlock';
-export { default as Slider } from './components/Slider';
-export { default as createContext } from './components/Context';
-export { default as Paper } from './components/Paper';
-export { default as TextField } from './components/TextField';
+export { default as Button } from './Button';
+export { default as Drawer } from './Drawer';
+export { default as Chevron } from './Chevron';
+export { default as DropDown } from './DropDown';
+export { default as Icon } from './Icon';
+export { default as KebabMenu } from './KebabMenu'
+export { default as LoadingDots } from './LoadingDots';
+export { default as Popup } from './Popup'
+export { default as Ripple } from './Ripple';
+export { updateStateTree, replaceStateTree } from './stateTree';
+export { default as Shown } from './Shown'
+export { default as TextArea } from './TextArea';
+export { default as Theme } from './Theme';
+export { default as Typography } from './Typography';
+export { Router } from './Router';
+export { default as Radio } from './Radio';
+export { default as Checkbox } from './Checkbox';
+export { default as Tooltip } from './Tooltip';
+export { default as Markdown } from './Markdown';
+export { default as Link } from './Link';
+export { default as CodeBlock } from './CodeBlock';
+export { default as Slider } from './Slider';
+export { default as createContext } from './Context';
+export { default as Paper } from './Paper';
+export { default as TextField } from './TextField';
