@@ -44,7 +44,12 @@ const Textarea = Theme.use(theme => (
     return <FocusEffect
         enabled={isFocused}
         style={{
-            padding: '10px'
+            padding: '10px',
+            pointer: 'text',
+        }}
+        onMouseDown={e => {
+            Ref.focus();
+            e.preventDefault();
         }}
     >
          <Ref

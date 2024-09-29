@@ -13,7 +13,7 @@ const TextField = ({value, style, inline, expand, onEnter, error, autoselect, on
 	return <FocusEffect
 		enabled={focus.map(focus => focus && !value.isImmutable())}
 		error={error}
-		onClick={e => {
+		onMouseDown={e => {
 			Input.focus();
 			e.preventDefault();
 		}}
@@ -25,7 +25,7 @@ const TextField = ({value, style, inline, expand, onEnter, error, autoselect, on
 			padding: 10,
 			marginTop: 10,
 			marginBottom: 10,
-			cursor: 'text',
+			pointer: 'text',
 			background: 'white',
 			...style
 		}}
