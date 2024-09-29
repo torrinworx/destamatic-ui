@@ -9,7 +9,6 @@ export { default as KebabMenu } from './KebabMenu.jsx';
 export { default as LoadingDots } from './LoadingDots.jsx';
 export { default as Popup } from './Popup.jsx';
 export { default as Ripple } from './Ripple.jsx';
-export { updateStateTree, replaceStateTree } from './stateTree.js';
 export { default as Shown } from './Shown.jsx'
 export { default as TextArea } from './TextArea.jsx';
 export { default as Theme } from './Theme.jsx';
