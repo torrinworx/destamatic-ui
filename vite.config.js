@@ -22,7 +22,9 @@ const createTransform = (name, transform, jsx, options) => ({
 });
 
 const plugins = [];
-plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {}));
+plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {
+	jsx_auto_import: {'h': 'destamatic-ui'},
+}));
 
 if (process.env.NODE_ENV === 'production') {
 	plugins.push(createTransform('assert-remove', assertRemove));
