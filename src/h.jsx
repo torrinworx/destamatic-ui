@@ -198,3 +198,5 @@ export const mark = (name, props, ...children) => {
 	obj.props = props;
 	return obj;
 };
+
+mark.prototype = Object.create(Object.prototype);
