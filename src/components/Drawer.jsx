@@ -1,10 +1,10 @@
-import { h } from '../h';
+import { h } from './h';
 
 import { Observer } from "destam-dom";
 
-import Button from "../Button";
-import Icon from '../Icon';
-import Theme from '../Theme';
+import Button from "./Button";
+import Icon from './Icon';
+import Theme from './Theme';
 
 const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup) => {
     const width = '25vw';
