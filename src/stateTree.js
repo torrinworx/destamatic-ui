@@ -4,7 +4,7 @@ OObject's and OArrays of arbitrary size. In simple cases it's more straight forw
 update/replace the state tree contents, however with large more complex state trees this automates
 away the hassle of having to think about it and just update the entire thing if needed.
 */
-import h from "./h.jsx";
+import { h } from "./h.jsx";
 import { OArray, OObject } from "destam-dom";
 
 const convertToObservables = (value) => {

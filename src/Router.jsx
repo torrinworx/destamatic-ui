@@ -7,7 +7,7 @@ import { h, Observer } from 'destam-dom';
  * @param {Function} [NotFound] - Optional. A component to render when the route is not found.
  * @returns {HTMLElement} The component that matches the current route, or a 404 message if no match is found.
  */
-export const Router = ({ currentRoute, routes, NotFound, ...props }) => {
+const Router = ({ currentRoute, routes, NotFound, ...props }) => {
     if (!(currentRoute instanceof Observer)) currentRoute = Observer.immutable('/');
 
     return currentRoute.def('/').map(route => {
@@ -17,3 +17,5 @@ export const Router = ({ currentRoute, routes, NotFound, ...props }) => {
             : (NotFound ? <NotFound {...props} /> : <div>404 - Not Found</div>);
     });
 };
+
+export default Router;
