@@ -1,4 +1,5 @@
-import { h, OArray, Observer } from 'destam-dom';
+import { OArray, Observer } from 'destam-dom';
+import { h } from './h';
 
 /**
  * Global array to hold active popup components.
@@ -24,12 +25,20 @@ const Popup = ({ children, style, placement, ref: Ref }, cleanup, mounted) => {
     if (!Ref) Ref = <div />;
     if (!(placement instanceof Observer)) placement = Observer.immutable(placement);
 
-    const dom = <Ref $style={{
+    const getter = (obj, name) => {
+        if (obj?.[name] !== undefined) return obj[name];
+        return null;
+    }
+
+    const dom = <Ref style={{
         position: 'absolute',
-        left: placement.map(p => p?.left + 'px'),
-        top: placement.map(p => p?.top + 'px'),
-        right: placement.map(p => p?.right + 'px'),
-        bottom: placement.map(p => p?.bottom + 'px'),
+        left: placement.map(p => getter(p, 'left')),
+        top: placement.map(p => getter(p, 'top')),
+        right: placement.map(p => getter(p, 'right')),
+        bottom: placement.map(p => getter(p, 'bottom')),
+        maxWidth: placement.map(p => getter(p, 'maxWidth')),
+        maxHeight: placement.map(p => getter(p, 'maxHeight')),
+        overflow: 'scroll',
         ...style
     }}>
         {children}
