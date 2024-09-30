@@ -24,3 +24,4 @@ export { default as Slider } from './Slider.jsx';
 export { default as createContext } from './Context.jsx';
 export { default as Paper } from './Paper.jsx';
 export { default as TextField } from './TextField.jsx';
+export { default as Select } from './Select.jsx';
