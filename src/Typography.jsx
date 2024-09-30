@@ -22,9 +22,9 @@ const Typography = Theme.use(theme => ({ inline, type = 'h1', fontStyle = 'regul
 
     return <div
         style={{
-            ...style,
             display: inline ? 'inline-block' : 'block',
-            font: theme.Typography[validType][validFontStyle]
+            font: theme.Typography[validType][validFontStyle],
+            ...style
         }}
         {...props}
     >
