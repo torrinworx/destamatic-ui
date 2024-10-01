@@ -1,13 +1,10 @@
 import { h } from './h';
 import Observer from 'destam/Observer';
 import FocusEffect from './FocusEffect';
-import Typography from './Typography';
-import Icon from './Icon';
 import Popup from './Popup';
 import Shown from './Shown';
-import Paper from './Paper';
-import useRipples from './Ripple.jsx';
 import Theme from './Theme';
+import Button from './Button';
 
 const calculate = (bounds, rot) => {
 	const cardinals = [
@@ -43,14 +40,15 @@ const calculate = (bounds, rot) => {
 const Detached = Theme.use(theme => ({menu, children, enabled, style}) => {
 	const focused = enabled || Observer.mutable(false);
 
-	const A = <a />;
+	const A = <button />;
 	const popup = <div />;
 
 	return <FocusEffect
 		enabled={focused}
 		style={{display: 'inline-block', ...style}}
 	>
-		<A
+		<Button
+			ref={A}
 			onClick={() => {
 				if (typeof focused.get() === 'number') {
 					focused.set(false);
@@ -102,7 +100,7 @@ const Detached = Theme.use(theme => ({menu, children, enabled, style}) => {
 			}}
 		>
 			{menu}
-		</A>
+		</Button>
 		<Shown value={focused.map(v => typeof v === 'number' || v === true)}>
 			<Popup
 				ref={popup}
