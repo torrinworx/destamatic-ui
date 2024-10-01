@@ -2,44 +2,37 @@ import { h } from './h';
 import { Observer } from 'destam-dom';
 
 /**
- * Checkbox component that allows a user to select multiple items from a list of items.
+ * Checkbox component.
+ *
+ * This component renders a checkbox input that is controlled via an observable state (OValue).
+ * It also provides a callback function (onChange) to handle state changes and can receive custom styles.
  *
  * @param {Object} props - The properties object.
- * @param {Array<{ label: string, value: string }>} props.items - The list of items to be rendered as checkboxes.
- * @param {Observer<Array<string>>} [props.OValue] - Observable selected values array.
- * @param {function} [props.onChange] - Function to call when the selected values change.
+ * @param {Observer<boolean>|boolean} [props.OValue=Observer.mutable(false)] - Observable selected state or a boolean value.
+ * @param {function} [props.onChange] - Callback function to call when the selected state changes.
  * @param {Object} [props.style] - Custom styles to apply to the component.
+ * @param {Object} [props.rest] - Additional props to pass to the input element.
  * 
  * @returns {JSX.Element} The rendered Checkbox component.
  */
-const Checkbox = ({ items, OValue=Observer.mutable([]), onChange, style, ...props}) => {
+const Checkbox = ({ OValue=Observer.mutable(false), onChange, style, ...props }) => {
     if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
 
-    const handleSelection = (value) => {
-        let newValues;
-        if (OValue.get().includes(value)) {
-            newValues = OValue.get().filter(val => val !== value);
-        } else {
-            newValues = [...OValue.get(), value];
-        }
-        OValue.set(newValues);
+    const handleToggle = () => {
+        const newValue = !OValue.get();
+        OValue.set(newValue);
         if (onChange) {
-            onChange(newValues);
+            onChange(newValue);
         }
     };
 
-    return <div $style={style} {...props}>
-        {items.map(item => (
-            <label $style={{ display: 'block', margin: '5px 0' }} key={item.value}>
-                <input
-                    type="checkbox"
-                    checked={item.value}
-                    $onchange={() => handleSelection(item.value)}
-                />
-                {item.label}
-            </label>
-        ))}
-    </div>;
+    return <input
+        type="checkbox"
+        checked={OValue.get()}
+        onChange={handleToggle}
+        style={style}
+        {...props}
+    />;
 };
 
 export default Checkbox;
