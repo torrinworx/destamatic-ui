@@ -7,6 +7,8 @@ const Paper = ({children, style}) => {
         boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
         insetBoxShadow: 'inset -2px -2px 10px rgba(0,0,0,0.2)',
         padding: '10px',
+        maxWidth: 'inherit',
+        maxHeight: 'inherit',
         ...style
     }}>
         {children}

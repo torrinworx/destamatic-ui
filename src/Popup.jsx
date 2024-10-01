@@ -38,7 +38,6 @@ const Popup = ({ children, style, placement, ref: Ref }, cleanup, mounted) => {
         bottom: placement.map(p => getter(p, 'bottom')),
         maxWidth: placement.map(p => getter(p, 'maxWidth')),
         maxHeight: placement.map(p => getter(p, 'maxHeight')),
-        overflow: 'scroll',
         ...style
     }}>
         {children}

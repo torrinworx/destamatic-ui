@@ -8,6 +8,7 @@ import Shown from './Shown';
 import Paper from './Paper';
 import useRipples from './Ripple.jsx';
 import Theme from './Theme';
+import Detached from './Detached';
 
 const calculate = (bounds, rot) => {
 	const cardinals = [
@@ -45,11 +46,8 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 	if (!(options instanceof Observer)) options = Observer.immutable(options);
 	if (!display) display = a => a;
 
+
 	const focused = Observer.mutable(false);
-
-	const A = <a />;
-	const popup = <div />;
-
 	const selector = value.selector('rgba(0, 0, 0, 0.1)', 'none');
 
 	const Selectable = ({each: option}) => {
@@ -81,61 +79,8 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 		</div>;
 	};
 
-	return <FocusEffect
-		enabled={focused}
-		style={{display: 'inline-block', background: '#DDD', ...style}}
-	>
-		<A
-			onClick={() => {
-				if (typeof focused.get() === 'number') {
-					focused.set(false);
-					return;
-				}
-
-				focused.set(true);
-
-				const bounds = popup.getBoundingClientRect();
-				const surround = A.getBoundingClientRect();
-
-				let fits = [];
-				for (const rot of [6, 5, 1, 2, 0, 7, 3, 4]) {
-					const calc = calculate(surround, rot);
-
-					if ('right' in calc) calc.left = window.innerWidth - calc.right - Math.min(bounds.width, calc.maxWidth);
-					if ('left' in calc) calc.right = window.innerWidth - calc.left - Math.min(bounds.width, calc.maxWidth);
-					if ('bottom' in calc) calc.top = window.innerHeight - calc.bottom - Math.min(bounds.height, calc.maxHeight);
-					if ('top' in calc) calc.bottom = window.innerHeight - calc.top - Math.min(bounds.height, calc.maxHeight);
-
-					const isWithin = (val, min, max) => {
-						return val >= min && val <= max;
-					};
-
-					if (
-						isWithin(calc.left, 0, window.innerWidth) &&
-						isWithin(calc.right, 0, window.innerWidth) &&
-						isWithin(calc.top, 0, window.innerHeight) &&
-						isWithin(calc.bottom, 0, window.innerHeight)
-					) {
-						let width = (window.innerWidth - calc.right) - calc.left;
-						let height = (window.innerHeight - calc.bottom) - calc.top;
-						fits.push({size: width * height, rot});
-					}
-				}
-
-				fits.sort((a, b) => b.size - a.size);
-
-				if (!fits.length) {
-					focused.set(false);
-				} else {
-					focused.set(fits[0].rot);
-				}
-			}}
-			style={{
-				padding: 10,
-				cursor: 'pointer',
-				display: 'flex',
-			}}
-		>
+	return <Detached style={{background: '#EAEAEA', ...style}} enabled={focused} menu={
+		<>
 			<Typography type='p1' style={{display: 'inline'}}>
 				{value.map(val => {
 					if (options.get().includes(val)) {
@@ -147,26 +92,12 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 				})}
 			</Typography>
 			<Icon lib="feather" name="play" size={16} style={{marginLeft: 10, transform: 'rotate(90deg)'}} />
-		</A>
-		<Shown value={focused.map(v => typeof v === 'number' || v === true)}>
-			<Popup
-				ref={popup}
-				placement={focused.map(rot => {
-					if (typeof rot !== 'number') return null;
-
-					const bounds = A.getBoundingClientRect();
-					return calculate(bounds, rot);
-				}).setter(() => focused.set(false))}
-				style={{
-					visibility: 'visible',
-				}}
-			>
-				<Paper style={{minWidth: 100, padding: 0, overflow: 'clip'}}>
-					<Selectable each={options} />
-				</Paper>
-			</Popup>
-		</Shown>
-	</FocusEffect>;
+		</>
+	}>
+		<Paper style={{minWidth: 100, padding: 0, overflow: 'clip', overflow: 'scroll'}}>
+			<Selectable each={options} />
+		</Paper>
+	</Detached>;
 });
 
 export default Select;
