@@ -115,6 +115,7 @@ Theme.Button = OObject({
         base: OObject({
             backgroundColor: 'transparent',
             color: 'black',
+            boxShadow: 'none',
         }),
         hover: OObject({
             backgroundColor: Theme.Colours.primary.baseTrans,

@@ -69,7 +69,7 @@ const Button = Theme.use(theme => (
         borderRadius: theme.borderRadius,
         boxShadow: disabled.map(d =>
             d ? theme.Button[type].disabled.boxShadow
-            : (hover.map(h => h ? theme.boxShadow : null))
+            : theme.Button[type].base.boxShadow || (hover.map(h => h ? theme.boxShadow : null))
         ),
         display: inline ? 'inline-flex' : 'flex',
         backgroundColor: disabled.map(d =>

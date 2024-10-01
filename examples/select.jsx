@@ -20,10 +20,9 @@ mount(document.body, <>
 		return <Select style={{position: 'absolute', [a]: 0, [b]: 0}} value={input} options={Array(100).fill(null).map((_, i) => i)} />
 	})}
 
-	<KebabMenu style={{position: 'absolute', left: 100, top: 100}}>
-		<Paper style={{width: 200, height: 200}}>
-
-		</Paper>
-	</KebabMenu>
+	<KebabMenu style={{position: 'absolute', left: 100, top: 100}} items={[
+		{label: 'Rename'},
+		{label: 'Remove'},
+	]} />
 	{popups}
 </>);
