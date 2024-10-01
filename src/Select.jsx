@@ -42,6 +42,7 @@ const calculate = (bounds, rot) => {
 
 export const Select = Theme.use(theme => ({value, options, display, style}) => {
 	if (!(value instanceof Observer)) value = Observer.immutable(value);
+	if (!(options instanceof Observer)) options = Observer.immutable(options);
 	if (!display) display = a => a;
 
 	const focused = Observer.mutable(false);
@@ -56,7 +57,8 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 
 		return <div
 			style={{
-				width: 'calc(100% - 16px)',
+				width: '100%',
+				boxSizing: 'border-box',
 		        display: 'flex',
 		        alignItems: 'center',
 		        justifyContent: 'center',
@@ -64,7 +66,6 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 		        position: 'relative',
 		        overflow: 'clip',
 		        font: theme.font,
-		        fontSize: '1.3em',
 		        padding: 8,
 		        cursor: 'pointer',
 		        background: selector(option),
@@ -73,7 +74,7 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 				createRipple(e);
 				value.set(option);
 				focused.set(false);
-			}} 
+			}}
 		>
 			{display(option)}
 			{ripples}
@@ -110,9 +111,9 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 					};
 
 					if (
-						isWithin(calc.left, 0, window.innerWidth) && 
-						isWithin(calc.right, 0, window.innerWidth) && 
-						isWithin(calc.top, 0, window.innerHeight) && 
+						isWithin(calc.left, 0, window.innerWidth) &&
+						isWithin(calc.right, 0, window.innerWidth) &&
+						isWithin(calc.top, 0, window.innerHeight) &&
 						isWithin(calc.bottom, 0, window.innerHeight)
 					) {
 						let width = (window.innerWidth - calc.right) - calc.left;
@@ -137,7 +138,8 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 		>
 			<Typography type='p1' style={{display: 'inline'}}>
 				{value.map(val => {
-					if (options.includes(val)) {
+					if (options.get().includes(val)) {
+						console.log(val);
 						return display(val);
 					} else {
 						return "None";
@@ -156,7 +158,7 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 					return calculate(bounds, rot);
 				}).setter(() => focused.set(false))}
 				style={{
-					visibility: 'visible', 
+					visibility: 'visible',
 				}}
 			>
 				<Paper style={{minWidth: 100, padding: 0, overflow: 'clip'}}>
