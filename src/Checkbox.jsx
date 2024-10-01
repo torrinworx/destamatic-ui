@@ -8,27 +8,27 @@ import { Observer } from 'destam-dom';
  * It also provides a callback function (onChange) to handle state changes and can receive custom styles.
  *
  * @param {Object} props - The properties object.
- * @param {Observer<boolean>|boolean} [props.OValue=Observer.mutable(false)] - Observable selected state or a boolean value.
+ * @param {Observer<boolean>|boolean} [props.value]] - Observable selected state or a boolean value.
  * @param {function} [props.onChange] - Callback function to call when the selected state changes.
  * @param {Object} [props.style] - Custom styles to apply to the component.
  * @param {Object} [props.rest] - Additional props to pass to the input element.
  * 
  * @returns {JSX.Element} The rendered Checkbox component.
  */
-const Checkbox = ({ OValue=Observer.mutable(false), onChange, style, ...props }) => {
-    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
+const Checkbox = ({ value, onChange, style, ...props }) => {
+    if (!(value instanceof Observer)) value = Observer.immutable(value);
 
-    const handleToggle = () => {
-        const newValue = !OValue.get();
-        OValue.set(newValue);
+    const handleToggle = e => {
+        let value = e.target.value === 'on';
+        value.set(value);
         if (onChange) {
-            onChange(newValue);
+            onChange(value);
         }
     };
 
     return <input
         type="checkbox"
-        checked={OValue.get()}
+        $checked={value}
         onChange={handleToggle}
         style={style}
         {...props}
