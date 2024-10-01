@@ -3,7 +3,7 @@ import Observer from 'destam/Observer';
 import {h} from './h';
 
 // Takes value as an observer
-const TextField = ({value, style, inline, expand, onEnter, error, autoselect, onFocus, ...props}) => {
+const TextField = ({value, style, type = 'text', inline, expand, onEnter, error, autoselect, onFocus, ...props}) => {
 	if (!(value instanceof Observer)) value = Observer.immutable(value);
 	expand = Observer.immutable(expand);
 
@@ -15,7 +15,10 @@ const TextField = ({value, style, inline, expand, onEnter, error, autoselect, on
 		error={error}
 		onMouseDown={e => {
 			Input.focus();
-			e.preventDefault();
+
+			if (e.target !== Input)  {
+				e.preventDefault();
+			}
 		}}
 		style={{
 			flexGrow: expand.map(e => e ? 1 : ''),
@@ -40,7 +43,7 @@ const TextField = ({value, style, inline, expand, onEnter, error, autoselect, on
 
 				value.set(e.target.value);
 			}}
-			type="text"
+			type={type}
 			onFocus={() => {
 				if (autoselect) Input.select();
 				if (onFocus) onFocus();

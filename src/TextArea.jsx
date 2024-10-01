@@ -49,7 +49,10 @@ const Textarea = Theme.use(theme => (
         }}
         onMouseDown={e => {
             Ref.focus();
-            e.preventDefault();
+
+            if (e.target === Ref) {
+                e.preventDefault();
+            }
         }}
     >
          <Ref
