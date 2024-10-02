@@ -94,7 +94,7 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 			<Icon lib="feather" name="play" size={16} style={{marginLeft: 10, transform: 'rotate(90deg)'}} />
 		</>
 	}>
-		<Paper style={{minWidth: 100, padding: 0, overflow: 'clip', overflow: 'scroll'}}>
+		<Paper style={{minWidth: 100, padding: 0, overflow: 'auto'}}>
 			<Selectable each={options} />
 		</Paper>
 	</Detached>;
