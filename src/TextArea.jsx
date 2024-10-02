@@ -8,7 +8,7 @@ import FocusEffect from './FocusEffect';
  * 
  * @param {Object} props - The properties object.
  * @param {JSX.Element | string} [props.children] - Children elements to be included inside the textarea.
- * @param {Observer<string>} [props.OValue] - Observable value for the textarea content.
+ * @param {Observer<string>} [props.value] - Observable value for the textarea content.
  * @param {Object} [props.style] - Custom styles to apply to the textarea.
  * @param {number} [props.maxHeight=200] - Maximum height of the textarea before it starts to scroll.
  * @param {string} [props.id] - ID for the textarea element.
