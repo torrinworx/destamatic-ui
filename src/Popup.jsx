@@ -27,8 +27,8 @@ const Popup = ({ children, style, placement, ref: Ref }, cleanup, mounted) => {
 
     const getter = (obj, name) => {
         if (obj?.[name] !== undefined) return obj[name];
-        return null;
-    }
+        return undefined;
+    };
 
     const dom = <Ref style={{
         position: 'absolute',
