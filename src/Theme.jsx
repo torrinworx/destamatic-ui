@@ -167,16 +167,22 @@ Theme.Button = OObject({
             justifyContent: 'center',
             fontSize: '24px',
             color: 'black',
+            width: '35px',
+            height: '35px'
         }),
         hover: OObject({
             backgroundColor: 'transparent',
             color: Theme.Colours.primary.base,
+            width: '35px',
+            height: '35px'
         }),
         disabled: OObject({
             cursor: 'default',
             filter: 'grayscale(100%)',
             pointerEvents: 'none',
-            boxShadow: `inset 1px 1px 10px #333`
+            boxShadow: `inset 1px 1px 10px #333`,
+            width: '35px',
+            height: '35px'
         }),
     })
 });
