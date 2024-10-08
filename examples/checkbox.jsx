@@ -5,5 +5,5 @@ const value = Observer.mutable(false);
 
 mount(document.body, <>
 	<Checkbox value={value} />
-	<Checkbox value={value.map(v => !v)} />
+	<Checkbox value={value.map(v => !v, v => !v)} />
 </>);

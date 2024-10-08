@@ -19,13 +19,17 @@ const useRipples = background => {
      * @param {MouseEvent} event - The click event triggering the ripple.
      */
     const createRipple = (event) => {
-        const button = event.currentTarget;
-        const diameter = Math.max(button.clientWidth, button.clientHeight);
-        const radius = diameter / 2;
-        const rect = button.getBoundingClientRect();
+		let elem = event;
+		if (!(elem instanceof Node)) {
+			elem = elem.currentTarget;
+		}
 
-        const rippleX = event.clientX - rect.left - radius;
-        const rippleY = event.clientY - rect.top - radius;
+        const rect = elem.getBoundingClientRect();
+        const diameter = Math.max(rect.width, rect.height);
+        const radius = diameter / 2;
+
+        const rippleX = event.clientX - rect.left;
+        const rippleY = event.clientY - rect.top;
 
         const opacity = Observer.mutable(1);
         const scale = Observer.mutable(0);
@@ -39,7 +43,7 @@ const useRipples = background => {
                 top: rippleY + 'px',
                 left: rippleX + 'px',
                 background: background,
-                transform: scale.map(scale => `scale(${scale})`),
+                transform: scale.map(scale => `translate(-50%, -50%) scale(${scale})`),
                 opacity: opacity,
                 transition: 'transform 0.8s, opacity 0.8s',
             }}

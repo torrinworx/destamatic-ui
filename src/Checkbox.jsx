@@ -1,5 +1,6 @@
 import { h } from './h';
 import { Observer } from 'destam-dom';
+import useRipples from './Ripple.jsx';
 
 /**
  * Checkbox component.
@@ -18,21 +19,49 @@ import { Observer } from 'destam-dom';
 const Checkbox = ({ value, onChange, style, ...props }) => {
     if (!(value instanceof Observer)) value = Observer.immutable(value);
 
-    const handleToggle = e => {
-        let val = e.target.checked;
-        value.set(val);
-        if (onChange) {
-            onChange(val);
-        }
-    };
+	const [ripples, createRipple] = useRipples('rgba(0, 0, 0, 0.3)');
+	const hover = Observer.mutable(false);
 
-    return <input
-        type="checkbox"
-        $checked={value}
-        onChange={handleToggle}
-        style={style}
-        {...props}
-    />;
+	const Span = <span />;
+	const Input = <input />;
+
+    return <Span
+		style={{
+			padding: "8px",
+			overflow: 'clip',
+			position: 'relative',
+			borderRadius: '50%',
+			background: hover.map(h => h ? 'rgba(0, 0, 0, .1)' : null),
+			transition: 'background 250ms',
+			display: 'inline-block',
+			...style
+		}}
+		onMouseEnter={() => hover.set(true)}
+		onMouseLeave={() => hover.set(false)}
+		onClick={e => {
+			try {
+				const val = !value.get();
+				value.set(val);
+				if (onChange) {
+					onChange(val);
+				}
+
+				createRipple(e);
+			} catch (e) {
+				throw e;
+			} finally {
+				// make sure that the chekbox is always in sync with the observer
+				Input.checked = value.get();
+			}
+		}}
+	>
+		<Input
+			type="checkbox"
+			$checked={value}
+			{...props}
+		/>
+		{ripples}
+	</Span>
 };
 
 export default Checkbox;
