@@ -19,10 +19,10 @@ const Checkbox = ({ value, onChange, style, ...props }) => {
     if (!(value instanceof Observer)) value = Observer.immutable(value);
 
     const handleToggle = e => {
-        let value = e.target.value === 'on';
-        value.set(value);
+        let val = e.target.checked;
+        value.set(val);
         if (onChange) {
-            onChange(value);
+            onChange(val);
         }
     };
 
