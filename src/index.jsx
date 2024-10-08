@@ -25,3 +25,4 @@ export { default as createContext } from './Context.jsx';
 export { default as Paper } from './Paper.jsx';
 export { default as TextField } from './TextField.jsx';
 export { default as Select } from './Select.jsx';
+export { default as useRipples } from './Ripple.jsx';
