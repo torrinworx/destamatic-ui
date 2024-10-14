@@ -225,9 +225,9 @@ const getElements = (markdown) => {
 };
 
 const Markdown = ({ markdown }) => {
-    if (!(markdown instanceof Observer) && markdown instanceof string) {
+    if (!(markdown instanceof Observer) && typeof markdown === 'string') {
         markdown = Observer.mutable(markdown);
-    };
+    }
 
     const elements = OArray(getElements(markdown));
 
