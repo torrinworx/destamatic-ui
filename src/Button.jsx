@@ -117,6 +117,7 @@ const Button = Theme.use(theme => (
         onMouseLeave={() => hover.set(false)}
         style={buttonStyle}
         disabled={disabled.map(d => d ? true : false)}
+        {...props}
     >
     	{Icon}
         {label ? label : children}
