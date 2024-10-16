@@ -22,24 +22,24 @@ const DropDown = ({
     label,
     arrow = 'right',
     style,
-    open=Observer.mutable(false)
+    open = Observer.mutable(false),
 }) => {
     if (!(open instanceof Observer)) open = Observer.mutable(open);
 
     const toggle = () => open.set(!open.get());
 
     return <div style={style}>
-        <div
+        <div 
             $style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: arrow === 'right' ? 'space-between' : 'flex-start',
-                cursor: 'pointer'
-            }}
-            $onclick={toggle}
-        >
-            {arrow === 'right' ? label : null}
-            <div $style={{ display: 'flex', alignItems: 'center' }}>
+                cursor: 'pointer',
+                userSelect: 'none'
+            }} 
+            $onclick={toggle}>
+            {arrow === 'right' ? <span>{label}</span> : null}
+            <div $style={{ display: 'flex', alignItems: 'center', userSelect: 'none' }}>
                 <i className='chevron-icon' $style={{ cursor: 'pointer' }}>
                     {open.map((show) => show ? (
                         <Icon size='20' libraryName='feather' iconName='chevron-down' />
@@ -48,7 +48,7 @@ const DropDown = ({
                     ))}
                 </i>
             </div>
-            {arrow === 'left' ? label : null}
+            {arrow === 'left' ? <span>{label}</span> : null}
         </div>
 
         <Shown value={open} children={children} />
