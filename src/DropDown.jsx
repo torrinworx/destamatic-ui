@@ -33,13 +33,14 @@ const DropDown = ({
             $style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: arrow === 'right' ? 'space-between' : 'flex-start'
+                justifyContent: arrow === 'right' ? 'space-between' : 'flex-start',
+                cursor: 'pointer'
             }}
             $onclick={toggle}
         >
             {arrow === 'right' ? label : null}
             <div $style={{ display: 'flex', alignItems: 'center' }}>
-                <i $class='chevron-icon' $style={{ cursor: 'pointer' }}>
+                <i className='chevron-icon' $style={{ cursor: 'pointer' }}>
                     {open.map((show) => show ? (
                         <Icon size='20' libraryName='feather' iconName='chevron-down' />
                     ) : (
@@ -49,6 +50,7 @@ const DropDown = ({
             </div>
             {arrow === 'left' ? label : null}
         </div>
+
         <Shown value={open} children={children} />
     </div>;
 };
