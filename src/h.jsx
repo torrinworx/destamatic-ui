@@ -46,6 +46,31 @@ export const h = (name, props, ...children) => {
 					name.addEventListener(handlerName, handler);
 					return () => name.removeEventListener(handlerName, handler);
 				});
+			} else if (o.length >= 3 && o.startsWith('is') && o[2].toLowerCase() !== o[2]) {
+				const handlers = {
+					Focused: ['focus', 'blur'],
+					Hovered: ['mouseenter', 'mouseleave']
+				};
+
+				const handlerName = o.substring(2);
+				const handler = handlers[handlerName];
+				if (!handler) {
+					throw new Error("No handler for " + handlerName);
+				}
+
+				const obs = props[o];
+				delete props[o];
+
+				signals.push(() => {
+					let enter = () => obs.set(true);
+					let leave = () => obs.set(false);
+					name.addEventListener(handler[0], enter);
+					name.addEventListener(handler[1], leave);
+					return () => {
+						name.removeEventListener(handler[0], enter);
+						name.removeEventListener(handler[1], leave);
+					};
+				});
 			}
 		}
 
