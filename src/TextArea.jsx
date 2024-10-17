@@ -1,4 +1,5 @@
-import { h, Observer } from 'destam-dom';
+import Observer from 'destam/Observer';
+import { h } from './h';
 import Theme from './Theme';
 import FocusEffect from './FocusEffect';
 
@@ -56,11 +57,11 @@ const Textarea = Theme.use(theme => (
         }}
     >
          <Ref
-            $id={id}
+            id={id}
             $placeholder={placeholder}
             $value={value}
-            $onkeydown={onKeyDown}
-            $oninput={e => {
+            onKeydown={onKeyDown}
+            onInput={e => {
                 if (value.isImmutable()) {
                     Input.value = value.get() || '';
                     return;
@@ -68,9 +69,8 @@ const Textarea = Theme.use(theme => (
 
                 value.set(e.target.value);
             }}
-            $onfocus={() => isFocused.set(true)}
-            $onblur={() => isFocused.set(false)}
-            $style={{
+            isFocused={isFocused}
+            style={{
                 border: 0,
                 outline: 0,
                 padding: 0,
