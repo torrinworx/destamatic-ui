@@ -115,7 +115,7 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: [
-			{find: /^destamatic-ui($|\/)/, replacement: '/src/'},
+			{find: /^destamatic-ui($|\/)/, replacement: '/'},
 			{find: '@public', replacement: '/examples'}
 		]
 	}

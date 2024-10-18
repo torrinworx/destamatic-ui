@@ -1,9 +1,5 @@
 import { Observer, mount } from 'destam-dom';
-import Select from 'destamatic-ui/Select';
-import {popups} from 'destamatic-ui/Popup';
-import Typography from 'destamatic-ui/Typography';
-import KebabMenu from 'destamatic-ui/KebabMenu';
-import Paper from 'destamatic-ui/Paper';
+import { Select, popups, Typography, KebabMenu, Paper } from 'destamatic-ui';
 
 const input = Observer.mutable('');
 

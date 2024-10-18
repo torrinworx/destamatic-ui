@@ -1,6 +1,6 @@
 import { Observer, mount } from 'destam-dom';
-import Popup, {popups} from 'destamatic-ui/Popup.jsx';
 import {
+    popups,
     Theme,
     Typography,
     Button,
@@ -23,8 +23,6 @@ const DemoPage = Theme.use(theme => () => {
     };
 
     const drawerOpen = Observer.mutable(false);
-
-    const kebabValue = Observer.mutable({x: 0, y: 0});
 
     const markdown = Observer.mutable(`
 # h1, **bold** *italic* ***bold and italic***

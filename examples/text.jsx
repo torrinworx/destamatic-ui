@@ -1,5 +1,5 @@
 import { Observer, mount } from 'destam-dom';
-import TextField from 'destamatic-ui/TextField';
+import { TextField } from 'destamatic-ui';
 
 const input = Observer.mutable('');
 
