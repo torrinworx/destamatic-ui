@@ -1,5 +1,15 @@
 import { h } from './h';
 import Theme from './Theme';
+import { mount } from 'destam-dom';
+
+mount(document.head,
+	<style>{`
+		@keyframes dotFlashing {
+			0%, 100% { opacity: 0; }
+			50% { opacity: 1; }
+		}
+	`}</style>
+);
 
 /**
  * LoadingDots component - a loading indicator with three animated dots.
@@ -24,12 +34,6 @@ const LoadingDots = Theme.use(theme => () => {
         <span $style={{ ...dotStyle, animationDelay: '0s' }}></span>
         <span $style={{ ...dotStyle, animationDelay: '.2s' }}></span>
         <span $style={{ ...dotStyle, animationDelay: '.4s' }}></span>
-        <style>{`
-            @keyframes dotFlashing {
-                0%, 100% { opacity: 0; }
-                50% { opacity: 1; }
-            }
-        `}</style>
     </div>;
 });
 

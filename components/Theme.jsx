@@ -123,7 +123,8 @@ Theme.Button = OObject({
         }),
         disabled: OObject({
             cursor: 'default',
-            filter: 'grayscale(100%)',
+			backgroundColor: '#666',
+			color: '#CCC',
             pointerEvents: 'none',
         }),
     }),
@@ -138,7 +139,8 @@ Theme.Button = OObject({
         }),
         disabled: OObject({
             cursor: 'default',
-            filter: 'grayscale(100%)',
+			backgroundColor: '#666',
+			color: '#CCC',
             pointerEvents: 'none',
         }),
     }),
@@ -154,7 +156,8 @@ Theme.Button = OObject({
         }),
         disabled: OObject({
             cursor: 'default',
-            filter: 'grayscale(100%)',
+			backgroundColor: '#666',
+			color: '#CCC',
             pointerEvents: 'none',
         }),
     }),

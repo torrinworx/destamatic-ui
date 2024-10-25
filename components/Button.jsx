@@ -77,18 +77,17 @@ const Button = Theme.use(theme => (
             || theme.Button[type].base.backgroundColor
             : hover.map(h => (h ? theme.Button[type].hover.backgroundColor
             : theme.Button[type].base.backgroundColor))
-        ),
+        ).unwrap(),
         color: disabled.map(d =>
             d ? theme.Button[type].disabled.color
             || theme.Button[type].base.color
             : hover.map(h => (h ? theme.Button[type].hover.color
                 : theme.Button[type].base.color))
-        ),
+        ).unwrap(),
         cursor: disabled.map(d =>
             d ? theme.Button[type].disabled.cursor
             : theme.Button.base.cursor
         ),
-        filter: disabled.map(d => (d ? theme.Button[type].disabled.filter : 'none')),
         pointerEvents: disabled.map(d =>
             d ? theme.Button[type].disabled.pointerEvents : 'auto'
         ),
