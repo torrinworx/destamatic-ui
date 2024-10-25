@@ -12,23 +12,21 @@ import { Observer } from 'destam-dom';
  * 
  * @returns {JSX.Element} The rendered Radio component.
  */
-const Radio = ({ items, OValue=Observer.mutable(''), onChange, style, ...props}) => {
-    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
+const Radio = ({ items, value, onChange, style, ...props}) => {
+    if (!(value instanceof Observer)) value = Observer.immutable(value);
 
-    const handleSelection = (value) => {
-        OValue.set(value);
-        if (onChange) {
-            onChange(value);
-        }
-    };
+	const selector = value.selector();
 
-    return <div $style={style}>
+    return <div style={style}>
         {items.map(item => (
             <label $style={{ display: 'block', margin: '5px 0' }} key={item.value}>
                 <input
                     type="radio"
-                    checked={OValue.map(val => val === item.value)}
-                    $onchange={() => handleSelection(item.value)}
+                    $checked={selector(item.value)}
+                    onInput={e => {
+						value.set(item.value);
+        				if (onChange) onChange(e);
+					}}
                     {...props}
                 />
                 {item.label}
