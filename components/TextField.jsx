@@ -1,9 +1,9 @@
 import FocusEffect from './FocusEffect';
 import Observer from 'destam/Observer';
-import {h} from './h';
+import { h } from './h';
 
 // Takes value as an observer
-const TextField = ({value, style, type = 'text', inline, expand, onEnter, error, autoselect, onFocus, ...props}) => {
+const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error, autoselect, onFocus, ...props }) => {
 	if (!(value instanceof Observer)) value = Observer.immutable(value);
 	expand = Observer.immutable(expand);
 
@@ -39,15 +39,15 @@ const TextField = ({value, style, type = 'text', inline, expand, onEnter, error,
 					Input.value = value.get() || '';
 					return;
 				}
-
 				value.set(e.target.value);
 			}}
 			type={type}
 			onFocus={() => {
-				if (autoselect) Input.select();
-				if (onFocus) onFocus();
-
-				focus.set(true);
+				if (onFocus !== false) {
+					if (autoselect) Input.select();
+					if (typeof onFocus === 'function') onFocus();
+					focus.set(true);
+				}
 			}}
 			onBlur={() => focus.set(false)}
 			style={{
@@ -59,8 +59,8 @@ const TextField = ({value, style, type = 'text', inline, expand, onEnter, error,
 				height: '100%',
 				background: 'none',
 			}}
-			onKeyDown = {e => {
-				if (e.key === 'Enter'){
+			onKeyDown={e => {
+				if (e.key === 'Enter') {
 					if (onEnter) {
 						onEnter(e);
 						e.preventDefault();
