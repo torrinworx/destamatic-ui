@@ -1,4 +1,5 @@
-import { h, Observer } from 'destam-dom';
+import { Observer } from 'destam-dom';
+import { h } from './h';
 import Theme from './Theme';
 import FocusEffect from './FocusEffect';
 
@@ -48,19 +49,18 @@ const Textarea = Theme.use(theme => (
             pointer: 'text',
         }}
         onMouseDown={e => {
-            Ref.focus();
-
-            if (e.target === Ref) {
+            if (e.target !== Ref) {
+            	Ref.focus();
                 e.preventDefault();
             }
         }}
     >
          <Ref
-            $id={id}
-            $placeholder={placeholder}
+            id={id}
+            placeholder={placeholder}
             $value={value}
-            $onkeydown={onKeyDown}
-            $oninput={e => {
+            onKeyDown={onKeyDown}
+            onInput={e => {
                 if (value.isImmutable()) {
                     Input.value = value.get() || '';
                     return;
@@ -68,9 +68,8 @@ const Textarea = Theme.use(theme => (
 
                 value.set(e.target.value);
             }}
-            $onfocus={() => isFocused.set(true)}
-            $onblur={() => isFocused.set(false)}
-            $style={{
+			isFocused={isFocused}
+            style={{
                 border: 0,
                 outline: 0,
                 padding: 0,
@@ -81,11 +80,12 @@ const Textarea = Theme.use(theme => (
                 overflowY: 'auto',
                 flexGrow: 1,
                 font: theme.Typography.p1.regular,
+				width: '100%',
                 height: isMounted.map(mounted => {
                     if (!mounted) return 'auto';
 
                     return value.map(val => {
-                        let elem = <textarea rows={1} $value={val} $style={{
+                        let elem = <textarea rows={1} $value={val} style={{
                             resize: 'none',
                             padding: '0px',
                             boxSizing: 'border-box',

@@ -14,9 +14,8 @@ const TextField = ({value, style, type = 'text', inline, expand, onEnter, error,
 		enabled={focus.map(focus => focus && !value.isImmutable())}
 		error={error}
 		onMouseDown={e => {
-			Input.focus();
-
 			if (e.target !== Input)  {
+				Input.focus();
 				e.preventDefault();
 			}
 		}}
