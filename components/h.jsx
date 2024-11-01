@@ -92,10 +92,22 @@ export const h = (name, props, ...children) => {
 			}
 
 			signals.push(() => {
-				const cl = Theme.search(name)(...theme);
-				return cl.effect(cl => {
-					name.setAttribute('class', cl + _class);
-				}).remove;
+				let remove;
+				let removed;
+
+				queueMicrotask(() => {
+					if (removed) return;
+					const cl = Theme.search(name)(...theme);
+
+					remove = cl.effect(cl => {
+						name.setAttribute('class', cl + _class);
+					}).remove;
+				});
+
+				return () => {
+					removed = true;
+					if (remove) remove();
+				};
 			})
 
 			delete props.theme;

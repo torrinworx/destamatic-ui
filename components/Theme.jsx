@@ -447,7 +447,7 @@ const createTheme = (prefix, theme) => {
 				}
 
 				if (node.leaf) {
-					out.push({node, i: classes.length - ii});
+					out.push({node, i: ii});
 				}
 
 				current.splice(i, 1, ...node);
@@ -457,7 +457,7 @@ const createTheme = (prefix, theme) => {
 
 		out.sort((a, b) => {
 			if (a.node.leaf !== b.node.leaf) return a.node.leaf - b.node.leaf;
-			return b.i - a.i;
+			return a.i - b.i;
 		});
 
 		return out.map(a => a.node);
