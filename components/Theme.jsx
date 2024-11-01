@@ -1,265 +1,526 @@
-import { h, OObject } from "destam-dom";
+import { h, mount, Observer, OObject, OArray } from "destam-dom";
 import createContext from './Context';
+import { sizeProperties } from './h';
 
-/**
- * Global shared theme for the UI framework, accessible via Shared.
- * Contains default styles and theming options for various UI components.
- * 
- * @type {Object}
- */
-const Theme = OObject({
-    /**
-     * General
-     */
-    outline: '2px solid',
-    borderRadius: '6px',
-    transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
-    height: '40px',
-    padding: '10px',
-    boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
-    insetBoxShadow: 'inset -2px -2px 10px rgba(0,0,0,0.2)',
-    font: 'Roboto, sans-serif',
-    /**
-     * Colours
-     */
-    Colours: OObject({
-        primary: OObject({
-            base: '#02CA9F', // Main color for primary actions
-            baseTrans: 'rgba(2, 202, 159, 0.1)', // Base but transparent
-            onPrimary: 'white', // Text/icon color on primary
-            lighter: '#02DEAF', // Lighter variant for primary
-            darker: '#02B891',  // Darker variant for primary
-        }),
-        secondary: OObject({
-            base: '#CCCCCC', // Main color for secondary actions
-            darker: '#A5A5A5' // Darker variant for secondary
-        }),
-        ripple: OObject({
-            light: 'rgba(255, 255, 255, 0.8)', // Ripple effect color for light themes
-            dark: 'rgba(0, 0, 0, 0.3)', // Ripple effect color for dark themes
-        }),
-    }),
-});
+const theme = OObject({
+	"*": {
+		fontFamily: 'Roboto, sans-serif',
+	},
 
-/**
- * Typography styles for the Typography component.
- * 
- * @type {Object}
- */
-Theme.Typography = OObject({
-    h1: OObject({
-        regular: `62px ${Theme.font}`,
-        bold: `bold 62px ${Theme.font}`,
-        italic: `italic 62px ${Theme.font}`
-    }),
-    h2: OObject({
-        regular: `56px ${Theme.font}`, 
-        bold: `bold 56px ${Theme.font}`,
-        italic: `italic 56px ${Theme.font}`
-    }),
-    h3: OObject({
-        regular: `36px ${Theme.font}`,
-        bold: `bold 36px ${Theme.font}`,
-        italic: `italic 36px ${Theme.font}`
-    }),
-    h4: OObject({
-        regular: `30px ${Theme.font}`,
-        bold: `bold 30px ${Theme.font}`,
-        italic: `italic 30px ${Theme.font}`
-    }),
-    h5: OObject({
-        regular: `24px ${Theme.font}`,
-        bold: `bold 24px ${Theme.font}`,
-        italic: `italic 24px ${Theme.font}`
-    }),
-    h6: OObject({
-        regular: `20px ${Theme.font}`,
-        bold: `bold 20px ${Theme.font}`,
-        italic: `italic 20px ${Theme.font}`
-    }),
-    p1: OObject({
-        regular: `16px ${Theme.font}`,
-        bold: `bold 16px ${Theme.font}`,
-        italic: `italic 16px ${Theme.font}`
-    }),
-    p2: OObject({
-        regular: `14px ${Theme.font}`,
-        bold: `bold 14px ${Theme.font}`,
-        italic: `italic 14px ${Theme.font}`
-    }),
-});
+	primary: {
+		$color: '#02CA9F',
+		$color_hover: '#02B891',
+		$color_error: 'red',
+		$color_top: 'white',
+		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
+	},
 
-/**
- * Button styles for the Button component.
- * 
- * @type {Object}
- */
-Theme.Button = OObject({
-    base: OObject({
-        fontFamily: Theme.font,
+	secondary: {
+		$color: '#CCCCCC',
+	},
+
+	border: {
+		borderWidth: 2,
+		borderStyle: 'solid',
+		color: 'inherit',
+		background: 'inherit',
+	},
+
+	secondary_hovered: {
+		color: '#A5A5A5' // Darker variant for secondary
+	},
+
+	center: {
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+
+	radius: {
+		borderRadius: 6,
+	},
+
+	focus: {
+		extends: ['primary', 'radius'],
+		transitionDuration: '0.3s',
+		transitionProperty: 'border-color, background-color, box-shadow',
+		borderStyle: 'solid',
+		borderWidth: .5,
+		borderColor: '#388595',
+		padding: 10,
+		marginTop: 10,
+		marginBottom: 10,
+		alignItems: 'center',
+		background: 'white',
+	},
+
+	ripple: {
+		background: 'rgba(0, 0, 0, .3)'
+	},
+
+	focus_focused: {
+		boxShadow: '$color 0 0 0 0.2rem',
+		borderColor: '#ced4da',
+	},
+
+	focus_error: {
+		borderColor: '$color_error',
+	},
+
+	drawer: {
+		extends: 'secondary',
+		outlineColor: '$color',
+		outlineWidth: 1,
+		outlineStyle: 'solid',
+	},
+
+	button: {
+		extends: ['primary', 'center', 'radius'],
+
+		height: '40px',
+		userSelect: 'none',
+		border: 'none',
+		cursor: 'pointer',
+		textDecoration: 'none',
+		position: 'relative',
+		overflow: 'clip',
+		color: 'black',
+		boxShadow: 'none',
+	},
+
+	button_text: {
+		width: "auto",
+	},
+
+	button_contained: {
+		color: '$color_top',
+		background: '$color',
+	},
+
+	button_contained_hovered: {
+		background: '$color_hover',
+	},
+
+	button_outlined: {
+		borderWidth: 2,
+		borderStyle: 'solid',
+		borderColor: '$color',
+	},
+
+	button_outlined_hovered: {
+		extends: 'primary_hovered',
+		color: 'black',
+	},
+
+	hover: {
+		backgroundColor: 'rgba(2, 202, 159, 0.1)',
+		color: '#02CA9F',
+	},
+
+	disabled: {
+		cursor: 'default',
+		backgroundColor: '#666',
+		color: '#CCC',
+		pointerEvents: 'none'
+	},
+
+	loadingDots: {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+
+	loadingDots_dot: {
+		extends: 'primary',
+
+		background: '$color',
+        display: 'inline-block',
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        animationName: 'dotFlashing',
+        animationDuration: '1s',
+        animationIterationCount: 'infinite',
+        animationTimingFunction: 'ease-in-out',
+        margin: '20px 4px',
+	},
+
+	paper: {
+		extends: 'borderRadius',
+        background: 'white',
+        boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
+        insetBoxShadow: 'inset -2px -2px 10px rgba(0,0,0,0.2)',
+        padding: 10,
+        maxWidth: 'inherit',
+        maxHeight: 'inherit',
+	},
+
+	checkbox: {
+		extends: 'primary',
+		padding: 0,
+	},
+
+	checkbox_disabled: {
+		color: 'black',
+	},
+
+	slider: {
+		extends: 'primary',
+
+        width: '100%',
         height: '40px',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        userSelect: 'none',
-        border: 'none',
-        outline: 'none',
-        borderRadius: Theme.borderRadius,
-        cursor: 'pointer',
-        textDecoration: 'none',
-        position: 'relative',
-        overflow: 'clip',
-        transition: Theme.transition,
-    }),
-    text: OObject({
-        base: OObject({
-            backgroundColor: 'transparent',
-            color: 'black',
-            boxShadow: 'none',
-        }),
-        hover: OObject({
-            backgroundColor: Theme.Colours.primary.baseTrans,
-            color: Theme.Colours.primary.base,
-        }),
-        disabled: OObject({
-            cursor: 'default',
-			backgroundColor: '#666',
-			color: '#CCC',
-            pointerEvents: 'none',
-        }),
-    }),
-    contained: OObject({
-        base: OObject({
-            backgroundColor: Theme.Colours.primary.base,
-            color: Theme.Colours.primary.onPrimary,
-        }),
-        hover: OObject({
-            backgroundColor: Theme.Colours.primary.darker,
-            color: Theme.Colours.primary.onPrimary,
-        }),
-        disabled: OObject({
-            cursor: 'default',
-			backgroundColor: '#666',
-			color: '#CCC',
-            pointerEvents: 'none',
-        }),
-    }),
-    outlined: OObject({
-        base: OObject({
-            backgroundColor: 'transparent',
-            border: `2px solid ${Theme.Colours.primary.lighter}`,
-            color: Theme.Colours.primary.base,
-        }),
-        hover: OObject({
-            backgroundColor: Theme.Colours.primary.baseTrans,
-            color: Theme.Colours.primary.base,
-        }),
-        disabled: OObject({
-            cursor: 'default',
-			backgroundColor: '#666',
-			color: '#CCC',
-            pointerEvents: 'none',
-        }),
-    }),
-    icon: OObject({
-        base: OObject({
-            backgroundColor: 'transparent',
-            margin: '0px 6px 0px 6px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            color: 'black',
-            width: '35px',
-            height: '35px'
-        }),
-        hover: OObject({
-            backgroundColor: 'transparent',
-            color: Theme.Colours.primary.base,
-            width: '35px',
-            height: '35px'
-        }),
-        disabled: OObject({
-            cursor: 'default',
-            filter: 'grayscale(100%)',
-            pointerEvents: 'none',
-            boxShadow: `inset 1px 1px 10px #333`,
-            width: '35px',
-            height: '35px'
-        }),
-    })
+	},
+
+	slider_track: {
+		extends: 'primary_radius',
+
+        background: '$color',
+	},
+
+	slider_track_hovered: {
+		extends: 'primary',
+		background: '$color_hover',
+	},
+
+	slider_thumb: {
+		$size: 25,
+		extends: 'secondary',
+
+        width: `$size$px`,
+        height: `$size$px`,
+        background: '$color',
+	},
+
+	typography_h1: { fontSize: 62 },
+	typography_h2: { fontSize: 56 },
+	typography_h3: { fontSize: 36 },
+	typography_h4: { fontSize: 30 },
+	typography_h5: { fontSize: 24 },
+	typography_h6: { fontSize: 20 },
+	typography_p1: { fontSize: 16 },
+	typography_p2: { fontSize: 14 },
+	typography_regular: { fontStyle: 'normal' },
+	typography_bold: { fontWeight: 'bold' },
+	typography_italic: { fontStyle: 'italic' },
+
+	text: {
+		extends: 'typography_p1_regular',
+        border: 0,
+        outline: 0,
+        padding: 0,
+        background: 'none',
+        width: '100%',
+	},
 });
 
-/**
- * Markdown styles for the Markdown component.
- * 
- * @type {Object}
- */
-Theme.Markdown = OObject({
-    code: {
-        backgroundColor: Theme.Colours.secondary.base,
-        borderRadius: Theme.borderRadius,
-        padding: '2px 6px',
-        fontFamily: 'monospace',
-    },
-    inlineCode: {
-        backgroundColor: '#f8f8f8',
-        borderRadius: '3px',
-        padding: '0 0.2em',
-        fontFamily: 'monospace',
-    },
-    blockquote: {
-        borderLeft: `4px solid ${Theme.Colours.primary.base}`,
-        paddingLeft: '16px',
-        color: '#666',
-        margin: '1em 0',
-        fontSize: '1em',
-    },
-    ul: {
-        listStyleType: 'disc',
-        margin: '1em 0',
-        paddingLeft: '40px',
-    },
-    ol: {
-        listStyleType: 'decimal',
-        margin: '1em 0',
-        paddingLeft: '40px',
-    },
-});
+const Style = ({each: {name, id, body, defines}}) => {
+	return body.map(text => {
+		if (!text.length) return null;
 
-export default createContext(Theme, customTheme => {
-    // The application may specify only a partial theme. We need to fill in
-    // the rest of the theme in this case from the defaults.
+		let out = '';
+		for (const item of text) {
+			if (typeof item === 'string') {
+				out += item;
+				continue;
+			}
 
-    const createReactiveCopy = (a, b) => {
-        if (!(a instanceof OObject)) {
-            return b ?? a;
-        }
+			for (let i = defines.length - 1; i >= 0; i--) {
+				if (defines[i].vars.has(item.name)) {
+					out += defines[i].vars.get(item.name);
+				}
+			}
+		}
 
-        const out = OObject();
+		return ['.' + name + '-' + id + ' {\n', out, '}\n'];
+	});
+};
 
-        a.observer.shallow().watch(delta => {
-            const prop = delta.path()[0];
+const styles = OArray();
+// TODO: Find a better way to handle keyframes and css special cases
+mount(document.head, <style>
+	{`@keyframes dotFlashing {
+		0%, 100% { opacity: 0; }
+		50% { opacity: 1; }
+	}`}
+	<Style each={styles} />
+</style>);
 
-            out[prop] = createReactiveCopy(a[prop], b[prop]);
-        });
+const createTheme = (prefix, theme) => {
+	const trie = theme.observer.shallow().map(theme => {
+		const trie = [];
 
-        b.observer?.shallow().watch(delta => {
-            const prop = delta.path()[0];
+		const proc = [];
 
-            out[prop] = createReactiveCopy(a[prop], b[prop]);
-        });
+		for (const key of Object.keys(theme)) {
+			let current = trie;
 
-        for (let o in a) {
-            if (!(o in b)) {
-                out[o] = a[o];
-            } else {
-                out[o] = createReactiveCopy(a[o], b[o]);
-            }
-        }
+			const keys = key.split('_');
+			for (let obj of keys) {
+				let next;
+				for (let node of current) {
+					if (node.name === obj) {
+						next = node;
+						break;
+					}
+				}
 
-        return out;
-    };
+				if (!next) {
+					next = [];
+					current.push(next);
+				}
 
-    return createReactiveCopy(Theme, customTheme);
+				next.depth = current.depth + 1;
+				next.name = obj;
+				current = next;
+			}
+
+			current.leaf = keys.length;
+
+			const name = prefix + key.replace(/\*/g, 'wildcard');
+			proc.push({name, node: current, key});
+		};
+
+		const resolve = (data) => {
+			// already revolved
+			if (data.vars) return;
+
+			const {name, node, key} = data;
+			const vars = new Map();
+
+			let ex;
+			if ('extends' in theme[key]) {
+				ex = theme[key].extends;
+				if (!Array.isArray(ex)) ex = ex.split('_');
+				ex = getClasses(trie, ex);
+
+				for (const e of ex) {
+					resolve(proc.find(n => n.node === e));
+
+					for (const [key, val] of e.vars.entries()) {
+						vars.set(key, val);
+					}
+				}
+			}
+
+			for (const o in theme[key]) {
+				if (o.charAt(0) !== '$') continue;
+				vars.set(o.substring(1), theme[key][o]);
+			}
+
+			data.ex = ex;
+			node.vars = vars;
+		}
+
+		// resolve all variable
+		for (const data of proc) {
+			resolve(data);
+		}
+
+		for (const {name, node, key, ex} of proc) {
+			const body = theme.observer.path(key).map(style => {
+				return Object.entries(style).flatMap(([key, val]) => {
+					if (key === 'extends') return '';
+					if (key.charAt(0) === '$') return '';
+
+					if (typeof val === 'number' && sizeProperties.has(key)) {
+						val = [val + 'px'];
+					} else {
+						let out = [];
+						val = String(val);
+
+						for (let i = 0; i < val.length; i++) {
+							if (val.charAt(i) === '$') {
+								let name = '';
+								let start = i;
+								for (i++; i < val.length; i++) {
+									if ("_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+										.indexOf(val.charAt(i)) === -1) break;
+									name += val.charAt(i);
+								}
+
+								if (val.charAt(i) !== '$') i--;
+
+								if (name === '') {
+									out.push('$');
+								} else {
+									out.push({name});
+								}
+							} else {
+								let text = '';
+								for (i; i < val.length; i++) {
+									if (val.charAt(i) === '$') break;
+									text += val.charAt(i);
+								}
+								out.push(text);
+							}
+						}
+
+						val = out;
+					}
+
+					const split = [];
+					let start = 0;
+					for (let i = 0; i < key.length; i++) {
+						if (key[i].toLowerCase() !== key[i]) {
+							split.push(key.substring(start, i).toLowerCase());
+							start = i;
+						}
+					}
+
+					if (key) split.push(key.substring(start).toLowerCase());
+
+					val.splice(0, 0,'\t' + split.join('-') + ": ");
+					val.splice(val.length, 0, ';\n');
+					val.invariant = true;
+
+					// resolve any variables we already know
+					for (let i = 0; i < val.length; i++) {
+						if (typeof val[i] === 'string') continue;
+						if (node.vars.has(val[i].name)) {
+							val[i] = String(node.vars.get(val[i].name));
+							continue;
+						}
+
+						val.invariant = false;
+					}
+
+					return val;
+				});
+			});
+
+			const compareStyles = (style, name, defines) => {
+				if (style.name !== name) return false;
+				if (style.defines.length !== defines.length) return false;
+
+				for (let ii = 0; ii < defines.length; ii++) {
+					if (style.defines[ii] !== defines[ii]) {
+						return false;
+					}
+				}
+
+				return true;
+			};
+
+			let seq = 0;
+			node.style = defines => {
+				let nodes = [];
+
+				let prefix = '';
+				if (ex) for (const c of ex) {
+					prefix += c.style(defines) + ' ';
+				}
+
+				let anchor = styles.findIndex(style => compareStyles(style, name, defines));
+				if (anchor === -1) anchor = styles.length;
+
+				let style;
+				for (let i = anchor; i < styles.length; i++) {
+					if (compareStyles(styles[i], name, defines)) {
+						style = styles[i];
+						break;
+					}
+				}
+
+				if (!style) {
+					style = {name, id: seq++, body, defines: defines.slice(0)};
+					styles.splice(anchor, 0, style);
+				}
+
+				return prefix + name + '-' + style.id;
+			};
+		}
+
+		return trie;
+	});
+
+	const getClasses = (trie, classes) => {
+		const out = [];
+		const current = [...trie];
+		for (let ii = 0; ii < classes.length; ii++) {
+			const className = classes[ii];
+
+			for (let i = 0; i < current.length; i++) {
+				const node = current[i];
+
+				if (node.name !== className) {
+					continue;
+				}
+
+				if (node.leaf) {
+					out.push({node, i: classes.length - ii});
+				}
+
+				current.splice(i, 1, ...node);
+				i += node.length - 1;
+			}
+		}
+
+		out.sort((a, b) => {
+			if (a.node.leaf !== b.node.leaf) return a.node.leaf - b.node.leaf;
+			return b.i - a.i;
+		});
+
+		return out.map(a => a.node);
+	};
+
+	const cache = new Map();
+	const out = (...classes) =>{
+		const themeState = Observer.all([trie, ...classes.map(Observer.immutable)]).map(([trie, ...classes]) => {
+			classes = classes.filter(c => {
+				if (c == undefined) return false;
+				if (typeof c !== 'string') throw new Error("Theme classes must be a string: " + c);
+				return true;
+			});
+
+			let out = cache.get(classes.join(' '));
+			if (out) return out;
+
+			let defines = [];
+
+			out = '';
+			for (const c of getClasses(trie, ["*", ...classes])) {
+				out += ' ' + c.style(defines);
+
+				defines.push(c);
+			};
+
+			cache.set(classes.join(' '), {out, defines});
+			return {out, defines};
+		})
+
+		const out = themeState.map(state => state.out);
+		out.vars = name => themeState.map(state => {
+			for (let i = state.defines.length - 1; i >= 0; i--) {
+				if (state.defines[i].vars.has(name)) {
+					return state.defines[i].vars.get(name);
+				}
+			}
+		});
+		return out;
+	};
+
+	out.theme = theme;
+	return out;
+};
+
+let theme_seq = 0;
+export default createContext(createTheme('daui-', theme), (theme, prev) => {
+	prev = prev.theme;
+
+	const out = OObject();
+
+	let keys = new Set([...Object.keys(prev), ...Object.keys(theme)]);
+	for (const key of keys) {
+		out[key] = theme[key] ?? prev[key];
+	}
+
+	const listener = delta => {
+		const key = delta.path()[0];
+		out[key] = theme[key] ?? prev[key];
+	};
+
+	if (theme.observer) theme.observer.shallow().watch(listener);
+	if (prev.observer) prev.observer.shallow().watch(listener);
+
+	return createTheme(`daui${theme_seq++}-`, out);
 });

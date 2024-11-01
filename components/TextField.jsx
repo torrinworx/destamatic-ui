@@ -23,17 +23,13 @@ const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error
 			flexGrow: expand.map(e => e ? 1 : ''),
 			height: expand.map(e => e ? '100%' : 'auto'),
 			display: inline ? 'inline-flex' : 'flex',
-			alignItems: 'center',
-			padding: 10,
-			marginTop: 10,
-			marginBottom: 10,
 			pointer: 'text',
-			background: 'white',
 			...style
 		}}
 	>
 		<Input
 			$value={value.def('')}
+			theme='text_field'
 			onInput={(e) => {
 				if (value.isImmutable()) {
 					Input.value = value.get() || '';
@@ -42,22 +38,9 @@ const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error
 				value.set(e.target.value);
 			}}
 			type={type}
-			onFocus={() => {
-				if (onFocus !== false) {
-					if (autoselect) Input.select();
-					if (typeof onFocus === 'function') onFocus();
-					focus.set(true);
-				}
-			}}
-			onBlur={() => focus.set(false)}
+			isFocused={focus}
 			style={{
-				border: 0,
-				outline: 0,
-				padding: 0,
-				fontSize: '1rem',
-				width: '100%',
 				height: '100%',
-				background: 'none',
 			}}
 			onKeyDown={e => {
 				if (e.key === 'Enter') {

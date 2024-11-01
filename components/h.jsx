@@ -1,6 +1,8 @@
 import { h as destam_h, mount, getFirst} from 'destam-dom';
 import Observer, {observerGetter, shallowListener} from 'destam/Observer';
 
+import Theme from './Theme';
+
 // This h element overrides the default behavoior that destam-dom gives for
 // overriding styles. destam-dom will never try to be more fancy than the browser
 // let's us be if it means adding extra logic to the library. However, we can
@@ -13,13 +15,14 @@ import Observer, {observerGetter, shallowListener} from 'destam/Observer';
 // 3. Numbers in the style will be interpreted as pxs
 // From: https://github.com/Nefsen402/destam-dom/blob/main/examples/custom-h.jsx
 
-const sizeProperties = new Set([
+export const sizeProperties = new Set([
 	'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
 	'top', 'left', 'right', 'bottom',
 	'margin', 'marginTop', 'marginLeft', 'marginRight', 'marginBottom',
 	'padding', 'paddingTop', 'paddingLeft', 'paddingRight', 'paddingBottom',
 	'inset', 'borderRadius',
 	'fontSize',
+	'outlineWidth', 'borderWidth', 'outline', 'border',
 ]);
 
 export const h = (name, props, ...children) => {
@@ -46,7 +49,56 @@ export const h = (name, props, ...children) => {
 					name.addEventListener(handlerName, handler);
 					return () => name.removeEventListener(handlerName, handler);
 				});
+			} else if (o.length >= 3 && o.startsWith('is') && o[2].toLowerCase() !== o[2]) {
+				const handlers = {
+					Focused: ['focus', 'blur'],
+					Hovered: ['mouseenter', 'mouseleave']
+				};
+
+				const handlerName = o.substring(2);
+				const handler = handlers[handlerName];
+				if (!handler) {
+					throw new Error("No handler for " + handlerName);
+				}
+
+				const obs = props[o];
+				delete props[o];
+
+				signals.push(() => {
+					let enter = () => obs.set(true);
+					let leave = () => obs.set(false);
+					name.addEventListener(handler[0], enter);
+					name.addEventListener(handler[1], leave);
+					return () => {
+						name.removeEventListener(handler[0], enter);
+						name.removeEventListener(handler[1], leave);
+					};
+				});
 			}
+		}
+
+		if ('theme' in props) {
+			let _class = '';
+			if ('class' in props) {
+				class_ = ' ' + props.class;
+				delete props.class;
+			}
+
+			let theme;
+			if (Array.isArray(props.theme)) {
+				theme = props.theme;
+			} else {
+				theme = props.theme.split('_');
+			}
+
+			signals.push(() => {
+				const cl = Theme.search(name)(...theme);
+				return cl.effect(cl => {
+					name.setAttribute('class', cl + _class);
+				}).remove;
+			})
+
+			delete props.theme;
 		}
 
 		let style = props.style;
@@ -153,7 +205,7 @@ export const h = (name, props, ...children) => {
 
 	return (elem, val, before) => {
 		const rem = mount(elem, handler, before);
-		let sigs = signals.map(signal => signal());
+		let sigs = signals.map(signal => signal(elem, val, before));
 
 		return arg => {
 			if (arg === getFirst) return rem(getFirst);

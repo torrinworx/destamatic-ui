@@ -11,18 +11,20 @@ import {
     TextArea,
     Drawer,
     Chevron,
+    Slider,
     KebabMenu,
     Markdown,
     CodeBlock,
     h
 } from 'destamatic-ui';
 
-const DemoPage = Theme.use(theme => () => {
+const DemoPage = () => {
     const handleClick = () => {
         console.log('Button clicked');
     };
 
     const drawerOpen = Observer.mutable(false);
+    const text = Observer.mutable('');
 
     const markdown = Observer.mutable(`
 # h1, **bold** *italic* ***bold and italic***
@@ -154,10 +156,14 @@ main()
             />
         </div>
         <Theme value={{
-            Button: {
-                contained: { base: { backgroundColor: 'pink' } },
-                outlined: { base: { backgroundColor: 'pink' } },
-            }
+            primary: {
+                $color: 'pink',
+                $color_top: 'white',
+            },
+
+            myContent: {
+                color: 'red',
+            },
         }}>
            <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                 <Button label="Text Button" type="text" onClick={handleClick} />
@@ -176,21 +182,24 @@ main()
                     Icon={<Icon libraryName="feather" iconName="feather" />}
                 />
             </div>
+
+            <Typography type="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
+            <DropDown label="Click to Toggle">
+                <div theme="myContent">
+                    Dropdown Content
+                </div>
+            </DropDown>
         </Theme>
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Loading Dots</Typography>
         <LoadingDots />
 
-        <Typography type="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
-        <DropDown label="Click to Toggle">
-            <div $style={{ padding: '10px', border: `1px solid ${theme.Colours.secondary.base}` }}>
-                Dropdown Content
-            </div>
-        </DropDown>
+        <Typography type="h2" $style={{marginTop: '20px'}}>Slider</Typography>
+        <Slider min={0} max={100} value={Observer.mutable(0)} />
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Inputs</Typography>
-        <TextField placeholder="Type here..." style={{ marginBottom: '10px' }} />
-        <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} />
+        <TextField placeholder="Type here..." style={{ marginBottom: '10px' }} value={text} />
+        <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} value={text} />
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Drawer</Typography>
         <Drawer open={drawerOpen}>
@@ -221,7 +230,7 @@ main()
             </KebabMenu>
         </div>
     </div>;
-});
+};
 
 mount(document.body, <>
     <DemoPage />

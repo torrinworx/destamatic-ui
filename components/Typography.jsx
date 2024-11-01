@@ -13,23 +13,19 @@ import Theme from './Theme';
  * 
  * @returns {JSX.Element} The rendered typography element.
  */
-const Typography = Theme.use(theme => ({ inline, type = 'h1', fontStyle = 'regular', children, style, ...props }) => {
-    const validType = Object.keys(theme.Typography)
-        .includes(type) ? type : 'h1';
-
-    const validFontStyle = Object.keys(theme.Typography[validType])
-        .includes(fontStyle) ? fontStyle : 'regular';
+const Typography = ({ inline, type = 'h1', fontStyle = 'regular', bold, children, style, ...props }) => {
+    if (bold) fontStyle = 'bold';
 
     return <div
+        theme={['typography', type, fontStyle]}
         style={{
             display: inline ? 'inline-block' : 'block',
-            font: theme.Typography[validType][validFontStyle],
             ...style
         }}
         {...props}
     >
         {children}
     </div>;
-});
+};
 
 export default Typography;

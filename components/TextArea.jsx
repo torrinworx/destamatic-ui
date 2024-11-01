@@ -24,7 +24,7 @@ import FocusEffect from './FocusEffect';
 const Textarea = Theme.use(theme => (
     {
         children,
-        value=Observer.mutable(''),
+        value,
         style,
         maxHeight = 200,
         id,
@@ -35,15 +35,17 @@ const Textarea = Theme.use(theme => (
     _,
     mounted
 ) => {
-    if (!(value instanceof Observer)) value = Observer.mutable(value);
+    if (!(value instanceof Observer)) value = Observer.immutable(value);
 
     const Ref = <textarea />;
     const isMounted = Observer.mutable(false);
     const isFocused = Observer.mutable(false);
     mounted(() => isMounted.set(true));
 
+    const _class = theme('text', 'area');
+
     return <FocusEffect
-        enabled={isFocused}
+        enabled={isFocused.map(focus => focus && !value.isImmutable())}
         style={{
             padding: '10px',
             pointer: 'text',
@@ -62,35 +64,28 @@ const Textarea = Theme.use(theme => (
             onKeyDown={onKeyDown}
             onInput={e => {
                 if (value.isImmutable()) {
-                    Input.value = value.get() || '';
+                    Ref.value = value.get() || '';
                     return;
                 }
 
                 value.set(e.target.value);
             }}
 			isFocused={isFocused}
+            class={_class}
             style={{
-                border: 0,
-                outline: 0,
-                padding: 0,
-                fontSize: '1rem',
-                background: 'none',
                 display: 'block',
                 resize: 'none',
                 overflowY: 'auto',
                 flexGrow: 1,
-                font: theme.Typography.p1.regular,
-				width: '100%',
                 height: isMounted.map(mounted => {
                     if (!mounted) return 'auto';
 
                     return value.map(val => {
-                        let elem = <textarea rows={1} $value={val} style={{
+                        let elem = <textarea class={_class.get()} rows={1} $value={val} style={{
                             resize: 'none',
                             padding: '0px',
                             boxSizing: 'border-box',
                             width: Ref.clientWidth + 'px',
-                            font: theme.Typography.p1.regular,
                         }} />;
 
                         document.body.appendChild(elem);
