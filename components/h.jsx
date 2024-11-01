@@ -77,7 +77,7 @@ export const h = (name, props, ...children) => {
 			}
 		}
 
-		if ('theme' in props) {
+		{
 			let _class = '';
 			if ('class' in props) {
 				class_ = ' ' + props.class;
@@ -85,7 +85,9 @@ export const h = (name, props, ...children) => {
 			}
 
 			let theme;
-			if (Array.isArray(props.theme)) {
+			if (!props.theme) {
+				theme = [];
+			} else if (Array.isArray(props.theme)) {
 				theme = props.theme;
 			} else {
 				theme = props.theme.split('_');

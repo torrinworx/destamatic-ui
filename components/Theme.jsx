@@ -4,7 +4,7 @@ import { sizeProperties } from './h';
 
 const theme = OObject({
 	"*": {
-		fontFamily: 'Roboto, sans-serif',
+		fontFamily: 'Comic sans MS, sans-serif',
 	},
 
 	primary: {
@@ -227,6 +227,7 @@ const Style = ({each: {name, id, body, defines}}) => {
 			for (let i = defines.length - 1; i >= 0; i--) {
 				if (defines[i].vars.has(item.name)) {
 					out += defines[i].vars.get(item.name);
+					break;
 				}
 			}
 		}
