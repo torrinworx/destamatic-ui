@@ -30,14 +30,14 @@ const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup)
     cleanup(() => window.removeEventListener('resize', handleResize));
 
     return <div
-        $style={{
+        style={{
             height: '100%',
             boxSizing: 'border-box',
         }}
         {...props}
     >
         <div
-            $style={{
+            style={{
                 height: '100%',
                 boxSizing: 'border-box',
                 transition: resizing.map(r => r ? 'none' : 'width 0.3s ease-in-out'),
@@ -45,7 +45,7 @@ const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup)
             }}
         >
             <div
-                $style={{
+                style={{
                     width: width,
                     height: '100%',
                     boxSizing: 'border-box',
@@ -54,9 +54,8 @@ const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup)
                     overflow: 'auto',
                 }}
             >
-                    <div $style={{
+                    <div class={theme('drawer')} style={{
                         boxSizing: 'border-box',
-                        border: `1px solid ${theme.Colours.secondary.base}`,
                         height: '100%',
                         padding: '10px',
                         overflowY: 'hidden',

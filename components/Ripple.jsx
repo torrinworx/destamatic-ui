@@ -10,7 +10,7 @@ import Theme from './Theme';
  * 
  * @returns {[Array<JSX.Element>, Function]} - Returns a tuple where the first element is the array of ripple elements and the second is the function to create a ripple.
  */
-const useRipples = background => {
+const useRipples = theme => {
     const ripples = OArray();
 
     /**
@@ -35,14 +35,14 @@ const useRipples = background => {
         const scale = Observer.mutable(0);
 
         ripples.push(<span
-            $style={{
+            theme={theme}
+            style={{
                 position: 'absolute',
                 borderRadius: '50%',
-                width: diameter + 'px',
-                height: diameter + 'px',
-                top: rippleY + 'px',
-                left: rippleX + 'px',
-                background: background,
+                width: diameter,
+                height: diameter,
+                top: rippleY,
+                left: rippleX,
                 transform: scale.map(scale => `translate(-50%, -50%) scale(${scale})`),
                 opacity: opacity,
                 transition: 'transform 0.8s, opacity 0.8s',

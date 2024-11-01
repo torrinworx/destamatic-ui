@@ -1,9 +1,6 @@
 import { h } from './h';
 import { Observer } from 'destam-dom';
-
 import Theme from './Theme';
-
-const thumbWidth = 25;
 
 // Note: We are using a custom track and thumb component to get around the
 // destam-dom limitations with pseudo elements. Currently, we cannot style these.
@@ -15,29 +12,23 @@ const Thumb = ({
     hover,
     disabled
 }) => {
-    const backgroundColor = disabled.map(d =>
-        d ? theme.Colours.primary.disabled
-            : hover.get() ? theme.Colours.primary.hover : theme.Colours.primary.base
-    );
-
     const cursor = disabled.map(d => d ? 'not-allowed' : 'pointer');
 
-    const thumbStyle = {
-        position: 'absolute',
-        top: '50%',
-        left: position,
-        width: `${thumbWidth}px`,
-        height: `${thumbWidth}px`,
-        backgroundColor,
-        borderRadius: '50%',
-        transform: 'translate(-50%, -50%)',
-        cursor,
-        transition: theme.transition,
-        ...style
-    };
-
     return <div
-        $style={thumbStyle}
+        theme={[
+            "slider", "thumb",
+            hover.map(h => h ? 'hovered' : null),
+            disabled.map(d => d ? 'disabled' : null),
+        ]}
+        style={{
+            position: 'absolute',
+            top: '50%',
+            left: position,
+            borderRadius: '50%',
+            transform: 'translate(-50%, -50%)',
+            cursor,
+            ...style
+        }}
         onMouseEnter={() => hover.set(true)}
         onMouseLeave={() => hover.set(false)}
         onMouseDown={onDragStart}
@@ -49,24 +40,21 @@ const Thumb = ({
 
 const Track = ({ style, onMouseDown, hover }) => {
     return <div
-        $style={{
+        theme={[
+            "slider", "track",
+            hover.map(h => h ? 'hovered' : null)
+        ]}
+        style={{
             position: 'absolute',
             top: '50%',
             left: '0',
             width: '100%',
             height: '8px',
-            backgroundColor: hover.map(h => h
-                ? theme.Colours.secondary.darker
-                : theme.Colours.secondary.base
-            ),
-            borderRadius: '4px',
             transform: 'translateY(-50%)',
             cursor: 'pointer',
-            transition: theme.transition,
             ...style,
         }}
-        onMouseEnter={() => hover.set(true)}
-        onMouseLeave={() => hover.set(false)}
+        isHovered={hover}
         onMouseDown={onMouseDown}
     ></div>;
 };
@@ -87,25 +75,25 @@ const Track = ({ style, onMouseDown, hover }) => {
  * @returns {JSX.Element} The rendered slider element.
  */
 const Slider = Theme.use(theme => ({
-    min = Observer.mutable(0),
-    max = Observer.mutable(100),
-    OValue = Observer.mutable(50),
+    min,
+    max,
+    value,
     style,
     trackStyle,
     thumbStyle,
-    hover = Observer.mutable(false),
-    disabled = Observer.mutable(false),
+    hover,
+    disabled,
     onMouseDown,
     onDragStart,
     onDrag,
     onDragEnd,
     ...props
 }, _, mount) => {
-    if (!(min instanceof Observer)) min = Observer.mutable(min);
-    if (!(max instanceof Observer)) max = Observer.mutable(max);
-    if (!(OValue instanceof Observer)) OValue = Observer.mutable(OValue);
-    if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
-    if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
+    if (!(min instanceof Observer)) min = Observer.immutable(min ?? 0);
+    if (!(max instanceof Observer)) max = Observer.immutable(max ?? 1);
+    if (!(value instanceof Observer)) value = Observer.immutable(value ?? 0);
+    if (!(hover instanceof Observer)) hover = Observer.mutable(hover ?? false);
+    if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled ?? false);
 
     const trackRef = Observer.mutable(null);
     const dragging = Observer.mutable(false);
@@ -120,7 +108,7 @@ const Slider = Theme.use(theme => ({
         const minVal = min.get();
         const maxVal = max.get();
         const newValue = minVal + ((clickX / trackWidth) * (maxVal - minVal));
-        OValue.set(Math.min(Math.max(newValue, minVal), maxVal));
+        value.set(Math.min(Math.max(newValue, minVal), maxVal));
     };
 
     const handleMouseMove = (event) => {
@@ -145,7 +133,10 @@ const Slider = Theme.use(theme => ({
         onDragStart && onDragStart(event);
     };
 
-    const percentage = OValue.map((value) => {
+    const percentage = Observer.all([
+        value,
+        theme('slider', 'thumb').vars('size'),
+    ]).map(([value, thumbWidth]) => {
         const trackElement = trackRef.get();
         if (!trackElement) return '50%';
 
@@ -173,11 +164,9 @@ const Slider = Theme.use(theme => ({
     });
 
     return <Ref
-        $style={{
+        theme='slider'
+        style={{
             position: 'relative',
-            width: '100%',
-            height: '40px',
-            transition: theme.transition,
             ...style
         }}
         {...props}

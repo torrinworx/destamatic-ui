@@ -20,17 +20,14 @@ const Link = Theme.use(theme => ({
     underline = true,
     onClick,
     hover=Observer.mutable(false),
-    clicked=Observer.mutable(false),
     children,
     style,
     ...props
 }) => {
     if (!(hover instanceof Observer )) hover = Observer.mutable(hover);
-    if (!(clicked instanceof Observer )) clicked = Observer.mutable(clicked);
 
     const handleHover = isHovered => () => hover.set(isHovered);
     const handleClick = (event) => {
-        clicked.set(true);
         if (onClick) {
             onClick(event);
         }
@@ -41,14 +38,7 @@ const Link = Theme.use(theme => ({
         $onclick={handleClick}
         $onmouseenter={handleHover(true)}
         $onmouseleave={handleHover(false)}
-        $style={{
-            color: clicked.map(c => c
-                ? theme.Colours.primary.darker
-                : theme.Colours.primary.base
-            ),
-            textDecoration: underline ? hover.map(h => (h ? 'underline 2px' : 'none')) : 'none',
-            cursor: 'pointer'
-        }}
+        class={theme('link', underline ? 'underline' : null, hover.map(h => h ? 'hovered' : null))}
         {...props}
     >
         {children}

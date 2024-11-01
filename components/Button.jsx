@@ -23,23 +23,21 @@ import Typography from './Typography.jsx';
  *
  * @returns {JSX.Element} The rendered button element.
  */
-const Button = Theme.use(theme => (
-    {
-        label = '',
-        type = 'text',
-        onClick,
-        inline,
-        onMouseDown,
-        onMouseUp,
-        Icon = null,
-        style,
-        disabled = Observer.mutable(false),
-        hover,
-        ref: Ref,
-        children,
-        ...props
-    }
-) => {
+const Button = ({
+    label = '',
+    type = 'text',
+    onClick,
+    inline,
+    onMouseDown,
+    onMouseUp,
+    Icon = null,
+    style,
+    disabled,
+    hover,
+    ref: Ref,
+    children,
+    ...props
+}) => {
     if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
     if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
     if (!Ref) Ref = <button />;
@@ -49,52 +47,16 @@ const Button = Theme.use(theme => (
         </Typography>;
     }
 
-    const [ripples, createRipple] = useRipples((() => {
-        switch (type) {
-            case 'text':
-                return theme.Colours.ripple.dark;
-            case 'contained':
-                return theme.Colours.ripple.light;
-            case 'outlined':
-                return theme.Colours.ripple.dark;
-            default:
-                return theme.Colours.ripple.dark;
-        }
-    })());
+    disabled = disabled.map(d => !!d);
 
-    const buttonStyle = {
-        ...theme.Button.base,
-        ...theme.Button[type].base,
-        transition: theme.transition,
-        borderRadius: theme.borderRadius,
-        boxShadow: disabled.map(d =>
-            d ? theme.Button[type].disabled.boxShadow
-            : theme.Button[type].base.boxShadow || (hover.map(h => h ? theme.boxShadow : null))
-        ),
-        display: inline ? 'inline-flex' : 'flex',
-        backgroundColor: disabled.map(d =>
-            d ? theme.Button[type].disabled.backgroundColor
-            || theme.Button[type].base.backgroundColor
-            : hover.map(h => (h ? theme.Button[type].hover.backgroundColor
-            : theme.Button[type].base.backgroundColor))
-        ).unwrap(),
-        color: disabled.map(d =>
-            d ? theme.Button[type].disabled.color
-            || theme.Button[type].base.color
-            : hover.map(h => (h ? theme.Button[type].hover.color
-                : theme.Button[type].base.color))
-        ).unwrap(),
-        cursor: disabled.map(d =>
-            d ? theme.Button[type].disabled.cursor
-            : theme.Button.base.cursor
-        ),
-        pointerEvents: disabled.map(d =>
-            d ? theme.Button[type].disabled.pointerEvents : 'auto'
-        ),
-        ...style,
-    };
+    const [ripples, createRipple] = useRipples(['ripple']);
 
     return <Ref
+        theme={[
+            'button', type,
+            hover.map(h => h ? 'hovered' : null),
+            disabled.map(d => d ? 'disabled' : null),
+        ]}
         onClick={(event) => {
             if (!disabled.get() && onClick) {
                 createRipple(event);
@@ -112,16 +74,15 @@ const Button = Theme.use(theme => (
 				onMouseUp && onMouseUp(event);
 			}
 		}}
-        onMouseEnter={() => hover.set(true)}
-        onMouseLeave={() => hover.set(false)}
-        style={buttonStyle}
-        disabled={disabled.map(d => d ? true : false)}
+        isHovered={hover}
+        style={style}
+        disabled={disabled}
         {...props}
     >
     	{Icon}
         {label ? label : children}
         {ripples}
     </Ref>
-});
+};
 
 export default Button;

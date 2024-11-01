@@ -3,7 +3,6 @@ import Observer from 'destam/Observer';
 import FocusEffect from './FocusEffect';
 import Popup from './Popup';
 import Shown from './Shown';
-import Theme from './Theme';
 import Button from './Button';
 
 const calculate = (bounds, rot) => {
@@ -37,7 +36,7 @@ const calculate = (bounds, rot) => {
 	};
 }
 
-const Detached = Theme.use(theme => ({menu, children, enabled, style}) => {
+const Detached = ({menu, children, enabled, style}) => {
 	const focused = enabled || Observer.mutable(false);
 
 	const A = <button />;
@@ -118,6 +117,6 @@ const Detached = Theme.use(theme => ({menu, children, enabled, style}) => {
 			</Popup>
 		</Shown>
 	</FocusEffect>;
-});
+};
 
 export default Detached;
