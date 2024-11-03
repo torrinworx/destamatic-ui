@@ -2,6 +2,29 @@ import { h } from './h';
 import Theme from './Theme';
 import { mount } from 'destam-dom';
 
+Theme.define({
+    loadingDots: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    loadingDots_dot: {
+        extends: 'primary',
+
+        background: '$color',
+        display: 'inline-block',
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        animationName: 'dotFlashing',
+        animationDuration: '1s',
+        animationIterationCount: 'infinite',
+        animationTimingFunction: 'ease-in-out',
+        margin: '20px 4px',
+    },
+});
+
 /**
  * LoadingDots component - a loading indicator with three animated dots.
  * 

@@ -1,6 +1,18 @@
 import { h } from './h';
 import { Observer } from 'destam-dom';
 import useRipples from './Ripple.jsx';
+import Theme from './Theme';
+
+Theme.define({
+	checkbox: {
+		extends: 'primary',
+		padding: 0,
+	},
+
+	checkbox_disabled: {
+		color: 'black',
+	},
+});
 
 /**
  * Checkbox component.

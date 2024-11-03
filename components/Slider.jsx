@@ -2,6 +2,35 @@ import { h } from './h';
 import { Observer } from 'destam-dom';
 import Theme from './Theme';
 
+Theme.define({
+    slider: {
+        extends: 'primary',
+
+        width: '100%',
+        height: '40px',
+    },
+
+    slider_track: {
+        extends: 'primary_radius',
+
+        background: '$color',
+    },
+
+    slider_track_hovered: {
+        extends: 'primary',
+        background: '$color_hover',
+    },
+
+    slider_thumb: {
+        $size: 25,
+        extends: 'secondary',
+
+        width: `$size$px`,
+        height: `$size$px`,
+        background: '$color',
+    },
+});
+
 // Note: We are using a custom track and thumb component to get around the
 // destam-dom limitations with pseudo elements. Currently, we cannot style these.
 const Thumb = ({

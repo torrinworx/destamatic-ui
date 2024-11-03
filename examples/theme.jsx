@@ -30,7 +30,7 @@ const theme = OObject({
 		$color: 'orange',
 		$color_hover: 'pink',
 	},
-	
+
 	myDiv: {
 		background: '$color',
 		width: 100,

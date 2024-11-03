@@ -1,6 +1,7 @@
 import { h, mount, Observer, OObject, OArray } from "destam-dom";
 import createContext from './Context';
 import { sizeProperties } from './h';
+import { atomic } from 'destam/Network';
 
 const theme = OObject({
 	"*": {
@@ -40,31 +41,8 @@ const theme = OObject({
 		borderRadius: 6,
 	},
 
-	focus: {
-		extends: ['primary', 'radius'],
-		transitionDuration: '0.3s',
-		transitionProperty: 'border-color, background-color, box-shadow',
-		borderStyle: 'solid',
-		borderWidth: .5,
-		borderColor: '#388595',
-		padding: 10,
-		marginTop: 10,
-		marginBottom: 10,
-		alignItems: 'center',
-		background: 'white',
-	},
-
 	ripple: {
 		background: 'rgba(0, 0, 0, .3)'
-	},
-
-	focus_focused: {
-		boxShadow: '$color 0 0 0 0.2rem',
-		borderColor: '#ced4da',
-	},
-
-	focus_error: {
-		borderColor: '$color_error',
 	},
 
 	drawer: {
@@ -74,135 +52,12 @@ const theme = OObject({
 		outlineStyle: 'solid',
 	},
 
-	button: {
-		extends: ['primary', 'center', 'radius'],
-
-		height: '40px',
-		userSelect: 'none',
-		border: 'none',
-		cursor: 'pointer',
-		textDecoration: 'none',
-		position: 'relative',
-		overflow: 'clip',
-		color: 'black',
-		boxShadow: 'none',
-		background: 'none',
-	},
-
-	button_text: {
-		width: "auto",
-	},
-
-	button_contained: {
-		color: '$color_top',
-		background: '$color',
-	},
-
-	button_contained_hovered: {
-		background: '$color_hover',
-	},
-
-	button_outlined: {
-		borderWidth: 2,
-		borderStyle: 'solid',
-		borderColor: '$color',
-	},
-
-	button_outlined_hovered: {
-		extends: 'primary_hovered',
-		color: 'black',
-	},
-
-	hover: {
-		backgroundColor: 'rgba(2, 202, 159, 0.1)',
-		color: '#02CA9F',
-	},
-
 	disabled: {
 		cursor: 'default',
 		backgroundColor: '#666',
 		color: '#CCC',
 		pointerEvents: 'none'
 	},
-
-	loadingDots: {
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-
-	loadingDots_dot: {
-		extends: 'primary',
-
-		background: '$color',
-        display: 'inline-block',
-        width: '8px',
-        height: '8px',
-        borderRadius: '50%',
-        animationName: 'dotFlashing',
-        animationDuration: '1s',
-        animationIterationCount: 'infinite',
-        animationTimingFunction: 'ease-in-out',
-        margin: '20px 4px',
-	},
-
-	paper: {
-		extends: 'borderRadius',
-        background: 'white',
-        boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
-        insetBoxShadow: 'inset -2px -2px 10px rgba(0,0,0,0.2)',
-        padding: 10,
-        maxWidth: 'inherit',
-        maxHeight: 'inherit',
-	},
-
-	checkbox: {
-		extends: 'primary',
-		padding: 0,
-	},
-
-	checkbox_disabled: {
-		color: 'black',
-	},
-
-	slider: {
-		extends: 'primary',
-
-        width: '100%',
-        height: '40px',
-	},
-
-	slider_track: {
-		extends: 'primary_radius',
-
-        background: '$color',
-	},
-
-	slider_track_hovered: {
-		extends: 'primary',
-		background: '$color_hover',
-	},
-
-	slider_thumb: {
-		$size: 25,
-		extends: 'secondary',
-
-        width: `$size$px`,
-        height: `$size$px`,
-        background: '$color',
-	},
-
-	typography_h1: { fontSize: 62 },
-	typography_h2: { fontSize: 56 },
-	typography_h3: { fontSize: 36 },
-	typography_h4: { fontSize: 30 },
-	typography_h5: { fontSize: 24 },
-	typography_h6: { fontSize: 20 },
-	typography_p1: { fontSize: 16 },
-	typography_p2: { fontSize: 14 },
-	typography_regular: { fontStyle: 'normal' },
-	typography_bold: { fontWeight: 'bold' },
-	typography_italic: { fontStyle: 'italic' },
 
 	text: {
 		extends: 'typography_p1_regular',
@@ -506,7 +361,7 @@ const createTheme = (prefix, theme) => {
 };
 
 let theme_seq = 0;
-export default createContext(createTheme('daui-', theme), (theme, prev) => {
+const Theme = createContext(createTheme('daui-', theme), (theme, prev) => {
 	prev = prev.theme;
 
 	const out = OObject();
@@ -526,3 +381,12 @@ export default createContext(createTheme('daui-', theme), (theme, prev) => {
 
 	return createTheme(`daui${theme_seq++}-`, out);
 });
+
+Theme.define = obj => atomic(() => {
+	for (const o in obj) {
+		if (o in theme) throw new Error("Theme.define: theme definition already exists: " + o);
+		theme[o] = obj[o];
+	}
+});
+
+export default Theme;

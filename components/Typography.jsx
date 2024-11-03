@@ -1,6 +1,20 @@
 import { h } from './h';
 import Theme from './Theme';
 
+Theme.define({
+    typography_h1: { fontSize: 62 },
+    typography_h2: { fontSize: 56 },
+    typography_h3: { fontSize: 36 },
+    typography_h4: { fontSize: 30 },
+    typography_h5: { fontSize: 24 },
+    typography_h6: { fontSize: 20 },
+    typography_p1: { fontSize: 16 },
+    typography_p2: { fontSize: 14 },
+    typography_regular: { fontStyle: 'normal' },
+    typography_bold: { fontWeight: 'bold' },
+    typography_italic: { fontStyle: 'italic' },
+});
+
 /**
  * Typography component for rendering text with different styles and types.
  * 

@@ -5,6 +5,47 @@ import Theme from './Theme.jsx';
 import useRipples from './Ripple.jsx';
 import Typography from './Typography.jsx';
 
+Theme.define({
+    button: {
+        extends: ['primary', 'center', 'radius'],
+
+        height: '40px',
+        userSelect: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        textDecoration: 'none',
+        position: 'relative',
+        overflow: 'clip',
+        color: 'black',
+        boxShadow: 'none',
+        background: 'none',
+    },
+
+    button_text: {
+        width: "auto",
+    },
+
+    button_contained: {
+        color: '$color_top',
+        background: '$color',
+    },
+
+    button_contained_hovered: {
+        background: '$color_hover',
+    },
+
+    button_outlined: {
+        borderWidth: 2,
+        borderStyle: 'solid',
+        borderColor: '$color',
+    },
+
+    button_outlined_hovered: {
+        extends: 'primary_hovered',
+        color: 'black',
+    },
+});
+
 /**
  * Button component with ripple effect and dynamic styles based on properties.
  *
