@@ -21,10 +21,10 @@ const theme = OObject({
 		fontFamily: 'arial',
 	},
 
-	myPrimary: {
+	myPrimary: OObject({
 		$color: 'blue',
 		$color_hover: 'red',
-	},
+	}),
 
 	mySecondary: {
 		$color: 'orange',
@@ -67,4 +67,4 @@ mount(document.body, <Theme value={theme}>
 	<Button label="hello world" type="contained" />
 </Theme>);
 
-Observer.timer(1000).map(t => t % 2 === 0 ? 'blue' : 'red').effect(color => (theme.myPrimary.$color = color, null));
+Observer.timer(1000).map(t => t % 2 === 0 ? 'blue' : 'green').effect(color => (theme.myPrimary.$color = color, null));

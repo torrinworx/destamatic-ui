@@ -1,4 +1,4 @@
-import { Observer } from 'destam-dom';
+import { Observer, h as destam_h } from 'destam-dom';
 import { h } from './h';
 import Theme from './Theme';
 import FocusEffect from './FocusEffect';
@@ -81,7 +81,7 @@ const Textarea = Theme.use(theme => (
                     if (!mounted) return 'auto';
 
                     return value.map(val => {
-                        let elem = <textarea class={_class.get()} rows={1} $value={val} style={{
+                        let elem = <destam_h:textarea class={_class.get()} rows={1} $value={val} $style={{
                             resize: 'none',
                             padding: '0px',
                             boxSizing: 'border-box',

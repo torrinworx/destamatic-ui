@@ -80,7 +80,7 @@ export const h = (name, props, ...children) => {
 		{
 			let _class = '';
 			if ('class' in props) {
-				class_ = ' ' + props.class;
+				_class = Observer.immutable(props.class);
 				delete props.class;
 			}
 
@@ -99,11 +99,13 @@ export const h = (name, props, ...children) => {
 
 				queueMicrotask(() => {
 					if (removed) return;
-					const cl = Theme.search(name)(...theme);
+					let cl = Theme.search(name)(...theme);
 
-					remove = cl.effect(cl => {
-						name.setAttribute('class', cl + _class);
-					}).remove;
+					if (_class) {
+						cl = Observer.all([cl, _class]).map(s => s.join(' '));
+					}
+
+					remove = cl.effect(cl => name.setAttribute('class', cl)).remove;
 				});
 
 				return () => {
