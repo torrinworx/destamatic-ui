@@ -6,11 +6,7 @@ import Theme from './Theme';
 Theme.define({
 	checkbox: {
 		extends: 'primary',
-		padding: 0,
-	},
-
-	checkbox_disabled: {
-		color: 'black',
+		accentColor: '$color',
 	},
 });
 
@@ -69,6 +65,7 @@ const Checkbox = ({ value, onChange, style, ...props }) => {
 	>
 		<Input
 			type="checkbox"
+			theme="checkbox"
 			$checked={value}
 			{...props}
 		/>
