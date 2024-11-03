@@ -48,7 +48,7 @@ const Textarea = Theme.use(theme => (
         enabled={isFocused.map(focus => focus && !value.isImmutable())}
         style={{
             padding: '10px',
-            pointer: 'text',
+            cursor: 'text',
         }}
         onMouseDown={e => {
             if (e.target !== Ref) {

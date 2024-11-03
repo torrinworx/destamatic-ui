@@ -23,7 +23,7 @@ const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error
 			flexGrow: expand.map(e => e ? 1 : ''),
 			height: expand.map(e => e ? '100%' : 'auto'),
 			display: inline ? 'inline-flex' : 'flex',
-			pointer: 'text',
+			cursor: 'text',
 			...style
 		}}
 	>
