@@ -41,8 +41,7 @@ Theme.define({
     },
 
     button_outlined_hovered: {
-        extends: 'primary_hovered',
-        color: 'black',
+        color: '$color_hover',
     },
 });
 

@@ -158,6 +158,7 @@ main()
         <Theme value={{
             primary: {
                 $color: 'pink',
+                $color_hover: 'blue',
                 $color_top: 'white',
             },
 
