@@ -2,7 +2,6 @@ export * from './components/h.jsx';
 
 export { default as Button } from './components/Button.jsx';
 export { default as Drawer } from './components/Drawer.jsx';
-export { default as Chevron } from './components/Chevron.jsx';
 export { default as DropDown } from './components/DropDown.jsx';
 export { default as Icon } from './components/Icon.jsx';
 export { default as KebabMenu } from './components/KebabMenu.jsx';
