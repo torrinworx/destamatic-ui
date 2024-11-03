@@ -27,10 +27,6 @@ const theme = OObject({
 		background: 'inherit',
 	},
 
-	secondary_hovered: {
-		color: '#A5A5A5' // Darker variant for secondary
-	},
-
 	center: {
 		display: 'flex',
 		alignItems: 'center',
@@ -70,22 +66,25 @@ const theme = OObject({
 });
 
 const getVar = (name, exts) => {
-	let ret;
+	let ret = null;
 	for (const node of exts) {
-		if (ret) {
-			ret = node.vars(name).def(ret);
-		} else {
-			ret = node.vars(name);
-		}
+		const current = ret;
+		ret = node.body.map(({vars}) => {
+			if (vars.has(name)) {
+				return vars.get(name);
+			}
+
+			if (current === null) console.warn("Theme name is not defined but used: " + name);
+			return current;
+		}).unwrap()
 	}
 
-	if (!ret) return null;
-	return ret.map(e => e ? String(e.val) : null);
+	return ret;
 };
 
 const Style = ({each: {node, name, defines, children}}) => {
 	return <>
-		{node.body.map(text => {
+		{node.body.map(({text}) => {
 			if (!text.length) return null;
 
 			return ['.' + name + ' {\n', ...text.map(item => {
@@ -107,35 +106,6 @@ mount(document.head, <style>
 	}`}
 	<Style each={styles} />
 </style>);
-
-const insertStyle = defines => {
-	const found = [];
-	const search = (arr, index) => {
-		if (index >= defines.length) return;
-
-		for (let i = 0; i < arr.length; i++) {
-			if (arr[i].node === defines[index]) {
-				found.push(arr[i].name);
-				search(arr[i].children, index + 1);
-				return;
-			}
-		}
-
-		const style = {
-			node: defines[index],
-			children: OArray(),
-			defines: defines.slice(0, index),
-			name: defines[index].className + '-' + defines[index].id++,
-		};
-
-		search(style.children, index + 1);
-		found.push(style.name);
-		arr.push(style);
-	};
-
-	search(styles, 0);
-	return found.join(' ');
-};
 
 const getClasses = (trie, classes) => {
 	const out = [];
@@ -168,6 +138,35 @@ const getClasses = (trie, classes) => {
 };
 
 const createTheme = (prefix, theme) => {
+	const insertStyle = defines => {
+		const found = [];
+		const search = (arr, name, index) => {
+			if (index >= defines.length) return;
+
+			for (const style of arr) {
+				if (style.node === defines[index]) {
+					found.push(style.name);
+					search(style.children, style.name + '-', index + 1);
+					return;
+				}
+			}
+
+			const style = {
+				node: defines[index],
+				children: OArray(),
+				defines: defines.slice(0, index),
+				name: name + defines[index].name.replace(/\*/g, ''),
+			};
+
+			search(style.children, style.name + '-', index + 1);
+			found.push(style.name);
+			arr.push(style);
+		};
+
+		search(styles, prefix, 0);
+		return found.join(' ');
+	};
+
 	const trie = theme.observer.shallow().map(theme => {
 		const trie = [];
 		for (const key of Object.keys(theme)) {
@@ -193,8 +192,7 @@ const createTheme = (prefix, theme) => {
 			}
 
 			current.leaf = keys.length;
-
-			const body = theme.observer.path(key).map(theme => {
+			current.body = theme.observer.path(key).map(theme => {
 				let invariant = true;
 				const vars = new Map();
 				let text = Object.entries(theme).flatMap(([key, val]) => {
@@ -291,13 +289,8 @@ const createTheme = (prefix, theme) => {
 				return {text, vars, invariant, exts};
 			}).unwrap();
 
-			current.vars = name => body.map(({exts, vars}) =>
-				vars.has(name) ? {val: vars.get(name)} : null);
-			current.defs = body.map(({exts}) =>
+			current.defs = current.body.map(({exts}) =>
 				Observer.all(exts.map(node => node.defs)).map(arr => [...arr.flat(), current])).unwrap();
-			current.body = body.map(({text}) => text);
-			current.id = 0;
-			current.className = prefix + key.replace(/\*/g, 'wildcard');
 		};
 
 		return trie;
