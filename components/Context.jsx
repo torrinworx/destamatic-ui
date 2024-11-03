@@ -1,5 +1,4 @@
-import { h } from './h';
-import {Observer, mount} from 'destam-dom';
+import {Observer, mount, h} from 'destam-dom';
 
 
 const createContext = (def, transform = x => x) => {
