@@ -213,32 +213,33 @@ const theme = OObject({
 	},
 });
 
+const getVar = (name, exts, unpack) => {
+	let ret;
+	for (const node of exts) {
+		if (ret) {
+			ret = node.vars(name).def(ret);
+		} else {
+			ret = node.vars(name);
+		}
+	}
+
+	if (unpack) {
+		if (!ret) return null;
+		return ret.map(e => e ? String(e.val) : null);
+	}
+
+	return ret;
+};
+
 const Style = ({each: {name, id, body, defines}}) => {
-	return Observer.all([
-		body,
-		Observer.all(defines.map(d => d.vars)),
-	]).map(([text, scopes]) => {
+	return body.map(text => {
 		if (!text.length) return null;
 
-		let out = '.' + name + '-' + id + ' {\n';
-		for (const item of text) {
-			if (typeof item === 'string') {
-				out += item;
-				continue;
-			}
+		return ['.' + name + '-' + id + ' {\n', ...text.map(item => {
+			if (typeof item === 'string') return item;
 
-			for (let i = scopes.length - 1; i >= 0; i--) {
-				let map = scopes[i];
-				if (map.has(item.name)) {
-					out += map.get(item.name);
-					break;
-				}
-			}
-		}
-
-		out += '\n}\n';
-
-		return out;
+			return getVar(item.name, defines, true);
+		}), '\n}\n'];
 	});
 };
 
@@ -324,12 +325,12 @@ const createTheme = (prefix, theme) => {
 
 			const body = theme.observer.path(key).map(theme => {
 				let invariant = true;
-				const vars = [];
-				const text = Object.entries(theme).flatMap(([key, val]) => {
+				const vars = new Map();
+				let text = Object.entries(theme).flatMap(([key, val]) => {
 					if (key === 'extends') return '';
 
 					if (key.charAt(0) === '$') {
-						vars.push([key.substring(1), val])
+						vars.set(key.substring(1), val);
 						return '';
 					}
 
@@ -387,6 +388,25 @@ const createTheme = (prefix, theme) => {
 					return val;
 				});
 
+				// resolve any local variables
+				text = text.reduce((acc, item) => {
+					if (typeof item !== 'string') {
+						if (vars.has(item.name)) item = String(vars.get(item.name));
+					} else if (!item.length) {
+						return acc;
+					}
+
+					if (typeof item !== 'string') {
+						acc.push(item);
+					} else if (typeof acc[acc.length - 1] === 'string') {
+						acc[acc.length - 1] += item;
+					} else {
+						acc.push(item);
+					}
+
+					return acc;
+				}, []);
+
 				let exts;
 				if ('extends' in theme) {
 					let ex = theme.extends;
@@ -400,21 +420,13 @@ const createTheme = (prefix, theme) => {
 				return {text, vars, invariant, exts};
 			}).unwrap();
 
-			current.vars = body.map(({exts, vars}) => Observer.all(exts.map(e => e.vars)).map(scopes => {
-				const glob = new Map();
-
-				for (const scope of scopes) {
-					for (const [key, val] of scope.entries()) {
-						glob.set(key, val);
-					}
+			current.vars = name => body.map(({exts, vars}) => {
+				if (vars.has(name)) {
+					return {val: vars.get(name)};
 				}
 
-				for (const [key, val] of vars) {
-					glob.set(key, val);
-				}
-
-				return glob;
-			})).unwrap();
+				return getVar(name, exts, false);
+			}).unwrap();
 
 			let seq = 0;
 			const bodyText = body.map(({text}) => text);
@@ -447,7 +459,7 @@ const createTheme = (prefix, theme) => {
 					}
 
 					if (!style) {
-						style = {name, id: seq++, defines: defines, body: bodyText};
+						style = {name, id: seq++, defines, body: bodyText};
 						styles.splice(anchor, 0, style);
 					}
 
@@ -484,15 +496,7 @@ const createTheme = (prefix, theme) => {
 		}).unwrap();
 
 		const out = themeState.map(state => state.out).unwrap();
-		out.vars = name => themeState.map(({defines}) =>
-			Observer.all(defines.map(d => d.vars)).map(scopes => {
-			for (let i = scopes.length - 1; i >= 0; i--) {
-				const map = scopes[i];
-				if (map.has(name)) {
-					return map.get(name);
-				}
-			}
-		})).unwrap();
+		out.vars = name => themeState.map(({defines}) => getVar(name, defines, true)).unwrap();
 		return out;
 	};
 
