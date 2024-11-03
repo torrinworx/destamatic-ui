@@ -86,6 +86,7 @@ const theme = OObject({
 		overflow: 'clip',
 		color: 'black',
 		boxShadow: 'none',
+		background: 'none',
 	},
 
 	button_text: {
