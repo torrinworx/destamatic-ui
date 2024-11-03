@@ -69,7 +69,7 @@ const theme = OObject({
 	},
 });
 
-const getVar = (name, exts, unpack) => {
+const getVar = (name, exts) => {
 	let ret;
 	for (const node of exts) {
 		if (ret) {
@@ -79,24 +79,23 @@ const getVar = (name, exts, unpack) => {
 		}
 	}
 
-	if (unpack) {
-		if (!ret) return null;
-		return ret.map(e => e ? String(e.val) : null);
-	}
-
-	return ret;
+	if (!ret) return null;
+	return ret.map(e => e ? String(e.val) : null);
 };
 
-const Style = ({each: {name, id, body, defines}}) => {
-	return body.map(text => {
-		if (!text.length) return null;
+const Style = ({each: {node, name, defines, children}}) => {
+	return <>
+		{node.body.map(text => {
+			if (!text.length) return null;
 
-		return ['.' + name + '-' + id + ' {\n', ...text.map(item => {
-			if (typeof item === 'string') return item;
+			return ['.' + name + ' {\n', ...text.map(item => {
+				if (typeof item === 'string') return item;
 
-			return getVar(item.name, defines, true);
-		}), '\n}\n'];
-	});
+				return getVar(item.name, defines);
+			}), '\n}\n'];
+		})}
+		<Style each={children} />
+	</>;
 };
 
 const styles = OArray();
@@ -109,17 +108,33 @@ mount(document.head, <style>
 	<Style each={styles} />
 </style>);
 
-const compareStyles = (style, name, defines) => {
-	if (style.name !== name) return false;
-	if (style.defines.length !== defines.length) return false;
+const insertStyle = defines => {
+	const found = [];
+	const search = (arr, index) => {
+		if (index >= defines.length) return;
 
-	for (let ii = 0; ii < defines.length; ii++) {
-		if (style.defines[ii] !== defines[ii]) {
-			return false;
+		for (let i = 0; i < arr.length; i++) {
+			if (arr[i].node === defines[index]) {
+				found.push(arr[i].name);
+				search(arr[i].children, index + 1);
+				return;
+			}
 		}
-	}
 
-	return true;
+		const style = {
+			node: defines[index],
+			children: OArray(),
+			defines: defines.slice(0, index),
+			name: defines[index].className + '-' + defines[index].id++,
+		};
+
+		search(style.children, index + 1);
+		found.push(style.name);
+		arr.push(style);
+	};
+
+	search(styles, 0);
+	return found.join(' ');
 };
 
 const getClasses = (trie, classes) => {
@@ -276,52 +291,13 @@ const createTheme = (prefix, theme) => {
 				return {text, vars, invariant, exts};
 			}).unwrap();
 
-			current.vars = name => body.map(({exts, vars}) => {
-				if (vars.has(name)) {
-					return {val: vars.get(name)};
-				}
-
-				return getVar(name, exts, false);
-			}).unwrap();
-
-			let seq = 0;
-			const bodyText = body.map(({text}) => text);
-			const name = prefix + key.replace(/\*/g, 'wildcard');
-			current.style = _defines => {
-				_defines = _defines.slice(0);
-
-				return body.map(({exts, invariant}) => {
-					let defines = _defines.slice(0);
-
-					const prefix = Observer.all(exts.map(c => {
-						const style = c.style(defines);
-						defines.push(c);
-						return style;
-					}));
-
-					if (invariant) {
-						defines = [];
-					}
-
-					let anchor = styles.findIndex(style => compareStyles(style, name, defines));
-					if (anchor === -1) anchor = styles.length;
-
-					let style;
-					for (let i = anchor; i < styles.length; i++) {
-						if (compareStyles(styles[i], name, defines)) {
-							style = styles[i];
-							break;
-						}
-					}
-
-					if (!style) {
-						style = {name, id: seq++, defines, body: bodyText};
-						styles.splice(anchor, 0, style);
-					}
-
-					return prefix.map(p => [...p, name + '-' + style.id].join(' '));
-				}).unwrap();
-			};
+			current.vars = name => body.map(({exts, vars}) =>
+				vars.has(name) ? {val: vars.get(name)} : null);
+			current.defs = body.map(({exts}) =>
+				Observer.all(exts.map(node => node.defs)).map(arr => [...arr.flat(), current])).unwrap();
+			current.body = body.map(({text}) => text);
+			current.id = 0;
+			current.className = prefix + key.replace(/\*/g, 'wildcard');
 		};
 
 		return trie;
@@ -329,30 +305,25 @@ const createTheme = (prefix, theme) => {
 
 	const cache = new Map();
 	const out = (...classes) =>{
-		const themeState = Observer.all([trie, ...classes.map(Observer.immutable)]).map(([trie, ...classes]) => {
+		const defines = Observer.all([trie, ...classes.map(Observer.immutable)]).map(([trie, ...classes]) => {
 			classes = classes.filter(c => {
 				if (c == undefined) return false;
 				if (typeof c !== 'string') throw new Error("Theme classes must be a string: " + c);
 				return true;
 			});
 
-			let out = cache.get(classes.join(' '));
-			if (out) return out;
+			let defines = cache.get(classes.join(' '));
+			if (defines) return defines;
 
-			let defines = [], styles = [];
-			for (const c of getClasses(trie, ["*", ...classes])) {
-				styles.push(c.style(defines));
-				defines.push(c);
-			};
+			defines = Observer.all(getClasses(trie, ["*", ...classes])
+				.map(node => node.defs)).map(def => def.flat());
 
-			out = {out: Observer.all(styles).map(s => s.join(' ')), defines}
-
-			cache.set(classes.join(' '), out);
-			return out;
+			cache.set(classes.join(' '), defines);
+			return defines;
 		}).unwrap();
 
-		const out = themeState.map(state => state.out).unwrap();
-		out.vars = name => themeState.map(({defines}) => getVar(name, defines, true)).unwrap();
+		const out = defines.map(insertStyle);
+		out.vars = name => defines.map(defines => getVar(name, defines)).unwrap();
 		return out;
 	};
 
