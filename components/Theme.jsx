@@ -419,37 +419,41 @@ const createTheme = (prefix, theme) => {
 			let seq = 0;
 			const bodyText = body.map(({text}) => text);
 			const name = prefix + key.replace(/\*/g, 'wildcard');
-			current.style = _defines => body.map(({exts, invariant}) => {
-				let defines = _defines.slice(0);
+			current.style = _defines => {
+				_defines = _defines.slice(0);
 
-				const prefix = Observer.all(exts.map(c => {
-					const style = c.style(defines);
-					defines.push(c);
-					return style;
-				}));
+				return body.map(({exts, invariant}) => {
+					let defines = _defines.slice(0);
 
-				if (invariant) {
-					defines = [];
-				}
+					const prefix = Observer.all(exts.map(c => {
+						const style = c.style(defines);
+						defines.push(c);
+						return style;
+					}));
 
-				let anchor = styles.findIndex(style => compareStyles(style, name, defines));
-				if (anchor === -1) anchor = styles.length;
-
-				let style;
-				for (let i = anchor; i < styles.length; i++) {
-					if (compareStyles(styles[i], name, defines)) {
-						style = styles[i];
-						break;
+					if (invariant) {
+						defines = [];
 					}
-				}
 
-				if (!style) {
-					style = {name, id: seq++, defines: defines, body: bodyText};
-					styles.splice(anchor, 0, style);
-				}
+					let anchor = styles.findIndex(style => compareStyles(style, name, defines));
+					if (anchor === -1) anchor = styles.length;
 
-				return prefix.map(p => [...p, name + '-' + style.id].join(' '));
-			}).unwrap();
+					let style;
+					for (let i = anchor; i < styles.length; i++) {
+						if (compareStyles(styles[i], name, defines)) {
+							style = styles[i];
+							break;
+						}
+					}
+
+					if (!style) {
+						style = {name, id: seq++, defines: defines, body: bodyText};
+						styles.splice(anchor, 0, style);
+					}
+
+					return prefix.map(p => [...p, name + '-' + style.id].join(' '));
+				}).unwrap();
+			};
 		};
 
 		return trie;
