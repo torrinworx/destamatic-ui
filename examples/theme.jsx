@@ -22,6 +22,7 @@ const theme = OObject({
 	},
 
 	myPrimary: OObject({
+		$color_background: 'aqua',
 		$color: 'blue',
 		$color_hover: 'red',
 	}),
@@ -59,12 +60,21 @@ const theme = OObject({
 		color: 'black',
 		boxShadow: 'none',
 	},
+
+	body: {
+		extends: 'myPrimary',
+		inset: 0,
+		position: 'absolute',
+		background: '$color_background',
+	}
 });
 
 mount(document.body, <Theme value={theme}>
-	<MyComponent type="myPrimary"/>
-	<MyComponent type="mySecondary"/>
-	<Button label="hello world" type="contained" />
+	<div theme="body">
+		<MyComponent type="myPrimary"/>
+		<MyComponent type="mySecondary"/>
+		<Button label="hello world" type="contained" />
+	</div>
 </Theme>);
 
 Observer.timer(1000).map(t => t % 2 === 0 ? 'blue' : 'green').effect(color => (theme.myPrimary.$color = color, null));
