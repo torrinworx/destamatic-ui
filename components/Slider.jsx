@@ -180,7 +180,7 @@ const Slider = Theme.use(theme => ({
         return `${Math.min(Math.max(adjustedRatio * 100, 0), 100)}%`;
     });
 
-    const Ref = <div />;
+    const Ref = <raw:div />;
 
     mount(() => {
         trackRef.set(Ref.firstElementChild);

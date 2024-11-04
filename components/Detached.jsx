@@ -35,19 +35,20 @@ const calculate = (bounds, rot) => {
 	};
 }
 
-const Detached = ({menu, children, enabled, style}) => {
+const Detached = ({menu, type = 'text', children, enabled, style}) => {
 	const focused = enabled || Observer.mutable(false);
 
-	const A = <button />;
-	const popup = <div />;
+	const A = <raw:button />;
+	const popup = <raw:div />;
 
 	return <>
 		<Button
 			type={[
-				'text',
-				'selectable',
+				type,
+				'focusable',
 				focused.map(f => f ? 'focused' : null),
 			]}
+			style={style}
 			ref={A}
 			onClick={() => {
 				if (typeof focused.get() === 'number') {
@@ -92,11 +93,6 @@ const Detached = ({menu, children, enabled, style}) => {
 				} else {
 					focused.set(fits[0].rot);
 				}
-			}}
-			style={{
-				padding: 10,
-				cursor: 'pointer',
-				display: 'flex',
 			}}
 		>
 			{menu}

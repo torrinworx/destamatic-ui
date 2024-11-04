@@ -9,6 +9,25 @@ import useRipples from './Ripple.jsx';
 import Theme from './Theme';
 import Detached from './Detached';
 
+Theme.define({
+	select_selectable: {
+		width: '100%',
+		boxSizing: 'border-box',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		userSelect: 'none',
+		position: 'relative',
+		overflow: 'clip',
+		padding: 8,
+		cursor: 'pointer',
+	},
+
+	selected: {
+		background: '#CCCCCC'
+	},
+});
+
 const calculate = (bounds, rot) => {
 	const cardinals = [
 		bounds.left, bounds.top,
@@ -46,26 +65,16 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 	if (!display) display = a => a;
 
 	const focused = Observer.mutable(false);
-	const selector = value.selector('rgba(0, 0, 0, 0.1)', 'none');
+	const selector = value.selector('selected', null);
 
 	const Selectable = ({each: option}) => {
-	    const [ripples, createRipple] = useRipples('rgba(0, 0, 0, 0.3)');
+		const [ripples, createRipple] = useRipples('rgba(0, 0, 0, 0.3)');
 
 		return <div
-			style={{
-				width: '100%',
-				boxSizing: 'border-box',
-		        display: 'flex',
-		        alignItems: 'center',
-		        justifyContent: 'center',
-		        userSelect: 'none',
-		        position: 'relative',
-		        overflow: 'clip',
-		        font: theme.font,
-		        padding: 8,
-		        cursor: 'pointer',
-		        background: selector(option),
-			}}
+			theme={[
+				"select_selectable",
+				selector(option)
+			]}
 			onClick={e => {
 				createRipple(e);
 				value.set(option);
@@ -77,7 +86,7 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 		</div>;
 	};
 
-	return <Detached style={{background: '#EAEAEA', ...style}} enabled={focused} menu={
+	return <Detached style={style} enabled={focused} menu={
 		<>
 			<Typography type='p1' style={{display: 'inline'}}>
 				{value.map(val => {

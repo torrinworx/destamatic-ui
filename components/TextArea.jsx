@@ -1,4 +1,4 @@
-import { Observer, h as destam_h } from 'destam-dom';
+import { Observer  } from 'destam-dom';
 import { h } from './h';
 import Theme from './Theme';
 
@@ -38,7 +38,7 @@ const Textarea = Theme.use(theme => (
     if (!(value instanceof Observer)) value = Observer.immutable(value);
     if (!(error instanceof Observer)) error = Observer.immutable(error);
 
-    const Ref = <textarea />;
+    const Ref = <raw:textarea />;
     const isMounted = Observer.mutable(false);
     const isFocused = Observer.mutable(false);
     mounted(() => isMounted.set(true));
@@ -69,7 +69,7 @@ const Textarea = Theme.use(theme => (
                 if (!mounted) return 'auto';
 
                 return value.map(val => {
-                    let elem = <destam_h:textarea class={_class.get()} rows={1} $value={val} $style={{
+                    let elem = <raw:textarea class={_class.get()} rows={1} $value={val} $style={{
                         width: Ref.clientWidth + 'px',
                     }} />;
 

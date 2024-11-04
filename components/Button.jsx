@@ -85,7 +85,7 @@ const Button = ({
 }) => {
     if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
     if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
-    if (!Ref) Ref = <button />;
+    if (!Ref) Ref = <raw:button />;
     if (label && typeof label === 'string') {
         label = <Typography type='p1' fontStyle='bold'>
             {label}
@@ -94,7 +94,7 @@ const Button = ({
 
     disabled = disabled.map(d => !!d);
 
-    const [ripples, createRipple] = useRipples(['ripple']);
+    const [ripples, createRipple] = useRipples();
 
     return <Ref
         theme={[

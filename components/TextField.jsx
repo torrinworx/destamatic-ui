@@ -8,7 +8,7 @@ const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error
 	expand = Observer.immutable(expand);
 
 	const focus = Observer.mutable(false);
-	const Input = <input />;
+	const Input = <raw:input />;
 
 	return <Input
 		$value={value.def('')}

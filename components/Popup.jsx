@@ -22,7 +22,7 @@ export const popups = OArray();
  * @returns {null} The popup component does not return a DOM element directly; it sets up an element in the global `popups` array.
  */
 const Popup = ({ children, style, placement, ref: Ref }, cleanup, mounted) => {
-    if (!Ref) Ref = <div />;
+    if (!Ref) Ref = <raw:div />;
     if (!(placement instanceof Observer)) placement = Observer.immutable(placement);
 
     const getter = (obj, name) => {

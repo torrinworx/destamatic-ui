@@ -25,7 +25,7 @@ export const sizeProperties = new Set([
 	'outlineWidth', 'borderWidth', 'outline', 'border',
 ]);
 
-export const h = (name, props, ...children) => {
+const hypertext = (useThemes, name, props, ...children) => {
 	if (typeof name === 'string') {
 		name = document.createElement(name);
 	}
@@ -36,6 +36,46 @@ export const h = (name, props, ...children) => {
 	}
 
 	const signals = [];
+
+	if (useThemes) {
+		let _class = '';
+		if (props && 'class' in props) {
+			_class = Observer.immutable(props.class);
+			delete props.class;
+		}
+
+		let theme;
+		if (!props?.theme) {
+			theme = [];
+		} else if (Array.isArray(props.theme)) {
+			theme = props.theme;
+			delete props.theme;
+		} else {
+			theme = props.theme.split('_');
+			delete props.theme;
+		}
+
+		signals.push(() => {
+			let remove;
+			let removed;
+
+			queueMicrotask(() => {
+				if (removed) return;
+				let cl = Theme.search(name)(...theme);
+
+				if (_class) {
+					cl = Observer.all([cl, _class]).map(s => s.join(' '));
+				}
+
+				remove = cl.effect(cl => name.setAttribute('class', cl)).remove;
+			});
+
+			return () => {
+				removed = true;
+				if (remove) remove();
+			};
+		});
+	}
 
 	if (props) {
 		// handle onEvent properties
@@ -77,45 +117,7 @@ export const h = (name, props, ...children) => {
 			}
 		}
 
-		{
-			let _class = '';
-			if ('class' in props) {
-				_class = Observer.immutable(props.class);
-				delete props.class;
-			}
 
-			let theme;
-			if (!props.theme) {
-				theme = [];
-			} else if (Array.isArray(props.theme)) {
-				theme = props.theme;
-			} else {
-				theme = props.theme.split('_');
-			}
-
-			signals.push(() => {
-				let remove;
-				let removed;
-
-				queueMicrotask(() => {
-					if (removed) return;
-					let cl = Theme.search(name)(...theme);
-
-					if (_class) {
-						cl = Observer.all([cl, _class]).map(s => s.join(' '));
-					}
-
-					remove = cl.effect(cl => name.setAttribute('class', cl)).remove;
-				});
-
-				return () => {
-					removed = true;
-					if (remove) remove();
-				};
-			})
-
-			delete props.theme;
-		}
 
 		let style = props.style;
 		delete props.style;
@@ -232,9 +234,13 @@ export const h = (name, props, ...children) => {
 	};
 };
 
+export const h = (name, props, ...children) => {
+	return hypertext(true, name, props, ...children);
+}
+
 export const svg = (name, props, ...children) => {
 	name = document.createElementNS("http://www.w3.org/2000/svg", name);
-	return h(name, props, ...children);
+	return hypertext(false, name, props, ...children);
 };
 
 /**

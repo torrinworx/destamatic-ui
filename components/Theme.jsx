@@ -60,7 +60,7 @@ const theme = OObject({
 		pointerEvents: 'none'
 	},
 
-	selectable: {
+	focusable: {
 		borderStyle: 'solid',
 		borderWidth: .5,
 		borderColor: '$color',
@@ -69,7 +69,7 @@ const theme = OObject({
 	},
 
 	text: {
-		extends: 'primary_radius_typography_p1_regular_selectable',
+		extends: 'primary_radius_typography_p1_regular_focusable',
 		outline: 0,
 		background: 'none',
 

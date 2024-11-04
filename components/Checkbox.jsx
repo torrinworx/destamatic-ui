@@ -27,7 +27,7 @@ Theme.define({
 const Checkbox = ({ value, onChange, style, ...props }) => {
     if (!(value instanceof Observer)) value = Observer.immutable(value);
 
-	const [ripples, createRipple] = useRipples('rgba(0, 0, 0, 0.3)');
+	const [ripples, createRipple] = useRipples();
 	const hover = Observer.mutable(false);
 
 	const Span = <span />;
