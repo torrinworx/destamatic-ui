@@ -1,7 +1,6 @@
 import { Observer, h as destam_h } from 'destam-dom';
 import { h } from './h';
 import Theme from './Theme';
-import FocusEffect from './FocusEffect';
 
 /**
  * Textarea component that provides a flexible and controllable text input area.
@@ -30,80 +29,67 @@ const Textarea = Theme.use(theme => (
         id,
         onKeyDown,
         placeholder = '',
+        error,
         ...props
     },
     _,
     mounted
 ) => {
     if (!(value instanceof Observer)) value = Observer.immutable(value);
+    if (!(error instanceof Observer)) error = Observer.immutable(error);
 
     const Ref = <textarea />;
     const isMounted = Observer.mutable(false);
     const isFocused = Observer.mutable(false);
     mounted(() => isMounted.set(true));
 
-    const _class = theme('text', 'area');
+    const _class = theme(
+        'text', 'area',
+        isFocused.map(e => e ? 'focused' : null),
+        error.map(e => e ? 'error' : null));
 
-    return <FocusEffect
-        enabled={isFocused.map(focus => focus && !value.isImmutable())}
-        style={{
-            padding: '10px',
-            cursor: 'text',
-        }}
-        onMouseDown={e => {
-            if (e.target !== Ref) {
-            	Ref.focus();
-                e.preventDefault();
+    return <Ref
+        class={_class}
+        id={id}
+        placeholder={placeholder}
+        $value={value}
+        onKeyDown={onKeyDown}
+        onInput={e => {
+            if (value.isImmutable()) {
+                Ref.value = value.get() || '';
+                return;
             }
+
+            value.set(e.target.value);
         }}
-    >
-         <Ref
-            id={id}
-            placeholder={placeholder}
-            $value={value}
-            onKeyDown={onKeyDown}
-            onInput={e => {
-                if (value.isImmutable()) {
-                    Ref.value = value.get() || '';
-                    return;
-                }
+		isFocused={isFocused}
+        style={{
+            overflowY: 'auto',
+            height: isMounted.map(mounted => {
+                if (!mounted) return 'auto';
 
-                value.set(e.target.value);
-            }}
-			isFocused={isFocused}
-            class={_class}
-            style={{
-                display: 'block',
-                resize: 'none',
-                overflowY: 'auto',
-                flexGrow: 1,
-                height: isMounted.map(mounted => {
-                    if (!mounted) return 'auto';
+                return value.map(val => {
+                    let elem = <destam_h:textarea class={_class.get()} rows={1} $value={val} $style={{
+                        width: Ref.clientWidth + 'px',
+                    }} />;
 
-                    return value.map(val => {
-                        let elem = <destam_h:textarea class={_class.get()} rows={1} $value={val} $style={{
-                            resize: 'none',
-                            padding: '0px',
-                            boxSizing: 'border-box',
-                            width: Ref.clientWidth + 'px',
-                        }} />;
+                    document.body.appendChild(elem);
+                    let calculatedHeight = elem.scrollHeight + 1;
+                    document.body.removeChild(elem);
 
-                        document.body.appendChild(elem);
-                        let calculatedHeight = elem.scrollHeight;
-                        document.body.removeChild(elem);
+                    console.log(calculatedHeight, val);
 
-                        if (calculatedHeight > maxHeight) {
-                            calculatedHeight = maxHeight;
-                        }
+                    if (calculatedHeight > maxHeight) {
+                        calculatedHeight = maxHeight;
+                    }
 
-                        return calculatedHeight + 'px';
-                    }).memo();
-                }).unwrap(),
-                ...style
-            }}
-            {...props}
-        />
-    </FocusEffect>;
+                    return calculatedHeight + 'px';
+                }).memo();
+            }).unwrap(),
+            ...style
+        }}
+        {...props}
+    />;
 });
 
 export default Textarea;

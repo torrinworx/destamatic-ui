@@ -1,6 +1,5 @@
 import { h } from './h';
 import Observer from 'destam/Observer';
-import FocusEffect from './FocusEffect';
 import Popup from './Popup';
 import Shown from './Shown';
 import Button from './Button';
@@ -42,11 +41,13 @@ const Detached = ({menu, children, enabled, style}) => {
 	const A = <button />;
 	const popup = <div />;
 
-	return <FocusEffect
-		enabled={focused}
-		style={{display: 'inline-block', ...style}}
-	>
+	return <>
 		<Button
+			type={[
+				'text',
+				'selectable',
+				focused.map(f => f ? 'focused' : null),
+			]}
 			ref={A}
 			onClick={() => {
 				if (typeof focused.get() === 'number') {
@@ -116,7 +117,7 @@ const Detached = ({menu, children, enabled, style}) => {
 				{children}
 			</Popup>
 		</Shown>
-	</FocusEffect>;
+	</>;
 };
 
 export default Detached;

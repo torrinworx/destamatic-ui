@@ -1,6 +1,5 @@
 import { h } from './h';
 import Observer from 'destam/Observer';
-import FocusEffect from './FocusEffect';
 import Typography from './Typography';
 import Icon from './Icon';
 import Popup from './Popup';

@@ -6,6 +6,7 @@ import { atomic } from 'destam/Network';
 const theme = OObject({
 	"*": {
 		fontFamily: 'Roboto, sans-serif',
+		boxSizing: 'border-box',
 	},
 
 	primary: {
@@ -55,14 +56,37 @@ const theme = OObject({
 		pointerEvents: 'none'
 	},
 
-	text: {
-		extends: 'typography_p1_regular',
-        border: 0,
-        outline: 0,
-        padding: 0,
-        background: 'none',
-        width: '100%',
+	selectable: {
+		borderStyle: 'solid',
+		borderWidth: .5,
+		borderColor: '#388595',
+        transitionDuration: '0.3s',
+		transitionProperty: 'border-color, background-color, box-shadow',
 	},
+
+	text: {
+		extends: 'primary_radius_typography_p1_regular_selectable',
+        outline: 0,
+        background: 'none',
+
+		padding: 10,
+		alignItems: 'center',
+		background: 'white',
+	},
+
+	text_area: {
+        resize: 'none',
+	},
+
+	focused: {
+		boxShadow: '$color 0 0 0 0.2rem',
+		borderColor: '#ced4da',
+	},
+
+	expand: {
+		flexGrow: 1,
+		height: '100%',
+	}
 });
 
 const getVar = (name, exts) => {
@@ -76,7 +100,7 @@ const getVar = (name, exts) => {
 
 			if (current === null) console.warn("Theme name is not defined but used: " + name);
 			return current;
-		}).unwrap()
+		}).unwrap();
 	}
 
 	return ret;
@@ -298,7 +322,7 @@ const createTheme = (prefix, theme) => {
 
 	const cache = new Map();
 	const out = (...classes) =>{
-		const defines = Observer.all([trie, ...classes.map(Observer.immutable)]).map(([trie, ...classes]) => {
+		const defines = Observer.all([trie, ...classes.flat().map(Observer.immutable)]).map(([trie, ...classes]) => {
 			classes = classes.filter(c => {
 				if (c == undefined) return false;
 				if (typeof c !== 'string') throw new Error("Theme classes must be a string: " + c);

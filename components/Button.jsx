@@ -40,6 +40,10 @@ Theme.define({
         borderColor: '$color',
     },
 
+    button_text: {
+        border: 0,
+    },
+
     button_outlined_hovered: {
         color: '$color_hover',
     },

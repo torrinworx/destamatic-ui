@@ -10,7 +10,6 @@ import {
     TextField,
     TextArea,
     Drawer,
-    Chevron,
     Slider,
     KebabMenu,
     Markdown,
@@ -199,7 +198,7 @@ main()
         <Slider min={0} max={100} value={Observer.mutable(0)} />
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Inputs</Typography>
-        <TextField placeholder="Type here..." style={{ marginBottom: '10px' }} value={text} />
+        <TextField placeholder="Type here..." style={{ marginBottom: '10px', width: '100%' }} value={text} />
         <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} value={text} />
 
         <Typography type="h2" $style={{marginTop: '20px'}}>Drawer</Typography>
@@ -208,11 +207,6 @@ main()
                 <Typography type="p1">Drawer Content</Typography>
             </div>
         </Drawer>
-
-        <Typography type="h2" $style={{marginTop: '20px'}}>Chevron</Typography>
-        <div>
-            <Chevron />
-        </div>
 
         <div $style={{
             position: 'absolute',
