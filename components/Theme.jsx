@@ -1,6 +1,6 @@
 import { h, mount, Observer, OObject, OArray } from "destam-dom";
 import createContext from './Context';
-import { sizeProperties } from './h';
+import { sizeProperties } from '../util';
 import { atomic } from 'destam/Network';
 
 const theme = OObject({

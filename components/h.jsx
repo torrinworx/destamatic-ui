@@ -1,5 +1,6 @@
 import { h as destam_h, mount, getFirst} from 'destam-dom';
 import Observer, {observerGetter, shallowListener} from 'destam/Observer';
+import { sizeProperties } from '../util.js';
 
 import Theme from './Theme';
 
@@ -14,16 +15,6 @@ import Theme from './Theme';
 // 2. Support for OObjects as style objects and removing footguns there.
 // 3. Numbers in the style will be interpreted as pxs
 // From: https://github.com/Nefsen402/destam-dom/blob/main/examples/custom-h.jsx
-
-export const sizeProperties = new Set([
-	'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
-	'top', 'left', 'right', 'bottom',
-	'margin', 'marginTop', 'marginLeft', 'marginRight', 'marginBottom',
-	'padding', 'paddingTop', 'paddingLeft', 'paddingRight', 'paddingBottom',
-	'inset', 'borderRadius',
-	'fontSize',
-	'outlineWidth', 'borderWidth', 'outline', 'border',
-]);
 
 const hypertext = (useThemes, name, props, ...children) => {
 	if (typeof name === 'string') {
