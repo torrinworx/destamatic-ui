@@ -19,6 +19,10 @@ const theme = OObject({
 
 	secondary: {
 		$color: '#CCCCCC',
+		$color_hover: '#AAAAAA',
+		$color_error: 'red',
+		$color_top: 'white',
+		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
 	},
 
 	border: {
@@ -59,15 +63,15 @@ const theme = OObject({
 	selectable: {
 		borderStyle: 'solid',
 		borderWidth: .5,
-		borderColor: '#388595',
-        transitionDuration: '0.3s',
+		borderColor: '$color',
+		transitionDuration: '0.3s',
 		transitionProperty: 'border-color, background-color, box-shadow',
 	},
 
 	text: {
 		extends: 'primary_radius_typography_p1_regular_selectable',
-        outline: 0,
-        background: 'none',
+		outline: 0,
+		background: 'none',
 
 		padding: 10,
 		alignItems: 'center',
@@ -75,12 +79,11 @@ const theme = OObject({
 	},
 
 	text_area: {
-        resize: 'none',
+		resize: 'none',
 	},
 
 	focused: {
 		boxShadow: '$color 0 0 0 0.2rem',
-		borderColor: '#ced4da',
 	},
 
 	expand: {
@@ -323,10 +326,10 @@ const createTheme = (prefix, theme) => {
 	const cache = new Map();
 	const out = (...classes) =>{
 		const defines = Observer.all([trie, ...classes.flat().map(Observer.immutable)]).map(([trie, ...classes]) => {
-			classes = classes.filter(c => {
-				if (c == undefined) return false;
+			classes = classes.flatMap(c => {
+				if (c == undefined) return [];
 				if (typeof c !== 'string') throw new Error("Theme classes must be a string: " + c);
-				return true;
+				return c.split('_');
 			});
 
 			let defines = cache.get(classes.join(' '));

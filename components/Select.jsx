@@ -45,7 +45,6 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 	if (!(options instanceof Observer)) options = Observer.immutable(options);
 	if (!display) display = a => a;
 
-
 	const focused = Observer.mutable(false);
 	const selector = value.selector('rgba(0, 0, 0, 0.1)', 'none');
 
