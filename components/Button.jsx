@@ -76,6 +76,7 @@ const Button = ({
     hover,
     ref: Ref,
     children,
+    theme='button',
     ...props
 }) => {
     if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
@@ -93,7 +94,8 @@ const Button = ({
 
     return <Ref
         theme={[
-            'button', type,
+            theme,
+            type,
             hover.map(h => h ? 'hovered' : null),
             disabled.map(d => d ? 'disabled' : null),
         ]}
