@@ -24,8 +24,9 @@ Theme.define({
  * 
  * @returns {JSX.Element} The rendered Checkbox component.
  */
-const Checkbox = ({ value, onChange, style, ...props }) => {
+const Checkbox = ({ value, onChange, invert = false, disabled, style, ...props }) => {
     if (!(value instanceof Observer)) value = Observer.immutable(value);
+    if (!(disabled instanceof Observer)) disabled = Observer.immutable(disabled);
 
 	const [ripples, createRipple] = useRipples();
 	const hover = Observer.mutable(false);
@@ -47,6 +48,10 @@ const Checkbox = ({ value, onChange, style, ...props }) => {
 		onMouseEnter={() => hover.set(true)}
 		onMouseLeave={() => hover.set(false)}
 		onClick={e => {
+			if (disabled.get()) {
+				return;
+			}
+
 			try {
 				const val = !value.get();
 				value.set(val);
@@ -65,8 +70,11 @@ const Checkbox = ({ value, onChange, style, ...props }) => {
 	>
 		<Input
 			type="checkbox"
-			theme="checkbox"
-			$checked={value}
+			theme={[
+				"checkbox",
+				disabled.map(d => d ? 'disabled' : null)
+			]}
+			$checked={value.map(v => v !== invert)}
 			{...props}
 		/>
 		{ripples}
