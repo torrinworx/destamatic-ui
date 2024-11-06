@@ -7,26 +7,30 @@ import Popup from './Popup';
 import Theme from './Theme';
 import Button from './Button';
 
-const Tooltip = Theme.use(theme => ({hover=Observer.mutable(''), label, ...style}) => {
+Theme.define({
+	tooltip: {
+		extends: ['primary', 'radius'],
+
+		background: 'white',
+		border: `1px solid $color`,
+		fontColor: '$color',
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		opacity: '80%',
+	}
+});
+
+const Tooltip = ({hover, label, ...style}) => {
 	if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
 	return <Shown value={hover}>
 		<Popup placement={hover}>
-			<div style={{
-				background: 'white',
-				borderRadius: theme.borderRadius,
-				border: `1px solid ${theme.Colours.secondary.base}`,
-				fontColor: theme.Colours.primary.base,
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				opacity: '80%',
-				...style
-			}}>
+			<div theme="tooltip" style={style}>
 				<Button label={label} style={{ color: 'grey' }}/>
 			</div>
 		</Popup>
 	</Shown>;
-});
+};
 
 export default Tooltip;

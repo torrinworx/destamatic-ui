@@ -64,14 +64,14 @@ const theme = OObject({
 		transitionProperty: 'border-color, background-color, box-shadow',
 	},
 
-    field: {
-        extends: 'primary_radius_typography_p1_regular_focusable',
-        outline: 0,
+	field: {
+		extends: 'primary_radius_typography_p1_regular_focusable',
+		outline: 0,
 
-        padding: 10,
-        alignItems: 'center',
-        background: 'white',
-    },
+		padding: 10,
+		alignItems: 'center',
+		background: 'white',
+	},
 
 	text_area: {
 		resize: 'none',
