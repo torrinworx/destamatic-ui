@@ -348,23 +348,54 @@ const createTheme = (prefix, theme) => {
 };
 
 let theme_seq = 0;
-const Theme = createContext(createTheme('daui-', theme), (theme, prev) => {
-	prev = prev.theme;
+const Theme = createContext(createTheme('daui-', theme), (nextTheme, {theme: prevTheme}) => {
+	const zip = (prev, next, prop) => {
+		if (prop === 'extends') {
+			if (!Array.isArray(prev)) prev = prev.split('_');
+			if (!Array.isArray(next)) next = next.split('_');
 
-	const out = OObject();
+			return prev.concat(next);
+		} else if (typeof prev === 'object' && typeof next === 'object') {
+			const keys = new Set([...Object.keys(prev), ...Object.keys(next)]);
 
-	let keys = new Set([...Object.keys(prev), ...Object.keys(theme)]);
-	for (const key of keys) {
-		out[key] = theme[key] ?? prev[key];
-	}
+			let out;
+			if (prev instanceof OObject || next instanceof OObject) {
+				out = OObject();
+			} else {
+				out = {};
+			}
 
-	const listener = delta => {
-		const key = delta.path()[0];
-		out[key] = theme[key] ?? prev[key];
+			for (const o of keys) {
+				out[o] = zip(prev[o], next[o], o);
+			}
+
+			return out;
+		} else if (next === undefined) {
+			return prev;
+		} else {
+			return next;
+		}
 	};
 
-	if (theme.observer) theme.observer.shallow().watch(listener);
-	if (prev.observer) prev.observer.shallow().watch(listener);
+	const update = p => {
+		const walk = current => {
+			for (let i = 0; i < p.length && current != null; i++) current = current[p[i]];
+			return current;
+		};
+
+		return zip(walk(prevTheme), walk(nextTheme));
+	};
+
+	const out = update([]);
+	const listener = delta => {
+		const current = out.observer.path(delta.path());
+		current.set(update(delta.path()));
+	};
+
+	if (nextTheme.observer) nextTheme.observer.watch(listener);
+	if (prevTheme.observer) prevTheme.observer.watch(listener);
+
+	console.log(out);
 
 	return createTheme(`daui${theme_seq++}-`, out);
 });
