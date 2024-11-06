@@ -3,6 +3,15 @@ import { h } from './h';
 import { OArray, Observer } from 'destam-dom';
 import Theme from './Theme';
 
+Theme.define({
+    ripple: {
+        background: 'rgba(0, 0, 0, .3)',
+        position: 'absolute',
+        borderRadius: '50%',
+        transition: 'transform 0.8s, opacity 0.8s',
+    },
+});
+
 /**
  * Custom hook for creating ripple effects.
  * 
@@ -26,7 +35,8 @@ const useRipples = () => {
 
         const rect = elem.getBoundingClientRect();
         const diameter = Math.max(rect.width, rect.height);
-        const radius = diameter / 2;
+
+        console.log(rect);
 
         const rippleX = event.clientX - rect.left;
         const rippleY = event.clientY - rect.top;
@@ -35,17 +45,14 @@ const useRipples = () => {
         const scale = Observer.mutable(0);
 
         ripples.push(<span
-            theme="ripples"
+            theme="ripple"
             style={{
-                position: 'absolute',
-                borderRadius: '50%',
                 width: diameter,
                 height: diameter,
                 top: rippleY,
                 left: rippleX,
                 transform: scale.map(scale => `translate(-50%, -50%) scale(${scale})`),
                 opacity: opacity,
-                transition: 'transform 0.8s, opacity 0.8s',
             }}
         />);
 

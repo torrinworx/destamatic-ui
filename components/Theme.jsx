@@ -42,10 +42,6 @@ const theme = OObject({
 		borderRadius: 6,
 	},
 
-	ripple: {
-		background: 'rgba(0, 0, 0, .3)'
-	},
-
 	drawer: {
 		extends: 'secondary',
 		outlineColor: '$color',
