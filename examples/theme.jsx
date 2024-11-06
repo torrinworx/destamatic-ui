@@ -46,21 +46,6 @@ const theme = OObject({
 		color: 'black',
 	},
 
-	button: {
-		extends: ['radius'],
-
-		width: '100%',
-
-		userSelect: 'none',
-		border: 'none',
-		cursor: 'pointer',
-		textDecoration: 'none',
-		position: 'relative',
-		overflow: 'clip',
-		color: 'black',
-		boxShadow: 'none',
-	},
-
 	body: {
 		extends: 'myPrimary',
 		inset: 0,
@@ -78,3 +63,20 @@ mount(document.body, <Theme value={theme}>
 </Theme>);
 
 Observer.timer(1000).map(t => t % 2 === 0 ? 'blue' : 'green').effect(color => (theme.myPrimary.$color = color, null));
+
+setTimeout(() => {
+	theme.button = {
+		extends: ['radius'],
+
+		width: '100%',
+
+		userSelect: 'none',
+		border: 'none',
+		cursor: 'pointer',
+		textDecoration: 'none',
+		position: 'relative',
+		overflow: 'clip',
+		color: 'black',
+		boxShadow: 'none',
+	};
+}, 1000);
