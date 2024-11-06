@@ -395,8 +395,6 @@ const Theme = createContext(createTheme('daui-', theme), (nextTheme, {theme: pre
 	if (nextTheme.observer) nextTheme.observer.watch(listener);
 	if (prevTheme.observer) prevTheme.observer.watch(listener);
 
-	console.log(out);
-
 	return createTheme(`daui${theme_seq++}-`, out);
 });
 
