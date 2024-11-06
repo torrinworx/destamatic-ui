@@ -195,6 +195,8 @@ const createTheme = (prefix, theme) => {
 
 	const trie = theme.observer.shallow().map(theme => {
 		const trie = [];
+		trie.cache = new Map();
+
 		for (const key of Object.keys(theme)) {
 			let current = trie;
 
@@ -322,7 +324,6 @@ const createTheme = (prefix, theme) => {
 		return trie;
 	});
 
-	const cache = new Map();
 	const out = (...classes) =>{
 		const defines = Observer.all([trie, ...classes.flat().map(Observer.immutable)]).map(([trie, ...classes]) => {
 			classes = classes.flatMap(c => {
@@ -331,13 +332,13 @@ const createTheme = (prefix, theme) => {
 				return c.split('_');
 			});
 
-			let defines = cache.get(classes.join(' '));
+			let defines = trie.cache.get(classes.join(' '));
 			if (defines) return defines;
 
 			defines = Observer.all(getClasses(trie, ["*", ...classes])
 				.map(node => node.defs)).map(def => def.flat());
 
-			cache.set(classes.join(' '), defines);
+			trie.cache.set(classes.join(' '), defines);
 			return defines;
 		}).unwrap();
 
