@@ -44,7 +44,7 @@ const Textarea = Theme.use(theme => (
     mounted(() => isMounted.set(true));
 
     const _class = theme(
-        'text', 'area',
+        'field', 'area',
         isFocused.map(e => e ? 'focused' : null),
         error.map(e => e ? 'error' : null));
 

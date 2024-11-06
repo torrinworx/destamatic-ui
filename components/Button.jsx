@@ -47,6 +47,10 @@ Theme.define({
     button_outlined_hovered: {
         color: '$color_hover',
     },
+
+    text: {
+        extends: 'typography_p1_regular_focusable',
+    },
 });
 
 /**

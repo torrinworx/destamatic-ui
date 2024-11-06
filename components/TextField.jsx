@@ -13,7 +13,7 @@ const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error
 	return <Input
 		$value={value.def('')}
 		theme={[
-			'text', 'field',
+			'field', 'line',
 	        focus.map(e => e ? 'focused' : null),
 	        error.map(e => e ? 'error' : null),
 	        expand.map(e => e ? 'expand' : null),
