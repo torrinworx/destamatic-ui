@@ -36,8 +36,6 @@ const useRipples = () => {
         const rect = elem.getBoundingClientRect();
         const diameter = Math.max(rect.width, rect.height);
 
-        console.log(rect);
-
         const rippleX = event.clientX - rect.left;
         const rippleY = event.clientY - rect.top;
 
