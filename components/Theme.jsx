@@ -71,7 +71,6 @@ const theme = OObject({
 	text: {
 		extends: 'primary_radius_typography_p1_regular_focusable',
 		outline: 0,
-		background: 'none',
 
 		padding: 10,
 		alignItems: 'center',
