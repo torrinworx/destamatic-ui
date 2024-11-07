@@ -380,6 +380,9 @@ let theme_seq = 0;
 const Theme = createContext(createTheme('daui-', theme), (nextTheme, {theme: prevTheme}) => {
 	const zip = (prev, next, prop) => {
 		if (prop === 'extends') {
+			if (!prev) prev = [];
+			if (!next) next = [];
+
 			if (!Array.isArray(prev)) prev = prev.split('_');
 			if (!Array.isArray(next)) next = next.split('_');
 
