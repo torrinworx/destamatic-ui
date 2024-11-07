@@ -22,7 +22,7 @@ Theme.define({
     },
 
     button_text: {
-        width: "auto",
+        border: 0,
     },
 
     button_contained: {
@@ -38,10 +38,6 @@ Theme.define({
         borderWidth: 2,
         borderStyle: 'solid',
         borderColor: '$color',
-    },
-
-    button_text: {
-        border: 0,
     },
 
     button_outlined_hovered: {
