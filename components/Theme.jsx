@@ -178,6 +178,13 @@ const trackLifetime = (obs, cb) => {
 
 const createTheme = (prefix, theme) => {
 	const insertStyle = defines => {
+		// warn for duplicate styles
+		const dup = new Set();
+		for (const def of defines) {
+			if (dup.has(def)) console.warn("Duplicate theme: " + defines.map(d => d.name).join('_'));
+			dup.add(def);
+		}
+
 		const found = [];
 		const search = (arr, name, index) => {
 			if (index >= defines.length) return;
