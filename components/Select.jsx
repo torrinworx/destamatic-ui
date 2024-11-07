@@ -91,7 +91,6 @@ export const Select = Theme.use(theme => ({value, options, display, style}) => {
 			<Typography type='p1' style={{display: 'inline'}}>
 				{value.map(val => {
 					if (options.get().includes(val)) {
-						console.log(val);
 						return display(val);
 					} else {
 						return "None";
