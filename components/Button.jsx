@@ -45,7 +45,7 @@ Theme.define({
     },
 
     text: {
-        extends: 'typography_p1_regular_focusable',
+        extends: 'typography_p1_regular',
     },
 });
 

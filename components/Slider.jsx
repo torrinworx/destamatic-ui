@@ -11,7 +11,7 @@ Theme.define({
     },
 
     slider_track: {
-        extends: 'primary_radius',
+        extends: 'radius',
 
         background: '$color',
     },
