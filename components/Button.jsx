@@ -38,10 +38,12 @@ Theme.define({
         borderWidth: 2,
         borderStyle: 'solid',
         borderColor: '$color',
+        color: '$color',
     },
 
     button_outlined_hovered: {
         color: '$color_hover',
+        borderColor: '$color_hover',
     },
 
     text: {
