@@ -381,7 +381,11 @@ const Theme = createContext(createTheme('daui-', theme), (nextTheme, {theme: pre
 			if (!Array.isArray(prev)) prev = prev.split('_');
 			if (!Array.isArray(next)) next = next.split('_');
 
-			return prev.concat(next);
+			if (next[0] === '*') {
+				return next;
+			} else {
+				return prev.concat(next);
+			}
 		} else if (typeof prev === 'object' && typeof next === 'object') {
 			const keys = new Set([...Object.keys(prev), ...Object.keys(next)]);
 
