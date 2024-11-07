@@ -2,6 +2,12 @@ import { Observer  } from 'destam-dom';
 import { h } from './h';
 import Theme from './Theme';
 
+Theme.define({
+    field_area: {
+        resize: 'none',
+    },
+});
+
 /**
  * Textarea component that provides a flexible and controllable text input area.
  * Automatically resizes based on the content up to a maximum height.

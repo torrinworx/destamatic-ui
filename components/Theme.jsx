@@ -73,10 +73,6 @@ const theme = OObject({
 		background: 'white',
 	},
 
-	text_area: {
-		resize: 'none',
-	},
-
 	focused: {
 		boxShadow: '$color 0 0 0 0.2rem',
 	},
