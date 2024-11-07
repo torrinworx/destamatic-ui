@@ -69,7 +69,6 @@ const theme = OObject({
 		outline: 0,
 
 		padding: 10,
-		alignItems: 'center',
 		background: 'white',
 	},
 
