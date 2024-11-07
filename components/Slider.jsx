@@ -17,7 +17,6 @@ Theme.define({
     },
 
     slider_track_hovered: {
-        extends: 'primary',
         background: '$color_hover',
     },
 
