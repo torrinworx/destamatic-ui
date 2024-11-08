@@ -27,11 +27,11 @@ Theme.define({
  * 
  * @returns {JSX.Element} The rendered typography element.
  */
-const Typography = ({ inline, type = 'h1', fontStyle = 'regular', bold, children, style, ...props }) => {
+const Typography = ({ inline, type = 'h1', theme, fontStyle = 'regular', bold, children, style, ...props }) => {
     if (bold) fontStyle = 'bold';
 
     return <div
-        theme={['typography', type, fontStyle]}
+        theme={['typography', theme, type, fontStyle]}
         style={{
             display: inline ? 'inline-block' : 'block',
             ...style
