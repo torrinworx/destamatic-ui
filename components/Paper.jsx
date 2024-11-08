@@ -9,6 +9,7 @@ Theme.define({
         padding: 10,
         maxWidth: 'inherit',
         maxHeight: 'inherit',
+        overflow: 'hidden',
     },
 });
 
