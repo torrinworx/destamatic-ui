@@ -9,7 +9,7 @@ Theme.define({
     button: {
         extends: ['primary', 'center', 'radius'],
 
-        height: '40px',
+        padding: 10,
         userSelect: 'none',
         border: 'none',
         cursor: 'pointer',
@@ -23,6 +23,10 @@ Theme.define({
 
     button_text: {
         border: 0,
+    },
+
+    button_text_hovered: {
+        background: 'rgb(0, 0, 0, 0.1)',
     },
 
     button_contained: {
