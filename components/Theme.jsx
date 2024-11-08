@@ -387,7 +387,7 @@ const Theme = createContext(createTheme('daui-', theme), (nextTheme, {theme: pre
 			if (!Array.isArray(next)) next = next.split('_');
 
 			if (next[0] === '*') {
-				return next;
+				return next.slice(1);
 			} else {
 				return prev.concat(next);
 			}
