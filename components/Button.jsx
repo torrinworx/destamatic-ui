@@ -89,7 +89,7 @@ const Button = ({
     if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
     if (!Ref) Ref = <raw:button />;
     if (label && typeof label === 'string') {
-        label = <Typography type='p1' fontStyle='bold'>
+        label = <Typography type='p1' fontStyle='bold' inline>
             {label}
         </Typography>;
     }
@@ -124,7 +124,10 @@ const Button = ({
 			}
 		}}
         isHovered={hover}
-        style={style}
+        style={{
+            display: inline ? 'inline-flex' : 'flex',
+            ...style
+        }}
         disabled={disabled}
         {...props}
     >
