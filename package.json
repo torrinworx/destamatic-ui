@@ -13,8 +13,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "destam": "^0.3.2",
-    "destam-dom": "^0.8.7",
+    "destam": "^0.4.0",
+    "destam-dom": "^0.9.1",
     "vite": "^5.4.8"
   },
   "optionalDependencies": {

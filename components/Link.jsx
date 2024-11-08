@@ -15,7 +15,7 @@ import Theme from './Theme';
  * 
  * @returns {JSX.Element} The rendered link component.
  */
-const Link = Theme.use(theme => ({
+const Link = ({
     href,
     underline = true,
     onClick,
@@ -24,25 +24,25 @@ const Link = Theme.use(theme => ({
     style,
     ...props
 }) => {
-    if (!(hover instanceof Observer )) hover = Observer.mutable(hover);
-
-    const handleHover = isHovered => () => hover.set(isHovered);
-    const handleClick = (event) => {
-        if (onClick) {
-            onClick(event);
-        }
-    };
+    if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
     return <a
         href={href}
-        $onclick={handleClick}
-        $onmouseenter={handleHover(true)}
-        $onmouseleave={handleHover(false)}
-        class={theme('link', underline ? 'underline' : null, hover.map(h => h ? 'hovered' : null))}
+        onClick={(event) => {
+        if (onClick) {
+            onClick(event);
+        }
+    }}
+        isHovered={hover}
+        theme={[
+            'link',
+            underline ? 'underline' : null,
+            hover.map(h => h ? 'hovered' : null)
+        ]}
         {...props}
     >
         {children}
     </a>;
-});
+};
 
 export default Link;

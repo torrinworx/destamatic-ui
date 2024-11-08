@@ -46,25 +46,14 @@ const hypertext = (useThemes, name, props, ...children) => {
 			delete props.theme;
 		}
 
-		signals.push(() => {
-			let remove;
-			let removed;
+		signals.push(context => {
+			console.log(theme, context);
+			let cl = Theme.fromContext(context)(...theme);
+			if (_class) {
+				cl = Observer.all([cl, _class]).map(s => s.join(' '));
+			}
 
-			queueMicrotask(() => {
-				if (removed) return;
-				let cl = Theme.search(name)(...theme);
-
-				if (_class) {
-					cl = Observer.all([cl, _class]).map(s => s.join(' '));
-				}
-
-				remove = cl.effect(cl => name.setAttribute('class', cl)).remove;
-			});
-
-			return () => {
-				removed = true;
-				if (remove) remove();
-			};
+			return cl.effect(cl => name.setAttribute('class', cl));
 		});
 	}
 
@@ -107,8 +96,6 @@ const hypertext = (useThemes, name, props, ...children) => {
 				});
 			}
 		}
-
-
 
 		let style = props.style;
 		delete props.style;
@@ -212,9 +199,9 @@ const hypertext = (useThemes, name, props, ...children) => {
 		return handler;
 	}
 
-	return (elem, val, before) => {
-		const rem = mount(elem, handler, before);
-		let sigs = signals.map(signal => signal(elem, val, before));
+	return (elem, val, before, context) => {
+		const rem = mount(elem, handler, before, context);
+		let sigs = signals.map(signal => signal(context));
 
 		return arg => {
 			if (arg === getFirst) return rem(getFirst);

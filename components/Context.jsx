@@ -1,55 +1,54 @@
-import {Observer, mount, h} from 'destam-dom';
-
+import {Observer, mount} from 'destam-dom';
 
 const createContext = (def, transform = x => x) => {
 	const getter = Symbol();
-	const search = elem => {
-		let current = elem, val = def;
-		while (current) {
-			if (getter in current) {
-				const state = current[getter];
-
-				if (!state.hasValue) {
-					state.hasValue = true;
-					state.value = transform(state.raw, search(current.parentNode));
-				}
-
-				val = state.value;
-				break;
+	const getValue = context => {
+		const calc = state => {
+			if (!state) {
+				return def;
 			}
 
-			current = current.parentNode;
-		}
+			if (!state.hasValue) {
+				state.hasValue = true;
+				state.value = transform(state.raw, calc(state.parent));
+			}
 
-		return val;
+			console.log(state.value);
+			return state.value;
+		};
+
+		return calc(context?.[getter]);
 	};
 
 	const Context = ({value, children}, cleanup, mounted) => {
-		// span is the only element that won't affect page layout so use that as a wrapper.
-		const Span = <span />;
-		Span[getter] = { raw: value, hasValue: false, value: null };
+		return (elem, _, before, context) => {
+			context = {
+				...context,
+				[getter]: {
+					parent: context?.[getter],
+					raw: value,
+					hasValue: false,
+					value: null,
+				},
+			};
 
-		return <Span>{children}</Span>;
+			return mount(elem, children, before, context);
+		};
 	};
 
 	Context.use = component => (props, cleanup, mounted) => {
-		const ret = Observer.mutable(null);
-
-		props = {...props};
-
-		mounted(() => ret.set((elem, _, before) => {
-			const val = search(elem, def);
-
-			return mount(elem, h((_, cleanup, mounted) => {
-				return component(val)(props, cleanup, mounted);
-			}), before);
-		}));
-
-		return ret;
+		return (elem, _, before, context) => {
+			return mount(
+				elem,
+				component(getValue(context))(props, cleanup, mounted),
+				before,
+				context,
+			);
+		}
 	};
 
 	Context.def = def;
-	Context.search = search;
+	Context.fromContext = getValue;
 
 	return Context;
 };
