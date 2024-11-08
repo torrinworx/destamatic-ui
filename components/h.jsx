@@ -38,16 +38,13 @@ const hypertext = (useThemes, name, props, ...children) => {
 		let theme;
 		if (!props?.theme) {
 			theme = [];
-		} else if (Array.isArray(props.theme)) {
-			theme = props.theme;
-			delete props.theme;
 		} else {
-			theme = props.theme.split('_');
+			theme = props.theme;
 			delete props.theme;
 		}
 
 		signals.push(context => {
-			let cl = Theme.fromContext(context)(...theme);
+			let cl = Theme.fromContext(context)(theme);
 			if (_class) {
 				cl = Observer.all([cl, _class]).map(s => s.join(' '));
 			}

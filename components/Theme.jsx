@@ -350,7 +350,7 @@ const createTheme = (prefix, theme) => {
 	}).unwrap();
 
 	const out = (...classes) =>{
-		const defines = Observer.all([trie, ...classes.flat().map(Observer.immutable)]).map(([trie, ...classes]) => {
+		const defines = Observer.all([trie, ...classes.flat(Infinity).map(Observer.immutable)]).map(([trie, ...classes]) => {
 			classes = classes.flatMap(c => {
 				if (c == undefined) return [];
 				if (typeof c !== 'string') throw new Error("Theme classes must be a string: " + c);
