@@ -47,7 +47,6 @@ const hypertext = (useThemes, name, props, ...children) => {
 		}
 
 		signals.push(context => {
-			console.log(theme, context);
 			let cl = Theme.fromContext(context)(...theme);
 			if (_class) {
 				cl = Observer.all([cl, _class]).map(s => s.join(' '));

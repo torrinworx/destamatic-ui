@@ -13,7 +13,6 @@ const createContext = (def, transform = x => x) => {
 				state.value = transform(state.raw, calc(state.parent));
 			}
 
-			console.log(state.value);
 			return state.value;
 		};
 
