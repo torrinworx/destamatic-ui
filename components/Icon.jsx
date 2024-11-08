@@ -1,5 +1,12 @@
 import { h, svg } from './h';
 import { Observer, OObject } from 'destam-dom';
+import Theme from './Theme';
+
+Theme.define({
+    icon: {
+        display: 'inline-block'
+    }
+});
 
 /**
  * Asynchronous function to load icons from various libraries.
@@ -48,9 +55,9 @@ const Icon = ({
     lib,
     libraryName,
     name,
+    theme,
     iconName,
     size='20',
-    style,
     ref: Ref,
     ...props
 }) => {
@@ -58,8 +65,9 @@ const Icon = ({
 
     const svgChildren = Observer.mutable(null);
     const svgProps = OObject();
+    const libClass = Observer.mutable('');
 
-    const styleObject = { marginTop: '4px', height: size, width: size, ...style };
+    const styleObject = { height: size, width: size };
 
     loadIcon(lib ?? libraryName, name ?? iconName, styleObject)
         .then(svgContent => {
@@ -68,7 +76,12 @@ const Icon = ({
 
             for (let i = 0; i < svg.attributes.length; i++) {
                 const attr = svg.attributes[i];
-                Ref.setAttribute(attr.nodeName, attr.nodeValue);
+
+                if (attr.nodeName === 'class') {
+                    libClass.set(attr.nodeValue);
+                } else {
+                    Ref.setAttribute(attr.nodeName, attr.nodeValue);
+                }
             }
 
             while (svg.firstElementChild) {
@@ -80,7 +93,8 @@ const Icon = ({
         });
 
     return <Ref
-        style={{ display: 'inline-block', ...style }}
+        class={libClass}
+        theme={['icon', theme]}
         {...props}
     />;
 };
