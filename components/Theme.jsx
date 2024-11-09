@@ -154,27 +154,6 @@ const getClasses = (trie, classes) => {
 	return out.map(a => a.node);
 };
 
-const trackLifetime = (obs, cb) => {
-	let cbRemove;
-	let count = 0;
-
-	return Observer(obs.get, obs.set, (...args) => {
-		const remove = obs.register_(...args);
-		if (count === 0) cbRemove = cb();
-		count++;
-
-		return () => {
-			count--;
-			remove();
-
-			if (count === 0) {
-				cbRemove();
-				cbRemove = 0;
-			}
-		};
-	});
-};
-
 const createTheme = (prefix, theme) => {
 	const insertStyle = defines => {
 		// warn for duplicate styles
@@ -340,7 +319,7 @@ const createTheme = (prefix, theme) => {
 				Observer.all(exts.map(node => node.defs)).map(arr => [...arr.flat(), current])).unwrap();
 		};
 
-		return trackLifetime(Observer.immutable(trie), () => () => {
+		return Observer.immutable(trie).lifetime(() => () => {
 			const i = styles.findIndex(item => trie.includes(item.node));
 
 			if (i >= 0) {
