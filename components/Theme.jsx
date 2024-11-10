@@ -126,23 +126,21 @@ mount(document.head, <style>
 
 const getClasses = (trie, classes) => {
 	const out = [];
-	const current = [...trie];
+	const current = new Map(trie);
 	for (let ii = 0; ii < classes.length; ii++) {
 		const className = classes[ii];
 
-		for (let i = 0; i < current.length; i++) {
-			const node = current[i];
+		const node = current.get(className);
+		if (!node) continue;
 
-			if (node.name !== className) {
-				continue;
-			}
+		if (node.leaf) {
+			out.push({node, i: ii});
+		}
 
-			if (node.leaf) {
-				out.push({node, i: ii});
-			}
+		current.delete(className);
 
-			current.splice(i, 1, ...node);
-			i += node.length - 1;
+		for (const [key, val] of node.entries()) {
+			current.set(key, val);
 		}
 	}
 
@@ -192,7 +190,7 @@ const createTheme = (prefix, theme) => {
 	};
 
 	const trie = theme.observer.shallow().map(theme => {
-		const trie = [];
+		const trie = new Map();
 		trie.cache = new Map();
 
 		for (const key of Object.keys(theme)) {
@@ -200,17 +198,11 @@ const createTheme = (prefix, theme) => {
 
 			const keys = key.split('_');
 			for (let obj of keys) {
-				let next;
-				for (let node of current) {
-					if (node.name === obj) {
-						next = node;
-						break;
-					}
-				}
+				let next = current.get(obj);
 
 				if (!next) {
-					next = [];
-					current.push(next);
+					next = new Map();
+					current.set(obj, next);
 				}
 
 				next.name = obj;
