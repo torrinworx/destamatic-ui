@@ -19,7 +19,6 @@
   },
   "optionalDependencies": {
     "feather-icons": "^4.29.1",
-    "material-icons": "^1.13.12",
-    "prismjs": "^1.29.0"
+    "material-icons": "^1.13.12"
   }
 }

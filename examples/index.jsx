@@ -13,7 +13,6 @@ import {
     Slider,
     KebabMenu,
     Markdown,
-    CodeBlock,
     h
 } from 'destamatic-ui';
 
@@ -87,23 +86,6 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
 **this is bold**
 - this is a point with a dash \`-\`
 * this is a point with a star \`*\``);
-    
-    const python = `
-def main():
-    for i in 100:
-        print("Hello World!")
-
-main()
-    `
-    const javascript = `
-const main = () => {
-    for (let i = 0; i < 100; i++) {
-        console.log("Hello World!");
-    };
-};
-
-main()
-    `
 
     return <div $style={{
         fontFamily: 'Roboto, sans-serif',
@@ -111,11 +93,8 @@ main()
         inset: '0px',
         position: 'absolute',
     }}>
-        <CodeBlock language='python' code={python} />
-        <CodeBlock language='javascript' code={javascript} />
-
         <Markdown markdown={markdown} />
-        <TextArea OValue={markdown} style={{width: "1000px", height: "500px"}}/>
+        <TextArea OValue={markdown} style={{ width: "1000px", height: "500px" }} />
         {/* <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
             <Typography type="h1">Destamatic UI Demo</Typography>
             <Typography type="h2">Typography</Typography>
@@ -136,7 +115,7 @@ main()
         <Typography type="p2">Paragraph 2 Regular</Typography>
         <Typography type="p2" bold>Paragraph 2 Bold</Typography>
 
-        <Typography type="h2" $style={{marginTop: '20px'}}>Buttons</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }}>Buttons</Typography>
         <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <Button label="Text Button" type="text" onClick={handleClick} />
             <Button label="Contained Button" type="contained" onClick={handleClick} />
@@ -165,7 +144,7 @@ main()
                 color: 'red',
             },
         }}>
-           <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                 <Button label="Text Button" type="text" onClick={handleClick} />
                 <Button label="Contained Button" type="contained" onClick={handleClick} />
                 <Button label="Outlined Button" type="outlined" onClick={handleClick} />
@@ -183,7 +162,7 @@ main()
                 />
             </div>
 
-            <Typography type="h2" $style={{marginTop: '20px'}}>Dropdown</Typography>
+            <Typography type="h2" $style={{ marginTop: '20px' }}>Dropdown</Typography>
             <DropDown label="Click to Toggle">
                 <div theme="myContent">
                     Dropdown Content
@@ -191,17 +170,17 @@ main()
             </DropDown>
         </Theme>
 
-        <Typography type="h2" $style={{marginTop: '20px'}}>Loading Dots</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }}>Loading Dots</Typography>
         <LoadingDots />
 
-        <Typography type="h2" $style={{marginTop: '20px'}}>Slider</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }}>Slider</Typography>
         <Slider min={0} max={100} value={Observer.mutable(0)} />
 
-        <Typography type="h2" $style={{marginTop: '20px'}}>Inputs</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }}>Inputs</Typography>
         <TextField placeholder="Type here..." style={{ marginBottom: '10px', width: '100%' }} value={text} />
         <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} value={text} />
 
-        <Typography type="h2" $style={{marginTop: '20px'}}>Drawer</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }}>Drawer</Typography>
         <Drawer open={drawerOpen}>
             <div>
                 <Typography type="p1">Drawer Content</Typography>

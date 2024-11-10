@@ -17,7 +17,7 @@ export { default as Checkbox } from './components/Checkbox.jsx';
 export { default as Tooltip } from './components/Tooltip.jsx';
 export { default as Markdown } from './components/Markdown.jsx';
 export { default as Link } from './components/Link.jsx';
-export { default as CodeBlock } from './components/CodeBlock.jsx';
+// export { default as CodeBlock } from './components/CodeBlock.jsx';
 export { default as Slider } from './components/Slider.jsx';
 export { default as createContext } from './components/Context.jsx';
 export { default as Paper } from './components/Paper.jsx';

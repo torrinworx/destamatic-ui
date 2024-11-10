@@ -4,7 +4,7 @@ import { OArray, OObject, Observer } from 'destam-dom';
 import Link from './Link';
 import Theme from './Theme';
 import Checkbox from './Checkbox';
-import CodeBlock from './CodeBlock';
+// import CodeBlock from './CodeBlock';
 import Typography from './Typography';
 
 const emphasis = (line) => {
@@ -95,12 +95,12 @@ const Element = ({ each: e }) => {
 
     if (position === 'end') return null;
 
-    if (block === 'code' && Array.isArray(line)) {
-        const first_line = line.shift();
-        const language = first_line.slice(3);
-        line.pop();
-        return <CodeBlock language={language} code={line.join('\n')}/>;
-    };
+    // if (block === 'code' && Array.isArray(line)) {
+    //     const first_line = line.shift();
+    //     const language = first_line.slice(3);
+    //     line.pop();
+    //     return <CodeBlock language={language} code={line.join('\n')}/>;
+    // };
 
     if (block === 'quote' && Array.isArray(line)) {
         return <blockquote theme='blockquote'>
