@@ -9,6 +9,7 @@ const theme = OObject({
 		fontFamily: 'Roboto, sans-serif',
 		boxSizing: 'border-box',
 		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
+		$color_text: 'black',
 	},
 
 	primary: {
