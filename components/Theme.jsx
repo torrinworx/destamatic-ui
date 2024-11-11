@@ -71,6 +71,7 @@ const theme = OObject({
 
 		padding: 10,
 		background: '$color_top',
+		color: '$color_text',
 	},
 
 	focused: {
