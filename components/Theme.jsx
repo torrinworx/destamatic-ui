@@ -26,13 +26,6 @@ const theme = OObject({
 		$color_top: 'white',
 	},
 
-	border: {
-		borderWidth: 2,
-		borderStyle: 'solid',
-		color: 'inherit',
-		background: 'inherit',
-	},
-
 	center: {
 		display: 'flex',
 		alignItems: 'center',
