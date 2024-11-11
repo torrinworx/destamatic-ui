@@ -2,7 +2,7 @@ import Observer from 'destam/Observer';
 import { h } from './h';
 
 // Takes value as an observer
-const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error, autoselect, onFocus, ...props }) => {
+const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error, autoselect, onFocus, theme, ...props }) => {
 	if (!(value instanceof Observer)) value = Observer.immutable(value);
 	if (!(error instanceof Observer)) error = Observer.immutable(error);
 	expand = Observer.immutable(expand);
@@ -14,9 +14,10 @@ const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error
 		$value={value.def('')}
 		theme={[
 			'field', 'line',
-	        focus.map(e => e ? 'focused' : null),
-	        error.map(e => e ? 'error' : null),
-	        expand.map(e => e ? 'expand' : null),
+			theme,
+			focus.map(e => e ? 'focused' : null),
+			error.map(e => e ? 'error' : null),
+			expand.map(e => e ? 'expand' : null),
 		]}
 		style={style}
 		onInput={(e) => {
