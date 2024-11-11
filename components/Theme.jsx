@@ -154,6 +154,21 @@ const getClasses = (trie, classes) => {
 	return out.map(a => a.node);
 };
 
+const ignoreMutates = obs => {
+	return Observer(obs.get, obs.set, (listener, governor) => obs.register_((commit, ...args) => {
+		let through = false;
+		for (const c of commit) {
+			if (c instanceof Insert || c instanceof Delete) {
+				through = true;
+				break;
+			}
+		}
+
+		if (!through) return;
+		listener(commit, ...args);
+	}, governor));
+};
+
 const createTheme = (prefix, theme) => {
 	const insertStyle = defines => {
 		// warn for duplicate styles
@@ -191,7 +206,7 @@ const createTheme = (prefix, theme) => {
 		return found.join(' ');
 	};
 
-	const trie = theme.observer.shallow().map(theme => {
+	const trie = ignoreMutates(theme.observer.shallow()).map(theme => {
 		const trie = [];
 		trie.cache = new Map();
 
