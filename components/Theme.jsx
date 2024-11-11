@@ -248,7 +248,6 @@ const createTheme = (prefix, theme) => {
 						for (let i = 0; i < val.length; i++) {
 							if (val.charAt(i) === '$') {
 								let name = '';
-								let start = i;
 								for (i++; i < val.length; i++) {
 									if ("_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 										.indexOf(val.charAt(i)) === -1) break;
@@ -266,7 +265,10 @@ const createTheme = (prefix, theme) => {
 							} else {
 								let text = '';
 								for (i; i < val.length; i++) {
-									if (val.charAt(i) === '$') break;
+									if (val.charAt(i) === '$') {
+										i--;
+										break;
+									}
 									text += val.charAt(i);
 								}
 								out.push(text);
