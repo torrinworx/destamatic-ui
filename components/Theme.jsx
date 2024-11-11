@@ -2,11 +2,13 @@ import { h, mount, Observer, OObject, OArray } from "destam-dom";
 import createContext from './Context';
 import { sizeProperties } from '../util';
 import { atomic } from 'destam/Network';
+import { Insert, Delete } from 'destam/Events';
 
 const theme = OObject({
 	"*": {
 		fontFamily: 'Roboto, sans-serif',
 		boxSizing: 'border-box',
+		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
 	},
 
 	primary: {
@@ -14,7 +16,6 @@ const theme = OObject({
 		$color_hover: '#02B891',
 		$color_error: 'red',
 		$color_top: 'white',
-		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
 	},
 
 	secondary: {
@@ -22,7 +23,6 @@ const theme = OObject({
 		$color_hover: '#AAAAAA',
 		$color_error: 'red',
 		$color_top: 'white',
-		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
 	},
 
 	border: {
@@ -69,7 +69,7 @@ const theme = OObject({
 		outline: 0,
 
 		padding: 10,
-		background: 'white',
+		background: '$color_top',
 	},
 
 	focused: {

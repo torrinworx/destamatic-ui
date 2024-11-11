@@ -4,7 +4,7 @@ import Theme from './Theme';
 Theme.define({
     paper: {
         extends: 'radius',
-        background: 'white',
+        background: '$color_top',
         boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
         padding: 10,
         maxWidth: 'inherit',
@@ -14,7 +14,7 @@ Theme.define({
 });
 
 const Paper = ({children, tight, style}) => {
-    return <div theme="paper" style={{
+    return <div theme="primary_paper" style={{
         padding: tight ? 0 : null,
         ...style
     }}>
