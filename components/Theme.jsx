@@ -25,6 +25,16 @@ const theme = OObject({
 			[r, g, b] = color.hsvToRgb(h, s, v);
 			return color.toCSS([r, g, b, a]);
 		},
+
+		$invert: (c) => {
+			let [r, g, b, a] = color(c);
+			return color.toCSS([1 - r, 1 - g, 1 - b, a]);
+		},
+
+		$alpha: (c, amount) => {
+			let [r, g, b] = color(c);
+			return color.toCSS([r, g, b, amount]);
+		},
 	},
 
 	primary: {
