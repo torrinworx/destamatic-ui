@@ -77,19 +77,45 @@ const theme = OObject({
 	}
 });
 
-const getVar = (name, exts) => {
+const getVar = (item, exts) => {
+	if (Array.isArray(item)) {
+		const items = [];
+		const out = [];
+
+		for (let i of item) {
+			i = getVar(i, exts);
+
+			if (i instanceof Observer) {
+				const index = items.length;
+				items.push(i);
+				out.push(res => res[index]);
+			} else {
+				out.push(() => i);
+			}
+		}
+
+		return Observer.all(items).map(res => out.map(p => p(res)).join(''));
+	}
+
+	if (typeof item === 'string') return item;
+	if ('value' in item) return item.value;
+
 	let ret = null;
-	for (const node of exts) {
+	for (let i = 0; i < exts.length; i++) {
 		const current = ret;
-		ret = node.body.map(({vars}) => {
-			if (vars.has(name)) {
-				return vars.get(name);
+		ret = exts[i].body.map(({vars}) => {
+			if (vars.has(item.name)) {
+				return getVar(vars.get(item.name), exts.slice(0, i + 1));
 			}
 
 			if (current === null) console.warn("Theme name is not defined but used: " + name);
 			return current;
 		}).unwrap();
 	}
+
+	if (item.params) ret = Observer
+		.all([ret, ...item.params.map(param => getVar(param, exts))])
+		.map(([func, ...params]) => func(...params));
 
 	return ret;
 };
@@ -99,11 +125,7 @@ const Style = ({each: {node, name, defines, children}}) => {
 		{node.body.map(({text}) => {
 			if (!text.length) return null;
 
-			return ['.' + name + ' {\n', ...text.map(item => {
-				if (typeof item === 'string') return item;
-
-				return getVar(item.name, defines);
-			}), '\n}\n'];
+			return ['.' + name + ' {\n', ...text.map(item => getVar(item, defines)), '\n}\n'];
 		})}
 		<Style each={children} />
 	</>;
@@ -164,6 +186,81 @@ const ignoreMutates = obs => {
 	}, governor));
 };
 
+const reducer = p => {
+	const out = p.reduce((acc, item) => {
+		if (typeof item === 'string' && !item.length) {
+			return acc;
+		}
+
+		if (typeof item !== 'string') {
+			if (item.params) item = {...item, params: item.params.map(reducer)}
+			acc.push(item);
+		} else if (typeof acc[acc.length - 1] === 'string') {
+			acc[acc.length - 1] += item;
+		} else if (acc.length !== 0 || item !== ' '){
+			acc.push(item);
+		}
+
+		return acc;
+	}, []);
+
+	let last = out[out.length - 1];
+	if (typeof last === 'string') out[out.length - 1] = last.trimEnd();
+
+	return out;
+};
+
+const parse = (val) => {
+	val = String(val);
+
+	let i = 0;
+	const parse = (end, ignore, del) => {
+		let out = [];
+		const parts = [out];
+		let count = 1;
+		for (; i < val.length; i++) {
+			const char = val.charAt(i);
+			if (char === end) {
+				count--;
+				if (count === 0) break;
+			} else if (char === ignore) {
+				count++;
+			} else if (char === del) {
+				out = [];
+				parts.push(out);
+			} else if (val.charAt(i) === '$') {
+				let name = '';
+				let start = i;
+				for (i++; i < val.length; i++) {
+					if ("_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+						.indexOf(val.charAt(i)) === -1) break;
+					name += val.charAt(i);
+				}
+
+				if (val.charAt(i) !== '$') i--;
+
+				let params;
+				if (val.charAt(i + 1) === '(') {
+					i += 2;
+					params = parse(')', '(', ',');
+				}
+
+				if (name === '') {
+					out.push('$');
+				} else {
+					out.push({name, params});
+				}
+			} else {
+				out.push(char);
+			}
+		}
+
+		return parts.map(reducer);
+	};
+
+	return parse()[0];
+};
+
 const createTheme = (prefix, theme) => {
 	const insertStyle = defines => {
 		// warn for duplicate styles
@@ -188,7 +285,7 @@ const createTheme = (prefix, theme) => {
 			const style = {
 				node: defines[index],
 				children: OArray(),
-				defines: defines.slice(0, index),
+				defines: defines.slice(0, index + 1),
 				name: name + defines[index].name.replace(/\*/g, ''),
 			};
 
@@ -229,12 +326,17 @@ const createTheme = (prefix, theme) => {
 
 			current.leaf = keys.length;
 			current.body = theme.observer.path(key).map(theme => {
-				let invariant = true;
 				const vars = new Map();
 				let text = Object.entries(theme).flatMap(([key, val]) => {
 					if (key === 'extends') return '';
 
 					if (key.charAt(0) === '$') {
+						if (typeof val === 'string') {
+							val = parse(val);
+						} else {
+							val = {value: val};
+						}
+
 						vars.set(key.substring(1), val);
 						return '';
 					}
@@ -242,40 +344,7 @@ const createTheme = (prefix, theme) => {
 					if (typeof val === 'number' && sizeProperties.has(key)) {
 						val = [val + 'px'];
 					} else {
-						let out = [];
-						val = String(val);
-
-						for (let i = 0; i < val.length; i++) {
-							if (val.charAt(i) === '$') {
-								let name = '';
-								for (i++; i < val.length; i++) {
-									if ("_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-										.indexOf(val.charAt(i)) === -1) break;
-									name += val.charAt(i);
-								}
-
-								if (val.charAt(i) !== '$') i--;
-
-								if (name === '') {
-									out.push('$');
-								} else {
-									out.push({name});
-									invariant = false;
-								}
-							} else {
-								let text = '';
-								for (i; i < val.length; i++) {
-									if (val.charAt(i) === '$') {
-										i--;
-										break;
-									}
-									text += val.charAt(i);
-								}
-								out.push(text);
-							}
-						}
-
-						val = out;
+						val = parse(val);
 					}
 
 					const split = [];
@@ -295,24 +364,8 @@ const createTheme = (prefix, theme) => {
 					return val;
 				});
 
-				// resolve any local variables
-				text = text.reduce((acc, item) => {
-					if (typeof item !== 'string') {
-						if (vars.has(item.name)) item = String(vars.get(item.name));
-					} else if (!item.length) {
-						return acc;
-					}
 
-					if (typeof item !== 'string') {
-						acc.push(item);
-					} else if (typeof acc[acc.length - 1] === 'string') {
-						acc[acc.length - 1] += item;
-					} else {
-						acc.push(item);
-					}
-
-					return acc;
-				}, []);
+				text = reducer(text);
 
 				let exts;
 				if ('extends' in theme) {
@@ -324,7 +377,7 @@ const createTheme = (prefix, theme) => {
 					exts = [];
 				}
 
-				return {text, vars, invariant, exts};
+				return {text, vars, exts};
 			}).unwrap();
 
 			current.defs = current.body.map(({exts}) =>
@@ -359,7 +412,8 @@ const createTheme = (prefix, theme) => {
 		}).unwrap();
 
 		const out = defines.map(insertStyle);
-		out.vars = name => defines.map(defines => getVar(name, defines)).unwrap();
+		out.vars = (name, ...params) =>
+			defines.map(defines => getVar({name, params: params.length ? params : null}, defines)).unwrap();
 		return out;
 	};
 
