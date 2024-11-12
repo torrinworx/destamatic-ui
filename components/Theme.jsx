@@ -3,6 +3,7 @@ import createContext from './Context';
 import { sizeProperties } from '../util/index.js';
 import { atomic } from 'destam/Network';
 import { Insert, Delete } from 'destam/Events';
+import color from '../util/color.js';
 
 const theme = OObject({
 	"*": {
@@ -10,18 +11,32 @@ const theme = OObject({
 		boxSizing: 'border-box',
 		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
 		$color_text: 'black',
+
+		$shiftBrightness: (c, amount) => {
+			let [r, g, b, a] = color(c);
+			let [h, s, v] = color.rgbToHsv(r, g, b);
+
+			if (v > 0.5) {
+				v -= parseFloat(amount);
+			} else {
+				v += parseFloat(amount);
+			}
+
+			[r, g, b] = color.hsvToRgb(h, s, v);
+			return color.toCSS([r, g, b, a]);
+		},
 	},
 
 	primary: {
 		$color: '#02CA9F',
-		$color_hover: '#02B891',
+		$color_hover: '$shiftBrightness($color, 0.1)',
 		$color_error: 'red',
 		$color_top: 'white',
 	},
 
 	secondary: {
 		$color: '#CCCCCC',
-		$color_hover: '#AAAAAA',
+		$color_hover: '$shiftBrightness($color, 0.1)',
 		$color_error: 'red',
 		$color_top: 'white',
 	},
