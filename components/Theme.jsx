@@ -286,43 +286,47 @@ const parse = (val) => {
 	return parse()[0];
 };
 
-const createTheme = (prefix, theme) => {
-	const insertStyle = defines => {
-		// warn for duplicate styles
-		const dup = new Set();
-		for (const def of defines) {
-			if (dup.has(def)) console.warn("Duplicate theme: " + defines.map(d => d.name).join('_'));
-			dup.add(def);
-		}
+const insertStyle = defines => {
+	// warn for duplicate styles
+	const dup = new Set();
+	for (const def of defines) {
+		if (dup.has(def)) console.warn("Duplicate theme: " + defines.map(d => d.name).join('_'));
+		dup.add(def);
+	}
 
-		const found = [];
-		const search = (arr, name, index) => {
-			if (index >= defines.length) return;
+	const found = [];
+	const search = (arr, name, index) => {
+		if (index >= defines.length) return;
 
-			for (const style of arr) {
-				if (style.node === defines[index]) {
-					found.push(style.name);
-					search(style.children, style.name + '-', index + 1);
-					return;
-				}
+		let i = 0;
+		for (const style of arr) {
+			if (style.node === defines[index]) {
+				found.push(style.name);
+				search(style.children, style.name + '-', index + 1);
+				return;
 			}
 
-			const style = {
-				node: defines[index],
-				children: OArray(),
-				defines: defines.slice(0, index + 1),
-				name: name + defines[index].name.replace(/\*/g, ''),
-			};
+			if (style.i === i) i++;
+		}
 
-			search(style.children, style.name + '-', index + 1);
-			found.push(style.name);
-			arr.push(style);
+		const style = {
+			node: defines[index],
+			children: OArray(),
+			defines: defines.slice(0, index + 1),
+			i,
+			name: name + defines[index].name.replace(/\*/g, '') + i,
 		};
 
-		search(styles, prefix, 0);
-		return found.join(' ');
+		search(style.children, style.name + '-', index + 1);
+		found.push(style.name);
+		arr.splice(i, 0, style);
 	};
 
+	search(styles, 'daui-', 0);
+	return found.join(' ');
+};
+
+const createTheme = theme => {
 	const trie = ignoreMutates(theme.observer.shallow()).map(theme => {
 		const trie = [];
 		trie.cache = new Map();
@@ -446,8 +450,7 @@ const createTheme = (prefix, theme) => {
 	return out;
 };
 
-let theme_seq = 0;
-const Theme = createContext(createTheme('daui-', theme), (nextTheme, {theme: prevTheme}) => {
+const Theme = createContext(createTheme(theme), (nextTheme, {theme: prevTheme}) => {
 	const zip = (prev, next, prop) => {
 		if (prop === 'extends') {
 			if (!prev) prev = [];
@@ -501,7 +504,7 @@ const Theme = createContext(createTheme('daui-', theme), (nextTheme, {theme: pre
 	if (nextTheme.observer) nextTheme.observer.watch(listener);
 	if (prevTheme.observer) prevTheme.observer.watch(listener);
 
-	return createTheme(`daui${theme_seq++}-`, out);
+	return createTheme(out);
 });
 
 Theme.define = obj => atomic(() => {
