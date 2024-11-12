@@ -165,3 +165,42 @@ With the selectors that we've been able to define so far, we can overwrite style
 With variables, we can implement the hovered effect differently. Suppose that we find that the elements that we want to style basically always want to have a changed background when they hover. But the background color is silghtly different for each component to maybe complement whatever primary color they are using. Instead of defining the background in the generic `hovered` component, we basically define it to be the variable `hover_color`. Then in `myDiv`, the theme there defines the `hover_color` value. Note that this works because `myDiv` has a lower precedence than `hovered`. If `myDiv` had a higher precedence, the variable would not be seen by `hovered` and it would be pointless anyway. If this was the precedence order, you could just use the standard overwriting usage.
 
 The neat part here is that, `hovered` doesn't know anything about `myDiv`. The only reason these two are connected is because of the multiple selector in the div.
+
+## Variables can use other variables
+
+You can nest variables to create more complex structures.
+
+```jsx
+<div theme='myDiv' />
+
+// theme
+{
+    myDiv: {
+        $color: 'white',
+        $border: '1px solid $color'
+        border: '$border',
+    },
+}
+```
+
+## Functions
+
+Themes can also define and use functions. This heavily relies on the variable system. When a variable is used, you can give that variable paramaters and it will be called as a function. Consider the above example with the border: we can invert the border color from the actual color variable in case that's what we want.
+
+```jsx
+<div theme='myDiv' />
+
+// theme
+{
+    myDiv: {
+        $color: 'white',
+        $border: '1px solid $invert($color)'
+        border: '$border',
+    },
+}
+```
+
+`destamatic-ui` already defines a couple functions for our use:
+ - `$shiftBrightness(color, amount)`: Shifts the brightness of the color towards neutral grey by the amount. The amount is from 0-1
+ - '$insert(color)': Inverts the color
+ - '$alpha(color, alpha)': Sets the alpha of a color
