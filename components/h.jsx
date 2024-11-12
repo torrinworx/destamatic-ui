@@ -1,6 +1,6 @@
 import { h as destam_h, mount, getFirst} from 'destam-dom';
 import Observer, {observerGetter, shallowListener} from 'destam/Observer';
-import { sizeProperties } from '../util.js';
+import { sizeProperties } from '../util/index.js';
 
 import Theme from './Theme';
 
