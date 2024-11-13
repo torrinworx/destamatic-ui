@@ -266,7 +266,7 @@ const parse = (val, index) => {
 				if (count === 0) break;
 			} else if (char === ignore) {
 				count++;
-			} else if (char === del) {
+			} else if (count === 1 && char === del) {
 				out = [];
 				parts.push(out);
 			} else if (val.charAt(i) === '$') {
