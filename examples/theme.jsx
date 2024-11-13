@@ -19,6 +19,7 @@ const MyComponent = ({type}) => {
 const theme = OObject({
 	"*": {
 		fontFamily: 'arial',
+		transition: null,
 	},
 
 	myPrimary: OObject({
@@ -51,13 +52,29 @@ const theme = OObject({
 		inset: 0,
 		position: 'absolute',
 		background: '$color_background',
-	}
+	},
+
+	shiftHue: {
+		$test_value: '$color',
+		$color: '$hue($saturate($test_value, -.5), .3)',
+	},
+
+	row: {
+		display: 'flex',
+		flexDirection: 'row',
+	},
 });
 
 mount(document.body, <Theme value={theme}>
 	<div theme="body">
-		<MyComponent type="myPrimary"/>
-		<MyComponent type="mySecondary"/>
+		<div theme="row">
+			<MyComponent type="myPrimary"/>
+			<MyComponent type="myPrimary_shiftHue"/>
+		</div>
+		<div theme="row">
+			<MyComponent type="mySecondary"/>
+			<MyComponent type="mySecondary_shiftHue"/>
+		</div>
 		<Button label="hello world" type="contained" />
 	</div>
 </Theme>);
