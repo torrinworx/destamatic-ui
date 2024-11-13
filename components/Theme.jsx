@@ -133,6 +133,10 @@ const getVar = (item, exts) => {
 			}
 		}
 
+		if (items.length === 0) {
+			return Observer.immutable(item.join(''));
+		}
+
 		return Observer.all(items).map(res => out.map(p => p(res)).join(''));
 	}
 
@@ -462,6 +466,7 @@ const createTheme = theme => {
 		}).unwrap();
 
 		const out = defines.map(insertStyle);
+		out.defines = defines;
 		out.vars = (name, ...params) =>
 			defines.map(defines => getVar({name, params: params.length ? params : null}, defines)).unwrap();
 		return out;
@@ -534,5 +539,8 @@ Theme.define = obj => atomic(() => {
 		theme[o] = obj[o];
 	}
 });
+
+Theme.parse = parse;
+Theme.getVar = getVar;
 
 export default Theme;

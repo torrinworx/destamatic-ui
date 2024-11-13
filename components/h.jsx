@@ -28,7 +28,10 @@ const hypertext = (useThemes, name, props, ...children) => {
 
 	const signals = [];
 
+	let themeDefines;
 	if (useThemes) {
+		themeDefines = Observer.mutable(null).unwrap();
+
 		let _class = '';
 		if (props && 'class' in props) {
 			_class = Observer.immutable(props.class);
@@ -45,6 +48,8 @@ const hypertext = (useThemes, name, props, ...children) => {
 
 		signals.push(context => {
 			let cl = Theme.fromContext(context)(theme);
+			themeDefines.set(cl.defines);
+
 			if (_class) {
 				cl = Observer.all([cl, _class]).map(s => s.join(' '));
 			}
@@ -96,19 +101,38 @@ const hypertext = (useThemes, name, props, ...children) => {
 		let style = props.style;
 		delete props.style;
 		if (style) {
-			let apply = style => {
+			const apply = style => {
 				if (typeof style === 'string') {
 					name.setAttribute('style', style);
 					return;
 				}
 
-				let dynamicProps = [];
+				const parse = (key, value) => {
+					if (typeof value === 'number' && sizeProperties.has(key)) {
+						return value + 'px';
+					}
 
+					if (!themeDefines) return value;
+
+					const parsed = Theme.parse(value, Infinity);
+
+					if (parsed.length === 1 && typeof parsed[0] === 'string') {
+						return value;
+					} else {
+						return themeDefines.map(defines => Theme.getVar(parsed, defines)).unwrap();
+					}
+				};
+
+				const dynamicProps = [];
 				const set = (key, value) => {
 					if (value instanceof Observer) {
+						value = value.map(v => parse(key, v));
+					} else {
+						value = parse(key, value);
+					}
+
+					if (value instanceof Observer) {
 						dynamicProps.push([key, value]);
-					} else if (typeof value === 'number' && sizeProperties.has(key)) {
-						name.style[key] = value + 'px';
 					} else {
 						name.style[key] = value;
 					}
@@ -137,8 +161,8 @@ const hypertext = (useThemes, name, props, ...children) => {
 							propListeners.delete(key);
 						}
 
-						propListeners.set(key, shallowListener(value, () => set(key, value.get())));
-						set(key, value.get());
+						propListeners.set(key, shallowListener(value, () => name.style[key] = value.get()));
+						name.style[key] = value.get();
 					};
 
 					for (const [key, value] of dynamicProps) {
@@ -156,11 +180,7 @@ const hypertext = (useThemes, name, props, ...children) => {
 						}
 
 						for (let delta of commit) {
-							if (delta.value instanceof Observer) {
-								dynamicSet(delta.ref, delta.value);
-							} else {
-								set(delta.ref, delta.value);
-							}
+							set(delta.ref, delta.value);
 						}
 					});
 
