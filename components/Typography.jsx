@@ -13,6 +13,7 @@ Theme.define({
     typography_regular: { fontStyle: 'normal' },
     typography_bold: { fontWeight: 'bold' },
     typography_italic: { fontStyle: 'italic' },
+    typography_center: { textAlign: 'center' },
 });
 
 /**
@@ -27,13 +28,14 @@ Theme.define({
  * 
  * @returns {JSX.Element} The rendered typography element.
  */
-const Typography = ({ inline, type = 'h1', theme, fontStyle = 'regular', bold, children, style, ...props }) => {
+const Typography = ({ inline, type = 'h1', theme, fontStyle = 'regular', bold, center, children, style, ...props }) => {
     if (bold) fontStyle = 'bold';
 
     return <div
-        theme={['typography', theme, type, fontStyle]}
+        theme={['typography', center ? 'center' : null, theme, type, fontStyle]}
         style={{
-            display: inline ? 'inline-block' : 'block',
+
+            display: inline ? 'inline-flex' : 'flex',
             ...style
         }}
         {...props}
