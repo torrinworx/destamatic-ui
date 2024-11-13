@@ -28,7 +28,7 @@ const Link = ({
 
     return <a
         href={href}
-        onClick={(event) => {
+        onMouseDown={(event) => {
         if (onClick) {
             onClick(event);
         }

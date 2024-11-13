@@ -37,7 +37,7 @@ const DropDown = ({
                 cursor: 'pointer',
                 userSelect: 'none'
             }}
-            onClick={toggle}>
+            onMouseDown={toggle}>
             {arrow === 'right' ? <span>{label}</span> : null}
             <div style={{ display: 'flex', alignItems: 'center', userSelect: 'none' }}>
                 <i class='chevron-icon' style={{ cursor: 'pointer' }}>

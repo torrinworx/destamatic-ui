@@ -35,7 +35,7 @@ const calculate = (bounds, rot) => {
 	};
 }
 
-const Detached = ({menu, type = 'text', children, enabled, style}) => {
+const Detached = ({ menu, type = 'text', children, enabled, style }) => {
 	const focused = enabled || Observer.mutable(false);
 
 	const A = <raw:button />;
@@ -82,7 +82,7 @@ const Detached = ({menu, type = 'text', children, enabled, style}) => {
 					) {
 						let width = (window.innerWidth - calc.right) - calc.left;
 						let height = (window.innerHeight - calc.bottom) - calc.top;
-						fits.push({size: width * height, rot});
+						fits.push({ size: width * height, rot });
 					}
 				}
 
