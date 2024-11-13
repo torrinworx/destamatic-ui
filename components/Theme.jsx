@@ -116,13 +116,13 @@ const theme = OObject({
 	}
 });
 
-const getVar = (item, exts) => {
+const getVar = (item, exts, ignore) => {
 	if (Array.isArray(item)) {
 		const items = [];
 		const out = [];
 
 		for (let i of item) {
-			i = getVar(i, exts);
+			i = getVar(i, exts, ignore);
 
 			if (i instanceof Observer) {
 				const index = items.length;
@@ -143,8 +143,10 @@ const getVar = (item, exts) => {
 	for (let i = 0; i < exts.length; i++) {
 		const current = ret;
 		ret = exts[i].body.map(({vars}) => {
-			if (vars.has(item.name)) {
-				return getVar(vars.get(item.name), exts.slice(0, i + 1));
+			if ((i < exts.length - 1 || !ignore || !ignore.has(item.name)) && vars.has(item.name)) {
+				const ign = new Set(ignore);
+				ign.add(item.name);
+				return getVar(vars.get(item.name), exts.slice(0, i + 1), ign);
 			}
 
 			if (current === null) console.warn("Theme name is not defined but used: " + name);
@@ -153,7 +155,7 @@ const getVar = (item, exts) => {
 	}
 
 	if (item.params) ret = Observer
-		.all([ret, ...item.params.map(param => getVar(param, exts))])
+		.all([ret, ...item.params.map(param => getVar(param, exts, ignore))])
 		.map(([func, ...params]) => func(...params));
 
 	return ret;
