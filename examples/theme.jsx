@@ -80,7 +80,7 @@ mount(document.body, <Theme value={theme}>
 		<div theme="myPrimary" style={{
 			width: 200,
 			height: 200,
-			background: '$color'
+			background: 'linear-gradient($color, $invert($color))'
 		}} />
 	</div>
 </Theme>);
