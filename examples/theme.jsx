@@ -37,14 +37,14 @@ const theme = OObject({
 		background: '$color',
 		width: 100,
 		height: 100,
-		color: 'white',
+		color: '$invert($color)',
 
 		$background_color: 'blue',
 	},
 
 	hovered: {
 		background: '$color_hover',
-		color: 'black',
+		color: '$invert($color_hover)',
 	},
 
 	body: {
@@ -79,7 +79,7 @@ mount(document.body, <Theme value={theme}>
 	</div>
 </Theme>);
 
-Observer.timer(1000).map(t => t % 2 === 0 ? 'blue' : 'green').effect(color => (theme.myPrimary.$color = color, null));
+Observer.timer(1000).map(t => t % 2 === 0 ? 'blue' : 'lime').effect(color => (theme.myPrimary.$color = color, null));
 
 setTimeout(() => {
 	theme.button = {
