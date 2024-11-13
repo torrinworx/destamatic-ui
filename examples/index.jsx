@@ -143,6 +143,10 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
             myContent: {
                 color: 'red',
             },
+
+            button_contained: {
+                background: 'linear-gradient($color, $hue($color, 0.1))'
+            }
         }}>
             <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                 <Button label="Text Button" type="text" onClick={handleClick} />
