@@ -76,6 +76,12 @@ mount(document.body, <Theme value={theme}>
 			<MyComponent type="mySecondary_shiftHue"/>
 		</div>
 		<Button label="hello world" type="contained" />
+
+		<div theme="myPrimary" style={{
+			width: 200,
+			height: 200,
+			background: '$color'
+		}} />
 	</div>
 </Theme>);
 
