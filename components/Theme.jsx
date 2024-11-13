@@ -33,7 +33,7 @@ const theme = OObject({
 
 		$alpha: (c, amount) => {
 			let [r, g, b] = color(c);
-			return color.toCSS([r, g, b, amount]);
+			return color.toCSS([r, g, b, parseFloat(amount)]);
 		},
 	},
 
