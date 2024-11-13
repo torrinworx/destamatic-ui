@@ -126,7 +126,7 @@ const hypertext = (useThemes, name, props, ...children) => {
 				const dynamicProps = [];
 				const set = (key, value) => {
 					if (value instanceof Observer) {
-						value = value.map(v => parse(key, v));
+						value = value.map(v => parse(key, v)).unwrap();
 					} else {
 						value = parse(key, value);
 					}
