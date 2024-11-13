@@ -269,7 +269,7 @@ const parse = (val, index) => {
 			} else if (count === 1 && char === del) {
 				out = [];
 				parts.push(out);
-			} else if (val.charAt(i) === '$') {
+			} else if (char === '$') {
 				let name = '';
 				let start = i;
 				for (i++; i < val.length; i++) {
