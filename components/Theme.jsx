@@ -270,7 +270,9 @@ const parse = (val, index) => {
 				if (count === 0) break;
 			} else if (char === ignore) {
 				count++;
-			} else if (count === 1 && char === del) {
+			}
+
+			if (count === 1 && char === del) {
 				out = [];
 				parts.push(out);
 			} else if (char === '$') {
