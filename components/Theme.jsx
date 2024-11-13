@@ -24,9 +24,9 @@ const theme = OObject({
 
 		$shiftBrightness: transformHSV((h, s, v, amount) => {
 			if (v > 0.5) {
-				v -= parseFloat(amount);
+				v -= amount;
 			} else {
-				v += parseFloat(amount);
+				v += amount;
 			}
 
 			return [h, s, v];
