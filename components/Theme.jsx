@@ -5,6 +5,16 @@ import { atomic } from 'destam/Network';
 import { Insert, Delete } from 'destam/Events';
 import color from '../util/color.js';
 
+const transformHSV = callback => (c, ...params) => {
+	let [r, g, b, a] = color(c);
+	let [h, s, v] = color.rgbToHsv(r, g, b);
+
+	[h, s, v] = callback(h, s, v, ...params.map(p => parseFloat(p)));
+
+	[r, g, b] = color.hsvToRgb(h, s, v);
+	return color.toCSS([r, g, b, a]);
+};
+
 const theme = OObject({
 	"*": {
 		fontFamily: 'Roboto, sans-serif',
@@ -12,19 +22,23 @@ const theme = OObject({
 		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
 		$color_text: 'black',
 
-		$shiftBrightness: (c, amount) => {
-			let [r, g, b, a] = color(c);
-			let [h, s, v] = color.rgbToHsv(r, g, b);
-
+		$shiftBrightness: transformHSV((h, s, v, amount) => {
 			if (v > 0.5) {
 				v -= parseFloat(amount);
 			} else {
 				v += parseFloat(amount);
 			}
 
-			[r, g, b] = color.hsvToRgb(h, s, v);
-			return color.toCSS([r, g, b, a]);
-		},
+			return [h, s, v];
+		}),
+
+		$saturate: transformHSV((h, s, v, amount) => {
+			return [h, s + amount, v];
+		}),
+
+		$hue: transformHSV((h, s, v, amount) => {
+			return [h + amount, s, v];
+		}),
 
 		$invert: (c) => {
 			let [r, g, b, a] = color(c);
