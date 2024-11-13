@@ -342,7 +342,7 @@ const insertStyle = defines => {
 		arr.splice(i, 0, style);
 	};
 
-	search(styles, 'daui-', 0);
+	search(styles, 'daui', 0);
 	return found.join(' ');
 };
 
