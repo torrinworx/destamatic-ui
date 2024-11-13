@@ -116,13 +116,13 @@ const theme = OObject({
 	}
 });
 
-const getVar = (item, exts, ignore) => {
+const getVar = (item, exts) => {
 	if (Array.isArray(item)) {
 		const items = [];
 		const out = [];
 
 		for (let i of item) {
-			i = getVar(i, exts, ignore);
+			i = getVar(i, exts);
 
 			if (i instanceof Observer) {
 				const index = items.length;
@@ -143,19 +143,18 @@ const getVar = (item, exts, ignore) => {
 	for (let i = 0; i < exts.length; i++) {
 		const current = ret;
 		ret = exts[i].body.map(({vars}) => {
-			if ((i < exts.length - 1 || !ignore || !ignore.has(item.name)) && vars.has(item.name)) {
-				const ign = new Set(ignore);
-				ign.add(item.name);
-				return getVar(vars.get(item.name), exts.slice(0, i + 1), ign);
+			const val = vars.get(item.name);
+			if (val && (i < exts.length - 1 || val.index < item.index)) {
+				return getVar(val, exts.slice(0, i + 1));
 			}
 
-			if (current === null) console.warn("Theme name is not defined but used: " + name);
+			if (current === null) console.warn("Theme name is not defined but used: " + item.name);
 			return current;
 		}).unwrap();
 	}
 
 	if (item.params) ret = Observer
-		.all([ret, ...item.params.map(param => getVar(param, exts, ignore))])
+		.all([ret, ...item.params.map(param => getVar(param, exts))])
 		.map(([func, ...params]) => func(...params));
 
 	return ret;
@@ -251,7 +250,7 @@ const reducer = p => {
 	return out;
 };
 
-const parse = (val) => {
+const parse = (val, index) => {
 	val = String(val);
 
 	let i = 0;
@@ -261,6 +260,7 @@ const parse = (val) => {
 		let count = 1;
 		for (; i < val.length; i++) {
 			const char = val.charAt(i);
+
 			if (char === end) {
 				count--;
 				if (count === 0) break;
@@ -289,7 +289,7 @@ const parse = (val) => {
 				if (name === '') {
 					out.push('$');
 				} else {
-					out.push({name, params});
+					out.push({name, params, index});
 				}
 			} else {
 				out.push(char);
@@ -372,24 +372,28 @@ const createTheme = theme => {
 			current.leaf = keys.length;
 			current.body = theme.observer.path(key).map(theme => {
 				const vars = new Map();
+				let index = 0;
+
 				let text = Object.entries(theme).flatMap(([key, val]) => {
 					if (key === 'extends') return '';
 
 					if (key.charAt(0) === '$') {
 						if (typeof val === 'string') {
-							val = parse(val);
+							val = parse(val, index);
 						} else {
 							val = {value: val};
 						}
 
+						val.index = index;
 						vars.set(key.substring(1), val);
+						index++;
 						return '';
 					}
 
 					if (typeof val === 'number' && sizeProperties.has(key)) {
 						val = [val + 'px'];
 					} else {
-						val = parse(val);
+						val = parse(val, index);
 					}
 
 					const split = [];
@@ -406,6 +410,7 @@ const createTheme = theme => {
 					val.splice(0, 0,'\t' + split.join('-') + ": ");
 					val.splice(val.length, 0, ';\n');
 
+					index++;
 					return val;
 				});
 
