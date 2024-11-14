@@ -26,3 +26,4 @@ export { default as Select } from './components/Select.jsx';
 export { default as useRipples } from './components/Ripple.jsx';
 export { default as Popup } from './components/Popup.jsx';
 export { popups } from './components/Popup.jsx';
+export { default as Detached } from './components/Detached.jsx';

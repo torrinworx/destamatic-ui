@@ -33,9 +33,9 @@ const calculate = (bounds, rot) => {
 		maxWidth: window.innerWidth - x,
 		maxHeight: window.innerHeight - y,
 	};
-}
+};
 
-const Detached = ({ menu, type = 'text', children, enabled, style }) => {
+const Detached = ({ menu, type = 'text', children, enabled, style, icon, focusable = true }) => {
 	const focused = enabled || Observer.mutable(false);
 
 	const A = <raw:button />;
@@ -45,9 +45,9 @@ const Detached = ({ menu, type = 'text', children, enabled, style }) => {
 		<Button
 			type={[
 				type,
-				'focusable',
-				focused.map(f => f ? 'focused' : null),
+				...(focusable ? ['focusable', focused.map(f => f ? 'focused' : null)] : [])
 			]}
+			Icon={icon}
 			style={style}
 			ref={A}
 			onClick={() => {
@@ -57,7 +57,6 @@ const Detached = ({ menu, type = 'text', children, enabled, style }) => {
 				}
 
 				focused.set(true);
-
 				const bounds = popup.getBoundingClientRect();
 				const surround = A.getBoundingClientRect();
 
@@ -70,9 +69,7 @@ const Detached = ({ menu, type = 'text', children, enabled, style }) => {
 					if ('bottom' in calc) calc.top = window.innerHeight - calc.bottom - Math.min(bounds.height, calc.maxHeight);
 					if ('top' in calc) calc.bottom = window.innerHeight - calc.top - Math.min(bounds.height, calc.maxHeight);
 
-					const isWithin = (val, min, max) => {
-						return val >= min && val <= max;
-					};
+					const isWithin = (val, min, max) => val >= min && val <= max;
 
 					if (
 						isWithin(calc.left, 0, window.innerWidth) &&
