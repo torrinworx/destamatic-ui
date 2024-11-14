@@ -53,7 +53,7 @@ const Checkbox = ({ value, onChange, invert = false, disabled, style, ...props }
 
 	const Span = <raw:span />;
 	const Input = <raw:input />;
-
+	// Disable user able to grab and drag the checkbox:
 	return <div theme='checkboxwrapper'>
 		<Span
 			theme={[
@@ -82,6 +82,7 @@ const Checkbox = ({ value, onChange, invert = false, disabled, style, ...props }
 					Input.checked = value.get();
 				}
 			}}
+			draggable="false"
 		>
 			<Input
 				type="checkbox"
@@ -92,7 +93,7 @@ const Checkbox = ({ value, onChange, invert = false, disabled, style, ...props }
 				$checked={value}
 				{...props}
 			/>
-			<span theme={[disabled.map(d => d ? 'disabledoverlay' : null)]} />
+			<span draggable="false" theme={[disabled.map(d => d ? 'disabledoverlay' : null)]} />
 			{ripples}
 		</Span>
 
