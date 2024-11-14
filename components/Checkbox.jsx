@@ -11,14 +11,17 @@ Theme.define({
 		width: '20px'
 	},
 	checkboxwrapper: {
+		display: 'flex',
+		flexWrap: 'wrap'
+	},
+	checkboxspan: {
 		padding: "8px",
 		overflow: 'clip',
 		borderRadius: '50%',
 		position: 'relative',
-		display: 'inline-block',
 		transition: 'background 250ms',
 	},
-	checkboxwrapper_hovered: {
+	checkboxspan_hovered: {
 		extends: 'primary',
 		background: '$color_hover'
 	},
@@ -51,46 +54,49 @@ const Checkbox = ({ value, onChange, invert = false, disabled, style, ...props }
 	const Span = <raw:span />;
 	const Input = <raw:input />;
 
-	return <Span
-		theme={[
-			'checkboxwrapper',
-			disabled.map(d => d ? 'disabled' : null),
-			hover.map(h => h ? 'hovered' : null),
-		]}
-		isHovered={hover}
-		onMouseDown={e => {
-			if (disabled.get()) {
-				return;
-			}
-
-			try {
-				const val = !value.get();
-				value.set(val);
-				if (onChange) {
-					onChange(val);
+	return <div theme='checkboxwrapper'>
+		<Span
+			theme={[
+				'checkboxspan',
+				disabled.map(d => d ? 'disabled' : null),
+				hover.map(h => h ? 'hovered' : null),
+			]}
+			isHovered={hover}
+			onMouseDown={e => {
+				if (disabled.get()) {
+					return;
 				}
 
-				createRipple(e);
-			} catch (e) {
-				throw e;
-			} finally {
-				// make sure that the chekbox is always in sync with the observer
-				Input.checked = value.get();
-			}
-		}}
-	>
-		<Input
-			type="checkbox"
-			theme={[
-				"checkbox",
-				disabled.map(d => d ? 'disabled' : null)
-			]}
-			$checked={value}
-			{...props}
-		/>
-		<span theme={[disabled.map(d => d ? 'disabledoverlay' : null)]} />
-		{ripples}
-	</Span>
+				try {
+					const val = !value.get();
+					value.set(val);
+					if (onChange) {
+						onChange(val);
+					}
+
+					createRipple(e);
+				} catch (e) {
+					throw e;
+				} finally {
+					// make sure that the chekbox is always in sync with the observer
+					Input.checked = value.get();
+				}
+			}}
+		>
+			<Input
+				type="checkbox"
+				theme={[
+					"checkbox",
+					disabled.map(d => d ? 'disabled' : null)
+				]}
+				$checked={value}
+				{...props}
+			/>
+			<span theme={[disabled.map(d => d ? 'disabledoverlay' : null)]} />
+			{ripples}
+		</Span>
+
+	</div>
 };
 
 export default Checkbox;
