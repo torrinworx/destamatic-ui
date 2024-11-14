@@ -21,6 +21,7 @@ export { default as Link } from './components/Link.jsx';
 export { default as Slider } from './components/Slider.jsx';
 export { default as createContext } from './components/Context.jsx';
 export { default as Paper } from './components/Paper.jsx';
+export { default as Tabs } from './components/Tabs.jsx';
 export { default as TextField } from './components/TextField.jsx';
 export { default as Select } from './components/Select.jsx';
 export { default as useRipples } from './components/Ripple.jsx';

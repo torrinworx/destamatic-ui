@@ -13,6 +13,7 @@ import {
     Slider,
     KebabMenu,
     Markdown,
+    Tabs,
     h
 } from 'destamatic-ui';
 
@@ -36,7 +37,7 @@ const DemoPage = () => {
 
 ***bold and italic combined***
 
-> This is a quote block. 
+> This is a quote block.
 > This is part of the same quote block
 
 This is not a quote block
@@ -93,6 +94,18 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
         inset: '0px',
         position: 'absolute',
     }}>
+        <Tabs style={{width: '100%'}}>
+            <mark:tab name="one">
+                One
+            </mark:tab>
+            <mark:tab name="two">
+                Two
+            </mark:tab>
+            <mark:tab name="Three">
+                Three
+            </mark:tab>
+        </Tabs>
+
         <Markdown markdown={markdown} />
         <TextArea OValue={markdown} style={{ width: "1000px", height: "500px" }} />
         {/* <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
@@ -207,6 +220,7 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
                 </div>
             </KebabMenu>
         </div>
+
     </div>;
 };
 
