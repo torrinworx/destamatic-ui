@@ -30,7 +30,8 @@ const hypertext = (useThemes, name, props, ...children) => {
 
 	let themeDefines;
 	if (useThemes) {
-		themeDefines = Observer.mutable(null).unwrap();
+		const defines = Observer.mutable(null);
+		themeDefines = defines.unwrap();
 
 		let _class = '';
 		if (props && 'class' in props) {
@@ -48,13 +49,17 @@ const hypertext = (useThemes, name, props, ...children) => {
 
 		signals.push(context => {
 			let cl = Theme.fromContext(context)(theme);
-			themeDefines.set(cl.defines);
+			defines.set(cl.defines);
 
 			if (_class) {
 				cl = Observer.all([cl, _class]).map(s => s.join(' '));
 			}
 
-			return cl.effect(cl => name.setAttribute('class', cl));
+			const remove = cl.effect(cl => name.setAttribute('class', cl));
+			return () => {
+				defines.set(null);
+				remove();
+			}
 		});
 	}
 
