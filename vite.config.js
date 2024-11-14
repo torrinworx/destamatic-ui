@@ -25,6 +25,7 @@ const plugins = [];
 plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {
 	jsx_auto_import: {
 		'h': 'destamatic-ui',
+		'mark': 'destamatic-ui',
 		'raw': {name: 'h', location: 'destam-dom'},
 	},
 }));
