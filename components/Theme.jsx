@@ -195,28 +195,25 @@ mount(document.head, <style>
 
 const getClasses = (trie, classes) => {
 	const out = [];
-	const current = trie.map(t => ({node: t}));
+	let current = trie.map(t => ({node: t}));
 	for (let ii = 0; ii < classes.length; ii++) {
 		const className = classes[ii];
 
 		const iter = [];
-		for (let i = 0; i < current.length; i++) {
-			const node = current[i];
-
+		current = current.flatMap(node => {
 			if (node.node.name !== className) {
-				continue;
+				return [node];
 			}
 
 			if (node.node.body) {
 				iter.push(node);
 			}
 
-			current.splice(i, 1, ...node.node.map(t => ({
+			return node.node.map(t => ({
 				node: t,
 				index: node.index == null ? ii : node.index,
-			})));
-			i += node.length - 1;
-		}
+			}));
+		});
 
 		out.push(...iter.sort((a, b) => a.index - b.index).map(a => a.node));
 	}
