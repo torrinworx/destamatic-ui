@@ -124,7 +124,7 @@ const hypertext = (useThemes, name, props, ...children) => {
 					if (parsed.length === 1 && typeof parsed[0] === 'string') {
 						return value;
 					} else {
-						return themeDefines.map(defines => Theme.getVar(parsed, defines)).unwrap();
+						return themeDefines.map(defines => defines ? Theme.getVar(parsed, defines) : null).unwrap();
 					}
 				};
 
