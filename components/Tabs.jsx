@@ -1,5 +1,5 @@
 import { Observer } from 'destam-dom';
-import { mark } from './h';
+import { mark, h } from './h';
 import Theme from './Theme';
 import Button from './Button';
 
