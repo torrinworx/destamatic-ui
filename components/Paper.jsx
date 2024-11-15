@@ -15,7 +15,7 @@ Theme.define({
 });
 
 const Paper = ({children, theme, tight, style}) => {
-    return <div theme={["primary_paper", theme]} style={{
+    return <div theme={["primary", theme, "paper"]} style={{
         padding: tight ? 0 : null,
         ...style
     }}>
