@@ -207,7 +207,7 @@ const getClasses = (trie, classes) => {
 				continue;
 			}
 
-			if (node.node.leaf) {
+			if (node.node.body) {
 				iter.push(node);
 			}
 
@@ -384,7 +384,6 @@ const createTheme = theme => {
 				current = next;
 			}
 
-			current.leaf = keys.length;
 			current.body = theme.observer.path(key).map(theme => {
 				const vars = new Map();
 				let index = 0;
