@@ -21,7 +21,11 @@ const theme = OObject({
 		boxSizing: 'border-box',
 		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
 		$color_text: 'black',
-
+	
+		/*
+		Adjusts the brightness of the input colour by shifting its value in the HSV colour space. Accepts colours
+		in hexadecimal, RGB, or HSV.
+		*/
 		$shiftBrightness: transformHSV((h, s, v, amount) => {
 			if (v > 0.5) {
 				v -= amount;
@@ -32,22 +36,64 @@ const theme = OObject({
 			return [h, s, v];
 		}),
 
+		/*
+		Adjusts the saturation of the input colour by shifting it's value in the HSV colour space. Accepts colours
+		in hexadecimal, RGB, or HSV.
+		*/
 		$saturate: transformHSV((h, s, v, amount) => {
 			return [h, s + amount, v];
 		}),
 
+		/*
+		Adjusts the hue of the input colour by shifting it's value in the HSV colour space. Accepts colours in
+		hexadecimal, RGB, or HSV.
+		*/
 		$hue: transformHSV((h, s, v, amount) => {
 			return [h + amount, s, v];
 		}),
 
+		/*
+		Inverts the RGB components of the input colour. Accepts colours in hexadecimal, RGB, or HSV.
+		*/
 		$invert: (c) => {
 			let [r, g, b, a] = color(c);
 			return color.toCSS([1 - r, 1 - g, 1 - b, a]);
 		},
 
+		/*
+		Applies an alpha (transparency) value to the input colour. Accepts colours in hexadecimal, RGB, or HSV.
+		*/
 		$alpha: (c, amount) => {
 			let [r, g, b] = color(c);
 			return color.toCSS([r, g, b, parseFloat(amount)]);
+		},
+
+		/*
+		Computes a contrast color (black or white) based on the luminance of the input colour to ensure readability
+		compliant with WCAG 2.0 AAA standards. Accepts colours in hexadecimal, RGB, or HSV.
+		*/
+		$contrast_text: (c) => {
+			const luminance = (r, g, b) => {
+				const adjust = (value) => {
+					value /= 255;
+					return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+				};
+				const [R, G, B] = [adjust(r), adjust(g), adjust(b)];
+				return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+			};
+
+			const contrastRatio = (L1, L2) => (L1 + 0.05) / (L2 + 0.05);
+
+			let [r, g, b, a] = color(c);
+			const backgroundLuminance = luminance(r, g, b);
+
+			const contrastBlack = contrastRatio(backgroundLuminance, luminance(0, 0, 0));
+			const contrastWhite = contrastRatio(luminance(255, 255, 255), backgroundLuminance);
+
+			// Select color with greater contrast, use black if equal.
+			const textColor = contrastBlack > contrastWhite ? [0, 0, 0, a] : [255, 255, 255, a];
+
+			return color.toCSS(textColor);
 		},
 	},
 
@@ -55,14 +101,14 @@ const theme = OObject({
 		$color: '#02CA9F',
 		$color_hover: '$shiftBrightness($color, 0.1)',
 		$color_error: 'red',
-		$color_top: 'white',
+		$color_top: '$contrast_text($color)',
 	},
 
 	secondary: {
 		$color: '#CCCCCC',
 		$color_hover: '$shiftBrightness($color, 0.1)',
 		$color_error: 'red',
-		$color_top: 'white',
+		$color_top: '$contrast_text($color)',
 	},
 
 	center: {
@@ -82,20 +128,20 @@ const theme = OObject({
 		outlineStyle: 'solid',
 	},
 
-    disabled: {
+	disabled: {
 		cursor: 'default',
 		pointerEvents: 'none',
 		backgroundColor: 'none',
 	},
-    disabledoverlay: {
-        position: 'absolute',
+	disabledoverlay: {
+		position: 'absolute',
 		top: 0,
 		left: 0,
 		right: 0,
 		bottom: 0,
 		backgroundColor: 'rgba(0, 0, 0, 0.2)',
 		pointerEvents: 'none',
-    },
+	},
 
 	focusable: {
 		borderStyle: 'solid',
@@ -154,7 +200,7 @@ const getVar = (item, exts) => {
 	let ret = null;
 	for (let i = 0; i < exts.length; i++) {
 		const current = ret;
-		ret = exts[i].body.map(({vars}) => {
+		ret = exts[i].body.map(({ vars }) => {
 			const val = vars.get(item.name);
 			if (val && (i < exts.length - 1 || val.index < item.index)) {
 				return getVar(val, exts.slice(0, i + 1));
@@ -172,9 +218,9 @@ const getVar = (item, exts) => {
 	return ret;
 };
 
-const Style = ({each: {node, name, defines, children}}) => {
+const Style = ({ each: { node, name, defines, children } }) => {
 	return <>
-		{node.body.map(({text}) => {
+		{node.body.map(({ text }) => {
 			if (!text.length) return null;
 
 			return ['.' + name + ' {\n', ...text.map(item => getVar(item, defines)), '\n}\n'];
@@ -195,7 +241,7 @@ mount(document.head, <style>
 
 const getClasses = (trie, classes) => {
 	const out = [];
-	let current = trie.map(t => ({node: t}));
+	let current = trie.map(t => ({ node: t }));
 	for (let ii = 0; ii < classes.length; ii++) {
 		const className = classes[ii];
 
@@ -243,11 +289,11 @@ const reducer = p => {
 		}
 
 		if (typeof item !== 'string') {
-			if (item.params) item = {...item, params: item.params.map(reducer)}
+			if (item.params) item = { ...item, params: item.params.map(reducer) }
 			acc.push(item);
 		} else if (typeof acc[acc.length - 1] === 'string') {
 			acc[acc.length - 1] += item;
-		} else if (acc.length !== 0 || item !== ' '){
+		} else if (acc.length !== 0 || item !== ' ') {
 			acc.push(item);
 		}
 
@@ -301,7 +347,7 @@ const parse = (val, index) => {
 				if (name === '') {
 					out.push('$');
 				} else {
-					out.push({name, params, index});
+					out.push({ name, params, index });
 				}
 			} else {
 				out.push(char);
@@ -392,7 +438,7 @@ const createTheme = theme => {
 						if (typeof val === 'string') {
 							val = parse(val, index);
 						} else {
-							val = {value: val};
+							val = { value: val };
 						}
 
 						val.index = index;
@@ -418,7 +464,7 @@ const createTheme = theme => {
 
 					if (key) split.push(key.substring(start).toLowerCase());
 
-					val.splice(0, 0,'\t' + split.join('-') + ": ");
+					val.splice(0, 0, '\t' + split.join('-') + ": ");
 					val.splice(val.length, 0, ';\n');
 
 					index++;
@@ -438,10 +484,10 @@ const createTheme = theme => {
 					exts = [];
 				}
 
-				return {text, vars, exts};
+				return { text, vars, exts };
 			}).unwrap();
 
-			current.defs = current.body.map(({exts}) =>
+			current.defs = current.body.map(({ exts }) =>
 				Observer.all(exts.map(node => node.defs)).map(arr => [...arr.flat(), current])).unwrap();
 		};
 
@@ -454,7 +500,7 @@ const createTheme = theme => {
 		});
 	}).unwrap();
 
-	const out = (...classes) =>{
+	const out = (...classes) => {
 		const defines = Observer.all([trie, ...classes.flat(Infinity).map(Observer.immutable)]).map(([trie, ...classes]) => {
 			classes = classes.flatMap(c => {
 				if (c == undefined) return [];
@@ -475,7 +521,7 @@ const createTheme = theme => {
 		const out = defines.map(insertStyle);
 		out.defines = defines;
 		out.vars = (name, ...params) =>
-			defines.map(defines => getVar({name, params: params.length ? params : null, index: Infinity}, defines)).unwrap();
+			defines.map(defines => getVar({ name, params: params.length ? params : null, index: Infinity }, defines)).unwrap();
 		return out;
 	};
 
@@ -483,7 +529,7 @@ const createTheme = theme => {
 	return out;
 };
 
-const Theme = createContext(createTheme(theme), (nextTheme, {theme: prevTheme}) => {
+const Theme = createContext(createTheme(theme), (nextTheme, { theme: prevTheme }) => {
 	const zip = (prev, next, prop) => {
 		if (prop === 'extends') {
 			if (!prev) prev = [];
