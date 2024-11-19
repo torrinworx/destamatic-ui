@@ -1,6 +1,19 @@
 import { h } from './h';
 import { Observer } from 'destam-dom';
 
+/**
+ * Drag component to enable dragging of its children elements within a relative context.
+ *
+ * @param {Object} props - The properties object.
+ * @param {JSX.Element} props.children - The element(s) to render within the draggable container.
+ * @param {Function} [props.onDragStart] - Callback function to be called when dragging starts.
+ * @param {Function} [props.onDrag] - Callback function to be called as the element is being dragged.
+ * @param {Function} [props.onDragEnd] - Callback function to be called when dragging ends.
+ * @param {boolean} [props.snapBack=false] - If true, the element will snap back to its original position upon drag end.
+ * @param {number} [props.lag=0.1] - The lag factor for the drag animation, determining how fast the movement catches up. Ranges from 0.1 to 1.
+ *
+ * @returns {JSX.Element} A draggable container wrapping its children.
+ */
 const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag = 0.1 }) => {
     if (lag < 0.1) lag = 0.1;
     if (lag > 1) lag = 1;
