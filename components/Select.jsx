@@ -54,28 +54,25 @@ export const Select = ({ value, options, display, style, menu }) => {
 		</div>;
 	};
 
-	return <span>
-		<Detached style={style} enabled={focused} menu={
-			menu ? menu :
-				<>
-					<Typography type='p1' style={{ display: 'inline' }}>
-						{value.map(val => {
-							if (options.get().includes(val)) {
-								return display(val);
-							} else {
-								return "None";
-							}
-						})}
-					</Typography>
-					<Icon lib="feather" name="play" size={16} style={{ marginLeft: 10, transform: 'rotate(90deg)' }} />
-				</>
-		}>
-			<Paper style={{ minWidth: 100, padding: 0, overflow: 'auto' }}>
-				<Selectable each={options} />
-			</Paper>
-		</Detached>
-		{popups}
-	</span>;
+	return <Detached style={style} enabled={focused} menu={
+		menu ? menu :
+			<>
+				<Typography type='p1' style={{ display: 'inline' }}>
+					{value.map(val => {
+						if (options.get().includes(val)) {
+							return display(val);
+						} else {
+							return "None";
+						}
+					})}
+				</Typography>
+				<Icon lib="feather" name="play" size={16} style={{ marginLeft: 10, transform: 'rotate(90deg)' }} />
+			</>
+	}>
+		<Paper style={{ minWidth: 100, padding: 0, overflow: 'auto' }}>
+			<Selectable each={options} />
+		</Paper>
+	</Detached>;
 };
 
 export default Select;
