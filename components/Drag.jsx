@@ -22,17 +22,13 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
 
     const isDragging = Observer.mutable(false);
     const currentPosition = Observer.mutable({ x: 0, y: 0 });
-    const originalPosition = Observer.mutable({ x: 0, y: 0 });
+    const originalPosition = Observer.mutable();
     const offset = Observer.mutable({ x: 0, y: 0 });
     const targetPosition = { x: 0, y: 0 };
 
     let parentElement = null;
     let draggableElement = null;
     let animationFrameId;
-
-    currentPosition.watch(d => {
-        console.log( 'targetPosition: ', targetPosition, ' currentPosition: ', d.value, ' originalPosition: ', originalPosition.get(), ' offset: ', offset.get());
-    });
 
     const updatePosition = () => {
         const diffX = targetPosition.x - currentPosition.get().x;
@@ -56,11 +52,23 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
         draggableElement = e.currentTarget;
         parentElement = draggableElement.parentNode;
 
-        const elementRect = draggableElement.getBoundingClientRect();
+        const parentRect = parentElement.getBoundingClientRect();
+        const dragRect = draggableElement.getBoundingClientRect();
+
+        if (!originalPosition.get()) {
+            originalPosition.set({
+                left: dragRect.left,
+                top: dragRect.top,
+                right: dragRect.right,
+                bottom: dragRect.bottom,
+                x: 0,
+                y: 0,
+            });    
+        }
 
         offset.set({
-            x: e.clientX - elementRect.left,
-            y: e.clientY - elementRect.top
+            x: e.clientX - parentRect.left - currentPosition.get().x,
+            y: e.clientY - parentRect.top - currentPosition.get().y
         });
 
         document.addEventListener('mousemove', handleMouseMove);
@@ -74,23 +82,28 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
     };
 
     const handleMouseMove = (e) => {
+        // Return early if not dragging or elements are not available
         if (!isDragging.get() || !parentElement || !draggableElement) return;
 
         const parentRect = parentElement.getBoundingClientRect();
 
+        // Calculate the new potential positions based on mouse movement
+        let newPosX = e.clientX - parentRect.left - offset.get().x;
+        let newPosY = e.clientY - parentRect.top - offset.get().y;
+
         if (constrainToParent) {
-            targetPosition.x = Math.min(
-                Math.max(e.clientX - parentRect.left - offset.get().x, 0),
-                parentRect.width - draggableElement.offsetWidth
+            newPosX = Math.max(
+                -originalPosition.get().left + parentRect.left,
+                Math.min(newPosX, parentRect.right - originalPosition.get().right)
             );
-            targetPosition.y = Math.min(
-                Math.max(e.clientY - parentRect.top - offset.get().y, 0),
-                parentRect.height - draggableElement.offsetHeight
+            newPosY = Math.max(
+                -originalPosition.get().top + parentRect.top,
+                Math.min(newPosY, parentRect.bottom - originalPosition.get().bottom)
             );
-        } else {
-            targetPosition.x = e.clientX - parentRect.left - offset.get().x;
-            targetPosition.y = e.clientY - parentRect.top - offset.get().y;
         }
+
+        targetPosition.x = newPosX;
+        targetPosition.y = newPosY;
 
         if (onDrag) onDrag(e);
     };

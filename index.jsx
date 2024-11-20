@@ -28,3 +28,5 @@ export { default as useRipples } from './components/Ripple.jsx';
 export { default as Popup } from './components/Popup.jsx';
 export { popups } from './components/Popup.jsx';
 export { default as Detached } from './components/Detached.jsx';
+export { default as Drag } from './components/Drag.jsx';
+export { default as DragGrid } from './components/DragGrid.jsx';
