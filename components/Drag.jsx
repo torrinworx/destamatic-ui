@@ -57,19 +57,22 @@ const Drag = ({
     const handleMouseDown = (e) => {
         e.preventDefault();
         isDragging.set(true);
+        parentElement = Ref.parentElement;
 
         const parentRect = parentElement.getBoundingClientRect();
         const dragRect = Ref.getBoundingClientRect();
 
-        if (!originalPosition.get()) {
-            originalPosition.set({
-                left: dragRect.left,
-                top: dragRect.top,
-                right: dragRect.right,
-                bottom: dragRect.bottom,
-                x: 0,
-                y: 0,
-            });
+        const position = {
+            left: dragRect.left,
+            top: dragRect.top,
+            right: dragRect.right,
+            bottom: dragRect.bottom,
+            x: 0,
+            y: 0,
+        }
+
+        if (position != originalPosition.get()){
+            originalPosition.set(position);
         }
 
         offset.set({
@@ -89,8 +92,6 @@ const Drag = ({
 
     const handleMouseMove = (e) => {
         const parentRect = parentElement.getBoundingClientRect();
-
-        // Calculate the new potential positions based on mouse movement
         let newPosX = e.clientX - parentRect.left - offset.get().x;
         let newPosY = e.clientY - parentRect.top - offset.get().y;
 
@@ -125,15 +126,6 @@ const Drag = ({
         }
         if (onDragEnd) onDragEnd(e);
     };
-
-    mount(() => {
-        parentElement = Ref.parentElement;
-
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        }
-    });
 
     return <Ref
         style={{
