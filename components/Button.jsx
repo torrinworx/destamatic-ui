@@ -7,7 +7,7 @@ import Typography from './Typography.jsx';
 
 Theme.define({
     button: {
-        extends: ['primary', 'center', 'radius'],
+        extends: ['center', 'radius'],
 
         padding: 10,
         userSelect: 'none',
@@ -86,7 +86,7 @@ const Button = ({
     hover,
     ref: Ref,
     children,
-    theme,
+    theme = "primary",
     ...props
 }) => {
     if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
