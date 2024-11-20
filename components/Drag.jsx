@@ -24,7 +24,7 @@ const Drag = ({
     snapBack = false,
     lag = 0.1,
     constrainToParent = false
-}, _, mount) => {
+}) => {
     if (lag < 0.1) lag = 0.1;
     if (lag > 1) lag = 1;
 
