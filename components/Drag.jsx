@@ -16,10 +16,19 @@ import { Observer } from 'destam-dom';
  * @returns {JSX.Element} A draggable container wrapping its children.
  */
 
-const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag = 0.1, constrainToParent = false }) => {
+const Drag = ({
+    children,
+    onDragStart,
+    onDrag,
+    onDragEnd,
+    snapBack = false,
+    lag = 0.1,
+    constrainToParent = false
+}, _, mount) => {
     if (lag < 0.1) lag = 0.1;
     if (lag > 1) lag = 1;
 
+    const Ref = <raw:div />
     const isDragging = Observer.mutable(false);
     const currentPosition = Observer.mutable({ x: 0, y: 0 });
     const originalPosition = Observer.mutable();
@@ -27,7 +36,6 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
     const targetPosition = { x: 0, y: 0 };
 
     let parentElement = null;
-    let draggableElement = null;
     let animationFrameId;
 
     const updatePosition = () => {
@@ -49,11 +57,9 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
     const handleMouseDown = (e) => {
         e.preventDefault();
         isDragging.set(true);
-        draggableElement = e.currentTarget;
-        parentElement = draggableElement.parentNode;
 
         const parentRect = parentElement.getBoundingClientRect();
-        const dragRect = draggableElement.getBoundingClientRect();
+        const dragRect = Ref.getBoundingClientRect();
 
         if (!originalPosition.get()) {
             originalPosition.set({
@@ -63,7 +69,7 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
                 bottom: dragRect.bottom,
                 x: 0,
                 y: 0,
-            });    
+            });
         }
 
         offset.set({
@@ -82,9 +88,6 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
     };
 
     const handleMouseMove = (e) => {
-        // Return early if not dragging or elements are not available
-        if (!isDragging.get() || !parentElement || !draggableElement) return;
-
         const parentRect = parentElement.getBoundingClientRect();
 
         // Calculate the new potential positions based on mouse movement
@@ -123,7 +126,16 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
         if (onDragEnd) onDragEnd(e);
     };
 
-    return <div
+    mount(() => {
+        parentElement = Ref.parentElement;
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+    });
+
+    return <Ref
         style={{
             cursor: 'move',
             userSelect: 'none',
@@ -135,12 +147,12 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
             padding: 0,
             display: 'inline-block',
             boxSizing: 'border-box',
-            transition: isDragging.map(i => i ? '' : 'left 0.3s ease, top 0.3s ease'),
+            transition: isDragging.map(i => i ? '' : 'left 0.5s ease, top 0.5s ease'),
         }}
         onMouseDown={handleMouseDown}
     >
         {children}
-    </div>;
+    </Ref>;
 };
 
 export default Drag;
