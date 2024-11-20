@@ -4,6 +4,8 @@ import Popup from './Popup';
 import Shown from './Shown';
 import Button from './Button';
 
+const clamp = (x, l, h) => Math.max(l, Math.min(h, x));
+
 const calculate = (bounds, rot) => {
 	const cardinals = [
 		bounds.left, bounds.top,
@@ -60,27 +62,21 @@ const Detached = ({ menu, type = 'text', children, enabled, style, icon, focusab
 				const bounds = popup.getBoundingClientRect();
 				const surround = A.getBoundingClientRect();
 
+				const ww = window.innerWidth;
+				const wh = window.innerHeight;
+
 				let fits = [];
 				for (const rot of [6, 5, 1, 2, 0, 7, 3, 4]) {
 					const calc = calculate(surround, rot);
 
-					if ('right' in calc) calc.left = window.innerWidth - calc.right - Math.min(bounds.width, calc.maxWidth);
-					if ('left' in calc) calc.right = window.innerWidth - calc.left - Math.min(bounds.width, calc.maxWidth);
-					if ('bottom' in calc) calc.top = window.innerHeight - calc.bottom - Math.min(bounds.height, calc.maxHeight);
-					if ('top' in calc) calc.bottom = window.innerHeight - calc.top - Math.min(bounds.height, calc.maxHeight);
+					if ('right' in calc) calc.left = ww - calc.right - Math.min(bounds.width, calc.maxWidth);
+					if ('left' in calc) calc.right = ww - calc.left - Math.min(bounds.width, calc.maxWidth);
+					if ('bottom' in calc) calc.top = wh - calc.bottom - Math.min(bounds.height, calc.maxHeight);
+					if ('top' in calc) calc.bottom = wh - calc.top - Math.min(bounds.height, calc.maxHeight);
 
-					const isWithin = (val, min, max) => val >= min && val <= max;
-
-					if (
-						isWithin(calc.left, 0, window.innerWidth) &&
-						isWithin(calc.right, 0, window.innerWidth) &&
-						isWithin(calc.top, 0, window.innerHeight) &&
-						isWithin(calc.bottom, 0, window.innerHeight)
-					) {
-						let width = (window.innerWidth - calc.right) - calc.left;
-						let height = (window.innerHeight - calc.bottom) - calc.top;
-						fits.push({ size: width * height, rot });
-					}
+					const width = clamp(ww - calc.right, 0, ww) - clamp(calc.left, 0, ww);
+					const height = clamp(wh - calc.bottom, 0, wh) - clamp(calc.top, 0, wh);
+					fits.push({ size: width * height, rot });
 				}
 
 				fits.sort((a, b) => b.size - a.size);
