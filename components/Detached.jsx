@@ -43,6 +43,16 @@ const Detached = ({ menu, type = 'text', children, enabled, style, icon, focusab
 	const A = <raw:button />;
 	const popup = <raw:div />;
 
+	const computed = Observer.mutable(false);
+
+	const Contents = ({}, cleanup, mounted) => {
+		mounted(() => {
+			computed.set(true);
+		});
+
+		return children;
+	};
+
 	return <>
 		<Button
 			type={[
@@ -58,6 +68,7 @@ const Detached = ({ menu, type = 'text', children, enabled, style, icon, focusab
 					return;
 				}
 
+				computed.set(false);
 				focused.set(true);
 				const bounds = popup.getBoundingClientRect();
 				const surround = A.getBoundingClientRect();
@@ -100,10 +111,10 @@ const Detached = ({ menu, type = 'text', children, enabled, style, icon, focusab
 					return calculate(bounds, rot);
 				}).setter(() => focused.set(false))}
 				style={{
-					visibility: 'visible',
+					visibility: computed.map(c => c ? 'visible' : 'hidden'),
 				}}
 			>
-				{children}
+				<Contents />
 			</Popup>
 		</Shown>
 	</>;
