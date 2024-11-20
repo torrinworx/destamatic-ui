@@ -104,8 +104,8 @@ const Button = ({
 
     return <Ref
         theme={[
-            'button',
             theme,
+            'button',
             type,
             hover.map(h => h ? 'hovered' : null),
             disabled.map(d => d ? 'disabled' : null),
