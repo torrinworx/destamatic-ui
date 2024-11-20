@@ -15,6 +15,7 @@ import { Observer } from 'destam-dom';
  *
  * @returns {JSX.Element} A draggable container wrapping its children.
  */
+
 const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag = 0.1, constrainToParent = false }) => {
     if (lag < 0.1) lag = 0.1;
     if (lag > 1) lag = 1;
@@ -28,6 +29,10 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
     let parentElement = null;
     let draggableElement = null;
     let animationFrameId;
+
+    currentPosition.watch(d => {
+        console.log( 'targetPosition: ', targetPosition, ' currentPosition: ', d.value, ' originalPosition: ', originalPosition.get(), ' offset: ', offset.get());
+    });
 
     const updatePosition = () => {
         const diffX = targetPosition.x - currentPosition.get().x;
@@ -52,7 +57,6 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
         parentElement = draggableElement.parentNode;
 
         const elementRect = draggableElement.getBoundingClientRect();
-        const parentRect = parentElement.getBoundingClientRect();
 
         offset.set({
             x: e.clientX - elementRect.left,
@@ -100,6 +104,8 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
 
         if (snapBack) {
             currentPosition.set(originalPosition.get());
+            targetPosition.x = originalPosition.x;
+            targetPosition.y = originalPosition.y;
         }
         if (onDragEnd) onDragEnd(e);
     };
@@ -110,21 +116,15 @@ const Drag = ({ children, onDragStart, onDrag, onDragEnd, snapBack = false, lag 
             userSelect: 'none',
             position: 'relative',
             left: currentPosition.map(pos => `${pos.x}px`),
-
-            // Strang offset of 3.7px that happens on load of component that impacts the position calculation:
-            top: currentPosition.map(pos => `${pos.y - 3.7}px`),
+            top: currentPosition.map(pos => `${pos.y}px`),
             lineHeight: 0,
             margin: 0,
             padding: 0,
             display: 'inline-block',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            transition: isDragging.map(i => i ? '' : 'left 0.3s ease, top 0.3s ease'),
         }}
-        onMouseDown={(e) => {
-            if (!isDragging.get()) {
-                originalPosition.set(currentPosition.get());
-            }
-            handleMouseDown(e);
-        }}
+        onMouseDown={handleMouseDown}
     >
         {children}
     </div>;
