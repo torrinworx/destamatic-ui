@@ -84,7 +84,7 @@ mount(document.body, <div style={{ padding: '20px' }}>
         type="contained"
         onMouseDown={() => orienationToggle.set(orienationToggle.get() === 'row' ? 'column' : 'row')}
     />
-    <Typography type='h5'>Draggable List (Row)</Typography>
+    <Typography type='h5'>Draggable List ({orienationToggle})</Typography>
     <DragGrid
         items={items}
         orientation={orienationToggle}
