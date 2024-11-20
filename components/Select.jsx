@@ -36,7 +36,7 @@ export const Select = ({ value, options, display, style, menu }) => {
 	const selector = value.selector('selected', null);
 
 	const Selectable = ({ each: option }) => {
-		const [ripples, createRipple] = useRipples('rgba(0, 0, 0, 0.3)');
+		const [ripples, createRipple] = useRipples();
 
 		return <div
 			theme={[
