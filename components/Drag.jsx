@@ -23,24 +23,23 @@ const Drag = ({
     onDragEnd,
     snapBack = false,
     lag = 0.1,
-    constrainToParent = false
+    constrainToParent = false,
+    ref: Ref = <raw:div />,
+    originRect = Observer.mutable()
 }) => {
     if (lag < 0.1) lag = 0.1;
     if (lag > 1) lag = 1;
 
-    const Ref = <raw:div />
     const isDragging = Observer.mutable(false);
-    const currentPosition = Observer.mutable({ x: 0, y: 0 });
-    const originalPosition = Observer.mutable();
     const offset = Observer.mutable({ x: 0, y: 0 });
-    const targetPosition = { x: 0, y: 0 };
+    const currentPosition = Observer.mutable({ x: 0, y: 0 });
 
-    let parentElement = null;
+    let newPos = { x: 0, y: 0 }
     let animationFrameId;
 
     const updatePosition = () => {
-        const diffX = targetPosition.x - currentPosition.get().x;
-        const diffY = targetPosition.y - currentPosition.get().y;
+        const diffX = newPos.x - currentPosition.get().x;
+        const diffY = newPos.y - currentPosition.get().y;
 
         if (Math.abs(diffX) > 0.1 || Math.abs(diffY) > 0.1) {
             currentPosition.set({
@@ -57,22 +56,12 @@ const Drag = ({
     const handleMouseDown = (e) => {
         e.preventDefault();
         isDragging.set(true);
-        parentElement = Ref.parentElement;
 
-        const parentRect = parentElement.getBoundingClientRect();
+        const parentRect = Ref.parentElement.getBoundingClientRect();
         const dragRect = Ref.getBoundingClientRect();
 
-        const position = {
-            left: dragRect.left,
-            top: dragRect.top,
-            right: dragRect.right,
-            bottom: dragRect.bottom,
-            x: 0,
-            y: 0,
-        }
-
-        if (position != originalPosition.get()){
-            originalPosition.set(position);
+        if (!originRect.get()) {
+            originRect.set(dragRect);
         }
 
         offset.set({
@@ -91,23 +80,20 @@ const Drag = ({
     };
 
     const handleMouseMove = (e) => {
-        const parentRect = parentElement.getBoundingClientRect();
-        let newPosX = e.clientX - parentRect.left - offset.get().x;
-        let newPosY = e.clientY - parentRect.top - offset.get().y;
+        const parentRect = Ref.parentElement.getBoundingClientRect();
+        newPos.x = e.clientX - parentRect.left - offset.get().x;
+        newPos.y = e.clientY - parentRect.top - offset.get().y;
 
         if (constrainToParent) {
-            newPosX = Math.max(
-                -originalPosition.get().left + parentRect.left,
-                Math.min(newPosX, parentRect.right - originalPosition.get().right)
+            newPos.x = Math.max(
+                -originRect.get().left + parentRect.left,
+                Math.min(newPos.x, parentRect.right - originRect.get().right)
             );
-            newPosY = Math.max(
-                -originalPosition.get().top + parentRect.top,
-                Math.min(newPosY, parentRect.bottom - originalPosition.get().bottom)
+            newPos.y = Math.max(
+                -originRect.get().top + parentRect.top,
+                Math.min(newPos.y, parentRect.bottom - originRect.get().bottom)
             );
         }
-
-        targetPosition.x = newPosX;
-        targetPosition.y = newPosY;
 
         if (onDrag) onDrag(e);
     };
@@ -120,12 +106,22 @@ const Drag = ({
         animationFrameId = null;
 
         if (snapBack) {
-            currentPosition.set(originalPosition.get());
-            targetPosition.x = originalPosition.x;
-            targetPosition.y = originalPosition.y;
+            currentPosition.set({ x: 0, y: 0 });
+            newPos.x = 0;
+            newPos.y = 0;
         }
         if (onDragEnd) onDragEnd(e);
     };
+
+    // Meant to snap back component to new originRect
+    if (snapBack) {
+        originRect.watch(() => {
+            
+            currentPosition.set({ x: 0, y: 0 });
+            newPos.x = 0;
+            newPos.y = 0;
+        })
+    }
 
     return <Ref
         style={{
