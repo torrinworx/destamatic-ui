@@ -7,4 +7,5 @@ export const sizeProperties = new Set([
 	'inset', 'borderRadius',
 	'fontSize',
 	'outlineWidth', 'borderWidth', 'outline', 'border',
+	'gap',
 ]);
