@@ -22,58 +22,10 @@ const DragDots = ({ size = 8 }) => <div style={{ display: 'inline-block' }}>
 
 // Initial items array wrapped in OArray to enable drag and drop reactivity.
 const items = OArray([
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button
-            Icon={<DragDots size={5} />}
-            type="text"
-            onMouseDown={() => { }}
-            title={"Drag to re-order"}
-            style={{
-                cursor: 'move',
-                userSelect: 'none',
-            }}
-        />
-        <Typography type='p1' style={{ marginLeft: '8px' }}>Item 1</Typography>
-    </div>,
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button
-            Icon={<DragDots size={5} />}
-            type="text"
-            onMouseDown={() => { }}
-            title={"Drag to re-order"}
-            style={{
-                cursor: 'move',
-                userSelect: 'none',
-            }}
-        />
-        <Typography type='p1' style={{ marginLeft: '8px' }}>Item 2</Typography>
-    </div>,
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button
-            Icon={<DragDots size={5} />}
-            type="text"
-            onMouseDown={() => { }}
-            title={"Drag to re-order"}
-            style={{
-                cursor: 'move',
-                userSelect: 'none',
-            }}
-        />
-        <Typography type='p1' style={{ marginLeft: '8px' }}>Item 2</Typography>
-    </div>,
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-        <Button
-            Icon={<DragDots size={5} />}
-            type="text"
-            onMouseDown={() => { }}
-            title={"Drag to re-order"}
-            style={{
-                cursor: 'move',
-                userSelect: 'none',
-            }}
-        />
-        <Typography type='p1' style={{ marginLeft: '8px' }}>Item 3</Typography>
-    </div>,
+    "Item 1",
+    "Item 2",
+    "Item 3",
+    "Item 4",
 ]);
 
 const orienationToggle = Observer.mutable('row');
