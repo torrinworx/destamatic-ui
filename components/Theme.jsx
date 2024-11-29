@@ -288,7 +288,9 @@ const reducer = p => {
 			return acc;
 		}
 
-		if (typeof item !== 'string') {
+		if (Array.isArray(item)) {
+			acc.push(reducer(item));
+		} else if (typeof item !== 'string') {
 			if (item.params) item = { ...item, params: item.params.map(reducer) }
 			acc.push(item);
 		} else if (typeof acc[acc.length - 1] === 'string') {
@@ -400,6 +402,30 @@ const insertStyle = defines => {
 	return found.join(' ');
 };
 
+const buildProperty = (key, val, index) => {
+	if (typeof val === 'number' && sizeProperties.has(key)) {
+		val = [val + 'px'];
+	} else {
+		val = parse(val, index);
+	}
+
+	const split = [];
+	let start = 0;
+	for (let i = 0; i < key.length; i++) {
+		if (key[i].toLowerCase() !== key[i]) {
+			split.push(key.substring(start, i).toLowerCase());
+			start = i;
+		}
+	}
+
+	if (key) split.push(key.substring(start).toLowerCase());
+
+	val.splice(0, 0, '\t' + split.join('-') + ": ");
+	val.splice(val.length, 0, ';\n');
+
+	return val;
+};
+
 const createTheme = theme => {
 	const trie = ignoreMutates(theme.observer.shallow()).map(theme => {
 		const trie = [];
@@ -429,48 +455,54 @@ const createTheme = theme => {
 
 			current.body = theme.observer.path(key).map(theme => {
 				const vars = new Map();
+				const raw = [];
 				let index = 0;
 
 				let text = Object.entries(theme).flatMap(([key, val]) => {
 					if (key === 'extends') return '';
 
-					if (key.charAt(0) === '$') {
+					let directive = 'prop';
+					if (key.charAt(0) === '_') {
+						const del = key.indexOf('_', 1);
+						directive = key.substring(1, del);
+						key = key.substring(del + 1);
+					} else if (key.charAt(0) === '$') {
+						directive = 'var';
+						key = key.substring(1);
+					}
+
+					if (directive === 'prop') {
+						return buildProperty(key, val, index++);
+					}
+
+					if (directive === 'elem') {
+						raw.push([key, '.', {type: 'name'}, ' {\n'], ...Object.entries(val).flatMap(([key, val]) => {
+							return buildProperty(key, val, index);
+						}), '\n}\n');
+					} else if (directive === 'keyframes') {
+						raw.push(['@keyframes ', {type: 'name'}, '-', key, ' {\n'], val, '\n}\n');
+
+						const v = [{type: 'name'}, '-' + key];
+						v.index = index++;
+						vars.set(key, v);
+					} else if (directive === 'var') {
 						if (typeof val === 'string') {
 							val = parse(val, index);
 						} else {
 							val = { value: val };
 						}
 
-						val.index = index;
-						vars.set(key.substring(1), val);
-						index++;
-						return '';
-					}
-
-					if (typeof val === 'number' && sizeProperties.has(key)) {
-						val = [val + 'px'];
+						val.index = index++;
+						vars.set(key, val);
 					} else {
-						val = parse(val, index);
+						throw new Error("Unknown theme directive: " + directive);
 					}
 
-					const split = [];
-					let start = 0;
-					for (let i = 0; i < key.length; i++) {
-						if (key[i].toLowerCase() !== key[i]) {
-							split.push(key.substring(start, i).toLowerCase());
-							start = i;
-						}
-					}
-
-					if (key) split.push(key.substring(start).toLowerCase());
-
-					val.splice(0, 0, '\t' + split.join('-') + ": ");
-					val.splice(val.length, 0, ';\n');
-
-					index++;
-					return val;
+					return '';
 				});
 
+				if (text.length) text = [['.', {type: 'name'}, ' {\n'], ...text, '\n}\n'];
+				text.push(...raw);
 
 				text = reducer(text);
 
