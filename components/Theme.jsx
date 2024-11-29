@@ -232,10 +232,6 @@ const Style = ({ each: { node, name, defines, children } }) => {
 const styles = OArray();
 // TODO: Find a better way to handle keyframes and css special cases
 mount(document.head, <style>
-	{`@keyframes dotFlashing {
-		0%, 100% { opacity: 0; }
-		50% { opacity: 1; }
-	}`}
 	<Style each={styles} />
 </style>);
 
