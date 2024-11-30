@@ -21,7 +21,7 @@ const theme = OObject({
 		boxSizing: 'border-box',
 		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
 		$color_text: 'black',
-	
+
 		/*
 		Adjusts the brightness of the input colour by shifting its value in the HSV colour space. Accepts colours
 		in hexadecimal, RGB, or HSV.
@@ -170,13 +170,13 @@ const theme = OObject({
 	}
 });
 
-const getVar = (item, exts) => {
+const getVar = (item, exts, name) => {
 	if (Array.isArray(item)) {
 		const items = [];
 		const out = [];
 
 		for (let i of item) {
-			i = getVar(i, exts);
+			i = getVar(i, exts, name);
 
 			if (i instanceof Observer) {
 				const index = items.length;
@@ -188,7 +188,7 @@ const getVar = (item, exts) => {
 		}
 
 		if (items.length === 0) {
-			return Observer.immutable(item.join(''));
+			return Observer.immutable(out.map(p => p()).join(''));
 		}
 
 		return Observer.all(items).map(res => out.map(p => p(res)).join(''));
@@ -196,6 +196,7 @@ const getVar = (item, exts) => {
 
 	if (typeof item === 'string') return item;
 	if ('value' in item) return item.value;
+	if (item.type === 'name') return name;
 
 	let ret = null;
 	for (let i = 0; i < exts.length; i++) {
@@ -203,7 +204,7 @@ const getVar = (item, exts) => {
 		ret = exts[i].body.map(({ vars }) => {
 			const val = vars.get(item.name);
 			if (val && (i < exts.length - 1 || val.index < item.index)) {
-				return getVar(val, exts.slice(0, i + 1));
+				return getVar(val, exts.slice(0, i + 1), name);
 			}
 
 			if (current === null) console.warn("Theme name is not defined but used: " + item.name);
@@ -212,19 +213,15 @@ const getVar = (item, exts) => {
 	}
 
 	if (item.params) ret = Observer
-		.all([ret, ...item.params.map(param => getVar(param, exts))])
+		.all([ret, ...item.params.map(param => getVar(param, exts, name))])
 		.map(([func, ...params]) => func(...params));
 
 	return ret;
 };
 
-const Style = ({ each: { node, name, defines, children } }) => {
+const Style = ({ each: { node, name, extras, defines, children } }) => {
 	return <>
-		{node.body.map(({ text }) => {
-			if (!text.length) return null;
-
-			return ['.' + name + ' {\n', ...text.map(item => getVar(item, defines)), '\n}\n'];
-		})}
+		{node.body.map(({ text }) => text.map(item => getVar(item, defines, name)))}
 		<Style each={children} />
 	</>;
 };
