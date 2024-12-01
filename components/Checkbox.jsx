@@ -10,6 +10,15 @@ Theme.define({
 		height: '20px',
 		width: '20px'
 	},
+	checkboxOverlay: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(0, 0, 0, 0.2)',
+		pointerEvents: 'none',
+	},
 	checkboxwrapper: {
 		display: 'flex',
 		flexWrap: 'wrap'
@@ -93,7 +102,7 @@ const Checkbox = ({ value, onChange, invert = false, disabled, style, ...props }
 				$checked={value}
 				{...props}
 			/>
-			<span draggable="false" theme={[disabled.map(d => d ? 'disabledoverlay' : null)]} />
+			<span draggable="false" theme={[disabled.map(d => d ? 'checkboxOverlay' : null)]} />
 			{ripples}
 		</Span>
 
