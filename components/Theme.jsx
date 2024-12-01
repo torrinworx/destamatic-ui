@@ -183,13 +183,35 @@ const theme = OObject({
 	}
 });
 
-const getVar = (item, exts, name) => {
+const varWalk = (item, exts) => {
+	let ret = null;
+	for (let i = 0; i < exts.length; i++) {
+		const current = ret;
+		ret = exts[i].body.map(({ vars }) => {
+			const val = vars.get(item.name);
+			if (val && (i < exts.length - 1 || val.index < item.index)) {
+				return getVar(val, exts.slice(0, i + 1), name);
+			}
+
+			if (current === null) console.warn("Theme name is not defined but used: " + item.name);
+			return current;
+		}).unwrap();
+	}
+
+	if (item.params) ret = Observer
+		.all([ret, ...item.params.map(param => getVar(param, exts))])
+		.map(([func, ...params]) => func(...params));
+
+	return ret;
+};
+
+const getVar = (item, exts) => {
 	if (Array.isArray(item)) {
 		const items = [];
 		const out = [];
 
 		for (let i of item) {
-			i = getVar(i, exts, name);
+			i = getVar(i, exts);
 
 			if (i instanceof Observer) {
 				const index = items.length;
@@ -209,32 +231,35 @@ const getVar = (item, exts, name) => {
 
 	if (typeof item === 'string') return item;
 	if ('value' in item) return item.value;
-	if (item.type === 'name') return name;
 
-	let ret = null;
-	for (let i = 0; i < exts.length; i++) {
-		const current = ret;
-		ret = exts[i].body.map(({ vars }) => {
-			const val = vars.get(item.name);
-			if (val && (i < exts.length - 1 || val.index < item.index)) {
-				return getVar(val, exts.slice(0, i + 1), name);
-			}
+	if (!item.cache) return varWalk(item, exts);
 
-			if (current === null) console.warn("Theme name is not defined but used: " + item.name);
-			return current;
-		}).unwrap();
+	let elem = item.cache;
+	for (const ext of exts) {
+		let next = elem.get(ext);
+		if (!next) {
+			next = new WeakMap();
+			elem.set(ext, next);
+		}
+
+		elem = next;
 	}
 
-	if (item.params) ret = Observer
-		.all([ret, ...item.params.map(param => getVar(param, exts, name))])
-		.map(([func, ...params]) => func(...params));
+	if (!elem.value) {
+		elem.value = varWalk(item, exts);
+	}
 
-	return ret;
+	return elem.value;
 };
 
+
+const nameItem = Symbol();
 const Style = ({ each: { node, name, extras, defines, children } }) => {
 	return <>
-		{node.body.map(({ text }) => text.map(item => getVar(item, defines, name)))}
+		{node.body.map(({ text }) => text.map(item => {
+			if (item === nameItem) return name;
+			return getVar(item, defines);
+		}))}
 		<Style each={children} />
 	</>;
 };
@@ -355,7 +380,7 @@ const parse = (val, index) => {
 				if (name === '') {
 					out.push('$');
 				} else {
-					out.push({ name, params, index });
+					out.push({ name, params, index, cache: new WeakMap() });
 				}
 			} else {
 				out.push(char);
@@ -432,7 +457,10 @@ const buildProperty = (key, val, index) => {
 	return val;
 };
 
+let themeIDCounter = 0;
 const createTheme = theme => {
+	const themeID = themeIDCounter++;
+
 	const trie = ignoreMutates(theme.observer.shallow()).map(theme => {
 		const trie = [];
 		trie.cache = new Map();
@@ -482,13 +510,14 @@ const createTheme = theme => {
 					}
 
 					if (directive === 'elem') {
-						raw.push([key, '.', {type: 'name'}, ' {\n'], ...Object.entries(val).flatMap(([key, val]) => {
+						raw.push(key, '.', nameItem, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
 							return buildProperty(key, val, index);
 						}), '\n}\n');
 					} else if (directive === 'keyframes') {
-						raw.push(['@keyframes ', {type: 'name'}, '-', key, ' {\n'], val, '\n}\n');
+						const name = key + themeID;
+						raw.push('@keyframes ', name, '-', key, ' {\n', val, '\n}\n');
 
-						const v = [{type: 'name'}, '-' + key];
+						const v = [name, '-' + key];
 						v.index = index++;
 						vars.set(key, v);
 					} else if (directive === 'var') {
@@ -507,7 +536,7 @@ const createTheme = theme => {
 					return '';
 				});
 
-				if (text.length) text = [['.', {type: 'name'}, ' {\n'], ...text, '\n}\n'];
+				if (text.length) text = ['.', nameItem, ' {\n', ...text, '\n}\n'];
 				text.push(...raw);
 
 				text = reducer(text);
