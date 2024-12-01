@@ -27,6 +27,10 @@ Theme.define({
         width: `$size$px`,
         height: `$size$px`,
         background: '$color',
+
+        position: 'absolute',
+        top: '50%',
+        borderRadius: '50%',
     },
 });
 
@@ -49,10 +53,7 @@ const Thumb = ({
             disabled.map(d => d ? 'disabled' : null),
         ]}
         style={{
-            position: 'absolute',
-            top: '50%',
             left: position,
-            borderRadius: '50%',
             transform: 'translate(-50%, -50%)',
             cursor,
             ...style
