@@ -15,6 +15,10 @@ const transformHSV = callback => (c, ...params) => {
 	return color.toCSS([r, g, b, a]);
 };
 
+const math = cb => (a, b) => {
+	return String(cb(parseFloat(a), parseFloat(b)));
+};
+
 const theme = OObject({
 	"*": {
 		fontFamily: 'Roboto, sans-serif',
@@ -95,6 +99,15 @@ const theme = OObject({
 
 			return color.toCSS(textColor);
 		},
+
+		$add: math((a, b) => a + b),
+		$sub: math((a, b) => a - b),
+		$div: math((a, b) => a / b),
+		$mul: math((a, b) => a * b),
+		$mod: math((a, b) => a % b),
+		$floor: a => String(Math.floor(parseFloat(a))),
+		$ceil: a => String(Math.ceil(parseFloat(a))),
+		$round: a => String(Math.round(parseFloat(a))),
 	},
 
 	primary: {
