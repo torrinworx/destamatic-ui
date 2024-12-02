@@ -105,6 +105,8 @@ const theme = OObject({
 		$div: math((a, b) => a / b),
 		$mul: math((a, b) => a * b),
 		$mod: math((a, b) => a % b),
+		$min: math(Math.min),
+		$max: math(Math.max),
 		$floor: a => String(Math.floor(parseFloat(a))),
 		$ceil: a => String(Math.ceil(parseFloat(a))),
 		$round: a => String(Math.round(parseFloat(a))),
@@ -495,7 +497,7 @@ const createTheme = theme => {
 					}
 
 					if (directive === 'prop') {
-						return buildProperty(key, val, index++);
+						return buildProperty(key, val, index);
 					}
 
 					if (directive === 'elem') {
