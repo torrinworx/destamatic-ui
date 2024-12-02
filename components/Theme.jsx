@@ -602,7 +602,7 @@ const Theme = createContext(createTheme(theme), (nextTheme, { theme: prevTheme }
 				return prev.concat(next);
 			}
 		} else if (typeof prev === 'object' && typeof next === 'object') {
-			const keys = new Set([...Object.keys(prev), ...Object.keys(next)]);
+			const keys = new Set([...Object.keys(next), ...Object.keys(prev)]);
 
 			let out;
 			if (prev instanceof OObject || next instanceof OObject) {
