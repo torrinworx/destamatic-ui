@@ -181,7 +181,7 @@ const varWalk = (item, exts) => {
 		ret = exts[i].body.map(({ vars }) => {
 			const val = vars.get(item.name);
 			if (val && (i < exts.length - 1 || val.index < item.index)) {
-				return getVar(val, exts.slice(0, i + 1), name);
+				return getVar(val, exts.slice(0, i + 1));
 			}
 
 			if (current === null) console.warn("Theme name is not defined but used: " + item.name);
@@ -222,7 +222,6 @@ const getVar = (item, exts) => {
 
 	if (typeof item === 'string') return item;
 	if ('value' in item) return item.value;
-
 	if (!item.cache) return varWalk(item, exts);
 
 	let elem = item.cache;
