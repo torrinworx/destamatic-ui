@@ -50,6 +50,15 @@ Theme.define({
         borderColor: '$color_hover',
     },
 
+    button_outlined_disabled: {
+        borderColor: '$saturate($color, -1)',
+        color: '$saturate($color, -1)',
+    },
+
+    button_contained_disabled: {
+        background: '$saturate($color, -1)',
+    },
+
     text: {
         extends: 'typography_p1_regular',
     },

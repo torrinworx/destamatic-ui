@@ -144,7 +144,6 @@ const theme = OObject({
 	disabled: {
 		cursor: 'default',
 		pointerEvents: 'none',
-		backgroundColor: 'none',
 	},
 
 	focusable: {
