@@ -1,6 +1,6 @@
-import { h } from './h';
+import { h } from '../utils/h';
 import { Observer } from 'destam-dom';
-import Theme from './Theme';
+import Theme from '../utils/Theme';
 
 Theme.define({
     slider: {

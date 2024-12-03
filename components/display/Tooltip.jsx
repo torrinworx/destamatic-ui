@@ -1,11 +1,11 @@
-import { h } from './h';
+import { h } from '../utils/h';
 
 import { Observer } from 'destam-dom';
 
-import Shown from './Shown';
-import Popup from './Popup';
-import Theme from './Theme';
-import Button from './Button';
+import Shown from '../utils/Shown';
+import Popup from '../utils/Popup';
+import Theme from '../utils/Theme';
+import Button from '../inputs/Button';
 
 Theme.define({
 	tooltip: {

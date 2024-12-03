@@ -1,6 +1,6 @@
 import { Observer  } from 'destam-dom';
-import { h } from './h';
-import Theme from './Theme';
+import { h } from '../utils/h';
+import Theme from '../utils/Theme';
 
 Theme.define({
     field_area: {

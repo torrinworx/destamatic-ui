@@ -1,5 +1,5 @@
 import {mount, Observer, OObject} from 'destam-dom';
-import {Theme, Button} from '..';
+import {Theme, Button} from '../..';
 
 const MyComponent = ({type}) => {
 	const hovered = Observer.mutable(false);

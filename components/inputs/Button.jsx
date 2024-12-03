@@ -1,9 +1,9 @@
-import { h } from './h';
+import { h } from '../utils/h';
 import { Observer } from 'destam-dom';
 
-import Theme from './Theme.jsx';
-import useRipples from './Ripple.jsx';
-import Typography from './Typography.jsx';
+import Theme from '../utils/Theme';
+import useRipples from '../utils/Ripple';
+import Typography from '../display/Typography';
 
 Theme.define({
     button: {

@@ -1,5 +1,5 @@
+import { h } from '../utils/h';
 import Observer from 'destam/Observer';
-import { h } from './h';
 
 // Takes value as an observer
 const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error, autoselect, onFocus, theme, ...props }) => {

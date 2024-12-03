@@ -1,9 +1,10 @@
 import { h, mount, Observer, OObject, OArray } from "destam-dom";
-import createContext from './Context';
-import { sizeProperties } from '../util/index.js';
 import { atomic } from 'destam/Network';
 import { Insert, Delete } from 'destam/Events';
-import color from '../util/color.js';
+
+import color from '../../util/color.js';
+import createContext from './Context';
+import { sizeProperties } from '../../util/index.js';
 
 const transformHSV = callback => (c, ...params) => {
 	let [r, g, b, a] = color(c);

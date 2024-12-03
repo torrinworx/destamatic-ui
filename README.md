@@ -8,20 +8,17 @@ A lightweight component library powered by `destam` and `destam-dom`.
 
 ---
 
-Destamatic UI is a simple ui library built on the delta state management library [destam](https://github.com/equator-studios/destam) and dom manipulation library [destam-dom](https://github.com/Nefsen402/destam-dom). The base set of components take insperation from MUI and the base HTML tags, with some ease-of-use built in.
+Destamatic UI is a UI library built on the delta state management library [destam](https://github.com/equator-studios/destam) and the DOM manipulation library [destam-dom](https://github.com/Nefsen402/destam-dom). The base set of components take inspiration from MUI and the base HTML tags, with some ease-of-use built in.
 
-## Install
-```bash
-npm i destamatic-ui
-```
+## Features Overview
+Destamatic UI offers a range of components designed for responsive and interactive web interfaces. Key features include:
 
-## Notes
-[destam](https://github.com/equator-studios/destam) and [destam-dom](https://github.com/Nefsen402/destam-dom) are both required to run this library.
+- **State Management Integration:** Built on `destam`, effortless state management across components.
+- **Built in reactivity:** Uses `destam-dom` for efficient DOM manipulations and updates without the need for a virtual dom.
+- **Theming:** Customizable and reactive theming for consistent, application-wide style and appearance.
+- **Component Library:** Includes navigational, input, and display components inspired by material design principles.
 
-Optional libraries:
-- [prismjs](https://github.com/PrismJS/prism) - Adds language specific syntax highlighting for CodeBlock component.
-- [Feather](https://github.com/feathericons/feather) - Icon library used in with the Icon component
-- [Material Icons](https://github.com/marella/material-icons) - Icon library used with the Icon component
+For a detailed overview of the components and their functionalities, refer to the [documentation](./docs/index.md).
 
 ## Demo
 You can install and run the demo with the following steps:
@@ -37,26 +34,14 @@ npm i
 
 3. Run the demo:
 ```bash
-npm start
+npm run dev
 ```
 
-This will start the webpack dev server on localhost:3000, this has a small demo page showing off some of the capabilities of the components currently available.
+This will start the Vite demo server on [localhost:5173](http://localhost:5173/). You can view example components based on their directory paths in the `examples` folder. Here's how you can access them:
 
-## TODO:
-list of html Input components to wrap (https://www.w3schools.com/html/html_form_input_types.asp):
-- Button - [x]
-- Checkbox - [X]
-- Color - [ ]
-- DateTime (local) - [ ] - Make single Date component where you can enable either time, date + time, or date.
-- File - [ ] - use current Button component, <input> tags so that this can have children
-- Radio - [x]
-- Range - [ ]
+- `examples/inputs/button.jsx`, can bee seen by going to:
+	- [http://localhost:5173/inputs/button.html](http://localhost:5173/inputs/button.html)
+- `examples/utils/theme.jsx`, can bee seen by going to:
+	- [http://localhost:5173/utils/theme.html](http://localhost:5173/utils/theme.html)
 
-Features to add to standard text input:
-- Tel - [ ] - simple built in phone number validation
-- Email - [ ] simple built in email validation
-
-list of other html tags to wrap possibly:
-
-list of other components to make from material ui:
-- Grid?
+Replace the path with the corresponding directory and file name, adjusting for any additional examples you want to explore.

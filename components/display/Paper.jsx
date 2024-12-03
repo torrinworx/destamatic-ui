@@ -1,5 +1,5 @@
-import { h } from './h.jsx';
-import Theme from './Theme';
+import { h } from '../utils/h';
+import Theme from '../utils/Theme';
 
 Theme.define({
     paper: {

@@ -1,6 +1,6 @@
-import { h, svg } from './h';
+import { h, svg } from '../utils/h';
 import { Observer, OObject } from 'destam-dom';
-import Theme from './Theme';
+import Theme from '../utils/Theme';
 
 Theme.define({
     icon: {

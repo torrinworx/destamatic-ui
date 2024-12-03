@@ -1,5 +1,5 @@
-import { OArray, Observer } from 'destam-dom';
 import { h } from './h';
+import { OArray, Observer } from 'destam-dom';
 
 /**
  * Global array to hold active popup components.

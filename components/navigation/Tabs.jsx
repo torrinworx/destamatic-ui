@@ -1,7 +1,7 @@
 import { Observer } from 'destam-dom';
-import { mark, h } from './h';
-import Theme from './Theme';
-import Button from './Button';
+import { mark, h } from '../utils/h';
+import Theme from '../utils/Theme';
+import Button from '../inputs/Button';
 
 Theme.define({
 	button_tab: {

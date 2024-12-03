@@ -1,4 +1,4 @@
-import {mark} from './h';
+import { mark } from './h';
 import Observer from 'destam/Observer';
 
 /**

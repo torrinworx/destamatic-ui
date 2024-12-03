@@ -1,12 +1,11 @@
-import { h } from './h';
+import { h } from '../utils/h';
 import Observer from 'destam/Observer';
-import Typography from './Typography';
-import Icon from './Icon';
-import Paper from './Paper';
-import useRipples from './Ripple.jsx';
-import Theme from './Theme';
-import Detached from './Detached';
-import { popups } from './Popup.jsx';
+import Typography from '../display/Typography';
+import Icon from '../display/Icon';
+import Paper from '../display/Paper';
+import useRipples from '../utils/Ripple';
+import Theme from '../utils/Theme';
+import Detached from '../utils/Detached';
 
 Theme.define({
 	select_selectable: {

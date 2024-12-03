@@ -1,7 +1,8 @@
-import { h } from './h';
+import { h } from '../utils/h';
 import { Observer } from 'destam-dom';
-import useRipples from './Ripple.jsx';
-import Theme from './Theme';
+
+import Theme from '../utils/Theme';
+import useRipples from '../utils/Ripple';
 
 Theme.define({
 	checkbox: {

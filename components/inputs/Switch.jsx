@@ -1,7 +1,7 @@
-import { h } from './h';
+import { h } from '../utils/h';
 import { Observer } from 'destam-dom';
-import useRipples from './Ripple.jsx';
-import Theme from './Theme';
+import useRipples from '../utils/Ripple';
+import Theme from '../utils/Theme';
 
 Theme.define({
     switch: {

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 import assertRemove from 'destam-dom/transform/assertRemove';
 import compileHTMLLiteral from 'destam-dom/transform/htmlLiteral';
 import fs from 'fs';
@@ -34,15 +34,23 @@ if (process.env.NODE_ENV === 'production') {
 	plugins.push(createTransform('assert-remove', assertRemove));
 }
 
+const recursiveReadDir = (dir, fileList = []) => {
+	fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
+		const fullPath = resolve(dir, entry.name);
+		if (entry.isDirectory()) {
+			recursiveReadDir(fullPath, fileList);
+		} else if (entry.name.endsWith('.js') || entry.name.endsWith('.jsx')) {
+			fileList.push(fullPath);
+		}
+	});
+	return fileList;
+};
+
 const getExample = (file) => {
-	if (file === '/') file = '/index.html';
-	if (!file.startsWith('/') || !file.endsWith('.html')) return null;
+	file = file.replace(/\.html$/, '');
+	const name = file.startsWith('/') ? file.substring(1) : file;
 
-	file = file.substring(1);
-	let i = file.lastIndexOf('.');
-	const name = file.substring(0, i);
-
-	const existed = ['.js', '.jsx'].find(ex => fs.existsSync('examples/' + name + ex));
+	const existed = ['.js', '.jsx'].find(ex => fs.existsSync(resolve(__dirname, 'examples', name + ex)));
 	if (!existed) {
 		return null;
 	}
@@ -52,23 +60,21 @@ const getExample = (file) => {
 		name,
 		file: name + existed,
 		relative,
-		location: resolve(__dirname, '/examples/' + name + existed),
+		location: resolve(__dirname, 'examples', name + existed),
 		resolved: join(__dirname, relative),
 	};
 };
 
 let examples;
 const getExamples = () => {
-	if (examples) {
-		return examples;
-	}
+	if (examples) return examples;
 
-	return examples = fs.readdirSync(resolve(__dirname, 'examples')).map(file => {
-		let i = file.lastIndexOf('.');
-		const name = file.substring(0, i);
-
-		return getExample('/' + name + '.html');
-	});
+	const examplesDir = resolve(__dirname, 'examples');
+	return examples = recursiveReadDir(examplesDir).map(fullPath => {
+		const relativePath = fullPath.substring(fullPath.indexOf('examples') + 'examples/'.length);
+		const name = relativePath.substring(0, relativePath.lastIndexOf('.'));
+		return getExample(`/${name}.html`);
+	}).filter(Boolean);
 };
 
 const generateTemplate = (entry, hot) => {
@@ -79,19 +85,20 @@ const generateTemplate = (entry, hot) => {
 			<head>
 				<meta charset="UTF-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Destamatic UI</title>
+				<title>Destamatic UI - ${entry.name}</title>
 				<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 			</head>
 			<body>
-				<script type="module" src="./examples/${entry.file}"></script>
+				<div id="app"></div>
+				<script type="module" src="/examples/${entry.file}"></script>
 			</body>
 		</html>
-	`;
+	`.trim();
 };
 
 plugins.push({
 	name: 'examples',
-	resolveId (id) {
+	resolveId(id) {
 		let found = getExamples().find(ex => ex.resolved === id);
 		if (found) {
 			return found.resolved;
@@ -111,7 +118,7 @@ plugins.push({
 			}
 		});
 	},
-})
+});
 
 export default defineConfig({
 	plugins,
@@ -120,8 +127,8 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: [
-			{find: /^destamatic-ui($|\/)/, replacement: '/'},
-			{find: '@public', replacement: '/examples'}
+			{ find: /^destamatic-ui($|\/)/, replacement: '/' },
+			{ find: '@public', replacement: '/examples' },
 		]
 	}
 });

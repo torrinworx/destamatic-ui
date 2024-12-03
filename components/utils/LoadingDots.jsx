@@ -1,6 +1,5 @@
 import { h } from './h';
 import Theme from './Theme';
-import { mount } from 'destam-dom';
 
 Theme.define({
     loadingDots: {
@@ -35,8 +34,8 @@ Theme.define({
  * 
  * @returns {JSX.Element} The rendered loading dots component.
  */
-const LoadingDots = ({style}) => {
-    return <div theme='loadingDots' style={style}>
+const LoadingDots = () => {
+    return <div theme='loadingDots'>
         <span theme='loadingDots_dot' style={{ animationDelay: '0s' }}></span>
         <span theme='loadingDots_dot' style={{ animationDelay: '.2s' }}></span>
         <span theme='loadingDots_dot' style={{ animationDelay: '.4s' }}></span>

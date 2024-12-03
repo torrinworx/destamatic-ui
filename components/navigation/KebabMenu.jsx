@@ -1,12 +1,11 @@
-import { h } from './h';
+import { h } from '../utils/h';
 import { Observer } from 'destam-dom';
 
-import Detached from './Detached';
-
-import Paper from './Paper';
-import IconComponent from './Icon';
-import Button from './Button';
-import Shown from './Shown';
+import Detached from '../utils/Detached';
+import Paper from '../display/Paper';
+import IconComponent from '../display/Icon';
+import Button from '../inputs/Button';
+import Shown from '../utils/Shown';
 
 const KebabMenu = ({Icon, shown, children, items, style, ...props}) => {
     if (!(shown instanceof Observer)) shown = Observer.mutable(false);

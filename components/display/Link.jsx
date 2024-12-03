@@ -1,6 +1,5 @@
-import { h } from './h';
+import { h } from '../utils/h';
 import { Observer } from 'destam-dom';
-import Theme from './Theme';
 
 /**
  * Link component for navigation with optional styles and typography integration.

@@ -2,7 +2,7 @@ import { h } from './h';
 import Observer from 'destam/Observer';
 import Popup from './Popup';
 import Shown from './Shown';
-import Button from './Button';
+import Button from '../inputs/Button';
 
 const clamp = (x, l, h) => Math.max(l, Math.min(h, x));
 

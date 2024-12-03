@@ -1,9 +1,8 @@
-import { h } from './h';
+import { h } from '../utils/h';
 import { OArray, OObject, Observer } from 'destam-dom';
 
 import Link from './Link';
-import Theme from './Theme';
-import Checkbox from './Checkbox';
+import Checkbox from '../inputs/Checkbox';
 // import CodeBlock from './CodeBlock';
 import Typography from './Typography';
 

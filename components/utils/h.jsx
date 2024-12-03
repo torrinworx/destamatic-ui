@@ -1,7 +1,6 @@
-import { h as destam_h, mount, getFirst} from 'destam-dom';
-import Observer, {observerGetter, shallowListener} from 'destam/Observer';
-import { sizeProperties } from '../util/index.js';
-
+import { h as destam_h, mount, getFirst } from 'destam-dom';
+import Observer, { observerGetter, shallowListener } from 'destam/Observer';
+import { sizeProperties } from '../../util/index.js';
 import Theme from './Theme';
 
 // This h element overrides the default behavoior that destam-dom gives for
@@ -175,19 +174,19 @@ const hypertext = (useThemes, name, props, ...children) => {
 					}
 
 					const observer = style[observerGetter] &&
-							shallowListener(style[observerGetter], commit => {
-						// has the entire object been switched out?
-						for (let delta of commit) {
-							if (delta.getParent() !== style) {
-								reset();
-								return;
+						shallowListener(style[observerGetter], commit => {
+							// has the entire object been switched out?
+							for (let delta of commit) {
+								if (delta.getParent() !== style) {
+									reset();
+									return;
+								}
 							}
-						}
 
-						for (let delta of commit) {
-							set(delta.ref, delta.value);
-						}
-					});
+							for (let delta of commit) {
+								set(delta.ref, delta.value);
+							}
+						});
 
 					return () => {
 						if (observer) observer();
