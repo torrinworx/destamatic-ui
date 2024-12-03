@@ -4,41 +4,40 @@ import useRipples from './Ripple.jsx';
 import Theme from './Theme';
 
 Theme.define({
-    switchcontainer: {
+    switch: {
         extends: 'primary',
         display: 'flex',
         alignItems: 'center',
         cursor: 'pointer',
         overflow: 'clip',
         position: 'relative',
-        position: 'relative',
-        width: '40px',
-        height: '20px',
+        width: '60px',
+        height: '30px',
         background: '$color',
-        borderRadius: '25px',
-        transition: 'background 300ms',
+        borderRadius: '37.5px',
     },
-    switchtrack_disabled: {
-        background: '$saturate($color, -1)',
-    },
+
+    switch_hovered: {
+		extends: 'primary',
+		background: '$color_hover'
+	},
+
     switchknob: {
         extends: 'primary',
         position: 'absolute',
-        width: '18px',
-        height: '18px',
+        width: '23px',
+        height: '23px',
         background: '$color_top',
         borderRadius: '50%',
-        transition: 'left 300ms',
+        transition: '100ms',
     },
+
     switchknob_checked: {
-        left: '22px',
+        left: '32.5px',
     },
     switchknob_unchecked: {
-        left: '2px',
-    },
-    switchknob_disabled: {
-        background: '$saturate($color_top, -1)',
-    },
+        left: '4px',
+    }
 });
 
 /**
@@ -65,14 +64,17 @@ const Switch = ({
     if (!(value instanceof Observer)) value = Observer.immutable(value);
     if (!(disabled instanceof Observer)) disabled = Observer.immutable(disabled);
 
+    const hover = Observer.mutable(false);
     const [ripples, createRipple] = useRipples();
     const Span = <raw:span />
 
     return <Span
         theme={[
-            "switchcontainer",
+            "switch",
             disabled.map(d => d ? 'disabled' : null),
+            hover.map(h => h ? 'hovered' : null),
         ]}
+        isHovered={hover}
         onMouseDown={e => {
             if (disabled.get()) {
                 return;
@@ -98,6 +100,7 @@ const Switch = ({
                 disabled.map(d => d ? 'disabled' : null),
             ]}
         />
+        <span draggable="false" theme={[disabled.map(d => d ? 'checkboxOverlay' : null)]} />
         {ripples}
     </Span>;
 };
