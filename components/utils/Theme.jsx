@@ -75,27 +75,11 @@ const theme = OObject({
 
 		/*
 		Computes a contrast color (black or white) based on the luminance of the input colour to ensure readability
-		compliant with WCAG 2.0 AAA standards.
+		compliant with WCAG 2.0 AAA standards. Accepts colours in hexadecimal, RGB, or HSV.
 		*/
-		$contrast_text: (hexColor) => {
-			if (!hexColor.startsWith('#') || (hexColor.length !== 7 && hexColor.length !== 4)) {
-				throw new Error('Invalid input color');
-			}
-
-			let r, g, b;
-			if (hexColor.length === 7) {
-				r = parseInt(hexColor.substr(1, 2), 16);
-				g = parseInt(hexColor.substr(3, 2), 16);
-				b = parseInt(hexColor.substr(5, 2), 16);
-			} else {
-				r = parseInt(hexColor.substr(1, 1) + hexColor.substr(1, 1), 16);
-				g = parseInt(hexColor.substr(2, 1) + hexColor.substr(2, 1), 16);
-				b = parseInt(hexColor.substr(3, 1) + hexColor.substr(3, 1), 16);
-			}
-
+		$contrast_text: (c) => {
 			const luminance = (r, g, b) => {
 				const adjust = (value) => {
-					value /= 255;
 					return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
 				};
 				const [R, G, B] = [adjust(r), adjust(g), adjust(b)];
@@ -103,12 +87,17 @@ const theme = OObject({
 			};
 
 			const contrastRatio = (L1, L2) => (L1 + 0.05) / (L2 + 0.05);
+
+			let [r, g, b, a] = color(c);
 			const backgroundLuminance = luminance(r, g, b);
+
 			const contrastBlack = contrastRatio(backgroundLuminance, luminance(0, 0, 0));
-			const contrastWhite = contrastRatio(luminance(255, 255, 255), backgroundLuminance);
+			const contrastWhite = contrastRatio(luminance(1, 1, 1), backgroundLuminance);
 
 			// Select color with greater contrast, use black if equal.
-			return contrastBlack > contrastWhite ? '#000000' : '#FFFFFF';
+			const textColor = contrastBlack > contrastWhite ? [0, 0, 0, a] : [1, 1, 1, a];
+
+			return color.toCSS(textColor);
 		},
 
 		$add: math((a, b) => a + b),
