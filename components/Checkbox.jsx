@@ -105,7 +105,6 @@ const Checkbox = ({ value, onChange, invert = false, disabled, style, ...props }
 			<span draggable="false" theme={[disabled.map(d => d ? 'checkboxOverlay' : null)]} />
 			{ripples}
 		</Span>
-
 	</div>
 };
 

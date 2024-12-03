@@ -30,3 +30,4 @@ export { popups } from './components/Popup.jsx';
 export { default as Detached } from './components/Detached.jsx';
 export { default as Drag } from './components/Drag.jsx';
 export { default as DragGrid } from './components/DragGrid.jsx';
+export { default as Switch } from './components/Switch.jsx';
