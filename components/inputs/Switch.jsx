@@ -18,7 +18,6 @@ Theme.define({
     },
 
     switch_hovered: {
-		extends: 'primary',
 		background: '$color_hover'
 	},
 
