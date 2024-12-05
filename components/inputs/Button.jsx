@@ -96,6 +96,7 @@ const Button = ({
     ref: Ref,
     children,
     theme = "primary",
+    iconPosition = 'left',
     ...props
 }) => {
     if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
@@ -139,13 +140,15 @@ const Button = ({
         isHovered={hover}
         style={{
             display: inline ? 'inline-flex' : 'flex',
+            alignItems: 'center', // Ensure items are centered
             ...style
         }}
         disabled={disabled}
         {...props}
     >
-    	{Icon}
+		{iconPosition === 'left' ? Icon : null}
         {label ? label : children}
+        {iconPosition === 'right' ? Icon : null}
         {ripples}
     </Ref>
 };
