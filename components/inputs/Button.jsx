@@ -16,7 +16,7 @@ Theme.define({
         textDecoration: 'none',
         position: 'relative',
         overflow: 'clip',
-        color: '$color_text',
+        color: '$color_top',
         boxShadow: 'none',
         background: 'none',
     },

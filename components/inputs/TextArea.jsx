@@ -26,7 +26,7 @@ Theme.define({
  * 
  * @returns {JSX.Element} The rendered textarea element.
  */
-const Textarea = Theme.use(theme => (
+const Textarea = Theme.use(themer => (
     {
         children,
         value,
@@ -36,6 +36,8 @@ const Textarea = Theme.use(theme => (
         onKeyDown,
         placeholder = '',
         error,
+        theme = "primary",
+        type,
         ...props
     },
     _,
@@ -49,8 +51,10 @@ const Textarea = Theme.use(theme => (
     const isFocused = Observer.mutable(false);
     mounted(() => isMounted.set(true));
 
-    const _class = theme(
+    const _class = themer(
+        theme,
         'field', 'area',
+        type,
         isFocused.map(e => e ? 'focused' : null),
         error.map(e => e ? 'error' : null));
 

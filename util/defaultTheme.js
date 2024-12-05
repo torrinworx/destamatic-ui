@@ -19,7 +19,6 @@ export default {
 		fontFamily: 'Roboto, sans-serif',
 		boxSizing: 'border-box',
 		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
-		$color_text: 'black',
 
 		/*
 		Adjusts the brightness of the input colour by shifting its value in the HSV colour space. Accepts colours
@@ -110,7 +109,6 @@ export default {
 		$color: '#02CA9F',
 		$color_hover: '$shiftBrightness($color, 0.1)',
 		$color_error: 'red',
-		$color_top: '$contrast_text($color)',
 	},
 
 	secondary: {
@@ -151,12 +149,12 @@ export default {
 	},
 
 	field: {
-		extends: 'primary_radius_typography_p1_regular_focusable',
+		extends: 'radius_typography_p1_regular_focusable',
 		outline: 0,
 
 		padding: 10,
-		background: '$color_top',
-		color: '$color_text',
+		background: '$invert($color_top)',
+		color: '$color_top',
 	},
 
 	focused: {
