@@ -46,9 +46,9 @@ const recursiveReadDir = (dir, fileList = []) => {
 	return fileList;
 };
 
-const getExample = (file) => {
-	file = file.replace(/\.html$/, '');
-	const name = file.startsWith('/') ? file.substring(1) : file;
+const getExample = name => {
+	name = name.endsWith('.html') ? name.substring(0, name.length - 5) : name + 'index';
+	name = name.startsWith('/') ? name.substring(1) : name;
 
 	const existed = ['.js', '.jsx'].find(ex => fs.existsSync(resolve(__dirname, 'examples', name + ex)));
 	if (!existed) {
