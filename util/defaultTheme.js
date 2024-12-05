@@ -165,4 +165,8 @@ export default {
 		flexGrow: 1,
 		height: '100%',
 	},
+
+	tight: {
+		padding: 0,
+	},
 };

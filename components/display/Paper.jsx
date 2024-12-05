@@ -14,11 +14,8 @@ Theme.define({
     },
 });
 
-const Paper = ({ children, theme = "primary", type, tight, style, ...props }) => {
-    return <div theme={[theme, "paper", type]} style={{
-        padding: tight ? 0 : null,
-        ...style,
-    }}
+const Paper = ({ children, theme = "primary", type, tight, ...props }) => {
+    return <div theme={[theme, "paper", type, tight ? 'tight' : null]}
         {...props}
     >
         {children}
