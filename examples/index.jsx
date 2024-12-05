@@ -14,6 +14,7 @@ import {
     KebabMenu,
     Markdown,
     Tabs,
+    Paper,
     h
 } from 'destamatic-ui';
 
@@ -193,9 +194,11 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
         <Typography type="h2" $style={{ marginTop: '20px' }}>Slider</Typography>
         <Slider min={0} max={100} value={Observer.mutable(0)} />
 
-        <Typography type="h2" $style={{ marginTop: '20px' }}>Inputs</Typography>
-        <TextField placeholder="Type here..." style={{ marginBottom: '10px', width: '100%' }} value={text} />
-        <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} value={text} />
+        <Paper>
+            <Typography type="h2" $style={{ marginTop: '20px' }}>Inputs</Typography>
+            <TextField placeholder="Type here..." style={{ marginBottom: '10px', width: '100%' }} value={text} />
+            <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} value={text} />
+        </Paper>
 
         <Typography type="h2" $style={{ marginTop: '20px' }}>Drawer</Typography>
         <Drawer open={drawerOpen}>
