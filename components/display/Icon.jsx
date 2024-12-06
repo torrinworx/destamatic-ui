@@ -68,6 +68,7 @@ const Icon = ({
     const libClass = Observer.mutable('');
 
     const styleObject = { height: size, width: size };
+    const ready = Observer.mutable(false);
 
     loadIcon(lib ?? libraryName, name ?? iconName, styleObject)
         .then(svgContent => {
@@ -87,6 +88,8 @@ const Icon = ({
             while (svg.firstElementChild) {
                 Ref.appendChild(svg.firstElementChild);
             }
+
+            ready.set(true);
         })
         .catch(error => {
             console.error(error.message);
@@ -95,6 +98,9 @@ const Icon = ({
     return <Ref
         class={libClass}
         theme={['icon', theme]}
+        style={{
+            display: ready.map(r => r ? null : 'none'),
+        }}
         {...props}
     />;
 };
