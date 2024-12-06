@@ -49,7 +49,10 @@ const Textarea = Theme.use(themer => (
     const Ref = <raw:textarea />;
     const isMounted = Observer.mutable(false);
     const isFocused = Observer.mutable(false);
-    mounted(() => isMounted.set(true));
+
+    // TODO: Figure out why the microtask is needed. Sometimes without it,
+    // the text area won't have the right initial size.
+    mounted(() => queueMicrotask(() => isMounted.set(true)));
 
     const _class = themer(
         theme,
@@ -79,7 +82,7 @@ const Textarea = Theme.use(themer => (
                 if (!mounted) return 'auto';
 
                 return value.map(val => {
-                    let elem = <raw:textarea class={_class.get()} rows={1} $value={val} $style={{
+                    const elem = <raw:textarea class={_class.get()} rows={1} $value={val} $style={{
                         width: Ref.clientWidth + 'px',
                     }} />;
 
