@@ -20,5 +20,10 @@
   "optionalDependencies": {
     "feather-icons": "^4.29.1",
     "material-icons": "^1.13.12"
+  },
+  "devDependencies": {
+    "@babel/generator": "^7.26.3",
+    "@babel/parser": "^7.26.3",
+    "@babel/traverse": "^7.26.4"
   }
 }
