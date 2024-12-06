@@ -4,25 +4,30 @@ import Theme from '../utils/Theme';
 
 Theme.define({
     slider: {
-        extends: 'primary',
-
         width: '100%',
         height: '40px',
+        position: 'relative',
     },
 
     slider_track: {
         extends: 'radius',
 
-        background: '$color',
+        background: '$shiftBrightness($color, 0.1)',
+
+        position: 'absolute',
+        top: '50%',
+        width: '100%',
+        height: '8px',
+        transform: 'translateY(-50%)',
+        cursor: 'pointer',
     },
 
     slider_track_hovered: {
-        background: '$color_hover',
+        background: '$shiftBrightness($color_hover, 0.1)',
     },
 
     slider_thumb: {
         $size: 25,
-        extends: 'secondary',
 
         width: `$size$px`,
         height: `$size$px`,
@@ -31,62 +36,24 @@ Theme.define({
         position: 'absolute',
         top: '50%',
         borderRadius: '50%',
+        cursor: 'pointer',
     },
+
+    slider_thumb_hovered: {
+        background: '$color_hover',
+    },
+
 });
 
-// Note: We are using a custom track and thumb component to get around the
-// destam-dom limitations with pseudo elements. Currently, we cannot style these.
 const Thumb = ({
     position,
     style,
-    onDragStart,
-    onDragEnd,
+    dragging,
     hover,
     disabled
 }) => {
-    const cursor = disabled.map(d => d ? 'not-allowed' : 'pointer');
-
-    return <div
-        theme={[
-            "slider", "thumb",
-            hover.map(h => h ? 'hovered' : null),
-            disabled.map(d => d ? 'disabled' : null),
-        ]}
-        style={{
-            left: position,
-            transform: 'translate(-50%, -50%)',
-            cursor,
-            ...style
-        }}
-        onMouseEnter={() => hover.set(true)}
-        onMouseLeave={() => hover.set(false)}
-        onMouseDown={onDragStart}
-        onMouseUp={onDragEnd}
-        onTouchStart={onDragStart}
-        onTouchEnd={onDragEnd}
-    ></div>;
 };
 
-const Track = ({ style, onMouseDown, hover }) => {
-    return <div
-        theme={[
-            "slider", "track",
-            hover.map(h => h ? 'hovered' : null)
-        ]}
-        style={{
-            position: 'absolute',
-            top: '50%',
-            left: '0',
-            width: '100%',
-            height: '8px',
-            transform: 'translateY(-50%)',
-            cursor: 'pointer',
-            ...style,
-        }}
-        isHovered={hover}
-        onMouseDown={onMouseDown}
-    ></div>;
-};
 
 /**
  * Slider component for selecting a value from a range.
@@ -103,77 +70,60 @@ const Track = ({ style, onMouseDown, hover }) => {
  * 
  * @returns {JSX.Element} The rendered slider element.
  */
-const Slider = Theme.use(theme => ({
+const Slider = Theme.use(themer => ({
     min,
     max,
     value,
-    style,
-    trackStyle,
-    thumbStyle,
     hover,
     disabled,
-    onMouseDown,
-    onDragStart,
-    onDrag,
-    onDragEnd,
+    theme = "primary",
     ...props
-}, _, mount) => {
+}, cleanup, mount) => {
     if (!(min instanceof Observer)) min = Observer.immutable(min ?? 0);
     if (!(max instanceof Observer)) max = Observer.immutable(max ?? 1);
     if (!(value instanceof Observer)) value = Observer.immutable(value ?? 0);
     if (!(hover instanceof Observer)) hover = Observer.mutable(hover ?? false);
     if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled ?? false);
 
-    const trackRef = Observer.mutable(null);
+    const TrackRef = <raw:div />;
     const dragging = Observer.mutable(false);
+    const size = themer(theme, 'slider', 'thumb').vars('size');
 
-    const updateValueFromEvent = (event) => {
-        const trackElement = trackRef.get();
-        if (!trackElement) return;
+    cleanup(dragging.effect(event => {
+        if (!event) return;
+        if (disabled.get()) return;
 
+        const trackElement = TrackRef;
         const rect = trackElement.getBoundingClientRect();
-        const trackWidth = rect.width;
-        const clickX = event.clientX - rect.left;
+        const trackWidth = rect.width - size.get();
+        const clickX = event.clientX - rect.left - size.get() / 2;
         const minVal = min.get();
         const maxVal = max.get();
         const newValue = minVal + ((clickX / trackWidth) * (maxVal - minVal));
         value.set(Math.min(Math.max(newValue, minVal), maxVal));
-    };
+    }));
 
-    const handleMouseMove = (event) => {
-        if (dragging.get() && !disabled.get()) {
-            updateValueFromEvent(event);
-            onDrag && onDrag(event);
-        }
-    };
+    mount(() => cleanup(dragging.map(Boolean).effect(started => {
+        if (!started) return;
 
-    const handleMouseUp = (event) => {
-        if (dragging.get()) {
-            dragging.set(false);
-            onDragEnd && onDragEnd(event);
-        }
-    };
+        const reset = () => dragging.set(false);
+        const move = e => dragging.set(e);
 
-    const handleDragStart = (event) => {
-        event.preventDefault();
-        if (disabled.get()) return;
-        dragging.set(true);
-        updateValueFromEvent(event);
-        onDragStart && onDragStart(event);
-    };
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', reset);
 
-    const percentage = Observer.all([
-        value,
-        theme('slider', 'thumb').vars('size'),
-    ]).map(([value, thumbWidth]) => {
-        const trackElement = trackRef.get();
+        return () => {
+            window.removeEventListener('mousemove', move);
+            window.removeEventListener('mouseup', reset);
+        };
+    })));
+
+    const percentage = Observer.all([value, size, min, max]).map(([value, thumbWidth, min, max]) => {
+        const trackElement = TrackRef;
         if (!trackElement) return '50%';
 
         const trackWidth = trackElement.getBoundingClientRect().width;
-
-        const minVal = min.get();
-        const maxVal = max.get();
-        const ratio = (value - minVal) / (maxVal - minVal);
+        const ratio = (value - min) / (max - min);
 
         // Adjust the position to ensure the thumb stays within the track
         const adjustedRatio = ratio * (trackWidth - thumbWidth) / trackWidth + thumbWidth / (2 * trackWidth);
@@ -182,46 +132,41 @@ const Slider = Theme.use(theme => ({
 
     const Ref = <raw:div />;
 
-    mount(() => {
-        trackRef.set(Ref.firstElementChild);
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    });
+    const renderHover = Observer.all([dragging, hover]).map(([a, b]) => a || b)
 
     return <Ref
-        theme='slider'
-        style={{
-            position: 'relative',
-            ...style
-        }}
+        theme={[theme, 'slider']}
         {...props}
     >
-        <Track
-            style={trackStyle}
-            onMouseDown={(event) => {
-                if (!disabled.get()) {
-                    handleDragStart(event);
-                    onMouseDown && onMouseDown(event);
-                }
+        <TrackRef
+            theme={[
+                theme,
+                "slider", "track",
+                renderHover.map(h => h ? 'hovered' : null),
+                disabled.map(d => d ? 'disabled' : null),
+            ]}
+            isHovered={hover}
+            onMouseDown={event => {
+                event.preventDefault();
+                dragging.set(event);
             }}
-            ref={trackRef}
-            hover={hover}
         />
-        <Thumb
-            position={percentage}
-            onDragStart={(event) => {
-                handleDragStart(event);
+        <div
+            theme={[
+                theme,
+                "slider", "thumb",
+                dragging.map(h => h ? 'hovered' : null),
+                disabled.map(d => d ? 'disabled' : null),
+            ]}
+            style={{
+                left: percentage,
+                transform: 'translate(-50%, -50%)',
             }}
-            onDragEnd={(event) => {
-                handleMouseUp(event);
+            isHovered={hover}
+            onMouseDown={event => {
+                event.preventDefault();
+                dragging.set(event);
             }}
-            style={thumbStyle}
-            hover={hover}
-            disabled={disabled}
         />
     </Ref>;
 });

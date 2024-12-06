@@ -77,7 +77,9 @@ const hypertext = (useThemes, name, props, ...children) => {
 			} else if (o.length >= 3 && o.startsWith('is') && o[2].toLowerCase() !== o[2]) {
 				const handlers = {
 					Focused: ['focus', 'blur'],
-					Hovered: ['mouseenter', 'mouseleave']
+					Hovered: ['mouseenter', 'mouseleave'],
+					Clicked: ['mousedown', 'mouseup'],
+					Touched: ['touchstart', 'touchend'],
 				};
 
 				const handlerName = o.substring(2);
