@@ -112,13 +112,6 @@ export default {
 		$color_top: '$contrast_text($color)',
 	},
 
-	secondary: {
-		$color: '#CCCCCC',
-		$color_hover: '$shiftBrightness($color, 0.1)',
-		$color_error: 'red',
-		$color_top: '$contrast_text($color)',
-	},
-
 	center: {
 		display: 'flex',
 		alignItems: 'center',
