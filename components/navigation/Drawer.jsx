@@ -6,8 +6,19 @@ import Button from "../inputs/Button";
 import Icon from '../display/Icon';
 import Theme from '../utils/Theme';
 
+Theme.define({
+    drawer: {
+        outlineColor: '$color',
+        outlineWidth: 1,
+        outlineStyle: 'solid',
 
-const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup) => {
+        height: '100%',
+        padding: '10px',
+        overflowY: 'hidden',
+    },
+});
+
+const Drawer = ({ children, theme = "primary", type, open, style, ...props }, cleanup) => {
     const width = '25vw';
     if (!open) {
         open = Observer.mutable(false);
@@ -33,14 +44,12 @@ const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup)
     return <div
         style={{
             height: '100%',
-            boxSizing: 'border-box',
         }}
         {...props}
     >
         <div
             style={{
                 height: '100%',
-                boxSizing: 'border-box',
                 transition: resizing.map(r => r ? 'none' : 'width 0.3s ease-in-out'),
                 width: open.map(o => o ? width : '0px'),
             }}
@@ -49,20 +58,13 @@ const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup)
                 style={{
                     width: width,
                     height: '100%',
-                    boxSizing: 'border-box',
                     transition: resizing.map(r => r ? 'none' : 'transform 0.3s ease-in-out'),
                     transform: open.map(o => o ? 'translateX(0)' : `translateX(-${width})`),
                     overflow: 'auto',
                 }}
             >
-                    <div class={theme('drawer')} style={{
-                        boxSizing: 'border-box',
-                        height: '100%',
-                        padding: '10px',
-                        overflowY: 'hidden',
-                        ...style
-                    }}>
-                        {children}
+                <div theme={[theme, 'drawer', type]} style={style}>
+                    {children}
                 </div>
             </div>
         </div>
@@ -81,6 +83,6 @@ const Drawer = Theme.use(theme => ({ children, open, style, ...props }, cleanup)
             )}
         />
     </div>
-});
+};
 
 export default Drawer;

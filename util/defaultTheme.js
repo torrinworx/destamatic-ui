@@ -129,13 +129,6 @@ export default {
 		borderRadius: 6,
 	},
 
-	drawer: {
-		extends: 'secondary',
-		outlineColor: '$color',
-		outlineWidth: 1,
-		outlineStyle: 'solid',
-	},
-
 	disabled: {
 		cursor: 'default',
 		pointerEvents: 'none',
