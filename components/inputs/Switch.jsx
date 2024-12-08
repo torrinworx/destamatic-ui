@@ -5,7 +5,6 @@ import Theme from '../utils/Theme';
 
 Theme.define({
     switch: {
-        extends: 'primary',
         display: 'flex',
         alignItems: 'center',
         cursor: 'pointer',
@@ -22,7 +21,6 @@ Theme.define({
 	},
 
     switchknob: {
-        extends: 'primary',
         position: 'absolute',
         width: '23px',
         height: '23px',
@@ -58,6 +56,8 @@ const Switch = ({
     value,
     onChange,
     disabled,
+    theme = "primary",
+    type,
     ...props
 }) => {
     if (!(value instanceof Observer)) value = Observer.immutable(value);
@@ -69,7 +69,9 @@ const Switch = ({
 
     return <Span
         theme={[
+            theme,
             "switch",
+            type,
             disabled.map(d => d ? 'disabled' : null),
             hover.map(h => h ? 'hovered' : null),
         ]}
@@ -94,6 +96,7 @@ const Switch = ({
     >
         <span
             theme={[
+                theme,
                 'switchknob',
                 value.map(v => v ? 'checked' : 'unchecked'),
                 disabled.map(d => d ? 'disabled' : null),
