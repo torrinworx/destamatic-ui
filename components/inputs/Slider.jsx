@@ -12,14 +12,13 @@ Theme.define({
     },
 
     slider_track: {
-        extends: 'radius',
-
         background: '$shiftBrightness($color, 0.1)',
 
         position: 'absolute',
         top: '50%',
         width: '100%',
         height: '8px',
+        borderRadius: '4px',
         transform: 'translateY(-50%)',
         cursor: 'pointer',
     },
@@ -80,6 +79,7 @@ const Slider = Theme.use(themer => ({
     theme = "primary",
     styleThumb,
     styleTrack,
+    children,
     ...props
 }, cleanup, mount) => {
     if (!(min instanceof Observer)) min = Observer.immutable(min ?? 0);
@@ -148,6 +148,7 @@ const Slider = Theme.use(themer => ({
                 event.preventDefault();
                 dragging.set(event);
             }}
+            children={children}
         />
         <div
             theme={[
