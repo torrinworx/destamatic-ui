@@ -31,6 +31,7 @@ Theme.define({
 		height: '$size$px',
 		transform: 'translate(-50%, -50%)',
 		border: '1px solid $color_top',
+		pointerEvents: 'none',
 	},
 
 	colorPicker_alpha_slider_track: {
