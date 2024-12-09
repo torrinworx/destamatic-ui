@@ -18,7 +18,7 @@ Theme.define({
 	},
 });
 
-const Drag = ({dragging, children, map, constrained = true}, cleanup, mounted) => {
+const Drag = ({dragging, children, map, constrained = true, ...props}, cleanup, mounted) => {
 	assert(children.length === 1, "Drag can only have one child");
 
 	const array = children[0];
@@ -230,7 +230,7 @@ const Drag = ({dragging, children, map, constrained = true}, cleanup, mounted) =
 		};
 	}))
 
-	return <Ref theme="drag" style={{height: totalHeight}}><Elem each={rendered} /></Ref>;
+	return <Ref theme="drag" style={{height: totalHeight}} {...props}><Elem each={rendered} /></Ref>;
 };
 
 export default Drag;
