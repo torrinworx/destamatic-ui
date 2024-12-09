@@ -4,8 +4,10 @@ import Theme from '../utils/Theme';
 
 Theme.define({
     slider: {
+        $size: 25,
+
         width: '100%',
-        height: '40px',
+        height: '$size$px',
         position: 'relative',
     },
 
@@ -27,8 +29,6 @@ Theme.define({
     },
 
     slider_thumb: {
-        $size: 25,
-
         width: `$size$px`,
         height: `$size$px`,
         background: '$color',
@@ -37,6 +37,7 @@ Theme.define({
         top: '50%',
         borderRadius: '50%',
         cursor: 'pointer',
+        transform: 'translateY(-50%)'
     },
 
     slider_thumb_hovered: {
@@ -77,6 +78,8 @@ const Slider = Theme.use(themer => ({
     hover,
     disabled,
     theme = "primary",
+    styleThumb,
+    styleTrack,
     ...props
 }, cleanup, mount) => {
     if (!(min instanceof Observer)) min = Observer.immutable(min ?? 0);
@@ -93,8 +96,7 @@ const Slider = Theme.use(themer => ({
         if (!event) return;
         if (disabled.get()) return;
 
-        const trackElement = TrackRef;
-        const rect = trackElement.getBoundingClientRect();
+        const rect = TrackRef.getBoundingClientRect();
         const trackWidth = rect.width - size.get();
         const clickX = event.clientX - rect.left - size.get() / 2;
         const minVal = min.get();
@@ -119,15 +121,10 @@ const Slider = Theme.use(themer => ({
     })));
 
     const percentage = Observer.all([value, size, min, max]).map(([value, thumbWidth, min, max]) => {
-        const trackElement = TrackRef;
-        if (!trackElement) return '50%';
-
-        const trackWidth = trackElement.getBoundingClientRect().width;
         const ratio = (value - min) / (max - min);
 
-        // Adjust the position to ensure the thumb stays within the track
-        const adjustedRatio = ratio * (trackWidth - thumbWidth) / trackWidth + thumbWidth / (2 * trackWidth);
-        return `${Math.min(Math.max(adjustedRatio * 100, 0), 100)}%`;
+        const prc = Math.min(Math.max(ratio, 0), 1);
+        return `calc(${prc * 100}% - (${thumbWidth * prc}px * ${prc}))`;
     });
 
     const Ref = <raw:div />;
@@ -145,6 +142,7 @@ const Slider = Theme.use(themer => ({
                 renderHover.map(h => h ? 'hovered' : null),
                 disabled.map(d => d ? 'disabled' : null),
             ]}
+            style={styleTrack}
             isHovered={hover}
             onMouseDown={event => {
                 event.preventDefault();
@@ -160,7 +158,7 @@ const Slider = Theme.use(themer => ({
             ]}
             style={{
                 left: percentage,
-                transform: 'translate(-50%, -50%)',
+                ...styleThumb,
             }}
             isHovered={hover}
             onMouseDown={event => {
