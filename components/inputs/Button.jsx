@@ -29,8 +29,8 @@ Theme.define({
     },
 
     button_contained: {
-        color: '$color_top',
         background: '$color',
+        color: '$contrast_text($color_top)',
     },
 
     button_contained_hovered: {
@@ -55,7 +55,10 @@ Theme.define({
     },
 
     button_contained_disabled: {
-        background: '$saturate($color, -1)',
+        // temp var
+        $bg: '$saturate($color, -1)',
+        background: '$bg',
+        color: '$contrast_text($bg)',
     },
 
     text: {
