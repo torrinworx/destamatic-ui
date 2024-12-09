@@ -124,7 +124,7 @@ const Slider = Theme.use(themer => ({
         const ratio = (value - min) / (max - min);
 
         const prc = Math.min(Math.max(ratio, 0), 1);
-        return `calc(${prc * 100}% - (${thumbWidth * prc}px * ${prc}))`;
+        return `calc(${prc * 100}% - (${thumbWidth * prc}px))`;
     });
 
     const Ref = <raw:div />;
