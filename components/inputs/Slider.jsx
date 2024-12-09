@@ -45,16 +45,6 @@ Theme.define({
 
 });
 
-const Thumb = ({
-    position,
-    style,
-    dragging,
-    hover,
-    disabled
-}) => {
-};
-
-
 /**
  * Slider component for selecting a value from a range.
  *
