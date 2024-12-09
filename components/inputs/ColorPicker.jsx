@@ -1,3 +1,4 @@
+import h from '../utils/h';
 import color from '../../util/color.js';
 import Theme from '../utils/Theme';
 import Slider from './Slider';

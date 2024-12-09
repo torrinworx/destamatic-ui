@@ -1,3 +1,4 @@
+import h from '../utils/h';
 import Theme from '../utils/Theme';
 import { OArray, Observer } from 'destam-dom';
 import { assert } from 'destam/util';
