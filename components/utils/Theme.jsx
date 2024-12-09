@@ -106,13 +106,17 @@ const getClasses = (trie, classes) => {
 				return [node];
 			}
 
+			if (node.index == null) {
+				node = {...node, index: ii};
+			}
+
 			if (node.node.body) {
 				iter.push(node);
 			}
 
 			return node.node.map(t => ({
 				node: t,
-				index: node.index == null ? ii : node.index,
+				index: node.index,
 			}));
 		});
 
