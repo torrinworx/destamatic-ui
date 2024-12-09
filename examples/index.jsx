@@ -15,6 +15,7 @@ import {
     Markdown,
     Tabs,
     Paper,
+    ColorPicker,
     h
 } from 'destamatic-ui';
 
@@ -106,6 +107,8 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
                 Three
             </mark:tab>
         </Tabs>
+
+        <ColorPicker value={Observer.mutable([0, 1, 0])} />
 
         <Markdown markdown={markdown} />
         <TextArea OValue={markdown} style={{ width: "1000px", height: "500px" }} />

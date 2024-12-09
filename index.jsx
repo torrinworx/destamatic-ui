@@ -30,3 +30,4 @@ export { popups } from './components/utils/Popup.jsx';
 export { default as Detached } from './components/utils/Detached.jsx';
 export { default as Drag } from './components/display/Drag.jsx';
 export { default as Switch } from './components/inputs/Switch.jsx';
+export { default as ColorPicker } from './components/inputs/ColorPicker.jsx';
