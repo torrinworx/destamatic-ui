@@ -96,29 +96,29 @@ mount(document.head, <style>
 
 const getClasses = (trie, classes) => {
 	const out = [];
-	let current = trie.map(t => ({ node: t }));
+	const map = new Map(trie.map(t => [t.name, [{ node: t }]]));
+
 	for (let ii = 0; ii < classes.length; ii++) {
-		const className = classes[ii];
+		const nodes = map.get(classes[ii]);
+		if (!nodes) continue;
+
+		map.delete(classes[ii]);
 
 		const iter = [];
-		current = current.flatMap(node => {
-			if (node.node.name !== className) {
-				return [node];
-			}
-
-			if (node.index == null) {
-				node = {...node, index: ii};
-			}
+		for (const node of nodes) {
+			if (node.index == null) node.index = ii;
 
 			if (node.node.body) {
 				iter.push(node);
 			}
 
-			return node.node.map(t => ({
-				node: t,
-				index: node.index,
-			}));
-		});
+			for (let child of node.node) {
+				let existing = map.get(child.name);
+				if (!existing) map.set(child.name, existing = []);
+
+				existing.push({node: child, index: node.index});
+			}
+		}
 
 		out.push(...iter.sort((a, b) => b.index - a.index).map(a => a.node));
 	}
