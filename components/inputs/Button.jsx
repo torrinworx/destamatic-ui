@@ -14,7 +14,6 @@ Theme.define({
         border: 'none',
         cursor: 'pointer',
         textDecoration: 'none',
-        position: 'relative',
         overflow: 'clip',
         color: '$color_top',
         boxShadow: 'none',
