@@ -116,7 +116,7 @@ const getClasses = (trie, classes) => {
 			}));
 		});
 
-		out.push(...iter.sort((a, b) => a.index - b.index).map(a => a.node));
+		out.push(...iter.sort((a, b) => b.index - a.index).map(a => a.node));
 	}
 
 	return out;
