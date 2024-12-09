@@ -106,7 +106,10 @@ const ColorPicker = ({value: valueRGB, theme = "primary", hasAlpha = true}, clea
 	}));
 
 	return <div theme={[theme, 'colorPicker', 'base']}>
-		<div theme={[theme, 'colorPicker', 'view']} onMouseDown={e => viewClicked.set(e)}>
+		<div theme={[theme, 'colorPicker', 'view']} onMouseDown={e => {
+			e.preventDefault();
+			viewClicked.set(e);
+		}}>
 			<div style={{position: 'absolute', inset: 0, transition: 'unset', background: primary}} />
 			<div style={{position: 'absolute', inset: 0, background: 'linear-gradient(to right, white, rgba(0, 0, 0, 0))'}} />
 			<div style={{position: 'absolute', inset: 0, background: 'linear-gradient(to top, black, rgba(0, 0, 0, 0))'}} />
