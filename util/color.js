@@ -184,14 +184,6 @@ const getColor = (...args) => {
 			}else{
 				color = getColor(map[color]);
 			}
-		}else if (ArrayBuffer.isView(color)){
-			if (color.length === 1){
-				color = Math.vec4(color, color, color, 1);
-			}else if (color.length === 2){
-				color = Math.vec4(color[0], color[0], color[0], color[1]);
-			}else if (color.length === 3){
-				color = Math.vec4(color, 1);
-			}
 		}
 
 		if (isNaN(color[0])) color[0] = 0;
