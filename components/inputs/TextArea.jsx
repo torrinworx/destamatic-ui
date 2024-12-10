@@ -17,7 +17,6 @@ Theme.define({
  * @param {Observer<string>} [props.value] - Observable value for the textarea content.
  * @param {Object} [props.style] - Custom styles to apply to the textarea.
  * @param {number} [props.maxHeight=200] - Maximum height of the textarea before it starts to scroll.
- * @param {string} [props.id] - ID for the textarea element.
  * @param {Function} [props.onKeyDown] - Function to call when a key is pressed down inside the textarea.
  * @param {string} [props.placeholder] - Placeholder text for the textarea.
  * @param {...Object} [props] - Additional properties to spread onto the textarea element.
@@ -32,7 +31,6 @@ const Textarea = Theme.use(themer => (
         value,
         style,
         maxHeight = 200,
-        id,
         onKeyDown,
         placeholder = '',
         error,
@@ -63,7 +61,6 @@ const Textarea = Theme.use(themer => (
 
     return <Ref
         class={_class}
-        id={id}
         placeholder={placeholder}
         $value={value}
         onKeyDown={onKeyDown}
@@ -88,17 +85,20 @@ const Textarea = Theme.use(themer => (
 
                     document.body.appendChild(elem);
                     let calculatedHeight = elem.scrollHeight + 1;
+                    console.log(elem.scrollHeight);
+
                     document.body.removeChild(elem);
 
-                    if (calculatedHeight > maxHeight) {
-                        calculatedHeight = maxHeight;
-                    }
+                    if (calculatedHeight > maxHeight) calculatedHeight = maxHeight;
 
                     return calculatedHeight + 'px';
                 }).memo();
             }).unwrap(),
+            border: 'none',
+            outline: 'none',
             ...style
         }}
+        theme="center"
         {...props}
     />;
 });
