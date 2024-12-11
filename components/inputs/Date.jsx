@@ -6,6 +6,7 @@ import { atomic } from 'destam/Network';
 Theme.define({
 	date: {
 		$scrollSensitivity: 0.25,
+		userSelect: 'none',
 	},
 
 	date_base: {
