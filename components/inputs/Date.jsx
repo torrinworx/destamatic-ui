@@ -134,13 +134,18 @@ const DateElem = ({value, theme = "primary", ...props}, cleanup, mounted) => {
 		</Div>;
 
 		if (past.getDate() === 1) {
+			let year = past.getFullYear();
+			if (year <= 0) {
+				year = (-year + 1) + ' BC';
+			}
+
 			Div = <raw:div />;
 			content = [
 				<Div theme={[
 					theme,
 					"date",
 					"sep",
-				]}>{month[past.getMonth()] + ' ' + past.getFullYear()}</Div>,
+				]}>{month[past.getMonth()] + ' ' + year}</Div>,
 				content
 			];
 		}
