@@ -211,7 +211,7 @@ const DateElem = ({value, theme = "primary", ...props}, cleanup, mounted) => {
 	return <div theme={[theme, "date", "base"]} {...props}>
 		<div theme={[theme, "date", "header"]}>
 			{Array(7).fill(null).map((_, i) => {
-				return <div theme={[theme, "date", "elem", "center"]}>{"SMTWTFS".charAt(i)}</div>;
+				return <div theme={[theme, "date", "elem"]}>{"SMTWTFS".charAt(i)}</div>;
 			})}
 		</div>
 
