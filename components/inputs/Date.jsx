@@ -34,6 +34,7 @@ Theme.define({
 
 	date_holder: {
 		extends: 'date_elem',
+		cursor: 'default',
 	},
 
 	date_body: {
@@ -52,6 +53,7 @@ Theme.define({
 	date_sep: {
 		extends: 'center',
 		paddingTop: 10,
+		cursor: 'default',
 	},
 });
 
