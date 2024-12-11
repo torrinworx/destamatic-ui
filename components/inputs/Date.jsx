@@ -58,7 +58,11 @@ Theme.define({
 const normalize = d => {
 	d = new Date(d);
 	d.setHours(0, 0, 0, 0);
-	return +d;
+	return d;
+};
+
+const dateStr = d => {
+	return [d.getFullYear(), d.getMonth(), d.getDate()].join('-');
 };
 
 const getAdj = (date, diff) => {
@@ -86,12 +90,11 @@ const month = [
 
 const DateElem = ({value, theme = "primary", ...props}, cleanup, mounted) => {
 	const scrolled = Observer.mutable(0);
-	const selector = value.map(normalize).selector('selected', null);
+	const selector = value.map(dateStr).selector('selected', null);
 
 	const rows = OArray();
 	const getRow = date => {
 		// try to see if we already rendered this row
-		let normalized = normalize(date);
 		let found = rows.findIndex(row => row.past <= date && date < row.future);
 		if (found >= 0) {
 			const row = rows[found];
@@ -109,12 +112,14 @@ const DateElem = ({value, theme = "primary", ...props}, cleanup, mounted) => {
 					if (!past) past = adj;
 					future = adj;
 
+					console.log(dateStr(adj));
+
 					return <div
 						theme={[
 							theme,
 							"date",
 							"elem",
-							selector(normalize(adj)),
+							selector(dateStr(adj)),
 						]}
 						onClick={() => value.set(adj)}
 					>{adj.getDate()}</div>;
