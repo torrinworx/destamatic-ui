@@ -14,6 +14,14 @@ const math = cb => (a, b) => {
 	return String(cb(parseFloat(a), parseFloat(b)));
 };
 
+const luminance = (r, g, b) => {
+	const adjust = (value) => {
+		return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+	};
+
+	return 0.2126 * adjust(r) + 0.7152 * adjust(g) + 0.0722 * adjust(b);
+};
+
 export default {
 	"*": {
 		fontFamily: 'Roboto, sans-serif',
@@ -70,27 +78,25 @@ export default {
 		Computes a contrast color (black or white) based on the luminance of the input colour to ensure readability
 		compliant with WCAG 2.0 AAA standards. Accepts colours in hexadecimal, RGB, or HSV.
 		*/
-		$contrast_text: (c) => {
-			const luminance = (r, g, b) => {
-				const adjust = (value) => {
-					return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
-				};
-				const [R, G, B] = [adjust(r), adjust(g), adjust(b)];
-				return 0.2126 * R + 0.7152 * G + 0.0722 * B;
-			};
+		$contrast_text: (c, ...colors) => {
+			if (colors.length === 0) colors = ['white', 'black'];
 
-			const contrastRatio = (L1, L2) => (L1 + 0.05) / (L2 + 0.05);
-
-			let [r, g, b, a] = color(c);
+			const [r, g, b, a] = color(c);
 			const backgroundLuminance = luminance(r, g, b);
 
-			const contrastBlack = contrastRatio(backgroundLuminance, luminance(0, 0, 0));
-			const contrastWhite = contrastRatio(luminance(1, 1, 1), backgroundLuminance);
+			let bestColor;
+			let bestContrast = 0;
+			for (const colorCompare of colors) {
+				const [r, g, b] = color(colorCompare);
+				const contrast = Math.abs(backgroundLuminance - luminance(r, g, b));
 
-			// Select color with greater contrast, use black if equal.
-			const textColor = contrastBlack > contrastWhite ? [0, 0, 0, a] : [1, 1, 1, a];
+				if (bestContrast <= contrast) {
+					bestContrast = contrast;
+					bestColor = [r, g, b, a];
+				}
+			}
 
-			return color.toCSS(textColor);
+			return color.toCSS(bestColor);
 		},
 
 		$add: math((a, b) => a + b),
