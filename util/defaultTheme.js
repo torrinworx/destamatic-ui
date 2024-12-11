@@ -109,7 +109,7 @@ export default {
 		$color: '#02CA9F',
 		$color_hover: '$shiftBrightness($color, 0.1)',
 		$color_error: 'red',
-		$color_top: '$contrast_text($color)',
+		$color_top: 'black',
 	},
 
 	center: {
