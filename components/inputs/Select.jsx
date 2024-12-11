@@ -21,7 +21,7 @@ Theme.define({
 		cursor: 'pointer',
 	},
 
-	selected: {
+	select_selected: {
 		background: '#CCCCCC'
 	},
 });
