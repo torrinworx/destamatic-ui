@@ -32,6 +32,10 @@ Theme.define({
 		borderRadius: '50%',
 	},
 
+	date_elem_disabled: {
+		color: '$shiftBrightness($color_top, 0.6)',
+	},
+
 	date_elem_selected: {
 		background: '$color',
 		color: '$contrast_text($color)',
@@ -50,7 +54,7 @@ Theme.define({
 	},
 
 	date_header: {
-		extends: 'date_row',
+		extends: 'radius_date_row',
 		color: '$shiftBrightness($color_top, 0.3)',
 	},
 
@@ -94,9 +98,15 @@ const month = [
 	"December",
 ];
 
-const DateElem = ({value, theme = "primary", ...props}, cleanup, mounted) => {
+const DateElem = ({value, theme = "primary", min, max, ...props}, cleanup, mounted) => {
+	if (!(value instanceof Observer)) value = Observer.immutable(value);
+	if (!(min instanceof Observer)) min = Observer.immutable(min);
+	if (!(max instanceof Observer)) max = Observer.immutable(max);
+	const bounds = Observer.all([min, max]);
+
 	const scrolled = Observer.mutable(0);
 	const selector = value.map(dateStr).selector('selected', null);
+
 
 	const rows = OArray();
 	const getRow = date => {
@@ -123,6 +133,9 @@ const DateElem = ({value, theme = "primary", ...props}, cleanup, mounted) => {
 							theme,
 							"date",
 							"elem",
+							bounds.map(([min, max]) =>
+								(!min || min <= adj) && (!max || adj < max)
+									? null : 'disabled'),
 							selector(dateStr(adj)),
 						]}
 						onClick={() => value.set(adj)}
