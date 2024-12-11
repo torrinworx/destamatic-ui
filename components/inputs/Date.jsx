@@ -112,8 +112,6 @@ const DateElem = ({value, theme = "primary", ...props}, cleanup, mounted) => {
 					if (!past) past = adj;
 					future = adj;
 
-					console.log(dateStr(adj));
-
 					return <div
 						theme={[
 							theme,
