@@ -111,16 +111,18 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
             </mark:tab>
         </Tabs>
 
-        <ColorPicker value={Observer.mutable([0, 1, 0])} />
+        <div theme="center" style={{flexDirection: 'column'}}>
+            <ColorPicker value={Observer.mutable([0, 1, 0])} />
 
-        <DateComponent value={date} />
-        <Button onClick={() => {
-            let d = new Date(date.get());
-            d.setFullYear(d.getFullYear() + 1);
-            date.set(d);
-        }}>Advance one Year</Button>
-        <div>
-            {date.map(d => d.toString())}
+            <DateComponent value={date} />
+            <Button onClick={() => {
+                let d = new Date(date.get());
+                d.setFullYear(d.getFullYear() + 1);
+                date.set(d);
+            }}>Advance one Year</Button>
+            <div>
+                {date.map(d => d.toString())}
+            </div>
         </div>
 
         <Markdown markdown={markdown} />
