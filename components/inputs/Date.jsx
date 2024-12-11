@@ -4,6 +4,10 @@ import { OArray, Observer } from 'destam-dom';
 import { atomic } from 'destam/Network';
 
 Theme.define({
+	date: {
+		$scrollSensitivity: 0.25,
+	},
+
 	date_base: {
 		display: 'flex',
 		flexDirection: 'column',
@@ -33,8 +37,7 @@ Theme.define({
 	},
 
 	date_holder: {
-		extends: 'date_elem',
-		cursor: 'default',
+		width: '100%',
 	},
 
 	date_body: {
@@ -218,25 +221,29 @@ const DateElem = ({value, theme = "primary", ...props}, cleanup, mounted) => {
 
 	const Renderer = ({each: {content}}) => content;
 
-	return <div theme={[theme, "date", "base"]} {...props}>
-		<div theme={[theme, "date", "header"]}>
-			{Array(7).fill(null).map((_, i) => {
-				return <div theme={[theme, "date", "elem"]}>{"SMTWTFS".charAt(i)}</div>;
-			})}
-		</div>
+	const BodyComp = Theme.use(themer => () => {
+		const themed = themer(theme, "date", "body");
 
-		<Body
-			theme={[theme, "date", "body"]}
+		return <Body
+			class={themed}
 			onWheel={e => {
 				e.preventDefault();
-
-				scrolled.set(purge(scrolled.get() - e.deltaY / 2, rows.length));
+				scrolled.set(purge(scrolled.get() - e.deltaY * themed.vars('scrollSensitivity').get(), rows.length));
 			}}
 		>
 			<div style={{position: 'relative', top: scrolled}}>
 				<Renderer each={rows} />
 			</div>
 		</Body>
+	});
+
+	return <div theme={[theme, "date", "base"]} {...props}>
+		<div theme={[theme, "date", "header"]}>
+			{Array(7).fill(null).map((_, i) => {
+				return <div theme={[theme, "date", "elem"]}>{"SMTWTFS".charAt(i)}</div>;
+			})}
+		</div>
+		<BodyComp />
 	</div>;
 };
 
