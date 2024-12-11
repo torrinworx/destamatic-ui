@@ -85,8 +85,6 @@ const Textarea = Theme.use(themer => (
 
                     document.body.appendChild(elem);
                     let calculatedHeight = elem.scrollHeight + 1;
-                    console.log(elem.scrollHeight);
-
                     document.body.removeChild(elem);
 
                     if (calculatedHeight > maxHeight) calculatedHeight = maxHeight;
