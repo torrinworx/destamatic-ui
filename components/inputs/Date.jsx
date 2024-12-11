@@ -77,7 +77,7 @@ const getAdj = (date, diff) => {
 
 const month = [
 	"January",
-	"Febuary",
+	"February",
 	"March",
 	"April",
 	"May",
