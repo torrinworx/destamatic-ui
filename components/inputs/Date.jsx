@@ -181,6 +181,7 @@ const DateElem = ({value, theme = "primary", min, max, ...props}, cleanup, mount
 		const height = Body.getBoundingClientRect().height;
 
 		let first = rows[0];
+		let firstAdded = false;
 		while (first.div.offsetTop + scroll > 0) {
 			let current;
 			atomic(() => {
@@ -190,9 +191,11 @@ const DateElem = ({value, theme = "primary", min, max, ...props}, cleanup, mount
 			len++;
 			scroll -= first.div.offsetTop;
 			first = current;
+			firstAdded = true;
 		}
 
 		let last = rows[len - 1];
+		let lastAdded = false;
 		while (last.div.offsetTop + scroll < height) {
 			let current;
 			atomic(() => {
@@ -201,16 +204,17 @@ const DateElem = ({value, theme = "primary", min, max, ...props}, cleanup, mount
 			});
 			len++;
 			last = current;
+			lastAdded = true;
 		}
 
 		rows.splice(len, rows.length);
 
-		while (rows.length > 2 && rows[1].div.offsetTop + scroll < 0) {
+		if (!firstAdded) while (rows.length > 2 && rows[1].div.offsetTop + scroll < 0) {
 			scroll += rows[1].div.offsetTop;
 			rows.splice(0, 1);
 		}
 
-		while (rows.length && rows[rows.length - 1].div.offsetTop + scroll > height) {
+		if (!lastAdded) while (rows.length && rows[rows.length - 1].div.offsetTop + scroll > height) {
 			rows.splice(rows.length - 1, 1);
 		}
 
