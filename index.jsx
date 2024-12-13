@@ -32,3 +32,4 @@ export { default as Drag } from './components/display/Drag.jsx';
 export { default as Switch } from './components/inputs/Switch.jsx';
 export { default as ColorPicker } from './components/inputs/ColorPicker.jsx';
 export { default as Date } from './components/inputs/Date.jsx';
+export { default as Scroll } from './components/navigation/Scroll.jsx';
