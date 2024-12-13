@@ -51,6 +51,14 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 	const active = Observer.mutable(false);
 	const actuallyActive = Observer.all([active, autoHide]).map(([active, autoHide]) => !autoHide || active);
 
+	const move = (x, y) => {
+		const b = bounds.get();
+		const max = type => b['client_' + type] - b['scroll_' + type];
+
+		scrollX.set(Math.min(Math.max(x, max('horizontal')), 0));
+		scrollY.set(Math.min(Math.max(y, max('vertical')), 0));
+	};
+
 	const Bar = ({type, scroll}, cleanup) => {
 		const hovered = Observer.mutable(false);
 		const down = Observer.mutable(null);
@@ -73,6 +81,8 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 
 				scroll.set(-Math.min(Math.max(0, client - off) / (b['client_' + type] - size.get()), 1)
 					* (b['scroll_' + type] - b['client_' + type]));
+
+				move(scrollX.get(), scrollY.get());
 			};
 
 			const cancel = e => {
@@ -127,6 +137,8 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 				client_horizontal: Div.clientWidth,
 				client_vertical: Div.clientHeight,
 			});
+
+			move(scrollX.get(), scrollY.get());
 		};
 
 		const observer = new MutationObserver((mutationList) => {
@@ -162,11 +174,7 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 				y = tmp;
 			}
 
-			const b = bounds.get();
-			const max = type => b['client_' + type] - b['scroll_' + type];
-
-			scrollX.set(Math.max(Math.min(scrollX.get() - x, 0), max('horizontal')));
-			scrollY.set(Math.max(Math.min(scrollY.get() - y, 0), max('vertical')));
+			move(scrollX.get() - x, scrollY.get() - y);
 		}}
 		isHovered={active}
 		style={style}
