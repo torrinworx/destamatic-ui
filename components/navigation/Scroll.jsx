@@ -18,10 +18,12 @@ Theme.define({
 		width: '$size$px',
 		height: '$size$px',
 		borderRadius: '$div($size, 2)px',
+		pointerEvents: 'none',
 	},
 
 	scroll_bar_active: {
 		background: '$shiftBrightness($invert($color_top), 0.4)',
+		pointerEvents: 'auto',
 	},
 
 	scroll_body_vertical: {
@@ -130,8 +132,6 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 
 	const wheel = e => {
 		e.preventDefault();
-
-		console.log(e);
 
 		let x = e.deltaX;
 		let y = e.deltaY;
