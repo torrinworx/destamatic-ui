@@ -6,6 +6,7 @@ import Observer from 'destam/Observer';
 Theme.define({
 	scroll_body: {
 		position: 'relative',
+		overflow: 'visible',
 	},
 
 	scroll_bar: {
@@ -24,11 +25,11 @@ Theme.define({
 	},
 
 	scroll_body_vertical: {
-		overflowY: 'hidden',
+		overflowY: 'clip',
 	},
 
 	scroll_body_horizontal: {
-		overflowX: 'hidden',
+		overflowX: 'clip',
 	},
 
 	scroll_hovered: {
@@ -55,8 +56,8 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 		const b = bounds.get();
 		const max = type => b['client_' + type] - b['scroll_' + type];
 
-		scrollX.set(Math.min(Math.max(x, max('horizontal')), 0));
-		scrollY.set(Math.min(Math.max(y, max('vertical')), 0));
+		if (horizontal.get()) scrollX.set(Math.min(Math.max(x, max('horizontal')), 0));
+		if (vertical.get()) scrollY.set(Math.min(Math.max(y, max('vertical')), 0));
 	};
 
 	const Bar = ({type, scroll}, cleanup) => {
@@ -81,8 +82,6 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 
 				scroll.set(-Math.min(Math.max(0, client - off) / (b['client_' + type] - size.get()), 1)
 					* (b['scroll_' + type] - b['client_' + type]));
-
-				move(scrollX.get(), scrollY.get());
 			};
 
 			const cancel = e => {
