@@ -1,11 +1,14 @@
-import { Scroll, Button } from 'destamatic-ui';
+import { Scroll, Button, Paper } from 'destamatic-ui';
 import { Observer, mount } from 'destam-dom';
 
 const width = Observer.mutable(100);
 const height = Observer.mutable(100);
 
 mount(document.body, <>
-	<div theme="center" style={{position: 'absolute', inset: 0}}>
+	<div theme="center" style={{position: 'absolute', inset: 0, flexDirection: 'column'}}>
+		<Scroll vertical={false} invertScroll style={{width: 500}}>
+			{Array(10).fill(null).map(() => <Paper style={{display: "inline-block"}}>Hello world</Paper>)}
+		</Scroll>
 		<Scroll style={{width: 500, height: 500}}>
 			<div style={{
 				width,
