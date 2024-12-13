@@ -1,4 +1,5 @@
-import { Observer  } from 'destam-dom';
+import { Observer } from 'destam-dom';
+
 import { h } from '../utils/h';
 import Theme from '../utils/Theme';
 
