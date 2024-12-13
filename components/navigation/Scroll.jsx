@@ -128,6 +128,23 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 		/>;
 	};
 
+	const wheel = e => {
+		e.preventDefault();
+
+		console.log(e);
+
+		let x = e.deltaX;
+		let y = e.deltaY;
+
+		if (e.shiftKey === !invertScroll.get()) {
+			let tmp = x;
+			x = y;
+			y = tmp;
+		}
+
+		move(scrollX.get() - x, scrollY.get() - y);
+	};
+
 	mounted(() => {
 		const update = () => {
 			bounds.set({
@@ -163,18 +180,8 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 			vertical.map(v => v ? 'vertical' : null),
 			horizontal.map(v => v ? 'horizontal' : null),
 		]}
-		onWheel={e => {
-			let x = e.deltaX;
-			let y = e.deltaY;
-
-			if (e.shiftKey === !invertScroll.get()) {
-				let tmp = x;
-				x = y;
-				y = tmp;
-			}
-
-			move(scrollX.get() - x, scrollY.get() - y);
-		}}
+		onWheel={wheel}
+		onMouseWheel={wheel}
 		isHovered={active}
 		style={style}
 	>
