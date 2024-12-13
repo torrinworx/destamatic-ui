@@ -122,8 +122,8 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 	mounted(() => {
 		const update = () => {
 			bounds.set({
-				scroll_horizontal: Content.scrollWidth,
-				scroll_vertical: Content.scrollHeight,
+				scroll_horizontal: Content.clientWidth,
+				scroll_vertical: Content.clientHeight,
 				client_horizontal: Div.clientWidth,
 				client_vertical: Div.clientHeight,
 			});
@@ -175,6 +175,7 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 			position: 'relative',
 			top: scrollY,
 			left: scrollX,
+			display: 'inline-block',
 		}}>
 			{children}
 		</Content>
