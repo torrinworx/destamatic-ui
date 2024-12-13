@@ -183,6 +183,7 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 			top: scrollY,
 			left: scrollX,
 			display: 'inline-block',
+			textWrap: vertical.map(v => v ? 'wrap' : 'nowrap'),
 		}}>
 			{children}
 		</Content>
