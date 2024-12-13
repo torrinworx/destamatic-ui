@@ -36,9 +36,10 @@ Theme.define({
 	},
 });
 
-const Scroll = ({theme = "primary", children, vertical = true, horizontal = true, style}, cleanup, mounted) => {
+const Scroll = ({theme = "primary", children, vertical = true, horizontal = true, autoHide = true, style}, cleanup, mounted) => {
 	if (!(vertical instanceof Observer)) vertical = Observer.immutable(vertical);
 	if (!(horizontal instanceof Observer)) horizontal = Observer.immutable(horizontal);
+	if (!(autoHide instanceof Observer)) autoHide = Observer.immutable(autoHide);
 
 	const Div = <raw:div />;
 	const Content = <raw:div />;
@@ -46,6 +47,8 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 	const bounds = Observer.mutable();
 	const scrollX = Observer.mutable(0);
 	const scrollY = Observer.mutable(0);
+	const active = Observer.mutable(false);
+	const actuallyActive = Observer.all([active, autoHide]).map(([active, autoHide]) => !autoHide || active);
 
 	const Bar = ({type, scroll}, cleanup) => {
 		const hovered = Observer.mutable(false);
@@ -96,7 +99,8 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 				"scroll",
 				"bar",
 				type,
-				bounds.map(bounds => bounds && bounds['scroll_' + type] > bounds['client_' + type] ? 'active' : null),
+				Observer.all([actuallyActive, bounds])
+					.map(([active, bounds]) => active && bounds && bounds['scroll_' + type] > bounds['client_' + type] ? 'active' : null),
 				Observer.all([down, hovered]).map(([d, h]) => d || h ? 'hovered' : null),
 			]}
 			style={{
@@ -113,7 +117,6 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 			}}
 		/>;
 	};
-
 
 	mounted(() => {
 		const update = () => {
@@ -164,6 +167,7 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 			scrollX.set(Math.max(Math.min(scrollX.get() - x, 0), max('horizontal')));
 			scrollY.set(Math.max(Math.min(scrollY.get() - y, 0), max('vertical')));
 		}}
+		isHovered={active}
 		style={style}
 	>
 		<Content style={{
