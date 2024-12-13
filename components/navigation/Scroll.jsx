@@ -36,10 +36,11 @@ Theme.define({
 	},
 });
 
-const Scroll = ({theme = "primary", children, vertical = true, horizontal = true, autoHide = true, style}, cleanup, mounted) => {
+const Scroll = ({theme = "primary", children, vertical = true, horizontal = true, autoHide = true, invertScroll = false, style}, cleanup, mounted) => {
 	if (!(vertical instanceof Observer)) vertical = Observer.immutable(vertical);
 	if (!(horizontal instanceof Observer)) horizontal = Observer.immutable(horizontal);
 	if (!(autoHide instanceof Observer)) autoHide = Observer.immutable(autoHide);
+	if (!(invertScroll instanceof Observer)) invertScroll = Observer.immutable(invertScroll);
 
 	const Div = <raw:div />;
 	const Content = <raw:div />;
@@ -155,7 +156,7 @@ const Scroll = ({theme = "primary", children, vertical = true, horizontal = true
 			let x = e.deltaX;
 			let y = e.deltaY;
 
-			if (e.shiftKey) {
+			if (e.shiftKey === !invertScroll.get()) {
 				let tmp = x;
 				x = y;
 				y = tmp;
