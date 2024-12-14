@@ -1,38 +1,94 @@
 import { h } from '../utils/h';
-import { Observer } from 'destam-dom';
+import Observer from 'destam/Observer';
+import Theme from '../utils/Theme';
+import Typography from '../display/Typography';
 
-/**
- * Radio component that allows a user to select one item from a list of items.
- *
- * @param {Object} props - The properties object.
- * @param {Array<{ label: string, value: string }>} props.items - The list of items to be rendered as radio buttons.
- * @param {Observer<string>} [props.OValue] - Observable selected value.
- * @param {function} [props.onChange] - Function to call when the selected value changes.
- * @param {Object} [props.style] - Custom styles to apply to the button.
- * 
- * @returns {JSX.Element} The rendered Radio component.
- */
-const Radio = ({ items, value, onChange, style, ...props}) => {
-    if (!(value instanceof Observer)) value = Observer.immutable(value);
+Theme.define({
+	radio_label: {
+		display: 'flex',
+		flexDirection: 'row',
+		gap: 10,
+	},
 
-	const selector = value.selector();
+	radio_typography: {
+		extends: 'center',
+	},
 
-    return <div style={style}>
-        {items.map(item => (
-            <label $style={{ display: 'block', margin: '5px 0' }} key={item.value}>
-                <input
-                    type="radio"
-                    $checked={selector(item.value)}
-                    onInput={e => {
-						value.set(item.value);
-        				if (onChange) onChange(e);
-					}}
-                    {...props}
-                />
-                {item.label}
-            </label>
-        ))}
-    </div>;
+	radio_ring: {
+		extends: 'center',
+		position: 'relative',
+		borderRadius: '50%',
+		width: '80%',
+		height: '80%',
+		cursor: 'pointer',
+
+		$size: 30,
+	},
+
+	radio_ring_1: {
+		background: '$alpha($color, 0.8)',
+		width: '$size$px',
+		height: '$size$px',
+	},
+
+	radio_ring_1_selected: {
+		background: '$color',
+	},
+
+	radio_ring_2: {
+		background: '$invert($color_top)',
+	},
+
+	radio_ring_3: {
+		transition: 'width 100ms ease-in-out, height 100ms ease-in-out',
+		background: '$color',
+		width: 0,
+		height: 0,
+	},
+
+	radio_ring_3_hovered: {
+		background: '$color',
+		width: '20%',
+		height: '20%',
+	},
+
+	radio_ring_3_selected: {
+		background: '$color',
+		width: '80%',
+		height: '80%',
+	},
+});
+
+const Radio = (sel) => {
+	const selector = sel.selector('selected', null);
+
+	return ({theme = "primary", style, value, label}) => {
+		const hovered = Observer.mutable(false);
+		const hoveredTheme = hovered.map(h => h ? 'hovered' : null);
+		const selected = selector(value);
+
+		let out = <div
+				isHovered={hovered}
+				onClick={e => {
+					e.preventDefault();
+					sel.set(value);
+				}}
+				style={style}
+				theme={[theme, 'radio', 'ring', '1', hoveredTheme, selected]}>
+			<div theme={[theme, 'radio', 'ring', '2', hoveredTheme, selected]}>
+				<div theme={[theme, 'radio', 'ring', '3', hoveredTheme, selected]} />
+			</div>
+		</div>;
+
+		if (label) {
+			out = <div theme={[theme, 'radio', 'label']}>
+				{out}
+				<Typography type="h6" theme={[theme, 'radio']}>{label}</Typography>
+			</div>;
+		}
+
+		return out;
+	};
 };
 
 export default Radio;
