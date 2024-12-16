@@ -19,7 +19,7 @@ Theme.define({
 	},
 });
 
-const Drag = ({dragging, children, map, constrained = true, ...props}, cleanup, mounted) => {
+const Drag = ({theme = "primary", dragging, children, map, constrained = true, ...props}, cleanup, mounted) => {
 	assert(children.length === 1, "Drag can only have one child");
 
 	const array = children[0];
@@ -55,7 +55,7 @@ const Drag = ({dragging, children, map, constrained = true, ...props}, cleanup, 
 
 	const Elem = ({each}) => {
 		const {elem, mounted, pos, wrapper: Div} = each;
-		return <Div theme="drag_item" style={{
+		return <Div theme={[theme, 'drag', 'item']} style={{
 			visibility: mounted.map(m => m ? 'visible' : 'hidden'),
 			top: Observer.all([pos, totalHeight]).map(([val, height]) => {
 				if (constrained && mounted.get()) {
@@ -231,7 +231,7 @@ const Drag = ({dragging, children, map, constrained = true, ...props}, cleanup, 
 		};
 	}))
 
-	return <Ref theme="drag" style={{height: totalHeight}} {...props}><Elem each={rendered} /></Ref>;
+	return <Ref theme={[theme, 'drag']} style={{height: totalHeight}} {...props}><Elem each={rendered} /></Ref>;
 };
 
 export default Drag;
