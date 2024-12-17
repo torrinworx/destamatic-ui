@@ -34,3 +34,5 @@ export { default as Switch } from './components/inputs/Switch.jsx';
 export { default as ColorPicker } from './components/inputs/ColorPicker.jsx';
 export { default as Date } from './components/inputs/Date.jsx';
 export { default as Scroll } from './components/navigation/Scroll.jsx';
+export { default as Column } from './components/display/Column.jsx';
+export { default as Row } from './components/display/Row.jsx';
