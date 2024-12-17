@@ -1,6 +1,6 @@
-import { h } from '../utils/h';
 import Observer from 'destam/Observer';
 import Theme from '../utils/Theme';
+import ThemeContext from '../utils/ThemeContext';
 import Typography from '../display/Typography';
 
 Theme.define({
@@ -59,36 +59,38 @@ Theme.define({
 	},
 });
 
-const Radio = (sel) => {
-	const selector = sel.selector('selected', null);
+export default ThemeContext.use(h => {
+	const Radio = (sel) => {
+		const selector = sel.selector('selected', null);
 
-	return ({theme = "primary", style, value, label}) => {
-		const hovered = Observer.mutable(false);
-		const hoveredTheme = hovered.map(h => h ? 'hovered' : null);
-		const selected = selector(value);
+		return ({style, value, label}) => {
+			const hovered = Observer.mutable(false);
+			const hoveredTheme = hovered.map(h => h ? 'hovered' : null);
+			const selected = selector(value);
 
-		let out = <div
-				isHovered={hovered}
-				onClick={e => {
-					e.preventDefault();
-					sel.set(value);
-				}}
-				style={style}
-				theme={[theme, 'radio', 'ring', '1', hoveredTheme, selected]}>
-			<div theme={[theme, 'radio', 'ring', '2', hoveredTheme, selected]}>
-				<div theme={[theme, 'radio', 'ring', '3', hoveredTheme, selected]} />
-			</div>
-		</div>;
-
-		if (label) {
-			out = <div theme={[theme, 'radio', 'label']}>
-				{out}
-				<Typography type="h6" theme={[theme, 'radio']}>{label}</Typography>
+			let out = <div
+					isHovered={hovered}
+					onClick={e => {
+						e.preventDefault();
+						sel.set(value);
+					}}
+					style={style}
+					theme={['radio', 'ring', '1', hoveredTheme, selected]}>
+				<div theme={['radio', 'ring', '2', hoveredTheme, selected]}>
+					<div theme={['radio', 'ring', '3', hoveredTheme, selected]} />
+				</div>
 			</div>;
-		}
 
-		return out;
+			if (label) {
+				out = <div theme={['radio', 'label']}>
+					{out}
+					<Typography type="h6" theme={['radio']}>{label}</Typography>
+				</div>;
+			}
+
+			return out;
+		};
 	};
-};
 
-export default Radio;
+	return Radio;
+});

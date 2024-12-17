@@ -1,7 +1,8 @@
-import { Observer, mount } from 'destam-dom';
+import { Observer, mount, OObject } from 'destam-dom';
 import {
     popups,
     Theme,
+    ThemeContext,
     Typography,
     Button,
     Icon,
@@ -19,6 +20,7 @@ import {
     Date as DateComponent,
     h
 } from 'destamatic-ui';
+import color from 'destamatic-ui/util/color';
 
 const DemoPage = () => {
     const handleClick = () => {
@@ -29,6 +31,12 @@ const DemoPage = () => {
     const text = Observer.mutable('');
 
     const date = Observer.mutable(new Date());
+
+    const specialTheme = OObject({
+        special: OObject({
+            $color: 'green'
+        })
+    });
 
     const markdown = Observer.mutable(`
 # h1, **bold** *italic* ***bold and italic***
@@ -112,9 +120,14 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
         </Tabs>
 
         <div theme="center" style={{flexDirection: 'column'}}>
-            <ColorPicker value={Observer.mutable([0, 1, 0])} />
+            <ColorPicker value={specialTheme.observer.path(['special', '$color'])
+                .setter((val, set) => set(color.toCSS(val)))} />
 
-            <DateComponent value={date} />
+            <Theme value={specialTheme}>
+                <ThemeContext value="special">
+                    <DateComponent value={date} />
+                </ThemeContext>
+            </Theme>
             <Button onClick={() => {
                 let d = new Date(date.get());
                 d.setFullYear(d.getFullYear() + 1);

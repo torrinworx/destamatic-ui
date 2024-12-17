@@ -1,47 +1,49 @@
-import { h } from '../utils/h';
 import Theme from '../utils/Theme';
+import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
-    typography_h1: { fontSize: 62 },
-    typography_h2: { fontSize: 56 },
-    typography_h3: { fontSize: 36 },
-    typography_h4: { fontSize: 30 },
-    typography_h5: { fontSize: 24 },
-    typography_h6: { fontSize: 20 },
-    typography_p1: { fontSize: 16 },
-    typography_p2: { fontSize: 14 },
-    typography_regular: { fontStyle: 'normal' },
-    typography_bold: { fontWeight: 'bold' },
-    typography_italic: { fontStyle: 'italic' },
-    typography_center: { textAlign: 'center' },
+	typography_h1: { fontSize: 62 },
+	typography_h2: { fontSize: 56 },
+	typography_h3: { fontSize: 36 },
+	typography_h4: { fontSize: 30 },
+	typography_h5: { fontSize: 24 },
+	typography_h6: { fontSize: 20 },
+	typography_p1: { fontSize: 16 },
+	typography_p2: { fontSize: 14 },
+	typography_regular: { fontStyle: 'normal' },
+	typography_bold: { fontWeight: 'bold' },
+	typography_italic: { fontStyle: 'italic' },
+	typography_center: { textAlign: 'center' },
 });
 
-/**
- * Typography component for rendering text with different styles and types.
- * 
- * @param {Object} props - The properties object.
- * @param {string} [props.type='h1'] - The typography type, which determines the textual style. Must be a key in `Shared.Theme.Typography`.
- * @param {string} [props.fontStyle='regular'] - The font style for the typography. Must be a key under the specified type in `Shared.Theme.Typography`.
- * @param {JSX.Element | string} props.children - The content to be displayed inside the typography component.
- * @param {Object} [props.style] - Custom styles to be applied to the typography component.
- * @param {...Object} [props] - Additional properties to spread onto the typography element.
- * 
- * @returns {JSX.Element} The rendered typography element.
- */
-const Typography = ({ inline, type = 'h1', theme = "primary", fontStyle = 'regular', bold, center, children, style, ...props }) => {
-    if (bold) fontStyle = 'bold';
+export default ThemeContext.use(h => {
+	/**
+	 * Typography component for rendering text with different styles and types.
+	 *
+	 * @param {Object} props - The properties object.
+	 * @param {string} [props.type='h1'] - The typography type, which determines the textual style. Must be a key in `Shared.Theme.Typography`.
+	 * @param {string} [props.fontStyle='regular'] - The font style for the typography. Must be a key under the specified type in `Shared.Theme.Typography`.
+	 * @param {JSX.Element | string} props.children - The content to be displayed inside the typography component.
+	 * @param {Object} [props.style] - Custom styles to be applied to the typography component.
+	 * @param {...Object} [props] - Additional properties to spread onto the typography element.
+	 *
+	 * @returns {JSX.Element} The rendered typography element.
+	 */
+	const Typography = ({ inline, type = 'h1', fontStyle = 'regular', bold, center, children, style, ...props }) => {
+		if (bold) fontStyle = 'bold';
 
-    return <div
-        theme={[theme, 'typography', type, center ? 'center' : null, fontStyle]}
-        style={{
+		return <div
+			style={{
 
-            display: inline ? 'inline-flex' : 'flex',
-            ...style
-        }}
-        {...props}
-    >
-        {children}
-    </div>;
-};
+				display: inline ? 'inline-flex' : 'flex',
+				...style
+			}}
+			{...props}
+			theme={['typography', type, center ? 'center' : null, fontStyle]}
+		>
+			{children}
+		</div>;
+	};
 
-export default Typography;
+	return Typography;
+});

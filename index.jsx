@@ -10,6 +10,7 @@ export { default as Ripple } from './components/utils/Ripple.jsx';
 export { default as Shown } from './components/utils/Shown.jsx'
 export { default as TextArea } from './components/inputs/TextArea.jsx';
 export { default as Theme } from './components/utils/Theme.jsx';
+export { default as ThemeContext } from './components/utils/ThemeContext.jsx';
 export { default as Typography } from './components/display/Typography.jsx';
 export { default as Router } from './components/utils/Router.jsx';
 export { default as Radio } from './components/inputs/Radio.jsx';

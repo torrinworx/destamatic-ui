@@ -1,6 +1,7 @@
-import { h, svg } from '../utils/h';
+import { svg } from '../utils/h';
 import { Observer, OObject } from 'destam-dom';
 import Theme from '../utils/Theme';
+import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
     icon: {
@@ -37,72 +38,73 @@ const loadIcon = async (libraryName, iconName, style) => {
     }
 }
 
-/**
- * Icon component that dynamically loads and renders an SVG icon from a specified library.
- * 
- * Uses an asynchronous function to fetch the SVG content of the icon.
- * 
- * @param {Object} props - The properties object.
- * @param {string} props.libraryName - The name of the icon library (e.g., 'feather').
- * @param {string} props.iconName - The name of the icon to load from the library.
- * @param {string} [props.size='20'] - The size of the icon.
- * @param {Object} [props.style] - Custom styles to apply to the icon's wrapper element.
- * @param {...Object} [props] - Additional properties to spread onto the icon's wrapper element.
- * 
- * @returns {JSX.Element} The rendered icon element.
- */
-const Icon = ({
-    lib,
-    libraryName,
-    name,
-    theme,
-    iconName,
-    size='20',
-    ref: Ref,
-    ...props
-}) => {
-    if (!Ref) Ref = <svg:svg />;
+export default ThemeContext.use(h => {
+    /**
+     * Icon component that dynamically loads and renders an SVG icon from a specified library.
+     *
+     * Uses an asynchronous function to fetch the SVG content of the icon.
+     *
+     * @param {Object} props - The properties object.
+     * @param {string} props.libraryName - The name of the icon library (e.g., 'feather').
+     * @param {string} props.iconName - The name of the icon to load from the library.
+     * @param {string} [props.size='20'] - The size of the icon.
+     * @param {Object} [props.style] - Custom styles to apply to the icon's wrapper element.
+     * @param {...Object} [props] - Additional properties to spread onto the icon's wrapper element.
+     *
+     * @returns {JSX.Element} The rendered icon element.
+     */
+    const Icon = ({
+        lib,
+        libraryName,
+        name,
+        iconName,
+        size='20',
+        ref: Ref,
+        ...props
+    }) => {
+        if (!Ref) Ref = <svg:svg />;
 
-    const svgChildren = Observer.mutable(null);
-    const svgProps = OObject();
-    const libClass = Observer.mutable('');
+        const svgChildren = Observer.mutable(null);
+        const svgProps = OObject();
+        const libClass = Observer.mutable('');
 
-    const styleObject = { height: size, width: size };
-    const ready = Observer.mutable(false);
+        const styleObject = { height: size, width: size };
+        const ready = Observer.mutable(false);
 
-    loadIcon(lib ?? libraryName, name ?? iconName, styleObject)
-        .then(svgContent => {
-            const parser = new DOMParser();
-            const svg = parser.parseFromString(svgContent, 'image/svg+xml').children[0];
+        loadIcon(lib ?? libraryName, name ?? iconName, styleObject)
+            .then(svgContent => {
+                const parser = new DOMParser();
+                const svg = parser.parseFromString(svgContent, 'image/svg+xml').children[0];
 
-            for (let i = 0; i < svg.attributes.length; i++) {
-                const attr = svg.attributes[i];
+                for (let i = 0; i < svg.attributes.length; i++) {
+                    const attr = svg.attributes[i];
 
-                if (attr.nodeName === 'class') {
-                    libClass.set(attr.nodeValue);
-                } else {
-                    Ref.setAttribute(attr.nodeName, attr.nodeValue);
+                    if (attr.nodeName === 'class') {
+                        libClass.set(attr.nodeValue);
+                    } else {
+                        Ref.setAttribute(attr.nodeName, attr.nodeValue);
+                    }
                 }
-            }
 
-            while (svg.firstElementChild) {
-                Ref.appendChild(svg.firstElementChild);
-            }
+                while (svg.firstElementChild) {
+                    Ref.appendChild(svg.firstElementChild);
+                }
 
-            ready.set(true);
-        })
-        .catch(error => {
-            console.error(error.message);
-        });
+                ready.set(true);
+            })
+            .catch(error => {
+                console.error(error.message);
+            });
 
-    return <Ref
-        class={libClass}
-        theme={['icon', theme]}
-        style={{
-            display: ready.map(r => r ? null : 'none'),
-        }}
-        {...props}
-    />;
-};
+        return <Ref
+            class={libClass}
+            theme="icon"
+            style={{
+                display: ready.map(r => r ? null : 'none'),
+            }}
+            {...props}
+        />;
+    };
 
-export default Icon;
+    return Icon;
+});
