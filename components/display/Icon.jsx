@@ -5,7 +5,7 @@ import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
     icon: {
-        display: 'inline-block'
+        display: 'inline-block',
     }
 });
 
@@ -58,6 +58,7 @@ export default ThemeContext.use(h => {
         libraryName,
         name,
         iconName,
+        style,
         size='20',
         ref: Ref,
         ...props
@@ -98,11 +99,12 @@ export default ThemeContext.use(h => {
 
         return <Ref
             class={libClass}
-            theme="icon"
             style={{
                 display: ready.map(r => r ? null : 'none'),
+                ...style
             }}
             {...props}
+            theme="icon"
         />;
     };
 
