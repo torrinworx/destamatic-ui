@@ -5,6 +5,7 @@ Theme.define({
 	row: {
 		display: 'flex',
 		flexDirection: 'row',
+		alignItems: 'center',
 	},
 
 	row_inline: {
@@ -13,8 +14,17 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Row = ({ children, type, inline, ...props }) => {
-		return <div {...props} theme={["row", type, inline ? 'inline' : null]}>
+	const Row = ({ children, type, inline, gap, style, ...props }) => {
+		if (gap) style = {
+			gap: gap,
+			...style,
+		};
+
+		return <div
+			{...props}
+			style={style}
+			theme={["row", type, inline ? 'inline' : null]}
+		>
 			{children}
 		</div>;
 	};

@@ -13,8 +13,17 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Column = ({ children, type, inline, ...props }) => {
-		return <div {...props} theme={["column", type, inline ? 'inline' : null]}>
+	const Column = ({ children, type, inline, gap, style, ...props }) => {
+		if (gap) style = {
+			gap: gap,
+			...style,
+		};
+
+		return <div
+			{...props}
+			style={style}
+			theme={["column", type, inline ? 'inline' : null]}
+		>
 			{children}
 		</div>;
 	};
