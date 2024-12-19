@@ -6,7 +6,7 @@ Theme.define({
 		extends: 'radius',
 		background: '$invert($color_top)',
 		color: '$color_top',
-		boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
+		boxShadow: '4px 4px 10px $alpha($color_top, 0.2)',
 		padding: 10,
 		maxWidth: 'inherit',
 		maxHeight: 'inherit',
