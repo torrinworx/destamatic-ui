@@ -10,7 +10,21 @@
     "test": ""
   },
   "keywords": [],
-  "author": "",
+  "contributors": [
+    {
+      "name": "Torrin Z. Leonard",
+      "email": "torrin@worx4you.com",
+      "url": "https://torrinleonard.com"
+    },
+    {
+      "name": "Alexander Orzechowski",
+      "url": "https://ozal.ski/"
+    },
+    {
+      "name": "Max Weissman",
+      "url": "https://www.linkedin.com/in/max-weissman/"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "destam": "^0.4.0",
