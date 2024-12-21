@@ -32,7 +32,8 @@ export default ThemeContext.use(h => {
 			}}
 			{...props}
 			theme={[
-				'field', 'line',
+				'field',
+				'line',
 				type,
 				focus.map(e => e ? 'focused' : null),
 				error.map(e => e ? 'error' : null),

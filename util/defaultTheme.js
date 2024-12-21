@@ -26,7 +26,7 @@ export default {
 	"*": {
 		fontFamily: 'Roboto, sans-serif',
 		boxSizing: 'border-box',
-		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
+		transition: '250ms ease-out',
 
 		/*
 		Adjusts the brightness of the input colour by shifting its value in the HSV colour space. Accepts colours
@@ -144,7 +144,6 @@ export default {
 	field: {
 		extends: 'radius_typography_p1_regular_focusable',
 		outline: 0,
-
 		padding: 10,
 		background: '$invert($color_top)',
 		color: '$color_top',
@@ -161,5 +160,9 @@ export default {
 
 	tight: {
 		padding: 0,
+	},
+
+	shadow: {
+		boxShadow: '4px 4px 10px $alpha($color_top, 0.2)',
 	},
 };

@@ -57,7 +57,8 @@ export default ThemeContext.use(h => {
 
 		const _class = themer(
 			theme,
-			'field', 'area',
+			'field',
+			'area',
 			type,
 			isFocused.map(e => e ? 'focused' : null),
 			error.map(e => e ? 'error' : null));

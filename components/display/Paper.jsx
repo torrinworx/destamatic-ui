@@ -3,10 +3,9 @@ import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
 	paper: {
-		extends: 'radius',
+		extends: 'radius_shadow',
 		background: '$invert($color_top)',
 		color: '$color_top',
-		boxShadow: '4px 4px 10px $alpha($color_top, 0.2)',
 		padding: 10,
 		maxWidth: 'inherit',
 		maxHeight: 'inherit',
