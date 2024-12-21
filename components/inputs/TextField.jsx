@@ -2,7 +2,7 @@ import ThemeContext from '../utils/ThemeContext';
 import Observer from 'destam/Observer';
 
 export default ThemeContext.use(h => {
-	const TextField = ({ value, style, type, inline, expand, onEnter, error, autoselect, onFocus, ...props }) => {
+	const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error, autoselect, onFocus, ...props }) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
 		expand = Observer.immutable(expand);
@@ -20,7 +20,7 @@ export default ThemeContext.use(h => {
 				}
 				value.set(e.target.value);
 			}}
-			type='text'
+			type={type}
 			isFocused={focus}
 			onKeyDown={e => {
 				if (e.key === 'Enter') {
@@ -34,7 +34,6 @@ export default ThemeContext.use(h => {
 			theme={[
 				'field',
 				'line',
-				type,
 				focus.map(e => e ? 'focused' : null),
 				error.map(e => e ? 'error' : null),
 				expand.map(e => e ? 'expand' : null),
