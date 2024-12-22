@@ -1,0 +1,42 @@
+name: Publish to NPM
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Extract Version from Tag
+        id: extract_version
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$TAG_VERSION" >> $GITHUB_ENV
+
+      - name: Update package.json Version
+        run: |
+          npm pkg set version=${{ env.VERSION }}
+
+      - name: Verify package.json Version
+        run: |
+          grep "\"version\": \"${{ env.VERSION }}\"" package.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Publish to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
