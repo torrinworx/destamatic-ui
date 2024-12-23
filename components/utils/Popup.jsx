@@ -63,7 +63,7 @@ const Popup = ({ children, style, placement, ref: Ref }, cleanup, mounted) => {
 
         mounted(() => {
             setTimeout(() => {
-                document.body.addEventListener('click', listener);
+                document.body.addEventListener('mousedown', listener);
             }, 0);
         });
     }
@@ -75,7 +75,7 @@ const Popup = ({ children, style, placement, ref: Ref }, cleanup, mounted) => {
         if (index >= 0) popups.splice(index, 1);
 
         if (listener) {
-            document.body.removeEventListener('click', listener);
+            document.body.removeEventListener('mousedown', listener);
         }
     });
 
