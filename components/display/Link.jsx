@@ -1,5 +1,5 @@
-import { h } from '../utils/h';
 import { Observer } from 'destam-dom';
+import ThemeContext from '../utils/ThemeContext';
 
 /**
  * Link component for navigation with optional styles and typography integration.
@@ -14,34 +14,36 @@ import { Observer } from 'destam-dom';
  * 
  * @returns {JSX.Element} The rendered link component.
  */
-const Link = ({
-    href,
-    underline = true,
-    onClick,
-    hover=Observer.mutable(false),
-    children,
-    style,
-    ...props
-}) => {
-    if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
+export default ThemeContext.use(h => {
+	const Link = ({
+		href,
+		underline = true,
+		onClick,
+		hover=Observer.mutable(false),
+		children,
+		style,
+		...props
+	}) => {
+		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
-    return <a
-        href={href}
-        onMouseDown={(event) => {
-        if (onClick) {
-            onClick(event);
-        }
-    }}
-        isHovered={hover}
-        theme={[
-            'link',
-            underline ? 'underline' : null,
-            hover.map(h => h ? 'hovered' : null)
-        ]}
-        {...props}
-    >
-        {children}
-    </a>;
-};
+		return <a
+			href={href}
+			onMouseDown={(event) => {
+			if (onClick) {
+				onClick(event);
+			}
+		}}
+			isHovered={hover}
+			theme={[
+				'link',
+				underline ? 'underline' : null,
+				hover.map(h => h ? 'hovered' : null)
+			]}
+			{...props}
+		>
+			{children}
+		</a>;
+	};
 
-export default Link;
+	return Link;
+});
