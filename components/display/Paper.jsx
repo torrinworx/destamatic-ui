@@ -14,10 +14,12 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Paper = ({ children, type, tight, ...props }) => {
-		return <div {...props} theme={["paper", type, tight ? 'tight' : null]}>
+	const Paper = ({ ref: Ref, children, type, tight, ...props }) => {
+		if (!Ref) Ref = <raw:div />;
+
+		return <Ref {...props} theme={["paper", type, tight ? 'tight' : null]}>
 			{children}
-		</div>;
+		</Ref>;
 	};
 
 	return Paper;
