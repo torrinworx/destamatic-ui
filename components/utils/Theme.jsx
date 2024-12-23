@@ -127,7 +127,7 @@ const getClasses = (trie, classes) => {
 };
 
 const ignoreMutates = obs => {
-	return Observer(obs.get, obs.set, (listener, governor) => obs.register_((commit, ...args) => {
+	return Observer(() => obs.get(), v => obs.set(v), (listener, governor) => obs.register_((commit, ...args) => {
 		let through = false;
 		for (const c of commit) {
 			if (c instanceof Insert || c instanceof Delete) {
