@@ -26,7 +26,7 @@ export default {
 	"*": {
 		fontFamily: 'Roboto, sans-serif',
 		boxSizing: 'border-box',
-		transition: '250ms ease-out',
+		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out, color 250ms ease-in-out',
 
 		/*
 		Adjusts the brightness of the input colour by shifting its value in the HSV colour space. Accepts colours
