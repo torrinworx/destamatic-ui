@@ -335,9 +335,7 @@ const createTheme = theme => {
 
 					if (directive === 'prop') {
 						return buildProperty(key, val, index);
-					}
-
-					if (directive === 'elem') {
+					} else if (directive === 'elem') {
 						raw.push(key, '.', nameItem, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
 							return buildProperty(key, val, index);
 						}), '\n}\n');
@@ -357,6 +355,10 @@ const createTheme = theme => {
 
 						val.index = index++;
 						vars.set(key, val);
+					} else if (directive === 'children') {
+						raw.push('.', nameItem, ' > ', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
+							return buildProperty(key, val, index);
+						}), '\n}\n');
 					} else {
 						throw new Error("Unknown theme directive: " + directive);
 					}
