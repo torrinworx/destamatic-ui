@@ -5,7 +5,9 @@ import Theme from './Theme';
 
 Theme.define({
     ripple: {
-        background: 'rgba(0, 0, 0, .3)',
+        extends: 'primary',
+
+        background: '$alpha($color_top, .3)',
         position: 'absolute',
         borderRadius: '50%',
         transition: 'transform 0.8s, opacity 0.8s',
