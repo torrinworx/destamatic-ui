@@ -22,10 +22,6 @@ Theme.define({
 		background: 'none',
 	},
 
-	button_text: {
-		border: 0,
-	},
-
 	button_text_hovered: {
 		background: 'rgb(0, 0, 0, 0.1)',
 	},
@@ -118,20 +114,27 @@ export default ThemeContext.use(h => {
 
 		return <Ref
 			onClick={(event) => {
-				if (!disabled.get() && onClick) {
+				if (disabled.get()) return;
+
+				if (onClick) {
 					createRipple(event);
 					onClick(event);
 				}
 			}}
 			onMouseDown={(event) => {
-				if (!disabled.get() && onMouseDown) {
+				if (disabled.get()) return;
+
+				if (onMouseDown) {
 					createRipple(event);
 					onMouseDown(event);
 				}
 			}}
 			onMouseUp={(event) => {
-				if (!disabled.get()) {
-					onMouseUp && onMouseUp(event);
+				if (disabled.get()) return;
+
+				if (onMouseUp) {
+					createRipple(event);
+					onMouseUp(event);
 				}
 			}}
 			isHovered={hover}
