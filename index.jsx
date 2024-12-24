@@ -4,7 +4,6 @@ export { default as Button } from './components/inputs/Button.jsx';
 export { default as Drawer } from './components/navigation/Drawer.jsx';
 export { default as DropDown } from './components/navigation/DropDown.jsx';
 export { default as Icon } from './components/display/Icon.jsx';
-export { default as KebabMenu } from './components/navigation/KebabMenu.jsx';
 export { default as LoadingDots } from './components/utils/LoadingDots.jsx';
 export { default as Ripple } from './components/utils/Ripple.jsx';
 export { default as Shown } from './components/utils/Shown.jsx'
