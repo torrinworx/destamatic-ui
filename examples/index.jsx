@@ -12,7 +12,6 @@ import {
     TextArea,
     Drawer,
     Slider,
-    KebabMenu,
     Markdown,
     Tabs,
     Paper,
@@ -237,24 +236,6 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
                 <Typography type="p1">Drawer Content</Typography>
             </div>
         </Drawer>
-
-        <div $style={{
-            position: 'absolute',
-            top: '0px',
-            right: '0px',
-        }}>
-            <KebabMenu anchor='down-left'>
-                <div $style={{
-                    background: 'grey',
-                    borderRadius: '10px',
-                }}>
-                    <Button label='hello' />
-                    <br />
-                    <Button label='world' />
-                </div>
-            </KebabMenu>
-        </div>
-
     </div>;
 };
 
