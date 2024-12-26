@@ -137,6 +137,14 @@ export default ThemeContext.use(h => {
 					onMouseUp(event);
 				}
 			}}
+			onKeyDown={(event) => {
+				if (!disabled.get() && (event.key === "Enter" || event.key === " ")) {
+					event.preventDefault();
+					createRipple(event);
+					if (onClick) onClick(event);
+					if (onMouseDown) onMouseDown(event);
+				}
+			}}
 			isHovered={hover}
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
