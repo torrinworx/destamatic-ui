@@ -20,6 +20,10 @@ Theme.define({
 		color: '$color_top',
 		boxShadow: 'none',
 		background: 'none',
+
+		_cssProp_focus: {
+			outline: 'none',
+		},
 	},
 
 	button_text_hovered: {
@@ -94,12 +98,14 @@ export default ThemeContext.use(h => {
 		style,
 		disabled,
 		hover,
+		focused,
 		ref: Ref,
 		children,
 		iconPosition = 'left',
 		...props
 	}) => {
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
+		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 		if (!Ref) Ref = <raw:button />;
 		if (label && typeof label === 'string') {
@@ -146,6 +152,7 @@ export default ThemeContext.use(h => {
 				}
 			}}
 			isHovered={hover}
+			isFocused={focused}
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
 				...style
@@ -157,6 +164,7 @@ export default ThemeContext.use(h => {
 				type,
 				hover.map(h => h ? 'hovered' : null),
 				disabled.map(d => d ? 'disabled' : null),
+				focused.map(d => d ? 'focused' : null),
 			]}
 		>
 			{iconPosition === 'left' ? Icon : null}
