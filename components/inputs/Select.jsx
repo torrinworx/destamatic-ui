@@ -79,7 +79,7 @@ export default ThemeContext.use(h => {
 				});
 			});
 
-			const radius = themer(theme, 'select').vars('radius');
+			const radius = Observer.immutable('50px'); //themer(theme, 'select').vars('radius');
 			const style = getComputedStyle(buttonRef);
 
 			return <Paper tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
