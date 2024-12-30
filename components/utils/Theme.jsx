@@ -359,6 +359,10 @@ const createTheme = theme => {
 						raw.push('.', nameItem, ' > ', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
 							return buildProperty(key, val, index);
 						}), '\n}\n');
+					} else if (directive === 'cssProp') {
+						raw.push('.', nameItem, ':', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
+							return buildProperty(key, val, index);
+						}), '\n}\n');
 					} else {
 						throw new Error("Unknown theme directive: " + directive);
 					}
