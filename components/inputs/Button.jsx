@@ -118,6 +118,9 @@ export default ThemeContext.use(h => {
 
 		const [ripples, createRipple] = useRipples();
 
+		if (!focused.isImmutable()) props.isFocused = focused;
+		if (!hover.isImmutable()) props.isHovered = hover;
+
 		return <Ref
 			onClick={(event) => {
 				if (disabled.get()) return;
@@ -151,8 +154,6 @@ export default ThemeContext.use(h => {
 					if (onMouseDown) onMouseDown(event);
 				}
 			}}
-			isHovered={hover}
-			isFocused={focused}
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
 				...style
