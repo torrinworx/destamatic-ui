@@ -125,7 +125,7 @@ export default {
 	},
 
 	radius: {
-		$radius: 6,
+		$radius: '6px',
 		borderRadius: '$radius',
 	},
 
