@@ -125,7 +125,8 @@ export default {
 	},
 
 	radius: {
-		borderRadius: 6,
+		$radius: 6,
+		borderRadius: '$radius',
 	},
 
 	disabled: {
