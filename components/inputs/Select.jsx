@@ -136,7 +136,7 @@ export default ThemeContext.use(h => {
 					name="chevron-down"
 					size={16}
 					style={{
-						marginLeft: 10,
+						marginLeft: 'auto',
 						transform: focused.map(f => f ? 'rotate(180deg)' : null),
 						transition: 'transform 100ms ease-in-out',
 					}}
