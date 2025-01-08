@@ -63,11 +63,18 @@ const trackedMount = (children) => {
 	const out = (elem, val, before, context) => {
 		const mountedElem = {
 			insertBefore: (node, before) => {
-				elems.push(node);
+				const i = elems.indexOf(node);
+				if (i === -1) elems.push(node);
+
 				elem.insertBefore(node, before);
 			},
 			replaceChild: (newNode, oldNode) => {
-				const i = elems.indexOf(oldNode);
+				let i;
+
+				i = elems.indexOf(newNode);
+				if (i >= 0) elems.splice(i, 1);
+
+				i = elems.indexOf(oldNode);
 				elems[i] = newNode;
 
 				elem.replaceChild(newNode, oldNode);
