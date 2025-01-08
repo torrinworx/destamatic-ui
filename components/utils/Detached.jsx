@@ -5,6 +5,7 @@ import Shown from './Shown';
 import ThemeContext from './ThemeContext';
 
 import { mount } from 'destam-dom';
+import trackedMount from '../../util/trackedMount';
 
 const clamp = (x, l, h) => Math.max(l, Math.min(h, x));
 
@@ -58,42 +59,6 @@ const getBounds = (elems) => {
 	};
 };
 
-const trackedMount = (children) => {
-	const elems = [];
-	const out = (elem, val, before, context) => {
-		const mountedElem = {
-			insertBefore: (node, before) => {
-				const i = elems.indexOf(node);
-				if (i === -1) elems.push(node);
-
-				elem.insertBefore(node, before);
-			},
-			replaceChild: (newNode, oldNode) => {
-				let i;
-
-				i = elems.indexOf(newNode);
-				if (i >= 0) elems.splice(i, 1);
-
-				i = elems.indexOf(oldNode);
-				elems[i] = newNode;
-
-				elem.replaceChild(newNode, oldNode);
-			},
-			removeChild: (node) => {
-				const i = elems.indexOf(node);
-				elems.splice(i, 1);
-
-				elem.removeChild(node);
-			},
-		};
-
-		return mount(mountedElem, children, before, context);
-	};
-
-	out.elems = elems;
-	return out;
-};
-
 const Detached = ThemeContext.use(h => {
 	const Detached = ({ children, locations = defaultLocations, enabled }, cleanup) => {
 		const focused = enabled || Observer.mutable(false);
@@ -107,7 +72,7 @@ const Detached = ThemeContext.use(h => {
 			if (value !== true) return;
 
 			const bounds = popupRef.getBoundingClientRect();
-			const surround = getBounds(elems.elems);
+			const surround = getBounds(elems);
 
 			const ww = window.innerWidth;
 			const wh = window.innerHeight;
@@ -163,8 +128,9 @@ const Detached = ThemeContext.use(h => {
 			return popup;
 		};
 
-		const elems = trackedMount(anchor);
+		const [elems, virtual] = trackedMount(anchor);
 		return <>
+			{virtual}
 			{elems}
 			<Shown value={focusedRender.map(v => typeof v === 'number' || v === true)}>
 				<Popup
@@ -172,7 +138,7 @@ const Detached = ThemeContext.use(h => {
 					placement={focusedAfter.map(rot => {
 						if (typeof rot !== 'number') return null;
 
-						const bounds = getBounds(elems.elems);
+						const bounds = getBounds(elems);
 						return calculate(bounds, rot);
 					}).setter(() => focused.set(false))}
 					style={{
