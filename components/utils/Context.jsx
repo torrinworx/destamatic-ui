@@ -1,4 +1,4 @@
-import {Observer, mount} from 'destam-dom';
+import { mount } from 'destam-dom';
 
 const createContext = (def, transform = x => x) => {
 	const getter = Symbol();
@@ -19,7 +19,7 @@ const createContext = (def, transform = x => x) => {
 		return calc(context?.[getter]);
 	};
 
-	const Context = ({value, children}, cleanup, mounted) => {
+	const Context = ({ value, children }, cleanup, mounted) => {
 		return (elem, _, before, context) => {
 			context = {
 				...context,
