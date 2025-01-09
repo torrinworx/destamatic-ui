@@ -63,6 +63,7 @@ export default ThemeContext.use(h => {
 						"select_selectable",
 						selector(option)
 					]}
+					onMouseDown={e => e.preventDefault()}
 					onMouseUp={e => {
 						value.set(option);
 						focused.set(false);
@@ -71,13 +72,6 @@ export default ThemeContext.use(h => {
 					{display(option)}
 				</Button>;
 			};
-
-			const foc = Observer.mutable(false);
-			mounted(() => {
-				requestAnimationFrame(() => {
-					foc.set(true);
-				});
-			});
 
 			const radius = Observer.immutable('50px'); //themer(theme, 'select').vars('radius');
 			const style = getComputedStyle(buttonRef);
@@ -100,7 +94,7 @@ export default ThemeContext.use(h => {
 					let index = options.get().indexOf(value.get());
 					if (index === -1) {
 						index = options.length - 1;
-					} else if (index !== options.length - 1) {
+					} else if (index !== options.get().length - 1) {
 						index++;
 					} else {
 						return;
@@ -112,8 +106,15 @@ export default ThemeContext.use(h => {
 				}
 			};
 
-			window.addEventListener('keydown', keydown);
-			cleanup(() => window.removeEventListener('keydown', keydown));
+			const foc = Observer.mutable(false);
+			mounted(() => {
+				requestAnimationFrame(() => {
+					foc.set(true);
+
+					window.addEventListener('keydown', keydown);
+					cleanup(() => window.removeEventListener('keydown', keydown));
+				});
+			});
 
 			return <Paper tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
 				width: style.width,
@@ -145,7 +146,9 @@ export default ThemeContext.use(h => {
 				theme={[]}
 				type="select_base"
 				ref={buttonRef}
-				onMouseDown={e => focused.set(true)}
+				onMouseDown={e => {
+					focused.set(!focused.get());
+				}}
 				focused={focused}
 				style={{
 					borderTopLeftRadius: focused.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
