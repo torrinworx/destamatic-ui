@@ -10,16 +10,7 @@ import Detached from '../utils/Detached';
 import Button from '../inputs/Button';
 
 Theme.define({
-	select: {
-		$radius: '4px',
-	},
-
-	select_base: {
-		borderRadius: '$radius',
-	},
-
 	select_paper: {
-		borderRadius: '$radius',
 		boxShadow: 'none',
 	},
 
