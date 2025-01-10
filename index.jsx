@@ -2,6 +2,7 @@
 // export { default as CodeBlock } from './components/CodeBlock.jsx';
 export { default as Column } from './components/display/Column.jsx';
 export { default as Drag } from './components/display/Drag.jsx';
+export { default as Divider } from './components/display/Divider.jsx';
 export { default as Icon } from './components/display/Icon.jsx';
 export { default as Link } from './components/display/Link.jsx';
 export { default as Markdown } from './components/display/Markdown.jsx';
