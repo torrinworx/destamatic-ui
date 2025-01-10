@@ -102,9 +102,12 @@ export default ThemeContext.use(h => {
 				requestAnimationFrame(() => {
 					foc.set(true);
 
+				});
+
+				setTimeout(() => {
 					window.addEventListener('keydown', keydown);
 					cleanup(() => window.removeEventListener('keydown', keydown));
-				});
+				}, 0);
 			});
 
 			return <Paper tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
