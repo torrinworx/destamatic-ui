@@ -35,7 +35,6 @@ export default ThemeContext.use(h => {
 	 *
 	 * @param {Object} props - The properties object.
 	 * @param {Observer<number>} [props.value] - Observable number from 0 to 1 to determine tiling window sizes on render and during dragging.
-	 * @param {number} [props.leftDefault] - Number from 0 to 1 to determine tiling window sizes on render and during dragging.
 	 * @param {number} [props.min=20] - Number from 0 to 1 representing the minimum width percentage taken up by the left tile.
 	 * @param {number} [props.max=80] - Number from 0 to 1 representing the maximum width percentage taken up by the left tile.
 	 * @param {Object} [props.style] - Custom styles to apply to the button.
@@ -44,13 +43,12 @@ export default ThemeContext.use(h => {
 	 */
 	const Divider = Theme.use(themer => ({
 		value,
-		leftDefault = 0.5,
 		min = 0.2,
 		max = 0.8,
 		children,
 		...props
 	}, cleanup) => {
-		if (!(value instanceof Observer)) value = Observer.mutable(leftDefault);
+		if (!(value instanceof Observer)) value = Observer.mutable(0.5);
 
 		let resizingWindow = false;
 		const Container = <raw:div />;
