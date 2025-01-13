@@ -26,23 +26,23 @@ export default ThemeContext.use(h => {
 	 * The right window div should have style={{width: leftWindowPercentage.map(w => `${100 - w * 100}%`) }}
 	 *
 	 * @param {Object} props - The properties object.
-	 * @param {Observer<number>} [props.leftWindowPercentage] - Observable number from 0 to 1 to determine tiling window sizes on render and during dragging.
-	 * @param {int} [props.leftOffset=0] - Number of pixels on the left of the page taken up by navigation bars, menu, etc.
-	 * @param {number} [props.leftMin=20] - Number from 0 to 1 representing the minimum width percentage taken up by the left tile.
-	 * @param {number} [props.leftMax=80] - Number from 0 to 1 representing the maximum width percentage taken up by the left tile.
+	 * @param {Observer<number>} [props.value] - Observable number from 0 to 1 to determine tiling window sizes on render and during dragging.
+	 * @param {number} [props.leftDefault] - Number from 0 to 1 to determine tiling window sizes on render and during dragging.
+	 * @param {number} [props.min=20] - Number from 0 to 1 representing the minimum width percentage taken up by the left tile.
+	 * @param {number} [props.max=80] - Number from 0 to 1 representing the maximum width percentage taken up by the left tile.
 	 * @param {Object} [props.style] - Custom styles to apply to the button.
 	 *
 	 * @returns {JSX.Element} The rendered draggable window divider element.
 	 */
 	const Divider = Theme.use(themer => ({
+		value,
 		leftDefault = 0.5,
-		leftOffset = 0,
-		leftMin = 0.2,
-		leftMax = 0.8,
+		min = 0.2,
+		max = 0.8,
 		children,
 		...props
 	}, cleanup) => {
-		const leftWindowPercentage = Observer.mutable(leftDefault);
+		if (!(value instanceof Observer)) value = Observer.mutable(leftDefault);
 
 		let resizingWindow = false;
 		const Container = <raw:div />;
@@ -58,9 +58,9 @@ export default ThemeContext.use(h => {
 			const bounds = Container.getBoundingClientRect();
 
 			let left = (e.clientX - bounds.left) / bounds.width;
-			left = Math.min(left, leftMax);
-			left = Math.max(left, leftMin);
-			leftWindowPercentage.set(left);
+			left = Math.min(left, max);
+			left = Math.max(left, min);
+			value.set(left);
 		};
 
 		const handleMouseUp = () => {
@@ -92,7 +92,7 @@ export default ThemeContext.use(h => {
 		}
 
 		const handleWidth = themer('divider_handle').vars('width');
-		const styleData = Observer.all([leftWindowPercentage, handleWidth]);
+		const styleData = Observer.all([value, handleWidth]);
 
 		return <Container theme="divider_base" {...props}>
 			<div theme="divider_left" style={{width: styleData.map(([p, w]) => `calc(${p * 100}% - ${w / 2}px)`)}}>
