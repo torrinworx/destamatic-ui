@@ -1,13 +1,20 @@
 import { Observer } from 'destam-dom';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
+import { mark } from '../utils/h';
 
 Theme.define({
-	divider: {
-		width: 4,
+	divider_base: {
+		position: 'relative',
+		display: 'flex',
+		flexDirection: 'row',
+	},
+	divider_handle: {
+		$width: 4,
+		width: '$width$px',
 		cursor: 'ew-resize',
 		background: '#E5E7EB'
-	}
+	},
 });
 
 export default ThemeContext.use(h => {
@@ -27,17 +34,18 @@ export default ThemeContext.use(h => {
 	 *
 	 * @returns {JSX.Element} The rendered draggable window divider element.
 	 */
-	const Divider = ({
+	const Divider = Theme.use(themer => ({
 		leftWindowPercentage,
 		leftOffset = 0,
 		leftMin = 0.2,
 		leftMax = 0.8,
-		style
+		children,
+		...props
 	}, cleanup) => {
 		if (!(leftWindowPercentage instanceof Observer)) leftWindowPercentage = Observer.mutable(0.5);
 
 		let resizingWindow = false;
-		const pageWidth = (window.innerWidth - leftOffset);
+		const Container = <raw:div />;
 
 		const handleMouseDown = () => {
 			resizingWindow = true;
@@ -47,9 +55,12 @@ export default ThemeContext.use(h => {
 
 		const handleMouseMove = (e) => {
 			if (!resizingWindow) return;
-			if (e.clientX < pageWidth * leftMin + leftOffset || e.clientX > pageWidth * leftMax + leftOffset) return;
+			const bounds = Container.getBoundingClientRect();
 
-			leftWindowPercentage.set((e.clientX - leftOffset) / pageWidth);
+			let left = (e.clientX - bounds.left) / bounds.width;
+			left = Math.min(left, leftMax);
+			left = Math.max(left, leftMin);
+			leftWindowPercentage.set(left);
 		};
 
 		const handleMouseUp = () => {
@@ -65,8 +76,34 @@ export default ThemeContext.use(h => {
 			document.removeEventListener('mouseup', handleMouseUp);
 		});
 
-		return <div theme='divider' style={style} onMouseDown={handleMouseDown} />;
-	};
+		const left = [], right = [];
+		for (const child of children) {
+			if (child instanceof mark) {
+				if (child.name === 'left') {
+					left.push(...child.props.children);
+					continue;
+				} else if (child.name === 'right') {
+					right.push(...child.props.children);
+					continue;
+				}
+			}
+
+			throw new Error("Divider expects children of <mark:left> or <mark:right>");
+		}
+
+		const handleWidth = themer('divider_handle').vars('width');
+		const styleData = Observer.all([leftWindowPercentage, handleWidth]);
+
+		return <Container theme="divider_base" {...props}>
+			<div theme="divider_left" style={{width: styleData.map(([p, w]) => `calc(${p * 100}% - ${w / 2}px)`)}}>
+				{left}
+			</div>
+			<div theme='divider_handle' onMouseDown={handleMouseDown} />
+			<div theme="divider_right" style={{width: styleData.map(([p, w]) => `calc(${(1 - p) * 100}% - ${w / 2}px)`)}}>
+				{right}
+			</div>
+		</Container>
+	});
 
 	return Divider;
 });
