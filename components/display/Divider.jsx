@@ -42,13 +42,13 @@ export default ThemeContext.use(h => {
 	 * @returns {JSX.Element} The rendered draggable window divider element.
 	 */
 	const Divider = Theme.use(themer => ({
-		value,
+		value = 0.5,
 		min = 0.2,
 		max = 0.8,
 		children,
 		...props
 	}, cleanup) => {
-		if (!(value instanceof Observer)) value = Observer.mutable(0.5);
+		if (!(value instanceof Observer)) value = Observer.mutable(value);
 
 		let resizingWindow = false;
 		const Container = <raw:div />;
