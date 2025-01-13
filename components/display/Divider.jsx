@@ -15,6 +15,14 @@ Theme.define({
 		cursor: 'ew-resize',
 		background: '#E5E7EB'
 	},
+
+	divider_left: {
+		overflow: 'auto',
+	},
+
+	divider_right: {
+		overflow: 'auto',
+	},
 });
 
 export default ThemeContext.use(h => {
