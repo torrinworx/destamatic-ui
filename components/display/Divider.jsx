@@ -35,14 +35,14 @@ export default ThemeContext.use(h => {
 	 * @returns {JSX.Element} The rendered draggable window divider element.
 	 */
 	const Divider = Theme.use(themer => ({
-		leftWindowPercentage,
+		leftDefault = 0.5,
 		leftOffset = 0,
 		leftMin = 0.2,
 		leftMax = 0.8,
 		children,
 		...props
 	}, cleanup) => {
-		if (!(leftWindowPercentage instanceof Observer)) leftWindowPercentage = Observer.mutable(0.5);
+		const leftWindowPercentage = Observer.mutable(leftDefault);
 
 		let resizingWindow = false;
 		const Container = <raw:div />;
