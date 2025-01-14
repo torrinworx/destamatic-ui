@@ -100,7 +100,7 @@ export default ThemeContext.use(h => {
 		const handleWidth = themer('divider_handle').vars('width');
 		const styleData = Observer.all([value, handleWidth]);
 
-		return <Container theme="divider_base" {...props}>
+		return <Container {...props} theme="divider_base">
 			<div theme="divider_left" style={{width: styleData.map(([p, w]) => `calc(${p * 100}% - ${w / 2}px)`)}}>
 				{left}
 			</div>
