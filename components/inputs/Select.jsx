@@ -23,15 +23,15 @@ Theme.define({
 	},
 
 	select_selected: {
-		background: '$shiftBrightness($invert($color_top), 0.2)',
+		background: '$alpha($invert($color_top), 0.3)',
 	},
 
 	select_selected_hovered: {
-		background: '$shiftBrightness($invert($color_top), 0.2)',
+		background: '$alpha($invert($color_top), 0.3)',
 	},
 
 	select_hovered: {
-		background: '$shiftBrightness($invert($color_top), 0.1)',
+		background: '$alpha($invert($color_top), 0.2)',
 	},
 });
 
