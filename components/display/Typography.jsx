@@ -1,11 +1,13 @@
+import { Observer } from 'destam';
+
+import { mark } from '../utils/h';
 import Theme from '../utils/Theme';
+import Shown from '../utils/Shown';
+import TextField from '../inputs/TextField';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
-	typography: {
-		display: 'flex',
-	},
-
+	typography: { display: 'flex' },
 	typography_h1: { fontSize: 62, textWrap: 'nowrap' },
 	typography_h2: { fontSize: 56, textWrap: 'nowrap' },
 	typography_h3: { fontSize: 36, textWrap: 'nowrap' },
@@ -18,35 +20,42 @@ Theme.define({
 	typography_bold: { fontWeight: 'bold' },
 	typography_italic: { fontStyle: 'italic' },
 	typography_center: { textAlign: 'center' },
-
-	typography_inline: {
-		display: 'inline-flex',
-	}
+	typography_inline: { display: 'inline-flex' }
 });
 
+/**
+ * Typography component for rendering text with different styles and types.
+ * Enables inline editing when double-clicked, if the label is a mutable Observer.
+ */
 export default ThemeContext.use(h => {
-	/**
-	 * Typography component for rendering text with different styles and types.
-	 *
-	 * @param {Object} props - The properties object.
-	 * @param {string} [props.type='h1'] - The typography type, which determines the textual style. Must be a key in `Shared.Theme.Typography`.
-	 * @param {string} [props.fontStyle='regular'] - The font style for the typography. Must be a key under the specified type in `Shared.Theme.Typography`.
-	 * @param {JSX.Element | string} props.children - The content to be displayed inside the typography component.
-	 * @param {Object} [props.style] - Custom styles to be applied to the typography component.
-	 * @param {...Object} [props] - Additional properties to spread onto the typography element.
-	 *
-	 * @returns {JSX.Element} The rendered typography element.
-	 */
-	const Typography = ({ inline, type = 'h1', fontStyle = 'regular', bold, center, children, ...props }) => {
-		if (bold) fontStyle = 'bold';
+	const Typography = ({ type = 'h1', label = '', children, ...props }) => {
+		if (!(label instanceof Observer)) label = Observer.immutable(label);
+		const isEditing = Observer.mutable(false);
 
 		return <div
+			onClick={(e) => {
+				if (!label.isImmutable() && e.detail === 2) { // check for double click
+					isEditing.set(true);
+				}
+			}}
+			theme={['typography', type]}
 			{...props}
-			theme={['typography', type, center ? 'center' : null, inline ? 'inline' : null, fontStyle]}
 		>
-			{children}
+			<Shown value={isEditing}>
+				<mark:then>
+					<TextField
+						value={label}
+						onBlur={() => isEditing.set(false)}
+						onEnter={() => isEditing.set(false)}
+					/>
+				</mark:then>
+
+				<mark:else>
+					{label ? label : null}
+					{children ? children : null}
+				</mark:else>
+			</Shown>
 		</div>;
 	};
-
 	return Typography;
 });

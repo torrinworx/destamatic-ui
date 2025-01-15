@@ -2,20 +2,27 @@ import ThemeContext from '../utils/ThemeContext';
 import Observer from 'destam/Observer';
 
 export default ThemeContext.use(h => {
-	const TextField = ({ value, style, type = 'text', inline, expand, onEnter, error, autoselect, onFocus, ...props }) => {
+	const TextField = ({
+		value,
+		type = 'text',
+		inline,
+		expand,
+		onEnter,
+		error,
+		focus = false,
+		Ref = <raw:input />,
+		...props
+	}) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
-		expand = Observer.immutable(expand);
+		if (!(expand instanceof Observer)) expand = Observer.immutable(expand);
+		if (!(focus instanceof Observer)) focus = Observer.mutable(focus);
 
-		const focus = Observer.mutable(false);
-		const Input = <raw:input />;
-
-		return <Input
+		return <Ref
 			$value={value.def('')}
-			style={style}
 			onInput={(e) => {
 				if (value.isImmutable()) {
-					Input.value = value.get() || '';
+					Ref.value = value.get() || '';
 					return;
 				}
 				value.set(e.target.value);
