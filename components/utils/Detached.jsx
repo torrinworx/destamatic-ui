@@ -157,6 +157,16 @@ const Detached = ThemeContext.use(h => {
 			{elems}
 			<Shown value={focusedRender.map(v => typeof v === 'number' || v === true)}>
 				<Popup
+					canClose={e => {
+						let current = e.target;
+
+						while (current) {
+							if (elems.includes(current)) return false;
+							current = current.parentElement;
+						}
+
+						return true;
+					}}
 					ref={popupRef}
 					placement={focusedAfter.map(rot => {
 						if (typeof rot !== 'number') return null;
