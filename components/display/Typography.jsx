@@ -34,12 +34,12 @@ export default ThemeContext.use(h => {
 
 		return <div
 			onClick={(e) => {
-				if (!label.isImmutable() && e.detail === 2) { // check for double click
+				if (!label.isImmutable() && e.detail === 2) {
 					isEditing.set(true);
 				}
 			}}
 		>
-			<Shown value={isEditing || label.map(l => typeof l === 'string' && l != '') && children.length == 0}>
+			<Shown value={isEditing}>
 				<mark:then>
 					<TextField
 						value={label}
@@ -53,7 +53,7 @@ export default ThemeContext.use(h => {
 						{...props}
 						theme={['typography', ...Array.isArray(type) ? type : type.split('_')]}
 					>
-						{children.length > 0 ? children : (label ? label : null)}
+						{children.length > 0 ? children : label ? label : null}
 					</div>
 				</mark:else>
 			</Shown>
