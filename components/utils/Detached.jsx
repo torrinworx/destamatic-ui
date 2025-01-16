@@ -97,6 +97,29 @@ const Detached = ThemeContext.use(h => {
 				focused.set(false);
 			} else {
 				focused.set(fits[0].rot);
+
+				let checking = true;
+				const check = () => {
+					if (checking) {
+						const updated = getBounds(elems);
+
+						if (surround.left !== updated.left ||
+								surround.right !== updated.right ||
+								surround.top !== updated.top ||
+								surround.bottom !== updated.bottom) {
+							focused.set(false);
+							return;
+						}
+
+						window.requestAnimationFrame(check);
+					}
+				};
+				window.requestAnimationFrame(check);
+
+				// poll the bounds for changes - if something changes we will hide the modal
+				return () => {
+					checking = false;
+				};
 			}
 		}));
 
@@ -134,6 +157,16 @@ const Detached = ThemeContext.use(h => {
 			{elems}
 			<Shown value={focusedRender.map(v => typeof v === 'number' || v === true)}>
 				<Popup
+					canClose={e => {
+						let current = e.target;
+
+						while (current) {
+							if (elems.includes(current)) return false;
+							current = current.parentElement;
+						}
+
+						return true;
+					}}
 					ref={popupRef}
 					placement={focusedAfter.map(rot => {
 						if (typeof rot !== 'number') return null;
