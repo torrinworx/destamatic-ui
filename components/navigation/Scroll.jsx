@@ -170,6 +170,9 @@ export default ThemeContext.use(h => {
 			});
 			observer.observe(Content, {subtree: true, attributes: true, childList: true});
 			update();
+
+			window.addEventListener('resize', update);
+			return () => window.removeEventListener('resize', update);
 		});
 
 		return <Div
