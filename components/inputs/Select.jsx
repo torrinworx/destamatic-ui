@@ -33,6 +33,11 @@ Theme.define({
 	select_hovered: {
 		background: '$alpha($invert($color_top), 0.2)',
 	},
+
+	button_select_focused: {
+		border: '1px solid rgba(0, 0, 0, 0)',
+		background: '$alpha($color_top, 0.1)'
+	},
 });
 
 export default ThemeContext.use(h => {
