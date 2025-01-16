@@ -39,7 +39,7 @@ export default ThemeContext.use(h => {
 				}
 			}}
 		>
-			<Shown value={isEditing}>
+			<Shown value={isEditing || label.map(l => typeof l === 'string' && l != '') && children.length == 0}>
 				<mark:then>
 					<TextField
 						value={label}
