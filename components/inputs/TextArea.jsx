@@ -39,6 +39,7 @@ export default ThemeContext.use(h => {
 			error,
 			theme,
 			type,
+			autofocus,
 			...props
 		},
 		_,
@@ -54,6 +55,8 @@ export default ThemeContext.use(h => {
 		// TODO: Figure out why the microtask is needed. Sometimes without it,
 		// the text area won't have the right initial size.
 		mounted(() => queueMicrotask(() => isMounted.set(true)));
+
+		if (autofocus) mounted(() => Ref.focus());
 
 		const _class = themer(
 			theme,
