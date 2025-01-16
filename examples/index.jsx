@@ -106,7 +106,7 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
         inset: '0px',
         position: 'absolute',
     }}>
-        <Tabs style={{width: '100%'}}>
+        <Tabs style={{ width: '100%' }}>
             <mark:tab name="one">
                 One
             </mark:tab>
@@ -118,7 +118,7 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
             </mark:tab>
         </Tabs>
 
-        <div theme="center" style={{flexDirection: 'column'}}>
+        <div theme="center" style={{ flexDirection: 'column' }}>
             <ColorPicker value={specialTheme.observer.path(['special', '$color'])
                 .setter((val, set) => set(color.toCSS(val)))} />
 
@@ -139,27 +139,17 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
 
         <Markdown markdown={markdown} />
         <TextArea OValue={markdown} style={{ width: "1000px", height: "500px" }} />
-        {/* <Popup placement={{x: 100, y: 100}} style={{background: 'white'}}>
-            <Typography type="h1">Destamatic UI Demo</Typography>
-            <Typography type="h2">Typography</Typography>
-            <Typography type="h3">Heading 3 Regular</Typography>
-            <Typography type="h3" bold>Heading 3 Bold</Typography>
-            <Typography type="p1">Paragraph 1 Regular</Typography>
-            <Typography type="p1" bold>Paragraph 1 Bold</Typography>
-            <Typography type="p2">Paragraph 2 Regular</Typography>
-            <Typography type="p2" bold>Paragraph 2 Bold</Typography>
-        </Popup> */}
 
-        <Typography type="h1">Destamatic UI Demo</Typography>
-        <Typography type="h2">Typography</Typography>
-        <Typography type="h3">Heading 3 Regular</Typography>
-        <Typography type="h3" bold>Heading 3 Bold</Typography>
-        <Typography type="p1">Paragraph 1 Regular</Typography>
-        <Typography type="p1" bold>Paragraph 1 Bold</Typography>
-        <Typography type="p2">Paragraph 2 Regular</Typography>
-        <Typography type="p2" bold>Paragraph 2 Bold</Typography>
+        <Typography type="h1" label="Destamatic UI Demo" />
+        <Typography type="h2" label="Typography" />
+        <Typography type="h3" label="Heading 3 Regular" />
+        <Typography type="h3_bold" label="Heading 3 Bold" />
+        <Typography type="p1" label="Paragraph 1 Regular" />
+        <Typography type="p1_bold" label="Paragraph 1 Bold" />
+        <Typography type="p2" label="Paragraph 2 Regular"/>
+        <Typography type="p2_bold" label="Paragraph 2 Bold"/>
 
-        <Typography type="h2" $style={{ marginTop: '20px' }}>Buttons</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }} label="Buttons"/>
         <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <Button label="Text Button" type="text" onClick={handleClick} />
             <Button label="Contained Button" type="contained" onClick={handleClick} />
@@ -210,7 +200,7 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
                 />
             </div>
 
-            <Typography type="h2" $style={{ marginTop: '20px' }}>Dropdown</Typography>
+            <Typography type="h2" $style={{ marginTop: '20px' }} label="Dropdown"/>
             <DropDown label="Click to Toggle">
                 <div theme="myContent">
                     Dropdown Content
@@ -218,22 +208,22 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
             </DropDown>
         </Theme>
 
-        <Typography type="h2" $style={{ marginTop: '20px' }}>Loading Dots</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }} label="Loading Dots"/>
         <LoadingDots />
 
-        <Typography type="h2" $style={{ marginTop: '20px' }}>Slider</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }} label="Slider" />
         <Slider min={0} max={100} value={Observer.mutable(0)} />
 
         <Paper>
-            <Typography type="h2" $style={{ marginTop: '20px' }}>Inputs</Typography>
+            <Typography type="h2" $style={{ marginTop: '20px' }} label="Inputs"/>
             <TextField placeholder="Type here..." style={{ marginBottom: '10px', width: '100%' }} value={text} />
             <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} value={text} />
         </Paper>
 
-        <Typography type="h2" $style={{ marginTop: '20px' }}>Drawer</Typography>
+        <Typography type="h2" $style={{ marginTop: '20px' }} label="Drawer"/>
         <Drawer open={drawerOpen}>
             <div>
-                <Typography type="p1">Drawer Content</Typography>
+                <Typography type="p1" label="Drawer Content"/>
             </div>
         </Drawer>
     </div>;

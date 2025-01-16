@@ -3,7 +3,6 @@ import Observer from 'destam/Observer';
 import Typography from '../display/Typography';
 import Icon from '../display/Icon';
 import Paper from '../display/Paper';
-import useRipples from '../utils/Ripple';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import Detached from '../utils/Detached';
@@ -157,7 +156,7 @@ export default ThemeContext.use(h => {
 					...style,
 				}}
 			>
-				<Typography type='p1' inline>
+				<Typography type='p1_inline'>
 					{value.map(val => {
 						if (options.get().includes(val)) {
 							return display(val);

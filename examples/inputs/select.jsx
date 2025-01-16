@@ -1,13 +1,11 @@
 import { Observer, mount } from 'destam-dom';
-import { Select, popups, Typography, Paper } from 'destamatic-ui';
+import { Select, popups, Typography } from 'destamatic-ui';
 
 const input = Observer.mutable('');
 
 mount(document.body, <>
 	<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', inset: 0, position: 'absolute', flexDirection: 'column'}}>
-		<Typography>
-			{input}
-		</Typography>
+		<Typography label={input} />
 		<Select options={['one', 'two', 'three']} value={Observer.mutable('one')} />
 	</div>
 	{[

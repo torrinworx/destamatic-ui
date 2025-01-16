@@ -109,9 +109,7 @@ export default ThemeContext.use(h => {
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 		if (!Ref) Ref = <raw:button />;
 		if (label && typeof label === 'string') {
-			label = <Typography type='p1' fontStyle='bold' inline>
-				{label}
-			</Typography>;
+			label = <Typography type='p1_bold_inline' label={label} />
 		}
 
 		disabled = disabled.map(d => !!d);
