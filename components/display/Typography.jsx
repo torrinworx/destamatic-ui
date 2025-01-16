@@ -38,8 +38,6 @@ export default ThemeContext.use(h => {
 					isEditing.set(true);
 				}
 			}}
-			theme={['typography', type]}
-			{...props}
 		>
 			<Shown value={isEditing}>
 				<mark:then>
@@ -51,8 +49,12 @@ export default ThemeContext.use(h => {
 				</mark:then>
 
 				<mark:else>
-					{label ? label : null}
-					{children ? children : null}
+					<div
+						{...props}
+						theme={['typography', ...Array.isArray(type) ? type : type.split('_')]}
+					>
+						{children.length > 0 ? children : (label ? label : null)}
+					</div>
 				</mark:else>
 			</Shown>
 		</div>;
