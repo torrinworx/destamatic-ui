@@ -38,7 +38,7 @@ export default ThemeContext.use(h => {
 		if (!(editable instanceof Observer)) editable = Observer.mutable(editable);
 		if (!(label instanceof Observer)) label = Observer.immutable(label);
 		const isEditing = Observer.mutable(false);
-		console.log(isEditing, editable, isEditing && editable)
+
 		return <div
 			onClick={(e) => {
 				if (!label.isImmutable() && e.detail === 2) {
