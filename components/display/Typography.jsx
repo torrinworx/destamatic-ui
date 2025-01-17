@@ -24,14 +24,20 @@ Theme.define({
 });
 
 /**
- * Typography component for rendering text with different styles and types.
- * Enables inline editing when double-clicked, if the label is a mutable Observer.
- * The "editable" param lets you pass in a mutable observer without having it automatically
- * turn into an editable field. This is useful if you want an updating text element but not
- * have it editable.
- * 
- * The editable if set to true will allow the header to be turned into a textfield and update
- * the value of the label observer.
+ * Creates a Typography element for rendering styled text with optional editing capabilities.
+ *
+ * - Inline editing if `editable` is `true` and the `label` is a mutable Observer.
+ * - The `editable` parameter allows toggling between an editable field and a dynamically updating
+ *   text element. Useful for scenarios where the text should update in real-time but remain non-editable.
+ *
+ * @function
+ * @param {Object} options - Configuration options for the Typography element.
+ * @param {string | string[]} [options.type='h1'] - The typography type (e.g., 'h1', 'h2', 'p1') and aditional styling (e.g., 'bold', 'italic', 'inline', 'center').
+ * @param {string | Observer} [options.label=''] - The text content or an Observer wrapping it.
+ * @param {boolean} [options.editable=false] - Controls whether the text can be edited.
+ * @param {string[]} [options.children] - Nested text or elements inside the typography container.
+ * @param {Object} [options.props] - Additional attributes for the container.
+ * @returns {HTMLElement} The constructed Typography element.
  */
 export default ThemeContext.use(h => {
 	const Typography = ({ type = 'h1', label = '', editable = false, children, ...props }) => {
