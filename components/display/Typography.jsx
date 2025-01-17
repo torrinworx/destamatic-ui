@@ -26,12 +26,19 @@ Theme.define({
 /**
  * Typography component for rendering text with different styles and types.
  * Enables inline editing when double-clicked, if the label is a mutable Observer.
+ * The "editable" param lets you pass in a mutable observer without having it automatically
+ * turn into an editable field. This is useful if you want an updating text element but not
+ * have it editable.
+ * 
+ * The editable if set to true will allow the header to be turned into a textfield and update
+ * the value of the label observer.
  */
 export default ThemeContext.use(h => {
-	const Typography = ({ type = 'h1', label = '', children, ...props }) => {
+	const Typography = ({ type = 'h1', label = '', editable = false, children, ...props }) => {
+		if (!(editable instanceof Observer)) editable = Observer.mutable(editable);
 		if (!(label instanceof Observer)) label = Observer.immutable(label);
 		const isEditing = Observer.mutable(false);
-
+		console.log(isEditing, editable, isEditing && editable)
 		return <div
 			onClick={(e) => {
 				if (!label.isImmutable() && e.detail === 2) {
@@ -39,7 +46,7 @@ export default ThemeContext.use(h => {
 				}
 			}}
 		>
-			<Shown value={isEditing}>
+			<Shown value={Observer.all([isEditing, editable]).map(([i, e]) => i && e)}>
 				<mark:then>
 					<TextField
 						value={label}
