@@ -1,36 +1,70 @@
-import { Observer } from 'destam-dom';
+import { Observer, Insert, Modify, Delete } from 'destam-dom';
 
-import Shown from '../utils/Shown';
-import Popup from '../utils/Popup';
+import Detached from '../utils/Detached';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
-import Button from '../inputs/Button';
+import Paper from '../display/Paper';
+import Typography from '../display/Typography';
+import trackedMount from '../../util/trackedMount';
 
 Theme.define({
-	tooltip: {
-		extends: ['radius'],
-
-		background: 'white',
+	tooltip_paper: {
 		border: `1px solid $color`,
-		fontColor: '$color',
-		display: 'flex',
-		flexDirection: 'column',
-		alignItems: 'center',
+		margin: 10,
 		opacity: '80%',
-	}
+	},
+
+	tooltip_typography: {
+	},
 });
 
 export default ThemeContext.use(h => {
-	const Tooltip = ({hover, label, ...style}) => {
-		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
+	const Tooltip = ({children, label, locations, type = "p4"}, cleanup, mounted) => {
+		const [elems, virtual] = trackedMount(children);
+		const hovered = Observer.mutable(false);
 
-		return <Shown value={hover}>
-			<Popup placement={hover}>
-				<div theme="tooltip" style={style}>
-					<Button label={label} style={{ color: 'grey' }}/>
-				</div>
-			</Popup>
-		</Shown>;
+		let references = 0;
+		const mouseenter = e => {
+			references++;
+
+			if (references === 1) {
+				hovered.set(true);
+			}
+		};
+
+		const mouseleave = e => {
+			references--;
+
+			if (references === 0) {
+				hovered.set(false);
+			}
+		};
+
+		cleanup(elems.observer.watch(delta => {
+			console.log(delta);
+			const modify = delta instanceof Modify;
+
+			if (modify || delta instanceof Delete) {
+				delta.prev.removeEventListener('mouseenter', mouseenter);
+				delta.prev.removeEventListener('mouseleave', mouseleave);
+			}
+
+			if (modify || delta instanceof Insert) {
+				delta.value.addEventListener('mouseenter', mouseenter);
+				delta.value.addEventListener('mouseleave', mouseleave);
+			}
+		}));
+
+		return <Detached enabled={hovered} locations={locations}>
+			{virtual}
+			{elems}
+
+			<mark:popup>
+				<Paper theme="tooltip">
+					<Typography theme="tooltip" type={type} label={label} />
+				</Paper>
+			</mark:popup>
+		</Detached>;
 	};
 
 	return Tooltip;
