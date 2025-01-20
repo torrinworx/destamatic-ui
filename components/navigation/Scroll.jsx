@@ -166,11 +166,11 @@ export default ThemeContext.use(h => {
 			});
 			observer.observe(Content, {subtree: true, attributes: true, childList: true});
 			update();
-		});
 
-		cleanup(useAbort(signal => {
-			window.addEventListener('resize', update, {signal});
-		})())
+			cleanup(useAbort(signal => {
+				window.addEventListener('resize', update, {signal});
+			})())
+		});
 
 		return <Div
 			theme={[
