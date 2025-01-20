@@ -1,5 +1,6 @@
 import { h } from './h';
 import { OArray, Observer } from 'destam-dom';
+import useAbort from '../../util/abort';
 
 /**
  * Global array to hold active popup components.
@@ -43,9 +44,8 @@ const Popup = ({ children, style, placement, canClose, ref: Ref }, cleanup, moun
         {children}
     </Ref>;
 
-    let listener;
     if (!placement.isImmutable()) {
-        listener = (e) => {
+        cleanup(useAbort(abort => document.body.addEventListener('mousedown', e => {
             let target = e.target;
             let found = false;
             while (target) {
@@ -59,11 +59,7 @@ const Popup = ({ children, style, placement, canClose, ref: Ref }, cleanup, moun
             if (!found && (!canClose || canClose(e))) {
                 placement.set(null);
             }
-        };
-
-        mounted(() => {
-            document.body.addEventListener('mousedown', listener);
-        });
+        }, {abort}))());
     }
 
     popups.push(dom);
@@ -71,10 +67,6 @@ const Popup = ({ children, style, placement, canClose, ref: Ref }, cleanup, moun
     cleanup(() => {
         const index = popups.indexOf(dom);
         if (index >= 0) popups.splice(index, 1);
-
-        if (listener) {
-            document.body.removeEventListener('mousedown', listener);
-        }
     });
 
     return null;

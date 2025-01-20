@@ -5,6 +5,7 @@ import { assert } from 'destam/util';
 import { OArray as DestamOArray } from 'destam';
 import { atomic } from 'destam/Network';
 import { Insert, Delete } from 'destam';
+import useAbort from '../../util/abort';
 
 const clamp = (x, min, max) => Math.min(Math.max(x, min), max);
 
@@ -205,7 +206,7 @@ const Drag = ({theme = "primary", dragging, children, map, constrained = true, .
 		}
 	};
 
-	cleanup(renderDragging.effect(render => {
+	cleanup(renderDragging.effect(useAbort((signal, render) => {
 		if (!render) return;
 
 		const moveRender = (e, resortRender) => {
@@ -222,14 +223,9 @@ const Drag = ({theme = "primary", dragging, children, map, constrained = true, .
 			moveRender(e, null);
 		};
 
-		window.addEventListener('mousemove', move);
-		window.addEventListener('mouseup', cancel);
-
-		return () => {
-			window.removeEventListener('mousemove', move);
-			window.removeEventListener('mouseup', cancel);
-		};
-	}))
+		window.addEventListener('mousemove', move, {signal});
+		window.addEventListener('mouseup', cancel, {signal});
+	})));
 
 	return <Ref theme={[theme, 'drag']} style={{height: totalHeight}} {...props}><Elem each={rendered} /></Ref>;
 };

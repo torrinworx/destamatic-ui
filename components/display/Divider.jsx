@@ -2,6 +2,7 @@ import { Observer } from 'destam-dom';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import { mark } from '../utils/h';
+import useAbort from '../../util/abort';
 
 Theme.define({
 	divider_base: {
@@ -53,34 +54,23 @@ export default ThemeContext.use(h => {
 		let resizingWindow = false;
 		const Container = <raw:div />;
 
-		const handleMouseDown = () => {
-			resizingWindow = true;
-			document.addEventListener('mousemove', handleMouseMove);
-			document.addEventListener('mouseup', handleMouseUp);
-		};
+		const resizing = Observer.mutable(false);
+		cleanup(resizing.effect(useAbort((signal, val) => {
+			if (!val) return;
 
-		const handleMouseMove = (e) => {
-			if (!resizingWindow) return;
-			const bounds = Container.getBoundingClientRect();
+			document.addEventListener('mousemove', e => {
+				const bounds = Container.getBoundingClientRect();
 
-			let left = (e.clientX - bounds.left) / bounds.width;
-			left = Math.min(left, max);
-			left = Math.max(left, min);
-			value.set(left);
-		};
+				let left = (e.clientX - bounds.left) / bounds.width;
+				left = Math.min(left, max);
+				left = Math.max(left, min);
+				value.set(left);
+			}, {signal});
 
-		const handleMouseUp = () => {
-			resizingWindow = false;
-			document.removeEventListener('mousemove', handleMouseMove);
-			document.removeEventListener('mouseup', handleMouseUp);
-		};
-
-		cleanup(() => {
-			if (!resizingWindow) return;
-
-			document.removeEventListener('mousemove', handleMouseMove);
-			document.removeEventListener('mouseup', handleMouseUp);
-		});
+			document.addEventListener('mouseup', () => {
+				resizing.set(false);
+			}, {signal});
+		})));
 
 		const left = [], right = [];
 		for (const child of children) {
@@ -104,7 +94,7 @@ export default ThemeContext.use(h => {
 			<div theme="divider_left" style={{width: styleData.map(([p, w]) => `calc(${p * 100}% - ${w / 2}px)`)}}>
 				{left}
 			</div>
-			<div theme='divider_handle' onMouseDown={handleMouseDown} />
+			<div theme='divider_handle' onMouseDown={() => resizing.set(true)} />
 			<div theme="divider_right" style={{width: styleData.map(([p, w]) => `calc(${(1 - p) * 100}% - ${w / 2}px)`)}}>
 				{right}
 			</div>

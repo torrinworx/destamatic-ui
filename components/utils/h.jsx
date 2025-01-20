@@ -2,6 +2,7 @@ import { h as destam_h, mount, getFirst } from 'destam-dom';
 import Observer, { observerGetter, shallowListener } from 'destam/Observer';
 import { sizeProperties } from '../../util/index.js';
 import Theme from './Theme';
+import useAbort from '../../util/abort';
 
 // This h element overrides the default behavoior that destam-dom gives for
 // overriding styles. destam-dom will never try to be more fancy than the browser
@@ -70,10 +71,9 @@ const hypertext = (useThemes, name, props, ...children) => {
 				const handlerName = o.substring(2).toLowerCase();
 				delete props[o];
 
-				signals.push(() => {
-					name.addEventListener(handlerName, handler);
-					return () => name.removeEventListener(handlerName, handler);
-				});
+				signals.push(useAbort(signal => {
+					name.addEventListener(handlerName, handler, {signal});
+				}));
 			} else if (o.length >= 3 && o.startsWith('is') && o[2].toLowerCase() !== o[2]) {
 				const handlers = {
 					Focused: ['focus', 'blur'],
@@ -91,16 +91,12 @@ const hypertext = (useThemes, name, props, ...children) => {
 				const obs = props[o];
 				delete props[o];
 
-				signals.push(() => {
+				signals.push(useAbort(signal => {
 					let enter = () => obs.set(true);
 					let leave = () => obs.set(false);
-					name.addEventListener(handler[0], enter);
-					name.addEventListener(handler[1], leave);
-					return () => {
-						name.removeEventListener(handler[0], enter);
-						name.removeEventListener(handler[1], leave);
-					};
-				});
+					name.addEventListener(handler[0], enter, {signal});
+					name.addEventListener(handler[1], leave, {signal});
+				}));
 			}
 		}
 

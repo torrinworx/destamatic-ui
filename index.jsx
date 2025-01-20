@@ -43,3 +43,5 @@ export { default as Shown } from './components/utils/Shown.jsx'
 export { default as suspend } from './components/utils/Suspend.jsx';
 export { default as Theme } from './components/utils/Theme.jsx';
 export { default as ThemeContext } from './components/utils/ThemeContext.jsx';
+
+export { default as useAbort } from './util/abort.js';

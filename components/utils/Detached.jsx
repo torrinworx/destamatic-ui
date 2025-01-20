@@ -10,6 +10,8 @@ import trackedMount from '../../util/trackedMount';
 const clamp = (x, l, h) => Math.max(l, Math.min(h, x));
 
 const calculate = (bounds, rot) => {
+	rot--;
+
 	const cardinals = [
 		bounds.left, bounds.top,
 		bounds.right, bounds.top,
@@ -187,14 +189,14 @@ const Detached = ThemeContext.use(h => {
 	return Detached;
 });
 
-Detached.TOP_LEFT_DOWN = 0;
-Detached.TOP_LEFT_RIGHT = 1;
-Detached.TOP_RIGHT_LEFT = 2;
-Detached.TOP_RIGHT_DOWN = 3;
-Detached.BOTTOM_RIGHT_UP = 4;
-Detached.BOTTOM_RIGHT_LEFT = 5;
-Detached.BOTTOM_LEFT_RIGHT = 6;
-Detached.BOTTOM_LEFT_UP = 7;
+Detached.TOP_LEFT_DOWN = 1;
+Detached.TOP_LEFT_RIGHT = 2;
+Detached.TOP_RIGHT_LEFT = 3;
+Detached.TOP_RIGHT_DOWN = 4;
+Detached.BOTTOM_RIGHT_UP = 5;
+Detached.BOTTOM_RIGHT_LEFT = 6;
+Detached.BOTTOM_LEFT_RIGHT = 7;
+Detached.BOTTOM_LEFT_UP = 8;
 
 const defaultLocations = [
 	Detached.BOTTOM_LEFT_RIGHT,
