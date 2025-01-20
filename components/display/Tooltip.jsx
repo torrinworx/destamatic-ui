@@ -1,5 +1,6 @@
 import { Observer, Insert, Modify, Delete } from 'destam-dom';
 
+import {mark} from '../utils/h';
 import Detached from '../utils/Detached';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
