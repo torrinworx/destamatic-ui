@@ -47,9 +47,6 @@ The `Drawer` component offers a sliding side panel that can be toggled open or c
 ### DropDown
 The `DropDown` component provides a collapsible element that, when toggled, displays its child components. It's often used to present a list of options or additional details relevant to the user's current context.
 
-### KebabMenu
-The `KebabMenu` component provides an icon-based menu typically represented by three vertical dots. It is used for actions like additional options or item-specific actions in a list.
-
 ### Tabs
 The `Tabs` component offers tabbed navigation that allows users to switch between different views in the same interface area.
 
