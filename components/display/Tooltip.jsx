@@ -41,7 +41,6 @@ export default ThemeContext.use(h => {
 		};
 
 		cleanup(elems.observer.watch(delta => {
-			console.log(delta);
 			const modify = delta instanceof Modify;
 
 			if (modify || delta instanceof Delete) {
@@ -54,6 +53,13 @@ export default ThemeContext.use(h => {
 				delta.value.addEventListener('mouseleave', mouseleave);
 			}
 		}));
+
+		cleanup(() => {
+			for (const item of elems) {
+				delta.prev.removeEventListener('mouseenter', mouseenter);
+				delta.prev.removeEventListener('mouseleave', mouseleave);
+			}
+		});
 
 		return <Detached enabled={hovered} locations={locations}>
 			{virtual}

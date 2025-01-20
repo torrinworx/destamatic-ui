@@ -7,6 +7,7 @@ import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import Detached from '../utils/Detached';
 import Button from '../inputs/Button';
+import useAbort from '../../util/abort';
 
 Theme.define({
 	select_paper: {
@@ -70,43 +71,43 @@ export default ThemeContext.use(h => {
 			const radius = Observer.immutable('50px'); //themer(theme, 'select').vars('radius');
 			const style = getComputedStyle(buttonRef);
 
-			const keydown = e => {
-				if (!options.get().length) return;
-
-				if (e.key === 'ArrowUp') {
-					let index = options.get().indexOf(value.get());
-					if (index === -1) {
-						index = 0;
-					} else if (index !== 0) {
-						index--;
-					} else {
-						return;
-					}
-
-					value.set(options.get()[index]);
-				} else if (e.key === 'ArrowDown') {
-					let index = options.get().indexOf(value.get());
-					if (index === -1) {
-						index = options.length - 1;
-					} else if (index !== options.get().length - 1) {
-						index++;
-					} else {
-						return;
-					}
-
-					value.set(options.get()[index]);
-				} else if (e.key === 'Enter') {
-					focused.set(false);
-				}
-			};
-
 			const foc = Observer.mutable(false);
-			requestAnimationFrame(() => {
-				foc.set(true);
-			});
 
-			window.addEventListener('keydown', keydown);
-			cleanup(() => window.removeEventListener('keydown', keydown));
+			cleanup(useAbort(signal => {
+				requestAnimationFrame(() => {
+					foc.set(true);
+				}, {signal});
+
+				window.addEventListener(e => {
+					if (!options.get().length) return;
+
+					if (e.key === 'ArrowUp') {
+						let index = options.get().indexOf(value.get());
+						if (index === -1) {
+							index = 0;
+						} else if (index !== 0) {
+							index--;
+						} else {
+							return;
+						}
+
+						value.set(options.get()[index]);
+					} else if (e.key === 'ArrowDown') {
+						let index = options.get().indexOf(value.get());
+						if (index === -1) {
+							index = options.length - 1;
+						} else if (index !== options.get().length - 1) {
+							index++;
+						} else {
+							return;
+						}
+
+						value.set(options.get()[index]);
+					} else if (e.key === 'Enter') {
+						focused.set(false);
+					}
+				}, {signal});
+			})());
 
 			return <Paper tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
 				width: style.width,

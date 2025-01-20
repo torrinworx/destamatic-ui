@@ -2,6 +2,7 @@ import Theme from '../utils/Theme.jsx';
 import ThemeContext from '../utils/ThemeContext.jsx';
 import Shown from '../utils/Shown';
 import Observer from 'destam/Observer';
+import useAbort from '../../util/abort';
 
 Theme.define({
 	scroll_body: {
@@ -73,7 +74,7 @@ export default ThemeContext.use(h => {
 				return bounds['client_' + type] * bounds['client_' + type] / bounds['scroll_' + type];
 			});
 
-			cleanup(down.effect(event => {
+			cleanup(down.effect(useAbort((signal, event) => {
 				if (!event) return;
 
 				const off = type === 'vertical' ? event.offsetY : event.offsetX;
@@ -92,14 +93,9 @@ export default ThemeContext.use(h => {
 					down.set(null);
 				};
 
-				window.addEventListener('mouseup', cancel);
-				window.addEventListener('mousemove', update);
-
-				return () => {
-					window.removeEventListener('mouseup', cancel);
-					window.removeEventListener('mousemove', update);
-				};
-			}));
+				window.addEventListener('mouseup', cancel, {signal});
+				window.addEventListener('mousemove', update, {signal});
+			})));
 
 			return <div
 				onMouseDown={e => {
@@ -170,10 +166,11 @@ export default ThemeContext.use(h => {
 			});
 			observer.observe(Content, {subtree: true, attributes: true, childList: true});
 			update();
-
-			window.addEventListener('resize', update);
-			return () => window.removeEventListener('resize', update);
 		});
+
+		cleanup(useAbort(signal => {
+			window.addEventListener('resize', update, {signal});
+		})())
 
 		return <Div
 			theme={[

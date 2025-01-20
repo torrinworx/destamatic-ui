@@ -1,6 +1,7 @@
 import { Observer } from 'destam-dom';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
+import useAbort from '../../util/abort';
 
 Theme.define({
 	slider: {
@@ -96,19 +97,14 @@ export default ThemeContext.use(h => {
 			value.set(Math.min(Math.max(newValue, minVal), maxVal));
 		}));
 
-		mount(() => cleanup(dragging.map(Boolean).effect(started => {
+		cleanup(dragging.map(Boolean).effect(useAbort((signal, started) => {
 			if (!started) return;
 
 			const reset = () => dragging.set(false);
 			const move = e => dragging.set(e);
 
-			window.addEventListener('mousemove', move);
-			window.addEventListener('mouseup', reset);
-
-			return () => {
-				window.removeEventListener('mousemove', move);
-				window.removeEventListener('mouseup', reset);
-			};
+			window.addEventListener('mousemove', move, {signal});
+			window.addEventListener('mouseup', reset, {signal});
 		})));
 
 		const percentage = Observer.all([value, size, min, max]).map(([value, thumbWidth, min, max]) => {

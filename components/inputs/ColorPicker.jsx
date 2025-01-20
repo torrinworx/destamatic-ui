@@ -3,6 +3,7 @@ import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import Slider from './Slider';
 import Observer from 'destam/Observer';
+import useAbort from '../../util/abort';
 
 Theme.define({
 	colorPicker: {
@@ -82,7 +83,7 @@ export default ThemeContext.use(h => {
 		});
 
 		const viewClicked = Observer.mutable(false);
-		cleanup(viewClicked.effect(clicked => {
+		cleanup(viewClicked.effect(useAbort((signal, clicked) => {
 			if (!clicked) return;
 
 			const handler = e => {
@@ -98,14 +99,9 @@ export default ThemeContext.use(h => {
 			handler(clicked);
 
 			const cancel = () => viewClicked.set(false);
-			window.addEventListener('mousemove', handler);
-			window.addEventListener('mouseup', cancel);
-
-			return () => {
-				window.removeEventListener('mousemove', handler);
-				window.removeEventListener('mouseup', cancel);
-			};
-		}));
+			window.addEventListener('mousemove', handler, {signal});
+			window.addEventListener('mouseup', cancel, {signal});
+		})));
 
 		return <div theme={['colorPicker', 'base']}>
 			<div theme={['colorPicker', 'view']} onMouseDown={e => {

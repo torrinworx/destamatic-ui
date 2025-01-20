@@ -4,6 +4,7 @@ import Button from "../inputs/Button";
 import Icon from '../display/Icon';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
+import useAbort from '../../util/abort';
 
 Theme.define({
     drawer: {
@@ -36,10 +37,7 @@ export default ThemeContext.use(h => {
             }, 200);  // Adjust the timeout as needed
         };
 
-        window.addEventListener('resize', handleResize);
-
-        // Cleanup resize event listener when the component unmounts
-        cleanup(() => window.removeEventListener('resize', handleResize));
+        cleanup(useAbort(abort => window.addEventListener('resize', handleResize, {abort})));
 
         return <div
             style={{
