@@ -34,7 +34,6 @@ Theme.define({
 	},
 
 	button_select_focused: {
-		border: '1px solid rgba(0, 0, 0, 0)',
 		background: '$alpha($color_top, 0.1)'
 	},
 });
@@ -102,17 +101,12 @@ export default ThemeContext.use(h => {
 			};
 
 			const foc = Observer.mutable(false);
-			mounted(() => {
-				requestAnimationFrame(() => {
-					foc.set(true);
-
-				});
-
-				setTimeout(() => {
-					window.addEventListener('keydown', keydown);
-					cleanup(() => window.removeEventListener('keydown', keydown));
-				}, 0);
+			requestAnimationFrame(() => {
+				foc.set(true);
 			});
+
+			window.addEventListener('keydown', keydown);
+			cleanup(() => window.removeEventListener('keydown', keydown));
 
 			return <Paper tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
 				width: style.width,
@@ -145,6 +139,7 @@ export default ThemeContext.use(h => {
 				type="select_base"
 				ref={buttonRef}
 				onMouseDown={e => {
+					e.preventDefault();
 					focused.set(!focused.get());
 				}}
 				focused={focused}
