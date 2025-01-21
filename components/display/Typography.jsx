@@ -46,6 +46,8 @@ export default ThemeContext.use(h => {
 		const isEditing = Observer.mutable(false);
 
 		return <div
+			{...props}
+			theme={['typography', ...Array.isArray(type) ? type : type.split('_')]}
 			onClick={(e) => {
 				if (!label.isImmutable() && e.detail === 2) {
 					isEditing.set(true);
@@ -62,12 +64,7 @@ export default ThemeContext.use(h => {
 				</mark:then>
 
 				<mark:else>
-					<div
-						{...props}
-						theme={['typography', ...Array.isArray(type) ? type : type.split('_')]}
-					>
-						{children.length > 0 ? children : label ? label : null}
-					</div>
+					{children.length > 0 ? children : label ? label : null}
 				</mark:else>
 			</Shown>
 		</div>;
