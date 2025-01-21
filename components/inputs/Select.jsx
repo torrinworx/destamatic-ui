@@ -78,7 +78,7 @@ export default ThemeContext.use(h => {
 					foc.set(true);
 				}, {signal});
 
-				window.addEventListener(e => {
+				window.addEventListener('keydown', e => {
 					if (!options.get().length) return;
 
 					if (e.key === 'ArrowUp') {
