@@ -19,50 +19,61 @@ Theme.define({
 	},
 });
 
+const defaultLocations = [
+	Detached.BOTTOM_CENTER,
+	Detached.TOP_CENTER,
+	Detached.RIGHT_CENTER,
+	Detached.LEFT_CENTER,
+];
+
 export default ThemeContext.use(h => {
-	const Tooltip = ({children, label, locations, type = "p4"}, cleanup, mounted) => {
+	const Tooltip = ({children, label, enabled = false, locations = defaultLocations, type = "p4"}, cleanup, mounted) => {
 		const [elems, virtual] = trackedMount(children);
-		const hovered = Observer.mutable(false);
+		if (!(enabled instanceof Observer)) enabled = Observer.mutable(enabled);
 
-		let references = 0;
-		const mouseenter = e => {
-			references++;
+		if (!enabled.isImmutable()) {
+			let references = 0;
+			const mouseenter = e => {
+				references++;
 
-			if (references === 1) {
-				hovered.set(true);
-			}
-		};
+				if (references === 1) {
+					enabled.set(true);
+				}
+			};
 
-		const mouseleave = e => {
-			references--;
+			const mouseleave = e => {
+				references--;
 
-			if (references === 0) {
-				hovered.set(false);
-			}
-		};
+				if (references === 0) {
+					enabled.set(false);
+				}
+			};
 
-		cleanup(elems.observer.watch(delta => {
-			const modify = delta instanceof Modify;
+			cleanup(elems.observer.watch(delta => {
+				const modify = delta instanceof Modify;
 
-			if (modify || delta instanceof Delete) {
-				delta.prev.removeEventListener('mouseenter', mouseenter);
-				delta.prev.removeEventListener('mouseleave', mouseleave);
-			}
+				if (modify || delta instanceof Delete) {
+					delta.prev.removeEventListener('mouseenter', mouseenter);
+					delta.prev.removeEventListener('mouseleave', mouseleave);
+				}
 
-			if (modify || delta instanceof Insert) {
-				delta.value.addEventListener('mouseenter', mouseenter);
-				delta.value.addEventListener('mouseleave', mouseleave);
-			}
-		}));
+				if (modify || delta instanceof Insert) {
+					delta.value.addEventListener('mouseenter', mouseenter);
+					delta.value.addEventListener('mouseleave', mouseleave);
+				}
+			}));
 
-		cleanup(() => {
-			for (const item of elems) {
-				delta.prev.removeEventListener('mouseenter', mouseenter);
-				delta.prev.removeEventListener('mouseleave', mouseleave);
-			}
-		});
+			cleanup(() => {
+				for (const item of elems) {
+					delta.prev.removeEventListener('mouseenter', mouseenter);
+					delta.prev.removeEventListener('mouseleave', mouseleave);
+				}
+			});
+		} else {
+			enabled = enabled.map(Observer.mutable).unwrap();
+		}
 
-		return <Detached enabled={hovered} locations={locations}>
+		return <Detached enabled={enabled} locations={locations}>
 			{virtual}
 			{elems}
 
