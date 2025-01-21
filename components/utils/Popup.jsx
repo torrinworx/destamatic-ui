@@ -39,6 +39,8 @@ const Popup = ({ children, style, placement, canClose, ref: Ref }, cleanup, moun
         bottom: placement.map(p => getter(p, 'bottom')),
         maxWidth: placement.map(p => getter(p, 'maxWidth')),
         maxHeight: placement.map(p => getter(p, 'maxHeight')),
+        width: 'max-content',
+        height: 'max-content',
         ...style
     }}>
         {children}
