@@ -14,7 +14,8 @@ Theme.define({
 		$width: 4,
 		width: '$width$px',
 		cursor: 'ew-resize',
-		background: '#E5E7EB'
+		background: '#E5E7EB',
+		userSelect: 'none',
 	},
 
 	divider_left: {
