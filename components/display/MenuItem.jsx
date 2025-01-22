@@ -23,8 +23,9 @@ Theme.define({
 		$icon_inspect: 'layers',
 		$icon_select: 'activity',
 		$icon_show: 'eye',
-		$icon_hide: 'eye',
+		$icon_hide: 'eye-off',
 		$icon_team: 'users',
+		$icon_target: 'target',
 	},
 
 	button_menuItem: {
