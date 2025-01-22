@@ -44,7 +44,13 @@ export default ThemeContext.use(h => {
 	const Select = ({ value, options, display, style, theme }, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(options instanceof Observer)) options = Observer.immutable(options);
-		if (!display) display = a => a;
+
+		if (Array.isArray(display)) {
+			let arr = display;
+			display = a => arr[options.get().indexOf(a)];
+		} else if (!display) {
+			display = a => a;
+		}
 
 		const focused = Observer.mutable(false);
 		const selector = value.selector('selected', null);
