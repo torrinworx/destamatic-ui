@@ -13,6 +13,7 @@ Theme.define({
 		$icon_add: 'plus',
 		$icon_new: 'plus',
 		$icon_copy: 'copy',
+		$icon_duplicate: 'copy',
 		$icon_cut: 'scissors',
 		$icon_share: 'share',
 		$icon_download: 'download',
