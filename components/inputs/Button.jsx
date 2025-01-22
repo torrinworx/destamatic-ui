@@ -4,11 +4,11 @@ import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 
 import useRipples from '../utils/Ripple';
-import Typography from '../display/Typography';
+import '../display/Typography';
 
 Theme.define({
 	button: {
-		extends: ['center', 'radius'],
+		extends: 'center_radius',
 
 		padding: 10,
 		userSelect: 'none',
@@ -31,6 +31,8 @@ Theme.define({
 	},
 
 	button_contained: {
+		extends: 'typography_p1_bold',
+
 		background: '$color',
 		color: '$contrast_text($color_top)',
 	},
@@ -40,6 +42,8 @@ Theme.define({
 	},
 
 	button_outlined: {
+		extends: 'typography_p1_bold',
+
 		borderWidth: 2,
 		borderStyle: 'solid',
 		borderColor: '$color',
@@ -108,9 +112,6 @@ export default ThemeContext.use(h => {
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 		if (!Ref) Ref = <raw:button />;
-		if (label && typeof label === 'string') {
-			label = <Typography type='p1_bold_inline' label={label} />
-		}
 
 		disabled = disabled.map(d => !!d);
 
