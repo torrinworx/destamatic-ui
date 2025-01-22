@@ -1,0 +1,74 @@
+import Theme from '../utils/Theme';
+import ThemeContext from '../utils/ThemeContext';
+import Button from '../inputs/Button';
+import IconComponent from '../display/Icon';
+
+Theme.define({
+	menuItem: {
+		$icon_rename: 'edit-2',
+		$icon_delete: 'trash',
+		$icon_remove: 'x',
+		$icon_ask: 'message-circle',
+		$icon_chat: 'message-circle',
+		$icon_add: 'plus',
+		$icon_new: 'plus',
+		$icon_copy: 'copy',
+		$icon_cut: 'scissors',
+		$icon_share: 'share',
+		$icon_download: 'download',
+		$icon_export: 'download',
+		$icon_info: 'info',
+		$icon_inspect: 'layers',
+		$icon_select: 'activity',
+		$icon_show: 'eye',
+		$icon_hide: 'eye',
+		$icon_team: 'users',
+	},
+
+	button_menuItem: {
+		borderRadius: 0,
+		width: '100%',
+		padding: '20px 10px',
+		justifyContent: 'left',
+	},
+
+	button_menuItem_hovered: {
+		background: '$alpha($color_top, .1)',
+	},
+});
+
+export default ThemeContext.use(h => Theme.use(themer => {
+	const MenuItem = ({ Icon, theme, children, label, ...props }) => {
+		if (children.length) throw new Error("MenuItem does not take children");
+
+		if (!Icon) {
+			// find the first suitable word for the keyword.
+			let iconName = label.split(' ').find(word => {
+				word = word.toLowerCase();
+				return !['manage', 'generate', ''].includes(word);
+			}).toLowerCase();
+
+			Icon = themer(theme, 'menuItem').vars('icon_' + iconName).map(iconName => {
+				if (!iconName) {
+					return null;
+				}
+
+				return <IconComponent
+					libraryName='feather'
+					iconName={iconName}
+					style={{paddingRight: 20, boxSizing: 'content-box'}}
+					size={20}
+				/>;
+			});
+		}
+
+		return <Button
+			Icon={Icon}
+			type='menuItem'
+			label={label}
+			{...props}
+		/>;
+	};
+
+	return MenuItem;
+}));
