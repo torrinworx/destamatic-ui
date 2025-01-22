@@ -2,6 +2,7 @@ import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import Button from '../inputs/Button';
 import IconComponent from '../display/Icon';
+import Observer from 'destam/Observer';
 
 Theme.define({
 	menuItem: {
@@ -27,6 +28,8 @@ Theme.define({
 	},
 
 	button_menuItem: {
+		extends: 'typography_p1_bold_inline',
+
 		borderRadius: 0,
 		width: '100%',
 		padding: '20px 10px',
@@ -44,23 +47,25 @@ export default ThemeContext.use(h => Theme.use(themer => {
 
 		if (!Icon) {
 			// find the first suitable word for the keyword.
-			let iconName = label.split(' ').find(word => {
-				word = word.toLowerCase();
-				return !['manage', 'generate', ''].includes(word);
-			}).toLowerCase();
+			Icon = Observer.immutable(label).map(label => {
+				label = label.split(' ').find(word => {
+					word = word.toLowerCase();
+					return !['manage', 'generate', ''].includes(word);
+				}).toLowerCase();
 
-			Icon = themer(theme, 'menuItem').vars('icon_' + iconName).map(iconName => {
-				if (!iconName) {
-					return null;
-				}
+				return themer(theme, 'menuItem').vars('icon_' + label).map(iconName => {
+					if (!iconName) {
+						return null;
+					}
 
-				return <IconComponent
-					libraryName='feather'
-					iconName={iconName}
-					style={{paddingRight: 20, boxSizing: 'content-box'}}
-					size={20}
-				/>;
-			});
+					return <IconComponent
+						libraryName='feather'
+						iconName={iconName}
+						style={{paddingRight: 20, boxSizing: 'content-box'}}
+						size={20}
+					/>;
+				});
+			}).unwrap();
 		}
 
 		return <Button
