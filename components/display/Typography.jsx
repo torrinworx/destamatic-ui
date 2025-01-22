@@ -46,13 +46,13 @@ export default ThemeContext.use(h => {
 		const isEditing = Observer.mutable(false);
 
 		return <div
-			{...props}
 			theme={['typography', ...Array.isArray(type) ? type : type.split('_')]}
 			onClick={(e) => {
 				if (!label.isImmutable() && e.detail === 2) {
 					isEditing.set(true);
 				}
 			}}
+			{...props}
 		>
 			<Shown value={Observer.all([isEditing, editable]).map(([i, e]) => i && e)}>
 				<mark:then>
