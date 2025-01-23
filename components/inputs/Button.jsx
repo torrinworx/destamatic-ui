@@ -168,7 +168,8 @@ export default ThemeContext.use(h => {
 			]}
 		>
 			{iconPosition === 'left' ? Icon : null}
-			{label ? label : children}
+			{label}
+			{children}
 			{iconPosition === 'right' ? Icon : null}
 			{ripples}
 		</Ref>;
