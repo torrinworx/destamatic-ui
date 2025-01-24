@@ -5,17 +5,15 @@ import Detached from '../utils/Detached';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import Paper from '../display/Paper';
-import Typography from '../display/Typography';
+import '../display/Typography';
 import trackedMount from '../../util/trackedMount';
 
 Theme.define({
 	tooltip_paper: {
+		extends: 'typography_p1',
 		border: `1px solid $color`,
 		margin: 10,
 		opacity: '80%',
-	},
-
-	tooltip_typography: {
 	},
 });
 
@@ -27,7 +25,7 @@ const defaultLocations = [
 ];
 
 export default ThemeContext.use(h => {
-	const Tooltip = ({children, label, enabled = false, locations = defaultLocations, type = "p4"}, cleanup, mounted) => {
+	const Tooltip = ({children, label, enabled = false, locations = defaultLocations}, cleanup, mounted) => {
 		const [elems, virtual] = trackedMount(children);
 		if (!(enabled instanceof Observer)) enabled = Observer.mutable(enabled);
 
@@ -79,7 +77,7 @@ export default ThemeContext.use(h => {
 
 			<mark:popup>
 				<Paper theme="tooltip">
-					<Typography theme="tooltip" type={type} label={label} />
+					{label}
 				</Paper>
 			</mark:popup>
 		</Detached>;
