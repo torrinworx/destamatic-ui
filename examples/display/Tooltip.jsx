@@ -18,6 +18,19 @@ const Comp = ({style}) => {
 		<Tooltip label="show tooltip to the left" locations={[Detached.LEFT_CENTER]}>
 			<div style={{pointerEvents: 'auto'}}>This is some text</div>
 		</Tooltip>
+
+		<Tooltip>
+			<div style={{pointerEvents: 'auto'}}>This is some text</div>
+
+			<mark:popup>
+				<div style={{
+					transition: 'none',
+					color: Observer.timer(10).map(t => `hsl(${(t / 100 * 360).toFixed(0)}deg 100% 50%)`),
+				}}>
+					Custom stuff
+				</div>
+			</mark:popup>
+		</Tooltip>
 	</div>
 };
 
