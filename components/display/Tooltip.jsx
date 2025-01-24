@@ -5,17 +5,15 @@ import Detached from '../utils/Detached';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import Paper from '../display/Paper';
-import Typography from '../display/Typography';
+import '../display/Typography';
 import trackedMount from '../../util/trackedMount';
 
 Theme.define({
 	tooltip_paper: {
+		extends: 'typography_p1',
 		border: `1px solid $color`,
 		margin: 10,
 		opacity: '80%',
-	},
-
-	tooltip_typography: {
 	},
 });
 
@@ -27,7 +25,21 @@ const defaultLocations = [
 ];
 
 export default ThemeContext.use(h => {
-	const Tooltip = ({children, label, enabled = false, locations = defaultLocations, type = "p4"}, cleanup, mounted) => {
+	const Tooltip = ({children, label, enabled = false, locations = defaultLocations, type}, cleanup, mounted) => {
+		const popup = [];
+		for (let i = 0; i < children.length; i++) {
+			const item = children[i];
+			if (item instanceof mark) {
+				if (item.name === 'popup') {
+					popup.push(...item.props.children);
+					children.splice(i--, 1);
+				} else {
+					throw new Error("Tooltip does not take a mark other than popup");
+				}
+			}
+		}
+
+
 		const [elems, virtual] = trackedMount(children);
 		if (!(enabled instanceof Observer)) enabled = Observer.mutable(enabled);
 
@@ -78,8 +90,8 @@ export default ThemeContext.use(h => {
 			{elems}
 
 			<mark:popup>
-				<Paper theme="tooltip">
-					<Typography theme="tooltip" type={type} label={label} />
+				<Paper theme="tooltip" type={type}>
+					{label ?? null} {popup}
 				</Paper>
 			</mark:popup>
 		</Detached>;
