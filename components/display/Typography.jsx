@@ -7,20 +7,20 @@ import TextField from '../inputs/TextField';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
-	typography: { display: 'flex' },
-	typography_h1: { fontSize: 62, textWrap: 'nowrap' },
-	typography_h2: { fontSize: 56, textWrap: 'nowrap' },
-	typography_h3: { fontSize: 36, textWrap: 'nowrap' },
-	typography_h4: { fontSize: 30, textWrap: 'nowrap' },
-	typography_h5: { fontSize: 24, textWrap: 'nowrap' },
-	typography_h6: { fontSize: 20, textWrap: 'nowrap' },
+	typography: { display: 'block' },
+	typography_h1: { fontSize: 62 },
+	typography_h2: { fontSize: 56 },
+	typography_h3: { fontSize: 36 },
+	typography_h4: { fontSize: 30 },
+	typography_h5: { fontSize: 24 },
+	typography_h6: { fontSize: 20 },
 	typography_p1: { fontSize: 16 },
 	typography_p2: { fontSize: 14 },
 	typography_regular: { fontStyle: 'normal' },
 	typography_bold: { fontWeight: 'bold' },
 	typography_italic: { fontStyle: 'italic' },
 	typography_center: { textAlign: 'center' },
-	typography_inline: { display: 'inline-flex' }
+	typography_inline: { display: 'inline' }
 });
 
 /**
