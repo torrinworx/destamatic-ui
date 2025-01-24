@@ -25,7 +25,7 @@ const defaultLocations = [
 ];
 
 export default ThemeContext.use(h => {
-	const Tooltip = ({children, label, enabled = false, locations = defaultLocations}, cleanup, mounted) => {
+	const Tooltip = ({children, label, enabled = false, locations = defaultLocations, type}, cleanup, mounted) => {
 		const [elems, virtual] = trackedMount(children);
 		if (!(enabled instanceof Observer)) enabled = Observer.mutable(enabled);
 
@@ -76,7 +76,7 @@ export default ThemeContext.use(h => {
 			{elems}
 
 			<mark:popup>
-				<Paper theme="tooltip">
+				<Paper theme="tooltip" type={type}>
 					{label}
 				</Paper>
 			</mark:popup>
