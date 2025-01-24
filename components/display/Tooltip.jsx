@@ -26,6 +26,20 @@ const defaultLocations = [
 
 export default ThemeContext.use(h => {
 	const Tooltip = ({children, label, enabled = false, locations = defaultLocations, type}, cleanup, mounted) => {
+		const popup = [];
+		for (let i = 0; i < children.length; i++) {
+			const item = children[i];
+			if (item instanceof mark) {
+				if (item.name === 'popup') {
+					popup.push(...item.props.children);
+					children.splice(i--, 1);
+				} else {
+					throw new Error("Tooltip does not take a mark other than popup");
+				}
+			}
+		}
+
+
 		const [elems, virtual] = trackedMount(children);
 		if (!(enabled instanceof Observer)) enabled = Observer.mutable(enabled);
 
@@ -77,7 +91,7 @@ export default ThemeContext.use(h => {
 
 			<mark:popup>
 				<Paper theme="tooltip" type={type}>
-					{label}
+					{label ?? null} {popup}
 				</Paper>
 			</mark:popup>
 		</Detached>;
