@@ -131,12 +131,14 @@ export default ThemeContext.use(h => {
 				style={styleTrack}
 				isHovered={hover}
 				onMouseDown={event => {
-					event.preventDefault();
-					dragging.set(event);
+					if (!value.isImmutable()) {
+						event.preventDefault();
+						dragging.set(event);
+					}
 				}}
 				children={children}
 			/>
-			<div
+			{value.isImmutable() ? null : <div
 				theme={[
 					"slider", "thumb",
 					dragging.map(h => h ? 'hovered' : null),
@@ -151,7 +153,7 @@ export default ThemeContext.use(h => {
 					event.preventDefault();
 					dragging.set(event);
 				}}
-			/>
+			/>}
 		</Ref>;
 	});
 
