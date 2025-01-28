@@ -12,7 +12,6 @@ export default ThemeContext.use(h => {
 		focus = false,
 		autofocus,
 		Ref = <raw:input />,
-		theme,
 		...props
 	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
@@ -48,7 +47,6 @@ export default ThemeContext.use(h => {
 				focus.map(e => e ? 'focused' : null),
 				error.map(e => e ? 'error' : null),
 				expand.map(e => e ? 'expand' : null),
-				...theme,
 			]}
 		/>;
 	};
