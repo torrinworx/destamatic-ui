@@ -11,7 +11,7 @@ Theme.define({
 		height: '20px',
 		width: '20px'
 	},
-	checkboxOverlay: {
+	checkboxoverlay: {
 		position: 'absolute',
 		top: 0,
 		left: 0,
@@ -49,12 +49,18 @@ export default ThemeContext.use(h => {
 	 * @param {function} [props.onChange] - Function to be executed when the selected state changes.
 	 * @param {boolean} [props.invert=false] - Flag to invert the appearance or behavior of the checkbox.
 	 * @param {Observer<boolean>|boolean} [props.disabled] - Observable representing the disabled state or a static boolean value.
-	 * @param {Object} [props.style] - Custom styles to apply directly to the checkbox input.
 	 * @param {Object} [props.rest] - Additional props to be propagated to the input element.
 	 *
 	 * @returns {JSX.Element} The rendered Checkbox component.
 	 */
-	const Checkbox = ({ value, onChange, invert = false, disabled, style, ...props }) => {
+	const Checkbox = ({
+		value,
+		onChange,
+		invert = false,
+		disabled,
+		Ref = <raw:input />,
+		...props
+	}) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(disabled instanceof Observer)) disabled = Observer.immutable(disabled);
 
@@ -62,7 +68,6 @@ export default ThemeContext.use(h => {
 		const hover = Observer.mutable(false);
 
 		const Span = <raw:span />;
-		const Input = <raw:input />;
 		// Disable user able to grab and drag the checkbox:
 		return <div theme='checkboxwrapper'>
 			<Span
@@ -94,7 +99,7 @@ export default ThemeContext.use(h => {
 				}}
 				draggable="false"
 			>
-				<Input
+				<Ref
 					type="checkbox"
 					theme={[
 						"checkbox",
@@ -103,7 +108,7 @@ export default ThemeContext.use(h => {
 					$checked={value}
 					{...props}
 				/>
-				<span draggable="false" theme={[disabled.map(d => d ? 'checkboxOverlay' : null)]} />
+				<span draggable="false" theme={[disabled.map(d => d ? 'checkboxoverlay' : null)]} />
 				{ripples}
 			</Span>
 		</div>
