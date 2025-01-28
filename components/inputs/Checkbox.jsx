@@ -1,7 +1,7 @@
 import { Observer } from 'destam-dom';
 
 import Theme from '../utils/Theme';
-import ThemeContext from '../utils/Theme';
+import ThemeContext from '../utils/ThemeContext';
 import useRipples from '../utils/Ripple';
 
 Theme.define({
