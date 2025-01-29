@@ -94,7 +94,7 @@ export default ThemeContext.use(h => {
 						throw e;
 					} finally {
 						// make sure that the chekbox is always in sync with the observer
-						Input.checked = value.get();
+						Ref.checked = value.get();
 					}
 				}}
 				draggable="false"
