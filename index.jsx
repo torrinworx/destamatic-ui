@@ -20,7 +20,6 @@ export { default as Date } from './components/inputs/Date.jsx';
 export { default as Radio } from './components/inputs/Radio.jsx';
 export { default as Select } from './components/inputs/Select.jsx';
 export { default as Slider } from './components/inputs/Slider.jsx';
-export { default as Switch } from './components/inputs/Switch.jsx';
 export { default as TextArea } from './components/inputs/TextArea.jsx';
 export { default as TextField } from './components/inputs/TextField.jsx';
 
@@ -41,6 +40,7 @@ export { default as Ripple } from './components/utils/Ripple.jsx';
 export { default as useRipples } from './components/utils/Ripple.jsx';
 export { default as Router } from './components/utils/Router.jsx';
 export { default as Shown } from './components/utils/Shown.jsx'
+export { default as Switch } from './components/utils/Switch.jsx'
 export { default as suspend } from './components/utils/Suspend.jsx';
 export { default as Theme } from './components/utils/Theme.jsx';
 export { default as ThemeContext } from './components/utils/ThemeContext.jsx';
