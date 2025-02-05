@@ -5,8 +5,11 @@ import Typography from '../display/Typography';
 
 Theme.define({
 	radio_label: {
+		extends: 'typography_h6',
+
 		display: 'flex',
 		flexDirection: 'row',
+		alignItems: 'center',
 		gap: 10,
 	},
 
@@ -83,7 +86,7 @@ export default sel => ThemeContext.use(h => {
 		if (label) {
 			out = <div theme={['radio', 'label']}>
 				{out}
-				<Typography type="h6_radio" label={label} />
+				{label}
 			</div>;
 		}
 
