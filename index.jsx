@@ -20,9 +20,9 @@ export { default as Date } from './components/inputs/Date.jsx';
 export { default as Radio } from './components/inputs/Radio.jsx';
 export { default as Select } from './components/inputs/Select.jsx';
 export { default as Slider } from './components/inputs/Slider.jsx';
-export { default as Switch } from './components/inputs/Switch.jsx';
 export { default as TextArea } from './components/inputs/TextArea.jsx';
 export { default as TextField } from './components/inputs/TextField.jsx';
+export { default as Toggle } from './components/inputs/Toggle.jsx';
 
 // ** navigation ** //
 export { default as Drawer } from './components/navigation/Drawer.jsx';

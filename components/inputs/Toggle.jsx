@@ -4,7 +4,7 @@ import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
-	switch: {
+	toggle: {
 		display: 'flex',
 		alignItems: 'center',
 		cursor: 'pointer',
@@ -16,11 +16,11 @@ Theme.define({
 		borderRadius: '37.5px',
 	},
 
-	switch_hovered: {
+	toggle_hovered: {
 		background: '$color_hover'
 	},
 
-	switchknob: {
+	toggleknob: {
 		position: 'absolute',
 		width: '23px',
 		height: '23px',
@@ -29,31 +29,31 @@ Theme.define({
 		transition: '100ms',
 	},
 
-	switchknob_checked: {
+	toggleknob_checked: {
 		left: '32.5px',
 	},
-	switchknob_unchecked: {
+	toggleknob_unchecked: {
 		left: '4px',
 	}
 });
 
 export default ThemeContext.use(h => {
 	/**
-	 * Switch component.
+	 * toggle component.
 	 *
-	 * This component acts like a toggle switch, utilizing an observable boolean value for its state.
+	 * This component acts like a toggle toggle, utilizing an observable boolean value for its state.
 	 * It supports custom styling, event handling, and a disabled state.
 	 *
 	 * @param {Object} props - The properties object.
-	 * @param {Observer<boolean>|boolean} [props.value] - Observable representing the switched state or a static boolean value.
-	 * @param {function} [props.onChange] - Function to be executed when the switched state changes.
+	 * @param {Observer<boolean>|boolean} [props.value] - Observable representing the toggled state or a static boolean value.
+	 * @param {function} [props.onChange] - Function to be executed when the toggled state changes.
 	 * @param {Observer<boolean>|boolean} [props.disabled] - Observable representing the disabled state or a static boolean value.
-	 * @param {Object} [props.style] - Custom styles to apply directly to the switch container.
-	 * @param {Object} [props.rest] - Additional props to be propagated to the switch container.
+	 * @param {Object} [props.style] - Custom styles to apply directly to the toggle container.
+	 * @param {Object} [props.rest] - Additional props to be propagated to the toggle container.
 	 *
-	 * @returns {JSX.Element} The rendered Switch component.
+	 * @returns {JSX.Element} The rendered toggle component.
 	 */
-	const Switch = ({
+	const Toggle = ({
 		value,
 		onChange,
 		disabled,
@@ -87,7 +87,7 @@ export default ThemeContext.use(h => {
 			}}
 			{...props}
 			theme={[
-				"switch",
+				"toggle",
 				type,
 				disabled.map(d => d ? 'disabled' : null),
 				hover.map(h => h ? 'hovered' : null),
@@ -95,7 +95,7 @@ export default ThemeContext.use(h => {
 		>
 			<span
 				theme={[
-					'switchknob',
+					'toggleknob',
 					value.map(v => v ? 'checked' : 'unchecked'),
 					disabled.map(d => d ? 'disabled' : null),
 				]}
@@ -105,5 +105,5 @@ export default ThemeContext.use(h => {
 		</Span>;
 	};
 
-	return Switch;
+	return Soggle;
 });
