@@ -59,37 +59,35 @@ Theme.define({
 	},
 });
 
-export default ThemeContext.use(h => {
-	const Radio = (sel) => {
-		const selector = sel.selector('selected', null);
+export default sel => ThemeContext.use(h => {
+	const selector = sel.selector('selected', null);
 
-		return ({ style, value, label }) => {
-			const hovered = Observer.mutable(false);
-			const hoveredTheme = hovered.map(h => h ? 'hovered' : null);
-			const selected = selector(value);
+	const Radio =  ({ style, value, label }) => {
+		const hovered = Observer.mutable(false);
+		const hoveredTheme = hovered.map(h => h ? 'hovered' : null);
+		const selected = selector(value);
 
-			let out = <div
-				isHovered={hovered}
-				onClick={e => {
-					e.preventDefault();
-					sel.set(value);
-				}}
-				style={style}
-				theme={['radio', 'ring', '1', hoveredTheme, selected]}>
-				<div theme={['radio', 'ring', '2', hoveredTheme, selected]}>
-					<div theme={['radio', 'ring', '3', hoveredTheme, selected]} />
-				</div>
+		let out = <div
+			isHovered={hovered}
+			onClick={e => {
+				e.preventDefault();
+				sel.set(value);
+			}}
+			style={style}
+			theme={['radio', 'ring', '1', hoveredTheme, selected]}>
+			<div theme={['radio', 'ring', '2', hoveredTheme, selected]}>
+				<div theme={['radio', 'ring', '3', hoveredTheme, selected]} />
+			</div>
+		</div>;
+
+		if (label) {
+			out = <div theme={['radio', 'label']}>
+				{out}
+				<Typography type="h6_radio" label={label} />
 			</div>;
+		}
 
-			if (label) {
-				out = <div theme={['radio', 'label']}>
-					{out}
-					<Typography type="h6_radio" label={label} />
-				</div>;
-			}
-
-			return out;
-		};
+		return out;
 	};
 
 	return Radio;
