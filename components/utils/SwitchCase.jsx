@@ -14,7 +14,7 @@ import Observer from 'destam/Observer';
  *
  * By default, if a component is not marked, it will be assumed that it will be shown when the value matches.
  */
-const Switch = ({children, value}) => {
+const SwitchCase = ({children, value}) => {
     const [cases, defaultCase] = children.reduce((a, c) => {
         if (c instanceof mark) {
             if (c.name === 'case') {
@@ -36,4 +36,4 @@ const Switch = ({children, value}) => {
     });
 };
 
-export default Switch;
+export default SwitchCase;
