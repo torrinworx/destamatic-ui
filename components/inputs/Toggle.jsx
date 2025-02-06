@@ -36,12 +36,12 @@ Theme.define({
 	toggleknob_checked: {
 		// Slide the knob to the right. 
 		// 28px or 32px depends on your design—adjust if needed
-		transform: 'translateX(28px) translateY(-50%) scale(1)',
+		transform: 'translateX(32px) translateY(-50%) scale(1)',
 	},
 
 	toggleknob_unchecked: {
 		// Slide it back to the “left”
-		transform: 'translateX(4px) translateY(-50%) scale(1)',
+		transform: 'translateX(5px) translateY(-50%) scale(1)',
 	},
 });
 
