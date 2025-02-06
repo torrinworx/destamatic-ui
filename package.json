@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "test": ""
+    "test": "node --test"
   },
   "keywords": [],
   "contributors": [
@@ -28,16 +28,19 @@
   "license": "MIT",
   "dependencies": {
     "destam": "^0.5.0",
-    "destam-dom": "^0.10.2",
-    "vite": "^5.4.8"
+    "destam-dom": "^0.10.2"
   },
   "optionalDependencies": {
     "feather-icons": "^4.29.1",
     "material-icons": "^1.13.12"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.7",
     "@babel/generator": "^7.26.3",
     "@babel/parser": "^7.26.3",
-    "@babel/traverse": "^7.26.4"
+    "@babel/register": "^7.25.9",
+    "@babel/traverse": "^7.26.4",
+    "@babel/types": "^7.26.7",
+    "vite": "^6.1.0"
   }
 }

@@ -166,4 +166,14 @@ export default {
 	shadow: {
 		boxShadow: '4px 4px 10px $alpha($color_top, 0.2)',
 	},
+
+	fill: { width: '100%', height: '100%' },
+	tall: { height: '100%' },
+	wide: { width: '100%' },
+	right: { marginLeft: 'auto' },
+
+	spread: {
+		display: 'flex',
+		justifyContent: 'space-between',
+	},
 };
