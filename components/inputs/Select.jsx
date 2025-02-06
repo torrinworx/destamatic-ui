@@ -41,7 +41,7 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Select = ({ value, options, display, style, placeholder }, cleanup, mounted) => {
+	const Select = ({ value, options, display, style, placeholder = "None" }, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(options instanceof Observer)) options = Observer.immutable(options);
 
@@ -162,9 +162,9 @@ export default ThemeContext.use(h => {
 				<Typography type='p1_inline'>
 					{value.map(val => {
 						if (options.get().includes(val)) {
-								return display(val);
+							return display(val);
 						} else {
-								return placeholder ? placeholder : "None";
+							return placeholder;
 						}
 					})}
 				</Typography>
