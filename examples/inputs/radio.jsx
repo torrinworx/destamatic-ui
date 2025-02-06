@@ -12,4 +12,3 @@ mount(document.body, <div style={{display: 'flex', flexDirection: 'column', gap:
 	{/* No label */}
 	<SelectRadio value={3} />
 </div>);
-

@@ -105,5 +105,5 @@ export default ThemeContext.use(h => {
 		</Span>;
 	};
 
-	return Soggle;
+	return Toggle;
 });
