@@ -15,25 +15,29 @@ import Observer from 'destam/Observer';
  * By default, if a component is not marked, it will be assumed that it will be shown when the value matches.
  */
 const SwitchCase = ({children, value}) => {
-    const [cases, defaultCase] = children.reduce((a, c) => {
-        if (c instanceof mark) {
-            if (c.name === 'case') {
-                a[0].push({ value: c.props.value, component: c.props.children });
-            } else if (c.name === 'default') {
-                a[1].push(c.props.children);
-            } else {
-                throw new Error("Unknown mark name for <Switch>: " + c.name);
-            }
-        } else {
-            a[1].push(c);
-        }
-        return a;
-    }, [[], []]);
+	const defaults = [];
+	const cases = new Map();
 
-    return Observer.immutable(value).map(val => {
-        const match = cases.find(c => c.value === val);
-        return match ? match.component : defaultCase;
-    });
+	for (const c of children) {
+		 if (c instanceof mark) {
+			if (c.name === 'case') {
+				let case_ = cases.get(c.props.value);
+				if (!case_) cases.set(c.props.value, case_ = []);
+
+				case_.push(...c.props.children);
+			} else if (c.name === 'default') {
+				defaults.push(...c.props.children);
+			} else {
+				throw new Error("Unknown mark name for <Switch>: " + c.name);
+			}
+		} else {
+			defaults.push(c);
+		}
+	}
+
+	return Observer.immutable(value).map(val => {
+		return cases.get(val) ?? defaults;
+	});
 };
 
 export default SwitchCase;
