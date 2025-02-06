@@ -1,7 +1,9 @@
 import Observer from 'destam/Observer';
+
 import Theme from '../utils/Theme';
-import ThemeContext from '../utils/ThemeContext';
+import useRipples from '../utils/Ripple';
 import Typography from '../display/Typography';
+import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
 	radio_label: {
@@ -24,69 +26,71 @@ Theme.define({
 		width: '80%',
 		height: '80%',
 		cursor: 'pointer',
-
 		$size: 30,
 	},
 
 	radio_ring_1: {
-		background: '$alpha($color, 0.8)',
+		overflow: 'clip',
+		border: '3px solid $color',
 		width: '$size$px',
 		height: '$size$px',
 	},
 
-	radio_ring_1_selected: {
-		background: '$color',
-	},
-
 	radio_ring_2: {
-		background: '$invert($color_top)',
+		background: 'transparent',
+		width: '100%',
+		height: '100%'
 	},
 
 	radio_ring_3: {
-		transition: 'width 100ms ease-in-out, height 100ms ease-in-out',
+		// Use a scale transform instead of explicit width/height expansions.
+		// This helps avoid jitter and feels more fluid.
+		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
 		background: '$color',
-		width: 0,
-		height: 0,
-	},
+		borderRadius: '50%',
+		width: '100%',
+		height: '100%',
+		transform: 'scale(0)',
+	  },
 
-	radio_ring_3_hovered: {
-		background: '$color',
-		width: '20%',
-		height: '20%',
-	},
-
-	radio_ring_3_selected: {
-		background: '$color',
-		width: '80%',
-		height: '80%',
-	},
+	  radio_ring_3_hovered: {
+		transform: 'scale(0.2)',
+	  },
+	  
+	  radio_ring_3_selected: {
+		transform: 'scale(0.65)',
+	  }
 });
 
 export default sel => ThemeContext.use(h => {
 	const selector = sel.selector('selected', null);
 
-	const Radio =  ({ style, value, label }) => {
+	const Radio = ({ style, value, label }) => {
 		const hovered = Observer.mutable(false);
 		const hoveredTheme = hovered.map(h => h ? 'hovered' : null);
 		const selected = selector(value);
+		const [ripples, createRipple] = useRipples();
 
 		let out = <div
 			isHovered={hovered}
 			onClick={e => {
+				createRipple(e);
 				e.preventDefault();
 				sel.set(value);
 			}}
-			style={style}
-			theme={['radio', 'ring', '1', hoveredTheme, selected]}>
-			<div theme={['radio', 'ring', '2', hoveredTheme, selected]}>
-				<div theme={['radio', 'ring', '3', hoveredTheme, selected]} />
+			style={{ border: `3px solid ${style?.color ? style.color : '$color'}`, ...style }}
+
+			theme={['radio', 'ring', '1', hoveredTheme]}>
+			<div theme={['radio', 'ring', '2', hoveredTheme]} >
+				<div theme={['radio', 'ring', '3', hoveredTheme, selected]} style={{ background: style?.color ? style.color : '$color' }} />
 			</div>
+			{ripples}
 		</div>;
 
 		if (label) {
 			out = <div theme={['radio', 'label']}>
 				{out}
-				{label}
+				{typeof label === 'string' ? <Typography type='p1' label={label} /> : label}
 			</div>;
 		}
 

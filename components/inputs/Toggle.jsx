@@ -22,19 +22,27 @@ Theme.define({
 
 	toggleknob: {
 		position: 'absolute',
+		top: '50%',
+		transform: 'translateX(4px) translateY(-50%) scale(1)',
+
 		width: '23px',
 		height: '23px',
 		background: '$color_top',
 		borderRadius: '50%',
-		transition: '100ms',
+
+		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
 	},
 
 	toggleknob_checked: {
-		left: '32.5px',
+		// Slide the knob to the right. 
+		// 28px or 32px depends on your design—adjust if needed
+		transform: 'translateX(28px) translateY(-50%) scale(1)',
 	},
+
 	toggleknob_unchecked: {
-		left: '4px',
-	}
+		// Slide it back to the “left”
+		transform: 'translateX(4px) translateY(-50%) scale(1)',
+	},
 });
 
 export default ThemeContext.use(h => {
