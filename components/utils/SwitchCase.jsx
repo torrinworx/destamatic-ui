@@ -14,15 +14,30 @@ import Observer from 'destam/Observer';
  *
  * By default, if a component is not marked, it will be assumed that it will be shown when the value matches.
  */
-const SwitchCase = ({children, value}) => {
+const SwitchCase = ({children, value, cases}) => {
+	if (cases) {
+		const entries = Object.entries(cases);
+
+		value = Observer
+			.all(entries.map(e => Observer.immutable(e[1])))
+			.map(cases => {
+				for (let i = 0; i < cases.length; i++) {
+					if (!cases[i]) continue;
+
+					return entries[i][0];
+				}
+
+			});
+	}
+
 	const defaults = [];
-	const cases = new Map();
+	const rendered = new Map();
 
 	for (const c of children) {
 		 if (c instanceof mark) {
 			if (c.name === 'case') {
-				let case_ = cases.get(c.props.value);
-				if (!case_) cases.set(c.props.value, case_ = []);
+				let case_ = rendered.get(c.props.value);
+				if (!case_) rendered.set(c.props.value, case_ = []);
 
 				case_.push(...c.props.children);
 			} else if (c.name === 'default') {
@@ -36,7 +51,7 @@ const SwitchCase = ({children, value}) => {
 	}
 
 	return Observer.immutable(value).map(val => {
-		return cases.get(val) ?? defaults;
+		return rendered.get(val) ?? defaults;
 	});
 };
 
