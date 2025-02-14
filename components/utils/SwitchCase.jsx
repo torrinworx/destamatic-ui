@@ -27,6 +27,7 @@ const SwitchCase = ({children, value, cases}) => {
 					return entries[i][0];
 				}
 
+				return null;
 			});
 	}
 
