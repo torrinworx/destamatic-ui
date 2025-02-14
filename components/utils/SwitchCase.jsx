@@ -4,15 +4,23 @@ import Observer from 'destam/Observer';
 /**
  * Conditionally renders components based on a value and multiple cases.
  *
- * This component supports marks. Marks are special elements that are not
- * meant to be rendered, but instead hold metadata that the user might want
- * to specify. This metadata can be read by the Switch component to implement
- * special behavior. Two marks are supported:
+ * This component supports marks, which are special elements that do not render
+ * visually but instead hold metadata. This metadata can be read by the Switch
+ * component to implement special behavior. Two marks are supported:
  *
- * <mark:case> Marks a child component to be shown when its associated case condition matches the value.
- * <mark:default> Marks a child component to be shown when none of the case conditions match the value.
+ * - `<mark:case>`: Marks a child component to be shown when its associated case matches the value.
+ * - `<mark:default>`: Marks a child component to be shown when no case matches the value.
  *
- * By default, if a component is not marked, it will be assumed that it will be shown when the value matches.
+ * If a component is not marked, it will default to the `<mark:default>` case.
+ *
+ * ## Parameters:
+ * - `value`: An observer holding the switch state. Cases will be matched against
+ *   its value. This is overridden when `cases` is provided.
+ * - `cases`: Enables an alternative mode where multiple boolean observers determine
+ *   the active case. This should be an object where:
+ *   - Keys represent possible case values.
+ *   - Values are observers, and the first truthy observer determines the active case.
+ *   - If multiple observers are truthy, priority is given to the first matching key.
  */
 const SwitchCase = ({children, value, cases}) => {
 	if (cases) {
