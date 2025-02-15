@@ -1,5 +1,6 @@
 import { mark } from './h';
 import Observer from 'destam/Observer';
+import { assert } from 'destam/util';
 
 /**
  * Conditionally renders components based on a value and multiple cases.
@@ -15,14 +16,19 @@ import Observer from 'destam/Observer';
  *
  * ## Parameters:
  * - `value`: An observer holding the switch state. Cases will be matched against
- *   its value. This is overridden when `cases` is provided.
+ *   its value.
  * - `cases`: Enables an alternative mode where multiple boolean observers determine
  *   the active case. This should be an object where:
  *   - Keys represent possible case values.
  *   - Values are observers, and the first truthy observer determines the active case.
  *   - If multiple observers are truthy, priority is given to the first matching key.
+ *
+ * Note that `value` and `cases` are mutually exclusive. The component will assert
+ * if both are present.
  */
 const SwitchCase = ({children, value, cases}) => {
+	assert(!value || !cases);
+
 	if (cases) {
 		const entries = Object.entries(cases);
 
