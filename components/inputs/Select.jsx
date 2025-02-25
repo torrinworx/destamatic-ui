@@ -35,7 +35,6 @@ Theme.define({
 	},
 
 	button_select_focused: {
-		border: '1px solid rgba(0, 0, 0, 0)',
 		background: '$alpha($color_top, 0.1)',
 	},
 });
