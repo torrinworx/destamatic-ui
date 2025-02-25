@@ -35,6 +35,7 @@ Theme.define({
 	},
 
 	button_select_focused: {
+		border: '1px solid rgba(0, 0, 0, 0)',
 		background: '$alpha($color_top, 0.1)',
 	},
 });
@@ -51,7 +52,7 @@ export default ThemeContext.use(h => {
 			display = a => a;
 		}
 
-		const focused = Observer.mutable(false);
+		const [preFocus, focused] = Observer.mutable(false).memo(2);
 		const selector = value.selector('selected', null);
 
 		const buttonRef = <raw:button />;
@@ -149,7 +150,7 @@ export default ThemeContext.use(h => {
 					e.preventDefault();
 					focused.set(!focused.get());
 				}}
-				focused={focused}
+				focused={preFocus}
 				style={{
 					borderTopLeftRadius: focused.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
 					borderTopRightRadius: focused.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
