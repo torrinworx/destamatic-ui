@@ -33,6 +33,10 @@ export default ThemeContext.use(h => {
 			type={type}
 			isFocused={focus}
 			onKeyDown={e => {
+				if (value.isImmutable()) {
+					e.preventDefault();
+				}
+
 				if (e.key === 'Enter') {
 					if (onEnter) {
 						onEnter(e);

@@ -70,7 +70,13 @@ export default ThemeContext.use(h => {
 			class={_class}
 			placeholder={placeholder}
 			$value={value}
-			onKeyDown={onKeyDown}
+			onKeyDown={(e) => {
+				if (value.isImmutable()) {
+					e.preventDefault();
+				}
+
+				if (onKeyDown) onKeyDown(e);
+			}}
 			onInput={e => {
 				if (value.isImmutable()) {
 					Ref.value = value.get() || '';
