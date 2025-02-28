@@ -168,7 +168,7 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
             />
         </div>
         <Theme value={{
-            primary: {
+            '*': {
                 $color: 'pink',
                 $color_hover: 'blue',
                 $color_top: 'white',
