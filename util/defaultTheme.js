@@ -157,6 +157,14 @@ export default {
 		height: '100%',
 	},
 
+	start: {
+		justifyContent: 'flex-start',
+	},
+
+	end: {
+		justifyContent: 'flex-end',
+	},
+
 	tight: {
 		padding: 0,
 	},
