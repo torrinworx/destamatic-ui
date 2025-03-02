@@ -82,7 +82,7 @@ export default ThemeContext.use(h => {
 	 * @param {Function} [props.onClick] - The function to call when the button is clicked.
 	 * @param {Function} [props.onMouseDown] - The function to call when the mouse button is pressed down on the button.
 	 * @param {Function} [props.onMouseUp] - The function to call when the mouse button is released on the button.
-	 * @param {JSX.Element} [props.Icon] - An optional icon element to display inside the button.
+	 * @param {JSX.Element} [props.icon] - An optional icon element to display inside the button.
 	 * @param {Object} [props.style] - Custom styles to apply to the button.
 	 * @param {Observer<boolean>} [props.disabled] - Observable boolean to determine if the button is disabled.
 	 * @param {Observer<boolean>} [props.hover] - Observable boolean to determine if the button is in hover state.
@@ -98,7 +98,7 @@ export default ThemeContext.use(h => {
 		inline,
 		onMouseDown,
 		onMouseUp,
-		Icon = null,
+		icon = null,
 		style,
 		disabled,
 		hover,
@@ -167,10 +167,10 @@ export default ThemeContext.use(h => {
 				focused.map(d => d ? 'focused' : null),
 			]}
 		>
-			{iconPosition === 'left' ? Icon : null}
+			{iconPosition === 'left' ? icon : null}
 			{label}
 			{children}
-			{iconPosition === 'right' ? Icon : null}
+			{iconPosition === 'right' ? icon : null}
 			{ripples}
 		</Ref>;
 	};

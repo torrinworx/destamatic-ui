@@ -70,7 +70,7 @@ export default ThemeContext.use(h => Theme.use(themer => {
 		}
 
 		return <Button
-			Icon={Icon}
+			icon={Icon}
 			type='menuItem'
 			label={label}
 			{...props}

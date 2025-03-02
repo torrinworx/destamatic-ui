@@ -158,13 +158,13 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
                 label="Icon Outline"
                 type="outlined"
                 onClick={handleClick}
-                Icon={<Icon libraryName="feather" iconName="feather" />}
+                icon={<Icon libraryName="feather" iconName="feather" />}
             />
             <Button
                 label="Icon Contained"
                 type="contained"
                 onClick={handleClick}
-                Icon={<Icon libraryName="feather" iconName="feather" />}
+                icon={<Icon libraryName="feather" iconName="feather" />}
             />
         </div>
         <Theme value={{
@@ -190,13 +190,13 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
                     label="Icon Outline"
                     type="outlined"
                     onClick={handleClick}
-                    Icon={<Icon libraryName="feather" iconName="feather" />}
+                    icon={<Icon libraryName="feather" iconName="feather" />}
                 />
                 <Button
                     label="Icon Contained"
                     type="contained"
                     onClick={handleClick}
-                    Icon={<Icon libraryName="feather" iconName="feather" />}
+                    icon={<Icon libraryName="feather" iconName="feather" />}
                 />
             </div>
 

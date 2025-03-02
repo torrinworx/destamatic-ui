@@ -75,7 +75,7 @@ export default ThemeContext.use(h => {
                     left: '0',
                     transform: open.map(o => `translateX(${o ? width : '0px'}) translateY(-100%)`),
                 }}
-                Icon={open.map(
+                icon={open.map(
                     o => o ? <Icon libraryName={'feather'} iconName={'chevron-left'} />
                         : <Icon libraryName={'feather'} iconName={'chevron-right'} />
                 )}
