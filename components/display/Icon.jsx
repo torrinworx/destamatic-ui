@@ -81,8 +81,9 @@ export default ThemeContext.use(h => {
 			}
 		};
 
-		await render();
-		name.watch(render);
+		await render(); // inintial render
+		name.watch(render); // re-render on name update
+		libDriver.watch(render); // re-render on library update
 
 		return <Ref
 			style={{

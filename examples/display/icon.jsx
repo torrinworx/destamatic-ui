@@ -5,6 +5,9 @@ import { Icon, Typography } from 'destamatic-ui';
 const name = Observer.timer(500).map(t => t % 2 === 0 ? 'feather' : 'user');
 const nameMaterial = Observer.timer(500).map(t => t % 2 === 0 ? 'face' : 'help');
 
+const libraryBoth = Observer.timer(500).map(t => t % 2 === 0 ? 'material' : 'feather')
+const both = Observer.timer(500).map(t => t % 2 === 0 ? { name: 'logo_dev', library: 'material' } : { name: 'feather', library: 'feather' })
+
 mount(document.body, <div>
 	<Typography type='h4' label='Feather Icons:' />
 	{Array.from({ length: 10 }).map(() => (
@@ -29,6 +32,10 @@ mount(document.body, <div>
 	<Icon library="material" name="outlined:help" />
 	<Icon library="material" name="outlined:help" size={100} style={{ fill: 'blue' }} />
 
+	<Typography type='h4' label='Switching between libraries:' />
+
+	<Icon library={libraryBoth} name='save' size={100} />
+	<Icon library={both.map(m => m.library)} name={both.map(m => m.name)} size={100} />
 
 	<Typography type='h4' label='Custom Icons:' />
 	<Icon library="custom" name="outlined:help" size={100} style={{ fill: 'blue' }} />
