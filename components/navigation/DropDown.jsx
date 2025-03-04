@@ -42,9 +42,9 @@ const DropDown = ({
             <div style={{ display: 'flex', alignItems: 'center', userSelect: 'none' }}>
                 <i class='chevron-icon' style={{ cursor: 'pointer' }}>
                     {open.map((show) => show ? (
-                        <Icon size='20' libraryName='feather' iconName='chevron-down' />
+                        <Icon size='20' library='feather' name='chevron-down' />
                     ) : (
-                        <Icon size='20' libraryName='feather' iconName='chevron-right' />
+                        <Icon size='20' library='feather' name='chevron-right' />
                     ))}
                 </i>
             </div>

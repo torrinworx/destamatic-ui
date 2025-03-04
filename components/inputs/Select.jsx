@@ -168,7 +168,7 @@ export default ThemeContext.use(h => {
 					})}
 				</Typography>
 				<Icon
-					lib="feather"
+					library="feather"
 					name="chevron-down"
 					size={16}
 					style={{

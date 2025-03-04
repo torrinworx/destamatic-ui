@@ -14,9 +14,9 @@ const DraggedComponent = ({thing, dragging}) => {
 		e.preventDefault();
 		dragging.set(e);
 	}}>
-		<Icon lib="feather" name="align-justify" />
+		<Icon library="feather" name="align-justify" />
 		{thing.text}
-		<Icon lib="feather" name="activity" onClick={() => dropdown.set(!dropdown.get())} />
+		<Icon library="feather" name="activity" onClick={() => dropdown.set(!dropdown.get())} />
 		<Shown value={dropdown}>
 			<div> My dropdown </div>
 		</Shown>
