@@ -31,8 +31,8 @@
     "destam-dom": "^0.10.2"
   },
   "optionalDependencies": {
-    "feather-icons": "^4.29.1",
-    "material-icons": "^1.13.12"
+    "@material-design-icons/svg": "^0.14.15",
+    "feather-icons": "^4.29.2"
   },
   "devDependencies": {
     "@babel/core": "^7.26.7",

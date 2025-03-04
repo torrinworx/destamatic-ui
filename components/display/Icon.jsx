@@ -1,112 +1,99 @@
 import { svg } from '../utils/h';
-import { Observer, OObject } from 'destam-dom';
+import { Observer } from 'destam-dom';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
+import suspend from '../utils/Suspend';
 
 Theme.define({
-    icon: {
-        display: 'inline-block',
-    }
+	icon: {
+		display: 'inline-block',
+	},
 });
 
-/**
- * Asynchronous function to load icons from various libraries.
- * - Currently supports Feather Icons.
- *
- * @param {string} libraryName - The name of the icon library.
- * @param {string} iconName - The name of the icon to load from the library.
- * @param {Object} style - The style object to apply to the SVG element.
- * @returns {Promise<string>} - A promise that resolves to the SVG string of the icon.
- */
-const loadIcon = async (libraryName, iconName, style) => {
-    switch (libraryName) {
-        case 'feather':
-            try {
-                const feather = await import('feather-icons');
-                if (feather.icons[iconName]) {
-                    return feather.icons[iconName].toSvg({ ...style });
-                }
-                throw new Error(`Icon ${iconName} not found in ${libraryName}.`);
-            } catch (error) {
-                // Handling failure of dynamic import or icon not found
-                console.error(error.message);
-                throw new Error(`Failed to load ${libraryName} or icon ${iconName} not found.`);
-            }
-        // Cases for other icon libraries can be added here
-        default:
-            throw new Error(`The library ${libraryName} is not supported.`);
-    }
-}
+const icons = import.meta.glob('./icons/*.jsx');
 
 export default ThemeContext.use(h => {
-    /**
-     * Icon component that dynamically loads and renders an SVG icon from a specified library.
-     *
-     * Uses an asynchronous function to fetch the SVG content of the icon.
-     *
-     * @param {Object} props - The properties object.
-     * @param {string} props.libraryName - The name of the icon library (e.g., 'feather').
-     * @param {string} props.iconName - The name of the icon to load from the library.
-     * @param {string} [props.size='20'] - The size of the icon.
-     * @param {Object} [props.style] - Custom styles to apply to the icon's wrapper element.
-     * @param {...Object} [props] - Additional properties to spread onto the icon's wrapper element.
-     *
-     * @returns {JSX.Element} The rendered icon element.
-     */
-    const Icon = ({
-        lib,
-        libraryName,
-        name,
-        iconName,
-        style,
-        size='20',
-        ref: Ref,
-        ...props
-    }) => {
-        if (!Ref) Ref = <svg:svg />;
+	// Need span because  “Argument 2 is not an object” happens with multiple icons with null.
+	const Icon = suspend(() => <span />, async ({
+		library,
+		name,
+		ref: Ref,
+		style,
+		size = '20',
+		...props
+	}) => {
+		if (!Ref) Ref = <svg:svg />;
+		if (!(library instanceof Observer)) library = Observer.mutable(library);
+		if (!(name instanceof Observer)) name = Observer.mutable(name);
+		if (!(size instanceof Observer)) size = Observer.mutable(size);
 
-        const svgChildren = Observer.mutable(null);
-        const svgProps = OObject();
-        const libClass = Observer.mutable('');
+		const libDriver = Observer.mutable(null);
 
-        const styleObject = { height: size, width: size };
-        const ready = Observer.mutable(false);
+		const updateDriver = async () => {
+			const found = Object.keys(icons).find(filePath => {
+				const parts = filePath.split('/');
+				return parts[parts.length - 1].replace('.jsx', '') === library.get();
+			});
 
-        loadIcon(lib ?? libraryName, name ?? iconName, styleObject)
-            .then(svgContent => {
-                const parser = new DOMParser();
-                const svg = parser.parseFromString(svgContent, 'image/svg+xml').children[0];
+			if (!found) {
+				console.warn(`Icon library "${library.get()}" not found.`);
+				libDriver.set(null);
+				return;
+			}
 
-                for (let i = 0; i < svg.attributes.length; i++) {
-                    const attr = svg.attributes[i];
+			const mod = await import(/* @vite-ignore */ found);
+			libDriver.set(mod.default);
+		};
 
-                    if (attr.nodeName === 'class') {
-                        libClass.set(attr.nodeValue);
-                    } else {
-                        Ref.setAttribute(attr.nodeName, attr.nodeValue);
-                    }
-                }
+		await updateDriver();
+		library.watch(updateDriver);
 
-                while (svg.firstElementChild) {
-                    Ref.appendChild(svg.firstElementChild);
-                }
+		// Parse returned SVG string, transfer attributes/children to Ref from driver
+		const render = async () => {
+			const driverFn = libDriver.get();
 
-                ready.set(true);
-            })
-            .catch(error => {
-                console.error(error.message);
-            });
+			if (!driverFn) {
+				Ref.innerHTML = '';
+				return;
+			}
 
-        return <Ref
-            class={libClass}
-            style={{
-                display: ready.map(r => r ? null : 'none'),
-                ...style
-            }}
-            {...props}
-            theme="icon"
-        />;
-    };
+			const raw = await driverFn(name.get());
 
-    return Icon;
+			if (!raw) {
+				Ref.innerHTML = '';
+				return;
+			}
+
+			// Parse the string into an actual SVG DOM
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(raw, 'image/svg+xml');
+			const parsedSvg = doc.documentElement;
+
+			Ref.innerHTML = ''; // Remove old contents in Ref
+
+			for (let i = 0; i < parsedSvg.attributes.length; i++) {
+				const attr = parsedSvg.attributes[i];
+				Ref.setAttribute(attr.nodeName, attr.nodeValue);
+			}
+
+			while (parsedSvg.firstChild) {
+				Ref.appendChild(parsedSvg.firstChild);
+			}
+		};
+
+		await render();
+		name.watch(render);
+
+		return <Ref
+			style={{
+				height: size,
+				width: size,
+				...style,
+			}}
+			{...props}
+			theme="icon"
+		/>;
+	});
+
+	return Icon;
 });

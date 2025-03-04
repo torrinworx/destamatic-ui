@@ -1,5 +1,5 @@
 import { Tooltip, popups, Detached } from 'destamatic-ui';
-import { mount, OArray, Observer } from 'destam-dom';
+import { mount, Observer } from 'destam-dom';
 
 const Comp = ({style}) => {
 	return <div theme="center" style={{position: 'absolute', inset: 0, flexDirection: 'column', gap: 40, pointerEvents: 'none', ...style}}>
