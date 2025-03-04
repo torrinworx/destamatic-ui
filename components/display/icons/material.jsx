@@ -14,3 +14,7 @@ export default async (name) => {
 		return await icons[path]().then(s => s.default);
 	} else return null;
 };
+
+// TODO: Error message to tell users that the library @material-design-icons/svg isn't installed instead of only
+// returning null. We donn't directly import it via `import` like with feather icons because it's just making requests
+// to an external site.
