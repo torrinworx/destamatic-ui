@@ -4,76 +4,46 @@ import { svg } from '../utils/h';
 import suspend from '../utils/Suspend';
 import createContext from '../utils/Context';
 
-export const IconsContext = createContext({});
+export const Context = createContext({});
+export const Icons = ({ icons, children }) => <Context value={icons} children={children} />;
 
-export const Icons = ({ icons, children }) => {
-	return <IconsContext value={icons}>{children}</IconsContext>;
-};
-
-export const Icon = IconsContext.use((iconsFromContext) => {
-	return suspend(() => <svg:svg />, async ({
+export const Icon = Context.use((iconsFromContext) => {
+	return suspend(() => <span />, async ({
 		name,
 		size = 24,
 		ref: Ref,
-		style: propsStyle,
+		style: styleProps,
 		...props
 	}) => {
-		if (!Ref) Ref = <svg:svg />;
 		if (!(name instanceof Observer)) name = Observer.mutable(name);
 		if (!(size instanceof Observer)) size = Observer.mutable(size);
 
+		if (!Ref) Ref = <raw:span />;
+
 		const renderIcon = async (iconName) => {
-			const iconFn = iconsFromContext[iconName];
-			if (!iconFn) {
-				Ref.innerHTML = '';
-				return;
-			}
-
-			const raw = await iconFn();
-			if (!raw) {
-				Ref.innerHTML = '';
-				return;
-			}
-
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(raw, 'image/svg+xml');
-			const parsedSvg = doc.documentElement;
-
+			// Clear anything already inside Ref
 			Ref.innerHTML = '';
 
-			// Remove old attributes but skip removing style if you want to preserve it
-			while (Ref.attributes.length > 0) {
-				const attrName = Ref.attributes[0].name;
-				if (attrName !== 'style') {
-					Ref.removeAttribute(attrName);
-				} else {
-					// skip removing 'style'
-					break;
-				}
-			}
+			const iconFn = iconsFromContext[iconName];
+			if (!iconFn) return; // TODO: No icon found, throw warning/error
 
-			// Set attributes from parsed <svg>
-			for (let i = 0; i < parsedSvg.attributes.length; i++) {
-				const attr = parsedSvg.attributes[i];
-				Ref.setAttribute(attr.name, attr.value);
-			}
+			// Load the raw SVG string
+			const rawSvg = await iconFn();
+			if (!rawSvg) return; // TODO: function didn't return valid string, throw error/warning
 
-			// Move the children
-			while (parsedSvg.firstChild) {
-				Ref.appendChild(parsedSvg.firstChild);
-			}
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(rawSvg, 'image/svg+xml');
+			const newSvg = doc.documentElement;
 
-			// Re-apply style object
-			Object.assign(Ref.style, {
-				height: `${size.get()}px`,
-				width: `${size.get()}px`,
-				...propsStyle
-			});
+			newSvg.setAttribute('width', size.get());
+			newSvg.setAttribute('height', size.get());
+			Object.assign(newSvg.style, styleProps);
+			Ref.appendChild(newSvg);
 		};
 
 		await renderIcon(name.get());
 		name.watch(() => renderIcon(name.get()));
 
-		return <Ref {...props} theme="icon" />;
+		return <Ref {...props} />;
 	});
 });
