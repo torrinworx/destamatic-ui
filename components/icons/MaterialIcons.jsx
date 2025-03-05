@@ -1,6 +1,6 @@
 const icons = import.meta.glob('/node_modules/@material-design-icons/svg/**/*.svg', { query: '?raw' });
 
-export default function MaterialIcons(name) {
+const  MaterialIcons = (name) => {
   return async () => {
     const [maybeStyle, maybeIcon] = name.split(':', 2);
     const style = maybeIcon ? maybeStyle : 'filled';
@@ -25,3 +25,5 @@ export default function MaterialIcons(name) {
     }
   };
 };
+
+export default MaterialIcons;

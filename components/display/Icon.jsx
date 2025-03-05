@@ -5,14 +5,14 @@ import suspend from '../utils/Suspend';
 import createContext from '../utils/Context';
 
 export const Context = createContext({});
-export const Icons = ({ icons, children }) => <Context value={icons} children={children} />;
+export const Icons = ({ value, children }) => <Context value={value} children={children} />;
 
-export const Icon = Context.use((iconsFromContext) => {
+export const Icon = Context.use(context => {
 	return suspend(() => <span />, async ({
 		name,
 		size = 24,
 		ref: Ref,
-		style: styleProps,
+		style,
 		...props
 	}) => {
 		if (!(name instanceof Observer)) name = Observer.mutable(name);
@@ -20,10 +20,10 @@ export const Icon = Context.use((iconsFromContext) => {
 
 		if (!Ref) Ref = <raw:div />;
 
-		const renderIcon = async (iconName) => {
+		const render = async (iconName) => {
 			Ref.innerHTML = '';
 
-			const iconFn = iconsFromContext[iconName];
+			const iconFn = context[iconName];
 			if (!iconFn) return; // TODO: No icon found, throw warning/error
 
 			// Load the raw SVG string
@@ -36,13 +36,13 @@ export const Icon = Context.use((iconsFromContext) => {
 
 			newSvg.setAttribute('width', size.get());
 			newSvg.setAttribute('height', size.get());
-			Object.assign(newSvg.style, styleProps);
+			Object.assign(newSvg.style, style);
 			Ref.appendChild(newSvg);
 		};
 
-		await renderIcon(name.get());
-		name.watch(() => renderIcon(name.get()));
+		await render(name.get());
+		name.watch(() => render(name.get()));
 
-		return <Ref style={{ width: size, height: size }} {...props} />;
+		return <Ref style={{ width: size, height: size, color: style?.color }} {...props} />;
 	});
 });

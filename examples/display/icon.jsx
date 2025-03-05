@@ -6,7 +6,7 @@ const icons = {
 	logo: MaterialIcons('filled:logo_dev')
 };
 
-mount(document.body, <Icons icons={icons}>
+mount(document.body, <Icons value={icons}>
 	<div theme='row'>
 		<Icon
 			name={Observer.timer(250).map(t => t % 2 === 0 ? 'logo' : 'feather')}
