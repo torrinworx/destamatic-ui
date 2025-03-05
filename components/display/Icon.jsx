@@ -18,10 +18,9 @@ export const Icon = Context.use((iconsFromContext) => {
 		if (!(name instanceof Observer)) name = Observer.mutable(name);
 		if (!(size instanceof Observer)) size = Observer.mutable(size);
 
-		if (!Ref) Ref = <raw:span />;
+		if (!Ref) Ref = <raw:div />;
 
 		const renderIcon = async (iconName) => {
-			// Clear anything already inside Ref
 			Ref.innerHTML = '';
 
 			const iconFn = iconsFromContext[iconName];
@@ -44,6 +43,6 @@ export const Icon = Context.use((iconsFromContext) => {
 		await renderIcon(name.get());
 		name.watch(() => renderIcon(name.get()));
 
-		return <Ref {...props} />;
+		return <Ref style={{ width: size, height: size }} {...props} />;
 	});
 });

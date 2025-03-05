@@ -7,11 +7,13 @@ const icons = {
 };
 
 mount(document.body, <Icons icons={icons}>
-	<Icon name={Observer.timer(250).map(t => {
-		// console.log(t % 2 === 0 ? 'logo' : 'feather')
-		return t % 2 === 0 ? 'logo' : 'feather'
-	})} size={48} style={{ color: 'red', fill: 'blue' }} />
-
-	<Icon name='logo' size={48} style={{ fill: 'red' }} />
-	<Icon name='feather' size={48} style={{ stroke: 'red' }} />
+	<div theme='row'>
+		<Icon
+			name={Observer.timer(250).map(t => t % 2 === 0 ? 'logo' : 'feather')}
+			size={48}
+			style={{ color: 'red', fill: 'blue' }}
+		/>
+		<Icon name='logo' size={48} style={{ fill: 'red' }} />
+		<Icon name='feather' size={48} style={{ stroke: 'red' }} />
+	</div>
 </Icons>);
