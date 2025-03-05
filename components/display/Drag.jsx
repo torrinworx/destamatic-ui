@@ -20,7 +20,7 @@ Theme.define({
 	},
 });
 
-const Drag = ({theme, dragging, children, map, constrained = true, ...props}, cleanup, mounted) => {
+const Drag = ({theme = "primary", dragging, children, map, constrained = true, ...props}, cleanup, mounted) => {
 	assert(children.length === 1, "Drag can only have one child");
 
 	const array = children[0];

@@ -5,6 +5,7 @@ import Theme from './Theme';
 
 Theme.define({
     ripple: {
+        extends: 'primary',
         pointerEvents: 'none',
         background: '$alpha($color_top, .3)',
         position: 'absolute',

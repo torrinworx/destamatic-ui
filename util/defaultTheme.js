@@ -28,11 +28,6 @@ export default {
 		boxSizing: 'border-box',
 		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out, color 250ms ease-in-out',
 
-		$color: '#02CA9F',
-		$color_hover: '$shiftBrightness($color, 0.1)',
-		$color_error: 'red',
-		$color_top: 'black',
-
 		/*
 		Adjusts the brightness of the input colour by shifting its value in the HSV colour space. Accepts colours
 		in hexadecimal, RGB, or HSV.
@@ -114,6 +109,13 @@ export default {
 		$floor: a => String(Math.floor(parseFloat(a))),
 		$ceil: a => String(Math.ceil(parseFloat(a))),
 		$round: a => String(Math.round(parseFloat(a))),
+	},
+
+	primary: {
+		$color: '#02CA9F',
+		$color_hover: '$shiftBrightness($color, 0.1)',
+		$color_error: 'red',
+		$color_top: 'black',
 	},
 
 	center: {
