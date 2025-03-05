@@ -1,100 +1,83 @@
-import { svg } from '../utils/h';
-import { Observer } from 'destam-dom';
-import Theme from '../utils/Theme';
-import ThemeContext from '../utils/ThemeContext';
+import { Observer } from 'destam';
 import suspend from '../utils/Suspend';
+import createContext from '../utils/Context';
+import { svg } from '../utils/h';
 
-Theme.define({
-	icon: {
-		display: 'inline-block',
-	},
-});
+export const IconsContext = createContext({});
 
-const icons = import.meta.glob('./icons/*.jsx');
+export const Icons = ({ icons, children }) => {
+	return <IconsContext value={icons}>{children}</IconsContext>;
+};
 
-export default ThemeContext.use(h => {
-	// Need span because  “Argument 2 is not an object” happens with multiple icons with null.
-	const Icon = suspend(() => <span />, async ({
-		library,
+export const Icon = IconsContext.use((iconsFromContext) => {
+	return suspend(() => <svg:svg />, async ({
 		name,
+		size = 24,
 		ref: Ref,
-		style,
-		size = '20',
+		style: propsStyle,
 		...props
 	}) => {
 		if (!Ref) Ref = <svg:svg />;
-		if (!(library instanceof Observer)) library = Observer.mutable(library);
 		if (!(name instanceof Observer)) name = Observer.mutable(name);
 		if (!(size instanceof Observer)) size = Observer.mutable(size);
 
-		const libDriver = Observer.mutable(null);
-
-		const updateDriver = async () => {
-			const found = Object.keys(icons).find(filePath => {
-				const parts = filePath.split('/');
-				return parts[parts.length - 1].replace('.jsx', '') === library.get();
-			});
-
-			if (!found) {
-				console.warn(`Icon library "${library.get()}" not found.`);
-				libDriver.set(null);
-				return;
-			}
-
-			const mod = await import(/* @vite-ignore */ found);
-			libDriver.set(mod.default);
-		};
-
-		await updateDriver();
-		library.watch(updateDriver);
-
-		// Parse returned SVG string, transfer attributes/children to Ref from driver
-		const render = async () => {
-			const driverFn = libDriver.get();
-
-			if (!driverFn) {
+		const renderIcon = async (iconName) => {
+			const iconFn = iconsFromContext[iconName];
+			if (!iconFn) {
 				Ref.innerHTML = '';
 				return;
 			}
 
-			const raw = await driverFn(name.get());
-
+			const raw = await iconFn();
 			if (!raw) {
 				Ref.innerHTML = '';
 				return;
 			}
 
-			// Parse the string into an actual SVG DOM
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(raw, 'image/svg+xml');
 			const parsedSvg = doc.documentElement;
 
-			Ref.innerHTML = ''; // Remove old contents in Ref
+			Ref.innerHTML = '';
 
-			for (let i = 0; i < parsedSvg.attributes.length; i++) {
-				const attr = parsedSvg.attributes[i];
-				Ref.setAttribute(attr.nodeName, attr.nodeValue);
+			// Remove old attributes but skip removing style if you want to preserve it
+			while (Ref.attributes.length > 0) {
+				const attrName = Ref.attributes[0].name;
+				if (attrName !== 'style') {
+					Ref.removeAttribute(attrName);
+				} else {
+					// skip removing 'style'
+					break;
+				}
 			}
 
+			// Set attributes from parsed <svg>
+			for (let i = 0; i < parsedSvg.attributes.length; i++) {
+				const attr = parsedSvg.attributes[i];
+				Ref.setAttribute(attr.name, attr.value);
+			}
+
+			// Move the children
 			while (parsedSvg.firstChild) {
 				Ref.appendChild(parsedSvg.firstChild);
 			}
+
+			// Re-apply style object
+			Object.assign(Ref.style, {
+				// ensure these are strings or valid CSS
+				height: `${size.get()}px`,
+				width: `${size.get()}px`,
+				...propsStyle
+			});
 		};
 
-		await render(); // inintial render
-		name.watch(render); // re-render on name update
-		libDriver.watch(render); // re-render on library update
+		// Render once
+		await renderIcon(name.get());
 
-		return <Ref
-			style={{
-				height: size,
-				width: size,
-				...style,
-			}}
-			{...props}
-			theme="icon"
-		/>;
+		// Re-render on name change
+		name.watch(() => renderIcon(name.get()));
+
+		// Return the <Ref> element
+		return <Ref {...props} theme="icon" />;
 	});
-
-	return Icon;
 });

@@ -1,7 +1,7 @@
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import Button from '../inputs/Button';
-import IconComponent from '../display/Icon';
+import { Icon } from '../display/Icon';
 import Observer from 'destam/Observer';
 
 Theme.define({
@@ -43,12 +43,12 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => Theme.use(themer => {
-	const MenuItem = ({ Icon, theme, children, label, ...props }) => {
+	const MenuItem = ({ icon, theme, children, label, ...props }) => {
 		if (children.length) throw new Error("MenuItem does not take children");
 
-		if (!Icon) {
+		if (!icon) {
 			// find the first suitable word for the keyword.
-			Icon = Observer.immutable(label).map(label => {
+			icon = Observer.immutable(label).map(label => {
 				label = label.split(' ').find(word => {
 					word = word.toLowerCase();
 					return !['manage', 'generate', ''].includes(word);
@@ -59,10 +59,10 @@ export default ThemeContext.use(h => Theme.use(themer => {
 						return null;
 					}
 
-					return <IconComponent
+					return <Icon
 						libraryName='feather'
 						iconName={iconName}
-						style={{paddingRight: 20, boxSizing: 'content-box'}}
+						style={{ paddingRight: 20, boxSizing: 'content-box' }}
 						size={20}
 					/>;
 				});
@@ -70,7 +70,7 @@ export default ThemeContext.use(h => Theme.use(themer => {
 		}
 
 		return <Button
-			icon={Icon}
+			icon={icon}
 			type='menuItem'
 			label={label}
 			{...props}

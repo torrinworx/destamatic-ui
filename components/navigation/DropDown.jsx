@@ -1,7 +1,7 @@
 import { h } from '../utils/h';
 import { Observer } from 'destam-dom';
 
-import Icon from '../display/Icon';
+import { Icon } from '../display/Icon';
 import Shown from '../utils/Shown';
 
 /**

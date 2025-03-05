@@ -1,7 +1,7 @@
 import { Observer } from "destam-dom";
 
 import Button from "../inputs/Button";
-import Icon from '../display/Icon';
+import { Icon } from '../display/Icon';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import useAbort from '../../util/abort';
@@ -37,7 +37,7 @@ export default ThemeContext.use(h => {
             }, 200);  // Adjust the timeout as needed
         };
 
-        cleanup(useAbort(abort => window.addEventListener('resize', handleResize, {abort})));
+        cleanup(useAbort(abort => window.addEventListener('resize', handleResize, { abort })));
 
         return <div
             style={{

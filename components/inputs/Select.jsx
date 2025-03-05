@@ -1,7 +1,7 @@
 import { mark } from '../utils/h';
 import Observer from 'destam/Observer';
 import Typography from '../display/Typography';
-import Icon from '../display/Icon';
+import { Icon } from '../display/Icon';
 import Paper from '../display/Paper';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
@@ -56,7 +56,7 @@ export default ThemeContext.use(h => {
 
 		const buttonRef = <raw:button />;
 
-		const Popup = Theme.use(themer => ({}, cleanup, mounted) => {
+		const Popup = Theme.use(themer => ({ }, cleanup, mounted) => {
 			const Selectable = ({ each: option }) => {
 				return <Button
 					focused={Observer.immutable(false)}
@@ -82,7 +82,7 @@ export default ThemeContext.use(h => {
 			cleanup(useAbort(signal => {
 				requestAnimationFrame(() => {
 					foc.set(true);
-				}, {signal});
+				}, { signal });
 
 				window.addEventListener('keydown', e => {
 					if (!options.get().length) return;
@@ -112,7 +112,7 @@ export default ThemeContext.use(h => {
 					} else if (e.key === 'Enter') {
 						focused.set(false);
 					}
-				}, {signal});
+				}, { signal });
 			})());
 
 			return <Paper tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
