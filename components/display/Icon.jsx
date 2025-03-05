@@ -1,7 +1,8 @@
 import { Observer } from 'destam';
+
+import { svg } from '../utils/h';
 import suspend from '../utils/Suspend';
 import createContext from '../utils/Context';
-import { svg } from '../utils/h';
 
 export const IconsContext = createContext({});
 
@@ -64,20 +65,15 @@ export const Icon = IconsContext.use((iconsFromContext) => {
 
 			// Re-apply style object
 			Object.assign(Ref.style, {
-				// ensure these are strings or valid CSS
 				height: `${size.get()}px`,
 				width: `${size.get()}px`,
 				...propsStyle
 			});
 		};
 
-		// Render once
 		await renderIcon(name.get());
-
-		// Re-render on name change
 		name.watch(() => renderIcon(name.get()));
 
-		// Return the <Ref> element
 		return <Ref {...props} theme="icon" />;
 	});
 });
