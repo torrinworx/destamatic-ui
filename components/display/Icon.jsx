@@ -3,25 +3,36 @@ import { Observer, OArray } from 'destam';
 import { h, svg } from '../utils/h';
 import createContext from '../utils/Context';
 
+const parser = new DOMParser();
+
 export const Icons = createContext(() => null, (next, prev) => {
-	// if next is not a function (we expect it to be an object in this case)
-	// convert it into the function representation.
-	if (typeof next !== 'function') {
-		const icons = next;
-		next = iconName => icons[iconName];
-	}
+	if (!Array.isArray(next)) next = [next];
 
-	// compbine next and prev making sure that we fall back to prev if the icon
-	// is not available in next
-	return async iconName => {
-		const icon = await next(iconName);
-		if (icon) return icon;
+	next = next.map(pack => {
+		// if the pack is not a function (we expect it to be an object in this case)
+		// convert it into the function representation.
+		if (typeof pack !== 'function') {
+			return iconName => pack[iconName];
+		}
 
-		return await prev(iconName);
+		return pack;
+	});
+
+	// slot in the prev icon pack
+	next.splice(0, 0, prev);
+
+	// combine all the icon packs
+	return async name => {
+		for (let i = next.length - 1; i >= 0; i--) {
+			const icon = await next[i](name);
+			if (icon) return icon;
+		}
+
+		return null;
 	};
 });
 
-export const Icon = Icons.use(context => {
+export const Icon = Icons.use(iconPack => {
 	return ({ name, size = 24, ref: Ref, style, ...props }, cleanup) => {
 		if (!(name instanceof Observer)) name = Observer.immutable(name);
 		if (!(size instanceof Observer)) size = Observer.immutable(size);
@@ -32,7 +43,7 @@ export const Icon = Icons.use(context => {
 		const children = OArray();
 
 		cleanup(name.effect(iconName => {
-			Promise.resolve(context(iconName)).then(rawSvg => {
+			Promise.resolve(iconPack(iconName)).then(svg => {
 				// remove all the old attributes
 				for (const name of oldIconAttrs.splice(0, oldIconAttrs.length)) {
 					Ref.removeAttribute(name);
@@ -41,13 +52,16 @@ export const Icon = Icons.use(context => {
 				// clear the svg from all children so that we can append our new children
 				children.splice(0, children.length);
 
-				if (!rawSvg) return;
+				if (!svg) return;
 
-				const parser = new DOMParser();
-				const parsedSvg = parser.parseFromString(rawSvg, 'image/svg+xml').children[0];
+				if (typeof svg === 'string') {
+					svg = parser.parseFromString(svg, 'image/svg+xml').children[0];
+				} else {
+					svg = svg.cloneNode(true);
+				}
 
-				for (let i = 0; i < parsedSvg.attributes.length; i++) {
-					const attr = parsedSvg.attributes[i];
+				for (let i = 0; i < svg.attributes.length; i++) {
+					const attr = svg.attributes[i];
 					if (attr.nodeName === 'class') {
 						libClass.set(attr.nodeValue);
 					} else {
@@ -57,9 +71,9 @@ export const Icon = Icons.use(context => {
 				}
 
 				// append the children of the parsed svg
-				while (parsedSvg.firstElementChild) {
-					const child = parsedSvg.firstElementChild;
-					parsedSvg.removeChild(child)
+				while (svg.firstElementChild) {
+					const child = svg.firstElementChild;
+					svg.removeChild(child)
 					children.push(child);
 				}
 			});
