@@ -13,6 +13,7 @@ mount(document.body, <Icons icons={icons}>
 			size={48}
 			style={{ color: 'red', fill: 'blue' }}
 		/>
+		<Icon name='logo' size={48} style={{ color: 'red' }} />
 		<Icon name='logo' size={48} style={{ fill: 'red' }} />
 		<Icon name='feather' size={48} style={{ stroke: 'red' }} />
 	</div>
