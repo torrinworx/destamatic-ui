@@ -1,6 +1,6 @@
 import { Observer, OArray } from 'destam';
 
-import { svg } from '../utils/h';
+import { h, svg } from '../utils/h';
 import createContext from '../utils/Context';
 
 export const Icons = createContext(() => null, (next, prev) => {

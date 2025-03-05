@@ -47,8 +47,3 @@ export { default as Theme } from './components/utils/Theme.jsx';
 export { default as ThemeContext } from './components/utils/ThemeContext.jsx';
 
 export { default as useAbort } from './util/abort.js';
-
-// icons
-export { default as CustomIcons } from './components/icons/CustomIcons.jsx'
-export { default as FeatherIcons } from './components/icons/FeatherIcons.jsx'
-export { default as MaterialIcons } from './components/icons/MaterialIcons.jsx'
