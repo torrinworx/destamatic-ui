@@ -85,8 +85,8 @@
 //             <Button
 //                 label={
 //                     <Icon
-//                         libraryName="feather"
-//                         iconName="clipboard"
+//
+//                         name="clipboard"
 //                         size="16"
 //                         $style={{
 //                             color: mode === 'dark' ? 'white' : 'black'

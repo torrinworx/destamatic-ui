@@ -60,8 +60,8 @@ export default ThemeContext.use(h => Theme.use(themer => {
 					}
 
 					return <Icon
-						libraryName='feather'
-						iconName={iconName}
+
+						name={iconName}
 						style={{ paddingRight: 20, boxSizing: 'content-box' }}
 						size={20}
 					/>;
