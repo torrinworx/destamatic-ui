@@ -99,6 +99,7 @@ export default ThemeContext.use(h => {
 		onMouseDown,
 		onMouseUp,
 		icon = null,
+		Icon = null,
 		style,
 		disabled,
 		hover,
@@ -108,6 +109,8 @@ export default ThemeContext.use(h => {
 		iconPosition = 'left',
 		...props
 	}) => {
+		if (!icon) icon = Icon;
+
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
