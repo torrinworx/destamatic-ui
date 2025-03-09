@@ -1,6 +1,6 @@
 import { mount } from 'destam-dom';
-import { describe, it, expect } from 'vitest';
 import { Button } from 'destamatic-ui';
+import { describe, it, expect } from 'vitest';
 
 import './document.js';
 
