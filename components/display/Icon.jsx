@@ -3,6 +3,7 @@ import { Observer, OArray } from 'destam';
 import { svg } from '../utils/h';
 import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
+console.log(DOMParser);
 
 const parser = new DOMParser();
 

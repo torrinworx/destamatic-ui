@@ -1,5 +1,7 @@
 /* node:coverage disable */
 
+global.DOMParser = window.DOMParser;
+
 global.Node = class Node {
 	constructor (name) {
 		this.name = name;
@@ -183,3 +185,5 @@ global.document.dummy = {
 	replaceChild (newNode, oldNode) {},
 	insertBefore (newNode, before) {},
 };
+
+global.document.head = new Node('head');

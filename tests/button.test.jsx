@@ -2,7 +2,7 @@ import { mount } from 'destam-dom';
 import { describe, it, expect } from 'vitest';
 
 import h from '../components/utils/h.jsx';
-import Button from '../components/inputs/Button.jsx';
+import { Button } from 'destamatic-ui';
 
 import './document.js';
 
