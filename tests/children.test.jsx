@@ -13,6 +13,7 @@ describe('Child elements', () => {
         expect(elem.tree()).toEqual({
             name: 'body',
             children: ["1", "2"],
-        });
+            eventListeners: {},
+          });
     });
 });
