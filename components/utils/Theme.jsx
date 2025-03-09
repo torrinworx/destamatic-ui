@@ -90,9 +90,9 @@ const Style = ({ each: { node, name, extras, defines, children } }) => {
 
 const styles = OArray();
 // TODO: Find a better way to handle keyframes and css special cases
-// mount(document.head, <style>
-// 	<Style each={styles} />
-// </style>);
+mount(document.head, <style>
+	<Style each={styles} />
+</style>);
 
 const getClasses = (trie, classes) => {
 	const out = [];
