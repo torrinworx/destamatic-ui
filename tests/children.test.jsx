@@ -1,7 +1,7 @@
 import { mount, OArray } from 'destam-dom';
 import { describe, it, expect } from 'vitest';
 
-import './document.js';
+// Example test nabbed  from destam-dom
 
 describe('Child elements', () => {
     it('should create a list of child elements', () => {
