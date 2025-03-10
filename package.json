@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "test": "node --test"
+    "test": "vitest --silent=false"
   },
   "keywords": [],
   "contributors": [
@@ -41,6 +41,8 @@
     "@babel/register": "^7.25.9",
     "@babel/traverse": "^7.26.4",
     "@babel/types": "^7.26.7",
-    "vite": "^6.1.0"
+    "jsdom": "^26.0.0",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.8"
   }
 }

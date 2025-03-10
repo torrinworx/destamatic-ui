@@ -1,10 +1,13 @@
 /* node:coverage disable */
 
+global.DOMParser = window.DOMParser;
+
 global.Node = class Node {
-	constructor (name) {
+	constructor(name) {
 		this.name = name;
 		this.childNodes = [];
 		this.attributes = {};
+		this.eventListeners = {};
 
 		const style = {};
 		Object.defineProperty(this, 'style', {
@@ -13,7 +16,7 @@ global.Node = class Node {
 		});
 	}
 
-	set textContent (content) {
+	set textContent(content) {
 		if (this.name === '') {
 			this.textContent_ = String(content);
 		} else if (content === '') {
@@ -27,11 +30,11 @@ global.Node = class Node {
 		}
 	}
 
-	get children () {
+	get children() {
 		return this.childNodes.filter(e => e.name);
 	}
 
-	get textContent () {
+	get textContent() {
 		if (this.name === '') {
 			return this.textContent_;
 		}
@@ -39,41 +42,41 @@ global.Node = class Node {
 		throw new Error("not supported");
 	}
 
-	get firstChild () {
+	get firstChild() {
 		return this.childNodes[0] ?? null;
 	}
 
-	get lastChild () {
+	get lastChild() {
 		return this.childNodes[this.childNodes.length - 1] ?? null;
 	}
 
-	get nextSibling () {
+	get nextSibling() {
 		if (!this.parentElement) throw new Error("does not belong to a parent");
 		let c = this.parentElement.childNodes;
 		let i = c.indexOf(this);
 		return c[i + 1] ?? null;
 	}
 
-	get previousSibling () {
+	get previousSibling() {
 		if (!this.parentElement) throw new Error("does not belong to a parent");
 		let c = this.parentElement.childNodes;
 		let i = c.indexOf(this);
 		return c[i - 1] ?? null;
 	}
 
-	append (node) {
+	append(node) {
 		node.remove();
 		node.parentElement = this;
 		this.childNodes.push(node);
 	}
 
-	prepend (node) {
+	prepend(node) {
 		node.remove();
 		node.parentElement = this;
 		this.childNodes.unshift(node);
 	}
 
-	insertBefore (node, before) {
+	insertBefore(node, before) {
 		if (!before) {
 			this.append(node);
 			return;
@@ -91,7 +94,7 @@ global.Node = class Node {
 		this.childNodes.splice(i, 0, node);
 	}
 
-	replaceChild (node, before) {
+	replaceChild(node, before) {
 		const i = this.childNodes.indexOf(before);
 		if (i === -1) throw new Error("node not found");
 
@@ -102,7 +105,7 @@ global.Node = class Node {
 		return node;
 	}
 
-	removeChild (child) {
+	removeChild(child) {
 		const i = this.childNodes.indexOf(child);
 		if (i === -1) throw new Error("node not found");
 		child.parentElement = null;
@@ -110,7 +113,7 @@ global.Node = class Node {
 		return child;
 	}
 
-	remove () {
+	remove() {
 		if (document.activeElement === this) document.activeElement = null;
 
 		if (this.parentElement) {
@@ -118,16 +121,16 @@ global.Node = class Node {
 		}
 	}
 
-	replaceWith (node) {
+	replaceWith(node) {
 		if (!this.parentElement) throw new Error("does not belong to a parent");
 		this.parentElement.replaceChild(node, this);
 	}
 
-	setAttribute (name, val) {
+	setAttribute(name, val) {
 		this.attributes[name] = String(val);
 	}
 
-	toggleAttribute (name, val) {
+	toggleAttribute(name, val) {
 		if (!val) {
 			delete this.attributes[name];
 		} else {
@@ -135,16 +138,16 @@ global.Node = class Node {
 		}
 	}
 
-	focus () {
+	focus() {
 		document.activeElement = this;
 	}
 
-	tree () {
+	tree() {
 		if (this.name === '') {
 			return this.textContent_;
 		}
 
-		const ret = {...this};
+		const ret = { ...this };
 		delete ret.parentElement;
 
 		delete ret.childNodes;
@@ -161,6 +164,29 @@ global.Node = class Node {
 		}
 
 		return ret;
+	}
+
+	addEventListener(type, listener) {
+		if (!(type in this.eventListeners)) {
+			this.eventListeners[type] = [];
+		}
+		this.eventListeners[type].push(listener);
+	}
+
+	removeEventListener(type, listener) {
+		if (!(type in this.eventListeners)) return;
+		const idx = this.eventListeners[type].indexOf(listener);
+		if (idx !== -1) {
+			this.eventListeners[type].splice(idx, 1);
+		}
+	}
+
+	// Dummy dispatchEvent
+	dispatchEvent(event) {
+		const listeners = this.eventListeners[event.type];
+		if (listeners) {
+			listeners.forEach(listener => listener.call(this, event));
+		}
 	}
 };
 
@@ -179,7 +205,9 @@ global.document = {
 };
 
 global.document.dummy = {
-	removeChild (child) {},
-	replaceChild (newNode, oldNode) {},
-	insertBefore (newNode, before) {},
+	removeChild(child) { },
+	replaceChild(newNode, oldNode) { },
+	insertBefore(newNode, before) { },
 };
+
+global.document.head = new Node('head');
