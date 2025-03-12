@@ -68,43 +68,86 @@ describe('Button', () => {
 
 	it('Should call onMouseDown, onMouseUp, and onClick when triggered', () => {
 		const elem = document.createElement('body');
-	  
+
 		// Create mock functions
 		const onMouseDownMock = vi.fn();
 		const onMouseUpMock = vi.fn();
 		const onClickMock = vi.fn();
-	  
+
 		// Mount a Button with these props
 		mount(elem, (
-		  <Button
-			onMouseDown={onMouseDownMock}
-			onMouseUp={onMouseUpMock}
-			onClick={onClickMock}
-		  />
+			<Button
+				onMouseDown={onMouseDownMock}
+				onMouseUp={onMouseUpMock}
+				onClick={onClickMock}
+			/>
 		));
-	  
+
 		// Retrieve node and event listeners
 		const tree = elem.tree();
 		const button = tree.children[0];
-		
+
 		// Provide a minimal event object that won't crash Ripple (rippe throws a hissy fit)
 		const fakeEvent = {
-		  currentTarget: {
-			getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
-		  },
-		  target: {
-			getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
-		  }
+			currentTarget: {
+				getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
+			},
+			target: {
+				getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
+			}
 		};
-	  
+
 		// Trigger the listeners with fakeEvent
 		button.eventListeners.mousedown.forEach(handler => handler(fakeEvent));
 		button.eventListeners.mouseup.forEach(handler => handler(fakeEvent));
 		button.eventListeners.click.forEach(handler => handler(fakeEvent));
-	  
+
 		// Check if our mock functions were called
 		expect(onMouseDownMock).toHaveBeenCalled();
 		expect(onMouseUpMock).toHaveBeenCalled();
 		expect(onClickMock).toHaveBeenCalled();
-	  });
+	});
+
+	it('Should not call onMouseDown, onMouseUp, and onClick when disabled', () => {
+		const elem = document.createElement('body');
+
+		// Create mock functions
+		const onMouseDownMock = vi.fn();
+		const onMouseUpMock = vi.fn();
+		const onClickMock = vi.fn();
+
+		// Mount a Button with these props and disabled state
+		mount(elem, (
+			<Button
+				onMouseDown={onMouseDownMock}
+				onMouseUp={onMouseUpMock}
+				onClick={onClickMock}
+				disabled={true}
+			/>
+		));
+
+		// Retrieve node and event listeners
+		const tree = elem.tree();
+		const button = tree.children[0];
+
+		// Provide a minimal event object that won't crash Ripple (ripple throws a hissy fit)
+		const fakeEvent = {
+			currentTarget: {
+				getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
+			},
+			target: {
+				getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
+			}
+		};
+
+		// Trigger the listeners with fakeEvent
+		button.eventListeners.mousedown.forEach(handler => handler(fakeEvent));
+		button.eventListeners.mouseup.forEach(handler => handler(fakeEvent));
+		button.eventListeners.click.forEach(handler => handler(fakeEvent));
+
+		// Check if our mock functions were NOT called
+		expect(onMouseDownMock).not.toHaveBeenCalled();
+		expect(onMouseUpMock).not.toHaveBeenCalled();
+		expect(onClickMock).not.toHaveBeenCalled();
+	});
 });
