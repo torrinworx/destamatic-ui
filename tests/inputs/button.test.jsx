@@ -2,6 +2,16 @@ import { mount } from 'destam-dom';
 import { Button } from 'destamatic-ui';
 import { describe, it, expect, vi } from 'vitest';
 
+// Provide a minimal event object that won't crash Ripple (ripple throws a hissy fit)
+const fakeEvent = {
+	currentTarget: {
+		getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
+	},
+	target: {
+		getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
+	}
+};
+
 describe('Button', () => {
 	it('Should render a Button.', () => {
 		const elem = document.createElement('body');
@@ -87,16 +97,6 @@ describe('Button', () => {
 		const tree = elem.tree();
 		const button = tree.children[0];
 
-		// Provide a minimal event object that won't crash Ripple (rippe throws a hissy fit)
-		const fakeEvent = {
-			currentTarget: {
-				getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
-			},
-			target: {
-				getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
-			}
-		};
-
 		// Trigger the listeners with fakeEvent
 		button.eventListeners.mousedown.forEach(handler => handler(fakeEvent));
 		button.eventListeners.mouseup.forEach(handler => handler(fakeEvent));
@@ -129,16 +129,6 @@ describe('Button', () => {
 		// Retrieve node and event listeners
 		const tree = elem.tree();
 		const button = tree.children[0];
-
-		// Provide a minimal event object that won't crash Ripple (ripple throws a hissy fit)
-		const fakeEvent = {
-			currentTarget: {
-				getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
-			},
-			target: {
-				getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
-			}
-		};
 
 		// Trigger the listeners with fakeEvent
 		button.eventListeners.mousedown.forEach(handler => handler(fakeEvent));
