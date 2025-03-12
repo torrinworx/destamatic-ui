@@ -26,7 +26,7 @@ plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true,
 	jsx_auto_import: {
 		'h': 'destamatic-ui',
 		'mark': 'destamatic-ui',
-		'raw': {name: 'h', location: 'destam-dom'},
+		'raw': { name: 'h', location: 'destam-dom' },
 	},
 }));
 
@@ -47,14 +47,11 @@ const recursiveReadDir = (dir, fileList = []) => {
 };
 
 const getExample = name => {
-	name = name.endsWith('.html') ? name.substring(0, name.length - 5) : name + 'index';
-	name = name.startsWith('/') ? name.substring(1) : name;
-
-	const existed = ['.js', '.jsx'].find(ex => fs.existsSync(resolve(__dirname, 'examples', name + ex)));
-	if (!existed) {
-		return null;
-	}
-
+	name = name.endsWith('.html') ? name.slice(0, -5) : name + 'index';
+	name = name.startsWith('/') ? name.slice(1) : name;
+	const variants = ['.js', '.jsx', '.example.js', '.example.jsx'];
+	const existed = variants.find(v => fs.existsSync(resolve(__dirname, 'examples', name + v)));
+	if (!existed) return null;
 	const relative = '/' + name + '.html';
 	return {
 		name,
@@ -68,7 +65,6 @@ const getExample = name => {
 let examples;
 const getExamples = () => {
 	if (examples) return examples;
-
 	const examplesDir = resolve(__dirname, 'examples');
 	return examples = recursiveReadDir(examplesDir).map(fullPath => {
 		const relativePath = fullPath.substring(fullPath.indexOf('examples') + 'examples/'.length);
