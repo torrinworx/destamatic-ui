@@ -41,7 +41,7 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Scroll = ({children, vertical = true, horizontal = true, autoHide = true, invertScroll = false, style}, cleanup, mounted) => {
+	const Scroll = ({ children, vertical = true, horizontal = true, autoHide = true, invertScroll = false, style }, cleanup, mounted) => {
 		if (!(vertical instanceof Observer)) vertical = Observer.immutable(vertical);
 		if (!(horizontal instanceof Observer)) horizontal = Observer.immutable(horizontal);
 		if (!(autoHide instanceof Observer)) autoHide = Observer.immutable(autoHide);
@@ -64,7 +64,7 @@ export default ThemeContext.use(h => {
 			if (vertical.get()) scrollY.set(Math.min(Math.max(y, max('vertical')), 0));
 		};
 
-		const Bar = ({type, scroll}, cleanup) => {
+		const Bar = ({ type, scroll }, cleanup) => {
 			const hovered = Observer.mutable(false);
 			const down = Observer.mutable(null);
 
@@ -93,8 +93,8 @@ export default ThemeContext.use(h => {
 					down.set(null);
 				};
 
-				window.addEventListener('mouseup', cancel, {signal});
-				window.addEventListener('mousemove', update, {signal});
+				window.addEventListener('mouseup', cancel, { signal });
+				window.addEventListener('mousemove', update, { signal });
 			})));
 
 			return <div
@@ -164,11 +164,11 @@ export default ThemeContext.use(h => {
 					update();
 				}
 			});
-			observer.observe(Content, {subtree: true, attributes: true, childList: true});
+			observer.observe(Content, { subtree: true, attributes: true, childList: true });
 			update();
 
 			cleanup(useAbort(signal => {
-				window.addEventListener('resize', update, {signal});
+				window.addEventListener('resize', update, { signal });
 			})())
 		});
 
@@ -184,13 +184,16 @@ export default ThemeContext.use(h => {
 			isHovered={active}
 			style={style}
 		>
-			<Content style={{
-				position: 'relative',
-				top: scrollY,
-				left: scrollX,
-				display: 'inline-block',
-				textWrap: vertical.map(v => v ? 'wrap' : 'nowrap'),
-			}}>
+			<Content
+				style={{
+					position: 'relative',
+					top: scrollY,
+					left: scrollX,
+					display: 'inline-block',
+					minWidth: '100%',
+					textWrap: vertical.map(v => v ? 'wrap' : 'nowrap'),
+				}}
+			>
 				{children}
 			</Content>
 
