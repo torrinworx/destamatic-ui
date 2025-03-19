@@ -4,6 +4,8 @@ import { Checkbox } from 'destamatic-ui';
 const value = Observer.mutable(false);
 
 mount(document.body, <>
-	<Checkbox value={value} />
-	<Checkbox value={value.map(v => !v, v => !v)} />
+	<Checkbox each:value={[
+		value,
+		value.map(v => !v, v => !v),
+	]} />
 </>);

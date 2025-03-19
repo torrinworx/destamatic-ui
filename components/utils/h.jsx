@@ -2,7 +2,8 @@ import { h as destam_h, mount, getFirst } from 'destam-dom';
 import Observer, { observerGetter, shallowListener } from 'destam/Observer';
 import { sizeProperties } from '../../util/index.js';
 import Theme from './Theme';
-import useAbort from '../../util/abort';
+import useAbort from '../../util/abort.js';
+import {assert} from 'destam/util.js';
 
 // This h element overrides the default behavoior that destam-dom gives for
 // overriding styles. destam-dom will never try to be more fancy than the browser
@@ -23,6 +24,35 @@ const hypertext = (useThemes, name, props, ...children) => {
 
 	// Don't do anything fancy for custom nodes
 	if (!(name instanceof Node)) {
+		let each;
+		for (const o of Object.keys(props)) {
+			if (o.startsWith('each:')) {
+				assert(!each, "each property defined multiple times");
+
+				each = {
+					name: o.substring(5),
+					val: props[o],
+				};
+				delete props[o];
+			}
+		}
+
+		assert(!props.each || !each,
+			"cannot have a named each property and a each together in a component");
+
+		if (each) {
+			props.each = each.val;
+			const old = name;
+
+			name = (props, cleanup, mounted) => {
+				const val = props.each;
+				delete props.each;
+				props[each.name] = val;
+
+				return old(props, cleanup, mounted);
+			};
+		}
+
 		return destam_h(name, props, ...children);
 	}
 
