@@ -51,15 +51,15 @@ Theme.define({
 		width: '100%',
 		height: '100%',
 		transform: 'scale(0)',
-	  },
+	},
 
-	  radio_ring_3_hovered: {
+	radio_ring_3_hovered: {
 		transform: 'scale(0.2)',
-	  },
-	  
-	  radio_ring_3_selected: {
+	},
+
+	radio_ring_3_selected: {
 		transform: 'scale(0.65)',
-	  }
+	}
 });
 
 export default sel => ThemeContext.use(h => {
