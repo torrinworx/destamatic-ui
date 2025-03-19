@@ -78,7 +78,7 @@ export default ThemeContext.use(h => {
 				]}
 				isHovered={hover}
 				onMouseDown={e => {
-					if (disabled.get()) {
+					if (disabled.get() || value.isImmutable()) {
 						return;
 					}
 
@@ -96,6 +96,8 @@ export default ThemeContext.use(h => {
 						// make sure that the chekbox is always in sync with the observer
 						Ref.checked = value.get();
 					}
+
+					e.preventDefault();
 				}}
 				draggable="false"
 			>
@@ -106,6 +108,9 @@ export default ThemeContext.use(h => {
 						disabled.map(d => d ? 'disabled' : null)
 					]}
 					$checked={value}
+					onClick={e => {
+						e.preventDefault();
+					}}
 					{...props}
 				/>
 				<span draggable="false" theme={[disabled.map(d => d ? 'checkboxoverlay' : null)]} />
