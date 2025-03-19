@@ -10,7 +10,8 @@ const fakeEvent = {
 	},
 	target: {
 		getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
-	}
+	},
+	preventDefault: () => {},
 };
 
 describe('Checkbox', () => {
