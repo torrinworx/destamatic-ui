@@ -6,7 +6,7 @@ const input = Observer.mutable('');
 mount(document.body, <>
 	<div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', inset: 0, position: 'absolute', flexDirection: 'column'}}>
 		<Typography label={input} />
-		<Select options={['one', 'two', 'three']} value={Observer.mutable('one')} />
+		<Select options={['one', 'two', 'three']} style={{width: '100px'}} value={Observer.mutable('one')} />
 	</div>
 	{[
 		['left', 'top'],
