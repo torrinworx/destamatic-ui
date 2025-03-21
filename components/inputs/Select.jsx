@@ -61,8 +61,10 @@ export default ThemeContext.use(h => {
 		const buttonRef = <raw:button />;
 
 		const Popup = Theme.use(themer => ({ }, cleanup, mounted) => {
+			const paper = <raw:div />;
 			const Selectable = ({ each: option }) => {
 				return <Button
+					$key={option}
 					focused={Observer.immutable(false)}
 					type={[
 						"select_selectable",
@@ -77,6 +79,17 @@ export default ThemeContext.use(h => {
 					{display(option)}
 				</Button>;
 			};
+
+			queueMicrotask(() => {
+				cleanup(value.effect(val => {
+					let elem = paper.firstChild;
+
+					while (elem) {
+						if (elem.key === val) elem.scrollIntoView();
+						elem = elem.nextSibling
+					}
+				}));
+			});
 
 			const radius = Observer.immutable('50px'); //themer(theme, 'select').vars('radius');
 			const style = getComputedStyle(buttonRef);
@@ -148,7 +161,7 @@ export default ThemeContext.use(h => {
 				}, { signal });
 			})());
 
-			return <Paper tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
+			return <Paper ref={paper} tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
 				width: style.width,
 				overflow: 'auto',
 
