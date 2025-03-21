@@ -34,13 +34,17 @@ Theme.define({
 		background: '$alpha($color_top, 0.15)',
 	},
 
-	button_select_focused: {
+	button_select_text_focused: {
 		background: '$alpha($color_top, 0.1)',
+	},
+
+	button_select_focused: {
+		background: '$shiftBrightness($color, 0.1)',
 	},
 });
 
 export default ThemeContext.use(h => {
-	const Select = ({ value, options, display, style, placeholder = "None" }, cleanup, mounted) => {
+	const Select = ({ value, options, display, style, type = 'text', placeholder = "None" }, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(options instanceof Observer)) options = Observer.immutable(options);
 
@@ -143,7 +147,7 @@ export default ThemeContext.use(h => {
 		]}>
 			<Button
 				theme={[]}
-				type="select_base"
+				type={['select', type]}
 				ref={buttonRef}
 				onMouseDown={e => {
 					e.preventDefault();
