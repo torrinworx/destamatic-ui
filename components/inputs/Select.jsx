@@ -88,6 +88,8 @@ export default ThemeContext.use(h => {
 					foc.set(true);
 				}, { signal });
 
+				const currentKeys = [];
+
 				window.addEventListener('keydown', e => {
 					if (!options.get().length) return;
 
@@ -115,6 +117,33 @@ export default ThemeContext.use(h => {
 						value.set(options.get()[index]);
 					} else if (e.key === 'Enter') {
 						focused.set(false);
+					} else if (e.key === 'Escape') {
+						focused.set(false);
+					} else if (e.key.length === 1) {
+						const key = e.key;
+						// advance existing keys
+						for (let i = 0; i < currentKeys.length; i++) {
+							const search = currentKeys[i];
+							if (search.str[++search.i] !== key) {
+								currentKeys.splice(i--, 1);
+							}
+						}
+
+						// search and add strings
+						// TODO: Fix non latin languages
+						for (const option of options.get()) {
+							let str = display(option);
+							if (str instanceof Observer) str = str.get();
+							str = str.toString();
+
+							for (let i = 0; i < str.length; i++) {
+								if (str[i] === key) {
+									currentKeys.push({str, i, option});
+								}
+							}
+						}
+
+						if (currentKeys.length) value.set(currentKeys[0].option);
 					}
 				}, { signal });
 			})());
