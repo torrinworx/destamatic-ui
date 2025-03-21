@@ -23,15 +23,15 @@ Theme.define({
 	},
 
 	select_selected: {
-		background: '$alpha($invert($color_top), 0.3)',
+		background: '$alpha($color_top, 0.2)',
 	},
 
 	select_selected_hovered: {
-		background: '$alpha($invert($color_top), 0.3)',
+		background: '$alpha($color_top, 0.2)',
 	},
 
 	select_hovered: {
-		background: '$alpha($invert($color_top), 0.2)',
+		background: '$alpha($color_top, 0.15)',
 	},
 
 	button_select_focused: {
@@ -168,7 +168,6 @@ export default ThemeContext.use(h => {
 					})}
 				</Typography>
 				<Icon
-
 					name="chevron-down"
 					size={16}
 					style={{
