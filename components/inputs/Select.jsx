@@ -38,8 +38,13 @@ Theme.define({
 		background: '$alpha($color_top, 0.1)',
 	},
 
-	button_select_focused: {
+	button_select_contained_focused: {
 		background: '$shiftBrightness($color, 0.1)',
+	},
+
+	button_select_outlined_focused: {
+		background: '$alpha($color_top, 0.1)',
+		borderColor: 'rgba(0, 0, 0, 0)',
 	},
 });
 
@@ -85,7 +90,10 @@ export default ThemeContext.use(h => {
 					let elem = paper.firstChild;
 
 					while (elem) {
-						if (elem.key === val) elem.scrollIntoView();
+						if (elem.key === val) {
+							elem.scrollIntoView();
+							break;
+						}
 						elem = elem.nextSibling
 					}
 				}));
