@@ -4,8 +4,6 @@ export { default as Column } from './components/display/Column.jsx';
 export { default as Drag } from './components/display/Drag.jsx';
 export { default as Divider } from './components/display/Divider.jsx';
 export * from './components/display/Icon.jsx';
-export { default as Link } from './components/display/Link.jsx';
-export { default as Markdown } from './components/display/Markdown.jsx';
 export { default as Paper } from './components/display/Paper.jsx';
 export { default as Row } from './components/display/Row.jsx';
 export { default as Tooltip } from './components/display/Tooltip.jsx';
@@ -25,7 +23,6 @@ export { default as TextField } from './components/inputs/TextField.jsx';
 export { default as Toggle } from './components/inputs/Toggle.jsx';
 
 // navigation
-export { default as Drawer } from './components/navigation/Drawer.jsx';
 export { default as DropDown } from './components/navigation/DropDown.jsx';
 export { default as Scroll } from './components/navigation/Scroll.jsx';
 export { default as Tabs } from './components/navigation/Tabs.jsx';
@@ -39,7 +36,6 @@ export { default as Popup } from './components/utils/Popup.jsx';
 export { popups } from './components/utils/Popup.jsx';
 export { default as Ripple } from './components/utils/Ripple.jsx';
 export { default as useRipples } from './components/utils/Ripple.jsx';
-export { default as Router } from './components/utils/Router.jsx';
 export { default as Shown } from './components/utils/Shown.jsx'
 export { default as SwitchCase } from './components/utils/SwitchCase.jsx'
 export { default as suspend } from './components/utils/Suspend.jsx';
