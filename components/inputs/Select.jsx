@@ -197,7 +197,7 @@ export default ThemeContext.use(h => {
 		]}>
 			<Button
 				theme={[]}
-				type={['select', type]}
+				type={['select', 'base', type]}
 				ref={buttonRef}
 				onMouseDown={e => {
 					e.preventDefault();
