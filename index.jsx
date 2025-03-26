@@ -1,5 +1,4 @@
 // display
-// export { default as CodeBlock } from './components/CodeBlock.jsx';
 export { default as Column } from './components/display/Column.jsx';
 export { default as Drag } from './components/display/Drag.jsx';
 export { default as Divider } from './components/display/Divider.jsx';

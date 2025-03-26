@@ -10,9 +10,7 @@ import {
     DropDown,
     TextField,
     TextArea,
-    Drawer,
     Slider,
-    Markdown,
     Tabs,
     Paper,
     ColorPicker,
@@ -36,69 +34,6 @@ const DemoPage = () => {
             $color: 'green'
         })
     });
-
-    const markdown = Observer.mutable(`
-# h1, **bold** *italic* ***bold and italic***
-## h2, **bold** *italic* ***bold and italic***
-### h3, **bold** *italic* ***bold and italic***
-#### h4, **bold** *italic* ***bold and italic***
-##### h5, **bold** *italic* ***bold and italic***
-###### h6, **bold** *italic* ***bold and italic***
-
-**bold** *italic*
-
-***bold and italic combined***
-
-> This is a quote block.
-> This is part of the same quote block
-
-This is not a quote block
-
-\`\`\`javascript
-// This is a code block
-
-// with multiple lines
-
-const main = () => {
-    for (let i = 0; i < 100; i++) {
-        console.log("Hello World!");
-    };
-};
-
-main()
-
-\`\`\`
-
-# This is a header between two code blocks
-
-\`\`\`python
-# This is a code block
-
-# with multiple lines
-
-def main():
-    for i in 100:
-        print("Hello World!")
-
-main()
-
-\`\`\`
-
-My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").
-
-# This is a link in a header: [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy")
-
-# TODO:
-
-#### This is a bold link in a header: **[Duck Duck Go](https://duckduckgo.com "The best search engine for privacy")**
-
-#### This is an italic link in a header: *[Duck Duck Go](https://duckduckgo.com "The best search engine for privacy")*
-
-#### This is a bold italic link in a header ***[Duck Duck Go](https://duckduckgo.com "The best search engine for privacy")***
-
-**this is bold**
-- this is a point with a dash \`-\`
-* this is a point with a star \`*\``);
 
     return <div $style={{
         fontFamily: 'Roboto, sans-serif',
@@ -136,9 +71,6 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
                 {date.map(d => d.toString())}
             </div>
         </div>
-
-        <Markdown markdown={markdown} />
-        <TextArea OValue={markdown} style={{ width: "1000px", height: "500px" }} />
 
         <Typography type="h1" label="Destamatic UI Demo" />
         <Typography type="h2" label="Typography" />
@@ -219,13 +151,6 @@ My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best sea
             <TextField placeholder="Type here..." style={{ marginBottom: '10px', width: '100%' }} value={text} />
             <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} value={text} />
         </Paper>
-
-        <Typography type="h2" $style={{ marginTop: '20px' }} label="Drawer"/>
-        <Drawer open={drawerOpen}>
-            <div>
-                <Typography type="p1" label="Drawer Content"/>
-            </div>
-        </Drawer>
     </div>;
 };
 
