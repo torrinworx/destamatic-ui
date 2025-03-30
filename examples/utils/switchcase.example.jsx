@@ -1,5 +1,5 @@
 import { mount, Observer} from 'destam-dom';
-import { SwitchCase, Button, Toggle } from 'destamatic-ui';
+import { Switch, Button, Toggle } from 'destamatic-ui';
 
 const value = Observer.mutable('red');
 
@@ -8,7 +8,7 @@ const two = Observer.mutable(false);
 const three = Observer.mutable(false);
 
 mount(document.body, <>
-	<SwitchCase value={value} >
+	<Switch value={value} >
 		<mark:case value='blue'>
 			<h1>you clicked the blue color</h1>
 		</mark:case>
@@ -21,7 +21,7 @@ mount(document.body, <>
 		<mark:default>
 			<h3>im not blue green or pink</h3>
 		</mark:default>
-	</SwitchCase>
+	</Switch>
 
 	<Button label="click me" type='contained' style={{backgroundColor: 'green'}} onClick={() => value.set('green')} />
 	<Button label="no me" type='outlined' style={{backgroundColor: 'blue'}}  onClick={() => value.set('blue')} />
@@ -31,7 +31,7 @@ mount(document.body, <>
 	<Toggle value={two} />
 	<Toggle value={three} />
 
-	<SwitchCase cases={{one, two, three}}>
+	<Switch cases={{one, two, three}}>
 		<mark:case value='one'>
 			The first toggle is on and trumps the state of all the others defined later
 		</mark:case>
@@ -44,5 +44,5 @@ mount(document.body, <>
 		<mark:default>
 			No toggles are switched
 		</mark:default>
-    </SwitchCase>
+    </Switch>
 </>);

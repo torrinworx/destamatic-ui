@@ -26,7 +26,7 @@ import { assert } from 'destam/util';
  * Note that `value` and `cases` are mutually exclusive. The component will assert
  * if both are present.
  */
-const SwitchCase = ({children, value, cases}) => {
+const Switch = ({children, value, cases}) => {
 	assert(!value || !cases);
 
 	if (cases) {
@@ -70,4 +70,4 @@ const SwitchCase = ({children, value, cases}) => {
 	});
 };
 
-export default SwitchCase;
+export default Switch;
