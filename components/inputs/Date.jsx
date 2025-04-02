@@ -219,7 +219,7 @@ export default ThemeContext.use(h => {
 
 		const Body = <raw:div />;
 
-		mounted(() => cleanup(value.effect(date => {
+		queueMicrotask(() => cleanup(value.effect(date => {
 			let found = rows.find(row => row.past <= date && date < row.future);
 			if (found) return;
 
