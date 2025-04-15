@@ -35,7 +35,7 @@ Theme.define({
  * @returns {HTMLElement} The constructed Typography element.
  */
 export default ThemeContext.use(h => {
-	const Typography = ({ type = 'h1', label = '', children, ...props }) => {
+	const Typography = ({ type = 'h1', label = '', children, onClick, ...props }) => {
 		if (!(label instanceof Observer)) label = Observer.immutable(label);
 		const isEditing = Observer.mutable(false);
 
@@ -43,6 +43,8 @@ export default ThemeContext.use(h => {
 			{...props}
 			theme={['typography', ...Array.isArray(type) ? type : type.split('_')]}
 			onClick={(e) => {
+				if (onClick) onClick(e);
+
 				if (!label.isImmutable() && e.detail === 2) {
 					isEditing.set(true);
 				}
