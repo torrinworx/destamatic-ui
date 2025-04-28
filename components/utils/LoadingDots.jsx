@@ -23,7 +23,7 @@ Theme.define({
 		animationDuration: '1s',
 		animationIterationCount: 'infinite',
 		animationTimingFunction: 'ease-in-out',
-		margin: '20px 4px',
+		margin: '0px 4px',
 	},
 });
 
