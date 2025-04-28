@@ -88,3 +88,5 @@ export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
 		>{children}</Ref>;
 	};
 }));
+
+export default Icon;
