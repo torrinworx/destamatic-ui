@@ -6,11 +6,13 @@ import Button from '../inputs/Button';
 import Icon from '../display/Icon';
 import Typography from '../display/Typography';
 import LoadingDots from '../utils/LoadingDots';
+import Context from '../utils/Context';
+import { h } from '../utils/h';
 
 import { OArray, OObject, Observer } from 'destam-dom';
 
 // File selection dialogue.
-export const selectFile = (extensions, multiple = true) => new Promise((ok) => {
+const selectFile = (extensions, multiple = true) => new Promise((ok) => {
 	let input = document.createElement('input');
 	input.click();
 	if (extensions) input.accept = extensions;
@@ -31,10 +33,13 @@ Theme.define({
 
 	fileDrop_base_empty: {
 		display: 'flex',
-		cursor: 'pointer',
 		border: '$borderSize $color dashed',
 		justifyContent: 'center',
 		padding: 10,
+	},
+
+	fileDrop_base_clickable: {
+		cursor: 'pointer',
 	},
 
 	fileDrop_base_dropping: {
@@ -55,7 +60,47 @@ Theme.define({
 	},
 });
 
-export default ThemeContext.use(h => {
+const FileDropContext = Context(null);
+
+const Listing = FileDropContext.use(({files}) => () => {
+	const File = ({each: file}) => {
+		return <Paper type='fileDrop'>
+			<Icon name="file" style={{margin: 10}} />
+			<Typography type="fileDrop_expand" label={file.observer.path('name')} />
+			{file.observer.path('status').map(status => {
+				if (status === 'loading') {
+					return <LoadingDots />;
+				} else if (status === 'error') {
+					return file.observer.path('error');
+				}/* else if (status === 'ready') {
+					return file.observer.path('loadingResult').map(e => e ?? null);
+				}*/
+
+				return null;
+			}).unwrap()}
+			<Button onClick={event => {
+				event.stopPropagation();
+
+				const i = files.indexOf(file);
+				files.splice(i, 1);
+			}}>
+				<Icon name="x" />
+			</Button>
+		</Paper>
+	};
+
+	return <File each={files} />;
+});
+
+const UploadButton = FileDropContext.use(({files, handleFiles, extensions, multiple}) => props => {
+	return <Button {...props} onClick={event => {
+		if (props.onClick) props.onClick(event);
+
+		selectFile(extensions, multiple).then(handleFiles);
+	}} />;
+});
+
+const FileDrop = ThemeContext.use(h => {
 	const FileDrop = ({
 		files,
 		children,
@@ -66,6 +111,7 @@ export default ThemeContext.use(h => {
 		loader,
 		limit,
 		theme,
+		clickable = true,
 		ready,
 		...props
 	}, cleanup, mounted) => {
@@ -76,8 +122,8 @@ export default ThemeContext.use(h => {
 
 		let droppingRefs = 0;
 
-		if (!children.length) {
-			children = <>
+		if (!children.length) children = <>
+			<Shown value={isEmpty}>
 				<div style={{
 					textAlign: 'center',
 				}}>
@@ -87,8 +133,9 @@ export default ThemeContext.use(h => {
 						<Typography type='p12_subtext' label={"Supports: " + extensions.join(', ')} />
 					</Shown>
 				</div>
-			</>;
-		}
+			</Shown>
+			<Listing />
+		</>;
 
 		if (ready) {
 			cleanup(files.observer.skip().path('status').effect(() => {
@@ -112,32 +159,6 @@ export default ThemeContext.use(h => {
 				}
 			}));
 		}
-
-		const File = ({each: file}) => {
-			return <Paper type='fileDrop'>
-				<Icon name="file" style={{margin: 10}} />
-				<Typography type="fileDrop_expand" label={file.observer.path('name')} />
-				{file.observer.path('status').map(status => {
-					if (status === 'loading') {
-						return <LoadingDots />;
-					} else if (status === 'error') {
-						return file.observer.path('error');
-					}/* else if (status === 'ready') {
-						return file.observer.path('loadingResult').map(e => e ?? null);
-					}*/
-
-					return null;
-				}).unwrap()}
-				<Button onClick={event => {
-					event.stopPropagation();
-
-					const i = files.indexOf(file);
-					files.splice(i, 1);
-				}}>
-					<Icon name="x" />
-				</Button>
-			</Paper>
-		};
 
 		const handleFiles = (data) => {
 			const addFiles = [];
@@ -181,8 +202,12 @@ export default ThemeContext.use(h => {
 
 					if (loader) {
 						fileObj.status = 'loading';
+						const load = loader(file, fileObj);
+						if (!load) {
+							continue;
+						}
 
-						loader(file, fileObj).then(res => {
+						Promise.resolve(load).then(res => {
 							fileObj.result = res;
 							fileObj.status = 'ready';
 						}, res => {
@@ -204,6 +229,7 @@ export default ThemeContext.use(h => {
 			theme={[
 				'fileDrop',
 				'base',
+				clickable ? 'clickable' : null,
 				isEmpty.map(e => e ? 'empty' : null),
 				dropping.map(e => e ? 'dropping' : null),
 			]}
@@ -240,16 +266,21 @@ export default ThemeContext.use(h => {
 			}}
 			onClick={event => {
 				if (onClick) onClick(event);
+				if (!clickable) return;
 
 				selectFile(extensions, multiple).then(handleFiles);
 			}}
 		>
-			<Shown value={isEmpty}>
+			<FileDropContext value={{files, handleFiles, extensions, multiple}}>
 				{children}
-			</Shown>
-			<File each={files} />
+			</FileDropContext>
 		</Div>;
 	};
 
 	return FileDrop;
 });
+
+FileDrop.Listing = Listing;
+FileDrop.Button = UploadButton;
+
+export default FileDrop;
