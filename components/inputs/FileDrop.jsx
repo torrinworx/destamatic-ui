@@ -1,0 +1,255 @@
+import Theme from '../utils/Theme';
+import ThemeContext from '../utils/ThemeContext';
+import Shown from '../utils/Shown';
+import Paper from '../display/Paper';
+import Button from '../inputs/Button';
+import Icon from '../display/Icon';
+import Typography from '../display/Typography';
+import LoadingDots from '../utils/LoadingDots';
+
+import { OArray, OObject, Observer } from 'destam-dom';
+
+// File selection dialogue.
+export const selectFile = (extensions, multiple = true) => new Promise((ok) => {
+	let input = document.createElement('input');
+	input.click();
+	if (extensions) input.accept = extensions;
+	input.multiple = multiple;
+
+	input.type = 'file';
+	input.onchange = e => {
+		ok(e.target);
+	};
+	input.click();
+});
+
+Theme.define({
+	fileDrop_base: {
+		$borderSize: '2px',
+		border: '$borderSize solid rgba(0, 0, 0, 0)',
+	},
+
+	fileDrop_base_empty: {
+		display: 'flex',
+		cursor: 'pointer',
+		border: '$borderSize $color dashed',
+		justifyContent: 'center',
+		padding: 10,
+	},
+
+	fileDrop_base_dropping: {
+		border: '$borderSize solid $color',
+	},
+
+	paper_fileDrop: {
+		margin: 5,
+		display: 'flex',
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+
+	typography_fileDrop: {
+		extends: "typography_p1",
+		marginRight: 10,
+		marginLeft: 10,
+	},
+});
+
+export default ThemeContext.use(h => {
+	const FileDrop = ({
+		files,
+		children,
+		onDrop,
+		onClick,
+		extensions = [],
+		multiple,
+		loader,
+		limit,
+		theme,
+		ready,
+		...props
+	}, cleanup, mounted) => {
+		if (!files) files = OArray();
+		const isEmpty = files.observer.shallow().map(files => files.length === 0);
+		const dropping = Observer.mutable(false);
+		const Div = <raw:div />;
+
+		let droppingRefs = 0;
+
+		if (!children.length) {
+			children = <>
+				<div style={{
+					textAlign: 'center',
+				}}>
+					<Icon name='download' style={{ color: '$color' }} />
+					<div style={{padding: 10}}>Drop your file here or <span theme={theme} style={{ color: '$color' }}>browse</span></div>
+					<Shown value={extensions.length}>
+						<Typography type='p12_subtext' label={"Supports: " + extensions.join(', ')} />
+					</Shown>
+				</div>
+			</>;
+		}
+
+		if (ready) {
+			cleanup(files.observer.skip().path('status').effect(() => {
+				const readyFiles = [];
+				for (const file of files) {
+					if (file.status === 'ready') {
+						readyFiles.push(file.result);
+					} else {
+						ready.set(null);
+						return;
+					}
+				}
+
+				console.log(readyFiles);
+				if (readyFiles.length === 0) {
+					ready.set(null);
+				} else if (multiple) {
+					ready.set(readyFiles);
+				} else {
+					ready.set(readyFiles[0]);
+				}
+			}));
+		}
+
+		const File = ({each: file}) => {
+			return <Paper type='fileDrop'>
+				<Icon name="file" style={{margin: 10}} />
+				<Typography type="fileDrop_expand" label={file.observer.path('name')} />
+				{file.observer.path('status').map(status => {
+					if (status === 'loading') {
+						return <LoadingDots />;
+					} else if (status === 'error') {
+						return file.observer.path('error');
+					}/* else if (status === 'ready') {
+						return file.observer.path('loadingResult').map(e => e ?? null);
+					}*/
+
+					return null;
+				}).unwrap()}
+				<Button onClick={event => {
+					event.stopPropagation();
+
+					const i = files.indexOf(file);
+					files.splice(i, 1);
+				}}>
+					<Icon name="x" />
+				</Button>
+			</Paper>
+		};
+
+		const handleFiles = (data) => {
+			const addFiles = [];
+			if (data.items) {
+				for (let i = 0; i < data.items.length; i++) {
+					const item = data.items[i];
+
+					if (item.kind === 'file') {
+						addFiles.push(item.getAsFile());
+					}
+				}
+			} else {
+				for (let i = 0; i < data.files.length; i++) {
+					addFiles.push(data.files[i]);
+				}
+			}
+
+			if (addFiles.length === 0) {
+				return;
+			}
+
+			if (!multiple) {
+				files.splice(0, files.length);
+				addFiles.splice(1, addFiles.length);
+			}
+
+			for (const file of addFiles) {
+				if (limit && file.size > limit) {
+					files.push(OObject({
+						name: file.name,
+						error: "This file is too large",
+						status: 'error',
+						file,
+					}));
+				} else {
+					const fileObj = OObject({
+						name: file.name,
+						status: 'ready',
+						file,
+					});
+
+					if (loader) {
+						fileObj.status = 'loading';
+
+						loader(file, fileObj).then(res => {
+							fileObj.result = res;
+							fileObj.status = 'ready';
+						}, res => {
+							fileObj.error = res;
+							fileObj.status = 'error';
+						});
+					} else {
+						fileObj.result = file;
+					}
+
+					files.push(fileObj);
+				}
+			}
+		};
+
+		return <Div
+			{...props}
+			draggable
+			theme={[
+				'fileDrop',
+				'base',
+				isEmpty.map(e => e ? 'empty' : null),
+				dropping.map(e => e ? 'dropping' : null),
+			]}
+			onDragenter={event => {
+				if (droppingRefs === 0) {
+					dropping.set(true);
+				}
+
+				droppingRefs++;
+			}}
+			onDragleave={event => {
+				if (droppingRefs > 0) {
+					droppingRefs--;
+				}
+
+				if (droppingRefs === 0) {
+					dropping.set(false);
+				}
+			}}
+			onDragover={event => {
+				event.preventDefault();
+			}}
+			onDrop={event => {
+				if (onDrop) {
+					onDrop(event);
+				} else {
+					event.preventDefault();
+				}
+
+				handleFiles(event.dataTransfer);
+
+				dropping.set(false);
+				droppingRefs = 0;
+			}}
+			onClick={event => {
+				if (onClick) onClick(event);
+
+				selectFile(extensions, multiple).then(handleFiles);
+			}}
+		>
+			<Shown value={isEmpty}>
+				{children}
+			</Shown>
+			<File each={files} />
+		</Div>;
+	};
+
+	return FileDrop;
+});
