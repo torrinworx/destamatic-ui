@@ -109,6 +109,7 @@ export default {
 		$floor: a => String(Math.floor(parseFloat(a))),
 		$ceil: a => String(Math.ceil(parseFloat(a))),
 		$round: a => String(Math.round(parseFloat(a))),
+		$if: (cond, a, b) => parseFloat(cond) ? a : b,
 	},
 
 	primary: {
