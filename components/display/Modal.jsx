@@ -1,6 +1,7 @@
 import { mount } from 'destam-dom';
 import { Observer } from 'destam';
-import createContext from './Context';
+import createContext from '../utils/Context';
+
 
 /**
  * We store a list of { name, function } modal definitions,
