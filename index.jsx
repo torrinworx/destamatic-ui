@@ -3,6 +3,7 @@ export { default as Column } from './components/display/Column.jsx';
 export { default as Drag } from './components/display/Drag.jsx';
 export { default as Divider } from './components/display/Divider.jsx';
 export * from './components/display/Icon.jsx';
+export { default as Modals } from './components/display/Modal.jsx'
 export { default as Paper } from './components/display/Paper.jsx';
 export { default as Row } from './components/display/Row.jsx';
 export { default as Tooltip } from './components/display/Tooltip.jsx';

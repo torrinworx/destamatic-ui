@@ -2,6 +2,7 @@ import { mount } from 'destam-dom';
 
 const createContext = (def, transform = x => x) => {
 	const getter = Symbol();
+
 	const getValue = context => {
 		const calc = state => {
 			if (!state) {
