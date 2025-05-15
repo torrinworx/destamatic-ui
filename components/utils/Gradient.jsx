@@ -1,5 +1,5 @@
-import { atomic } from 'destam/Network';
 import { OArray, Observer } from 'destam-dom';
+
 import { h } from '../utils/h';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
@@ -55,14 +55,14 @@ export default ThemeContext.use(h => Theme.use(theme => {
 		// watch for changes in gradientCSS and fade to a new layer
 		cleanup(gradientCSSObs.effect((newCSS) => {
 			if (!layers.length) {
-				atomic(() => layers.unshift(makeLayer(newCSS)));
+				layers.unshift(makeLayer(newCSS));
 				return;
 			}
 
 			const currentTopLayer = layers[0];
 			if (newCSS === currentTopLayer.background) return;
 
-			atomic(() => layers.unshift(makeLayer(newCSS)));
+			layers.unshift(makeLayer(newCSS));
 
 			// Fade out old top
 			const oldTop = layers[layers.length - 1];
@@ -71,7 +71,7 @@ export default ThemeContext.use(h => Theme.use(theme => {
 			// Remove after transition
 			setTimeout(() => {
 				const idx = layers.indexOf(oldTop);
-				if (idx >= 0) atomic(() => layers.splice(idx, 1));
+				if (idx >= 0) layers.splice(idx, 1);
 			}, 250);
 		}));
 
