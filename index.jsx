@@ -30,6 +30,7 @@ export { default as Tabs } from './components/navigation/Tabs.jsx';
 // utils
 export { default as createContext } from './components/utils/Context.jsx';
 export { default as Detached } from './components/utils/Detached.jsx';
+export { default as Gradient } from './components/utils/Gradient.jsx';
 export * from './components/utils/h.jsx';
 export { default as LoadingDots } from './components/utils/LoadingDots.jsx';
 export { default as Popup } from './components/utils/Popup.jsx';
