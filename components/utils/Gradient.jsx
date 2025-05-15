@@ -1,80 +1,74 @@
-import { h } from '../utils/h';
-import { OArray, Observer } from 'destam-dom';
 import { atomic } from 'destam/Network';
+import { OArray, Observer } from 'destam-dom';
+import { h } from '../utils/h';
 import Theme from '../utils/Theme';
+import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
+	gradient: {
+		extends: 'primary',
+		$gradientCSS: 'linear-gradient(to top right, $color, $color_top)',
+	},
+
 	gradientOuter: {
-		position: "relative",
-		width: "100%",
-		height: "100%",
+		position: 'relative',
+		width: '100%', height: '100%',
 	},
 	gradientFill: {
-		// The background "sheet" 100% of the screen, behind content
-		position: "fixed",
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		pointerEvents: "none",
+		position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+		pointerEvents: 'none',
 	},
 	gradientLayer: {
-		// Each layer crossfades via opacity, with no zIndex needed
-		position: "absolute",
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		transition: "opacity 250ms ease-in-out",
+		position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+		transition: 'opacity 250ms ease-in-out',
 	},
 	gradientContent: {
-		// The visible user content is also fixed, 
-		// painted after the background in the DOM => on top
-		position: "fixed",
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		overflowY: "auto",
-		overflowX: "hidden",
+		position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+		overflowY: 'auto',
 	},
 });
 
-export default Theme.use(theme => {
+export default ThemeContext.use(h => Theme.use(theme => {
+	/**
+	 * Gradient component that creates a dynamic, animated gradient background.
+	 * 
+	 * The component manages a list of gradient layers that can transition smoothly
+	 * as the theme's gradient CSS changes. New gradient layers are inserted and the
+	 * old layers fade out, creating a cross-fade effect.
+	 * 
+	 * @param {Object} props - Properties object.
+	 * @param {JSX.Element | Array<JSX.Element>} props.children - Components or elements to be rendered within the gradient.
+	 * @param {Function} cleanup - Cleanup function to manage component lifecycle and avoid memory leaks.
+	 * 
+	 * @returns {JSX.Element} A JSX element that contains the gradient layers and content.
+	 */
 	const Gradient = ({ children }, cleanup) => {
-		// Keep an OArray of background layers for crossfades
 		const layers = OArray();
+		const gradientCSSObs = theme('gradient').vars('gradientCSS');
 
-		// Colors from theme:
-		const primaryColor = theme('primary').vars('color');
-		const secondaryColor = theme('secondary').vars('color');
-		const gradient = Observer.all([primaryColor, secondaryColor]).map(([p, s]) =>
-			`linear-gradient(to top right, ${p}, ${s}, ${s})`
-		);
-
-		// Helper to build a new topmost layer:
-		const makeLayer = bg => ({
+		// build new toplayer object:
+		const makeLayer = (bg) => ({
 			background: bg,
 			opacity: Observer.mutable(1),
 		});
 
-		// On first mount or when gradient changes, add a new layer and fade out the old top:
-		cleanup(gradient.effect((bg, oldVal) => {
+		// watch for changes in gradientCSS and fade to a new layer
+		cleanup(gradientCSSObs.effect((newCSS) => {
 			if (!layers.length) {
-				// first layer
-				atomic(() => layers.unshift(makeLayer(bg)));
+				atomic(() => layers.unshift(makeLayer(newCSS)));
 				return;
 			}
-			if (bg === oldVal) return;
 
-			// Add new behind everything:
-			atomic(() => layers.unshift(makeLayer(bg)));
+			const currentTopLayer = layers[0];
+			if (newCSS === currentTopLayer.background) return;
 
-			// Fade out old top layer:
+			atomic(() => layers.unshift(makeLayer(newCSS)));
+
+			// Fade out old top
 			const oldTop = layers[layers.length - 1];
 			oldTop.opacity.set(0);
 
-			// Remove it after the transition:
+			// Remove after transition
 			setTimeout(() => {
 				const idx = layers.indexOf(oldTop);
 				if (idx >= 0) atomic(() => layers.splice(idx, 1));
@@ -100,4 +94,4 @@ export default Theme.use(theme => {
 	};
 
 	return Gradient;
-});
+}));
