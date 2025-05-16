@@ -1,3 +1,4 @@
+// import { atomic } from 'destam/Network';
 import { OArray, Observer } from 'destam-dom';
 
 import { h } from '../utils/h';
@@ -12,18 +13,31 @@ Theme.define({
 
 	gradientOuter: {
 		position: 'relative',
-		width: '100%', height: '100%',
+		width: '100%',
+		height: '100%',
 	},
 	gradientFill: {
-		position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+		position: 'fixed',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
 		pointerEvents: 'none',
 	},
 	gradientLayer: {
-		position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
 		transition: 'opacity 250ms ease-in-out',
 	},
 	gradientContent: {
-		position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+		position: 'fixed',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
 		overflowY: 'auto',
 	},
 });
@@ -31,66 +45,70 @@ Theme.define({
 export default ThemeContext.use(h => Theme.use(theme => {
 	/**
 	 * Gradient component that creates a dynamic, animated gradient background.
-	 * 
+	 *
 	 * The component manages a list of gradient layers that can transition smoothly
 	 * as the theme's gradient CSS changes. New gradient layers are inserted and the
 	 * old layers fade out, creating a cross-fade effect.
-	 * 
+	 *
 	 * @param {Object} props - Properties object.
 	 * @param {JSX.Element | Array<JSX.Element>} props.children - Components or elements to be rendered within the gradient.
 	 * @param {Function} cleanup - Cleanup function to manage component lifecycle and avoid memory leaks.
-	 * 
+	 *
 	 * @returns {JSX.Element} A JSX element that contains the gradient layers and content.
 	 */
 	const Gradient = ({ children }, cleanup) => {
 		const layers = OArray();
 		const gradientCSSObs = theme('gradient').vars('gradientCSS');
 
-		// build new toplayer object:
-		const makeLayer = (bg) => ({
-			background: bg,
+		const makeLayer = (background) => ({
+			background,
 			opacity: Observer.mutable(1),
 		});
 
-		// watch for changes in gradientCSS and fade to a new layer
-		cleanup(gradientCSSObs.effect((newCSS) => {
+		cleanup(gradientCSSObs.effect(newCSS => {
 			if (!layers.length) {
-				layers.unshift(makeLayer(newCSS));
+				layers.push(makeLayer(newCSS));
 				return;
 			}
 
-			const currentTopLayer = layers[0];
-			if (newCSS === currentTopLayer.background) return;
+			const topLayer = layers[0];
 
-			layers.unshift(makeLayer(newCSS));
+			if (topLayer.background === newCSS) return;
+			if (layers.length === 2) layers.pop();
 
-			// Fade out old top
-			const oldTop = layers[layers.length - 1];
-			oldTop.opacity.set(0);
+			topLayer.opacity.set(0);
+			const oldTop = topLayer;
 
-			// Remove after transition
 			setTimeout(() => {
 				const idx = layers.indexOf(oldTop);
-				if (idx >= 0) layers.splice(idx, 1);
+				if (idx >= 0) {
+					layers.splice(idx, 1);
+				}
 			}, 250);
+
+			layers.unshift(makeLayer(newCSS));
 		}));
 
-		const Layer = ({ each: layer }) => <div
-			theme="gradientLayer"
-			style={{
-				backgroundImage: layer.background,
-				opacity: layer.opacity,
-			}}
-		/>;
+		const Layer = ({ each: layer }) => (
+			<div
+				theme="gradientLayer"
+				style={{
+					backgroundImage: layer.background,
+					opacity: layer.opacity,
+				}}
+			/>
+		);
 
-		return <div theme="gradientOuter">
-			<div theme="gradientFill">
-				<Layer each={layers} />
+		return (
+			<div theme="gradientOuter">
+				<div theme="gradientFill">
+					<Layer each={layers} />
+				</div>
+				<div theme="gradientContent">
+					{children}
+				</div>
 			</div>
-			<div theme="gradientContent">
-				{children}
-			</div>
-		</div>;
+		);
 	};
 
 	return Gradient;
