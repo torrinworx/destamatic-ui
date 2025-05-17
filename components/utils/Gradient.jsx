@@ -89,26 +89,22 @@ export default ThemeContext.use(h => Theme.use(theme => {
 			layers.unshift(makeLayer(newCSS));
 		}));
 
-		const Layer = ({ each: layer }) => (
-			<div
-				theme="gradientLayer"
-				style={{
-					backgroundImage: layer.background,
-					opacity: layer.opacity,
-				}}
-			/>
-		);
+		const Layer = ({ each: layer }) => <div
+			theme="gradientLayer"
+			style={{
+				backgroundImage: layer.background,
+				opacity: layer.opacity,
+			}}
+		/>;
 
-		return (
-			<div theme="gradientOuter">
-				<div theme="gradientFill">
-					<Layer each={layers} />
-				</div>
-				<div theme="gradientContent">
-					{children}
-				</div>
+		return <div theme="gradientOuter">
+			<div theme="gradientFill">
+				<Layer each={layers} />
 			</div>
-		);
+			<div theme="gradientContent">
+				{children}
+			</div>
+		</div>;
 	};
 
 	return Gradient;
