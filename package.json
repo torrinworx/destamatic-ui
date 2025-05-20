@@ -32,7 +32,8 @@
   },
   "optionalDependencies": {
     "@material-design-icons/svg": "^0.14.15",
-    "feather-icons": "^4.29.2"
+    "feather-icons": "^4.29.2",
+    "simple-icons": "14.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.7",
