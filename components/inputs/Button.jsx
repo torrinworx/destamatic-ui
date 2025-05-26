@@ -32,7 +32,6 @@ Theme.define({
 
 	button_contained: {
 		extends: 'typography_p1_bold',
-
 		background: '$color',
 		color: '$contrast_text($color_top)',
 	},
@@ -69,6 +68,14 @@ Theme.define({
 
 	text: {
 		extends: 'typography_p1_regular',
+	},
+
+	button_icon: {
+		color: '$color_top',
+	},
+
+	button_icon_hovered: {
+		color: '$color_hover',
 	},
 });
 
