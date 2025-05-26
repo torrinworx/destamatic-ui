@@ -1,7 +1,6 @@
 import { mount, Observer } from 'destam-dom';
 import { Button, Modal, ModalContext, ThemeContext, popups, TextField } from 'destamatic-ui';
 
-
 const globalState = Observer.mutable(true);
 
 const value = {
@@ -23,7 +22,7 @@ const value = {
             </div>;
         }),
 
-        // disable click away
+        // disable click away and esc button
         test3: ModalContext.use(m => {
             return () => <div style={{ width: '500px', height: '500px', background: 'green' }}>
                 you can't escape!
@@ -55,6 +54,7 @@ const value = {
             </div>;
         }),
     },
+    // place any state you want into value when sending it to ModalContext, it will get sent to the modal automatically.
     globalState,
 };
 
@@ -67,8 +67,8 @@ const Comp = ModalContext.use(m => ThemeContext.use(h => {
             m.current.set('test2');
         }} />
         <Button type='contained' label='Test3' onClick={() => {
-            m.forced = true;
-            m.keep = true
+            m.noEsc = true;
+            m.noClickEsc = true;
             m.current.set('test3');
         }} />
         <Button type='contained' label='Page1' onClick={() => m.current.set('page1')} />

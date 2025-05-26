@@ -61,7 +61,18 @@ export const ModalContext = createContext(() => null, (value) => {
  */
 export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 	return (_, cleanup) => {
+		const handleEscape = (e) => {
+			if (e.which === 27) {
+				e.preventDefault();
+				m.current.set(false);
+			}
+		};
+
 		cleanup(m.current.effect(mo => {
+			if (mo && !m.noEsc) {
+				window.addEventListener('keydown', handleEscape);
+				return () => window.removeEventListener('keydown', handleEscape);
+			}
 			if (!mo) {
 				Object.keys(m).forEach(key => {
 					// don't need to reset modals because it's immutable
@@ -73,7 +84,7 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 		return <Shown value={m.current} >
 			<Popup style={{ inset: 0 }}>
 				<div theme='modalOverlay' onClick={() => {
-					if (!m.forced) m.current.set(false)
+					if (!m.noClickEsc) m.current.set(false)
 				}} />
 				<div theme='modalWrapper'>
 					{m.current.map(c => c ? m.modals.get()[c]() : null)}
