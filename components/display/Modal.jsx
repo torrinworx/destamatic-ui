@@ -1,11 +1,13 @@
 import { OObject } from 'destam';
 
+import Icon from '../display/Icon';
 import Shown from '../utils/Shown';
 import Popup from '../utils/Popup';
 import Theme from '../utils/Theme';
+import Paper from '../display/Paper';
 import Button from '../inputs/Button';
-import createContext from '../utils/Context';
 import Typography from './Typography';
+import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
@@ -23,14 +25,17 @@ Theme.define({
 });
 
 const DefTemplate = ({ m, children }) => {
-	console.log('this happens')
-	return <div>
+	return <Paper>
 		<div theme='row_spread'>
-			<Typography label={m.label} />
-			<Button type='contained' label='X' onClick={() => m.current = false} />
+			<Typography type='h2' label={m.label} />
+			<Button
+				type='icon'
+				icon={<Icon name='x' size={30} />}
+				onClick={() => m.current = false}
+			/>
 		</div>
 		{children}
-	</div>;
+	</Paper>;
 };
 
 export const ModalContext = createContext(() => null, (value) => {
@@ -63,6 +68,7 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 					// don't need to reset modals because it's immutable
 					if (key !== 'current' && key !== 'modals' && key !== 'template') delete m[key];
 				});
+				m.template = DefTemplate;
 			}
 		}));
 
