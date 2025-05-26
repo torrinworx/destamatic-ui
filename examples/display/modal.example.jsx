@@ -1,5 +1,6 @@
 import { mount, Observer } from 'destam-dom';
-import { Button, Modal, ModalContext, ThemeContext, popups, TextField, Typography } from 'destamatic-ui';
+import FeatherIcons from "destamatic-ui/components/icons/FeatherIcons";
+import { Button, Modal, ModalContext, ThemeContext, popups, TextField, Typography, Icons } from 'destamatic-ui';
 
 const globalState = Observer.mutable(true);
 
@@ -110,9 +111,11 @@ const Comp = ModalContext.use(m => ThemeContext.use(h => {
 globalState.effect(g => console.log(g));
 
 mount(document.body, <div>
-    <ModalContext value={value}>
-        <Comp />
-        <Modal />
-        {popups}
-    </ModalContext>
+    <Icons value={[FeatherIcons]}>
+        <ModalContext value={value}>
+            <Comp />
+            <Modal />
+            {popups}
+        </ModalContext>
+    </Icons>
 </div>);
