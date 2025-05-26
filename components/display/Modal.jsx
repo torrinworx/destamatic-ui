@@ -3,7 +3,9 @@ import { OObject } from 'destam';
 import Shown from '../utils/Shown';
 import Popup from '../utils/Popup';
 import Theme from '../utils/Theme';
+import Button from '../inputs/Button';
 import createContext from '../utils/Context';
+import Typography from './Typography';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
@@ -20,22 +22,34 @@ Theme.define({
 	}
 });
 
+const DefTemplate = ({ m, children }) => {
+	console.log('this happens')
+	return <div>
+		<div theme='row_spread'>
+			<Typography label={m.label} />
+			<Button type='contained' label='X' onClick={() => m.current = false} />
+		</div>
+		{children}
+	</div>;
+};
+
 export const ModalContext = createContext(() => null, (value) => {
 	const { modals, ...props } = value;
 
 	return OObject({
 		current: false,
 		modals: modals,
+		template: DefTemplate,
 		...props,
 	});
 });
 
 export const Modal = ModalContext.use(m => ThemeContext.use(h => {
-	return ({ template }, cleanup) => {
+	return (_, cleanup) => {
 		const handleEscape = (e) => {
 			if (e.which === 27) {
 				e.preventDefault();
-				m.current.set(false);
+				m.current = false;
 			}
 		};
 
@@ -47,23 +61,20 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 			if (!mo) {
 				Object.keys(m).forEach(key => {
 					// don't need to reset modals because it's immutable
-					if (key !== 'current' && key !== 'modals') delete m[key];
+					if (key !== 'current' && key !== 'modals' && key !== 'template') delete m[key];
 				});
 			}
 		}));
 
 		return <Shown value={m.observer.path('current')} >
 			<Popup style={{ inset: 0 }}>
-				<div theme='modalOverlay' onClick={() => {
-					if (!m.noClickEsc) m.current = false;
-				}} />
-				<div theme='column'>
-					<div>
-
-					</div>
-				</div>
+				<div theme='modalOverlay' onClick={() => !m.noClickEsc ? (m.current = false) : null} />
 				<div theme='modalWrapper'>
-					{m.observer.path('current').map(c => c ? m.modals[c]() : null)}
+					{m.observer.path('template').map(T => {
+						return <T m={m} >
+							{m.observer.path('current').map(c => c ? m.modals[c]() : null)}
+						</T>
+					})}
 				</div>
 			</Popup>
 		</Shown>
