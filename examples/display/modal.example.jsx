@@ -49,7 +49,6 @@ const value = {
             };
         }),
         page2: ModalContext.use(m => {
-            console.log(m);
             return () => <div style={{ width: '500px', height: '500px', background: 'green' }}>
                 Here is your context from page1!!!
                 <br />
