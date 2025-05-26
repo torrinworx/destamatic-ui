@@ -6,6 +6,20 @@ import ThemeContext from '../utils/ThemeContext';
 
 const parser = new DOMParser();
 
+/**
+ * Icons context is used to manage and resolve icon resources.
+ * It allows for the combination of multiple icon packs and supports asynchronous resolution of icons by name.
+ *
+ * @returns {Function} A function to resolve an icon by name from the registered icon packs.
+ *
+ * @param {Array|Function} next - The next icon pack(s) to register. It can be a single icon pack function, an array of such functions,
+ * or an object where each key is an icon name and the value is the SVG string or component.
+ * 
+ * @param {Function} prev - The previously registered icon pack function, used to fallback in icon resolution.
+ * 
+ * This context modifies the icon pack to prepend the newly added pack(s) to the existing list of packs,
+ * hence allowing orderly fallback mechanisms until the icon is resolved.
+ */
 export const Icons = createContext(() => null, (next, prev) => {
 	if (!Array.isArray(next)) next = [next];
 
@@ -33,6 +47,19 @@ export const Icons = createContext(() => null, (next, prev) => {
 	};
 });
 
+/**
+ * Icon component capable of rendering SVG icons based on the icon pack context.
+ *
+ * @param {Object} props - The properties object.
+ * @param {string|Observer<string>} props.name - The name of the icon to render. Can be a literal string or an Observer.
+ * @param {number|Observer<number>} [props.size=24] - The size of the icon. Can be a number or an Observer, and determines the width and height of the SVG element.
+ * @param {HTMLElement} [props.ref] - A reference to the DOM element of the icon. If not provided, a default SVG element is created.
+ * @param {Object} [props.style] - Custom styles to apply to the icon.
+ * @param {...Object} props - Additional properties to spread onto the SVG element representing the icon.
+ * @param {Function} cleanup - Function to handle cleanup operations when properties change.
+ * 
+ * @returns {JSX.Element} The rendered SVG icon element.
+ */
 export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
 	return ({ name, size = 24, ref: Ref, style, ...props }, cleanup) => {
 		if (!(name instanceof Observer)) name = Observer.immutable(name);
