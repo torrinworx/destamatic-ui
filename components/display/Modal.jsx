@@ -86,5 +86,3 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 		</Shown>
 	};
 }));
-
-// somehow add a modal template that the user can add, the temaplte will take in variables from the contextd when it's called?
