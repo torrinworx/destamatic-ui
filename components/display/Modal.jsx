@@ -24,7 +24,7 @@ Theme.define({
 	}
 });
 
-const DefTemplate = ({ m, children }) => {
+const DefTemplate = ThemeContext.use(h => ({ m, children }) => {
 	return <Paper>
 		<div theme='row_spread'>
 			<Typography type='h2' label={m.label} />
@@ -36,7 +36,7 @@ const DefTemplate = ({ m, children }) => {
 		</div>
 		{children}
 	</Paper>;
-};
+});
 
 export const ModalContext = createContext(() => null, (value) => {
 	const { modals, ...props } = value;
