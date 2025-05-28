@@ -24,7 +24,7 @@ Theme.define({
 	}
 });
 
-const DefTemplate = ThemeContext.use(h => ({ m, children }, cleanup) => {
+const DefaultTemplate = ThemeContext.use(h => ({ m, children }, cleanup) => {
 	const opacity = Observer.mutable(0);
 	const show = Observer.mutable(false);
 
@@ -62,7 +62,7 @@ const DefTemplate = ThemeContext.use(h => ({ m, children }, cleanup) => {
 					delete m[key];
 				}
 			});
-			m.template = DefTemplate;
+			m.template = DefaultTemplate;
 		}
 	}));
 
@@ -101,7 +101,7 @@ export const ModalContext = createContext(() => null, (value) => {
 	return OObject({
 		current: false,
 		modals: modals,
-		template: DefTemplate,
+		template: DefaultTemplate,
 		...props,
 	});
 });
