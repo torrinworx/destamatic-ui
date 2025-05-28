@@ -24,9 +24,8 @@ Theme.define({
 	}
 });
 
-const DefaultTemplate = ThemeContext.use(h => ({ m, children }, cleanup) => {
-	const opacity = Observer.mutable(0);
-	const show = Observer.mutable(false);
+const DefaultTemplate = ThemeContext.use(h => ({ m, children, closeSignal }, cleanup, mounted) => {
+	const shown = Observer.mutable(false);
 
 	const handleEscape = (e) => {
 		if (e.which === 27) {
@@ -35,64 +34,58 @@ const DefaultTemplate = ThemeContext.use(h => ({ m, children }, cleanup) => {
 		}
 	};
 
-	cleanup(m.observer.path('current').effect(mo => {
-		if (mo) {
-			queueMicrotask(() => {
-				setTimeout(() => opacity.set(1), 10);
+	mounted(() => {
+		queueMicrotask(() => {
+			setTimeout(() => shown.set(true), 10);
+		});
+
+		if (!m.noEsc) {
+			window.addEventListener('keydown', handleEscape);
+			cleanup(() => {
+				window.removeEventListener('keydown', handleEscape);
 			});
-
-			show.set(true);
-
-
-			if (!m.noEsc) {
-				window.addEventListener('keydown', handleEscape);
-				return () => window.removeEventListener('keydown', handleEscape);
-			}
-		} else {
-			opacity.set(0);
-
-			queueMicrotask(() => {
-				setTimeout(() => {
-					show.set(false);
-				}, 150);
-			});
-
-			Object.keys(m).forEach(key => {
-				if (key !== 'current' && key !== 'modals' && key !== 'template') {
-					delete m[key];
-				}
-			});
-			m.template = DefaultTemplate;
 		}
+	});
+		
+	cleanup(closeSignal.watch(() => {
+		shown.set(!closeSignal.get());
 	}));
+	
+/*
+	Object.keys(m).forEach(key => {
+		if (key !== 'current' && key !== 'modals' && key !== 'template') {
+			delete m[key];
+		}
+	});
+	*/
 
-	return <Shown value={show}>
-		<Popup
-			style={{
-				inset: 0,
-				transition: 'opacity 150ms ease-in-out',
-				opacity
-			}}
-		>
-			<div
-				theme='modalOverlay'
-				onClick={() => !m.noClickEsc ? (m.current = false) : null}
-			/>
-			<div theme='modalWrapper'>
-				<Paper>
-					<div theme='row_spread'>
-						<Typography type='h2' label={m.observer.map(m => m.label ? m.label : '')} />
-						<Button
-							type='icon'
-							icon={<Icon name='x' size={30} />}
-							onClick={() => m.current = false}
-						/>
-					</div>
-					{children}
-				</Paper>
-			</div>
-		</Popup>
-	</Shown >;
+	return <Popup
+		style={{
+			inset: 0,
+			transition: 'opacity 5000ms ease-in-out',
+
+			opacity: shown.map(shown => shown ? 1 : 0),
+			pointerEvents: shown.map(shown => shown ? null : 'none'),
+		}}
+	>
+		<div
+			theme='modalOverlay'
+			onClick={() => !m.noClickEsc ? (m.current = false) : null}
+		/>
+		<div theme='modalWrapper'>
+			<Paper>
+				<div theme='row_spread'>
+					<Typography type='h2' label={m.observer.map(m => m.label ? m.label : '')} />
+					<Button
+						type='icon'
+						icon={<Icon name='x' size={30} />}
+						onClick={() => m.current = false}
+					/>
+				</div>
+				{children}
+			</Paper>
+		</div>
+	</Popup>;
 });
 
 export const ModalContext = createContext(() => null, (value) => {
@@ -107,10 +100,39 @@ export const ModalContext = createContext(() => null, (value) => {
 });
 
 export const Modal = ModalContext.use(m => ThemeContext.use(h => {
-	return () => {
-		/* Issue here with these: they disappear before the fade out is complete, and it messes with the modal layout, very noticable and annoying */
-		return m.observer.path('template').map(T => {
-			return <T m={m}>{m.observer.path('current').map(c => c ? m.modals[c]() : null)}</T>;
+	const Modal = ({}, cleanup) => {
+		const aniCurrent = Observer.mutable(null);
+		cleanup(m.observer.path('current').effect(current => {
+			if (current) {
+				aniCurrent.set(current);
+			} else {
+				const timeout = setTimeout(() => aniCurrent.set(null), 5000);
+				return () => {
+					clearTimeout(timeout);
+				};
+			}
+		}));
+
+		return Observer.all([
+			m.observer.path('template'),
+			aniCurrent,
+		]).map(([T, c]) => {
+			console.log(T, c)
+			if (!c) {
+				return null;
+			}
+
+			const closeSignal = m.observer.path('current').map(current => {
+				if (!current) {
+					return true;
+				} else {
+					return current !== c;
+				}
+			});
+
+			return <T closeSignal={closeSignal} m={m}>{m.modals[c]()}</T>;
 		});
 	};
+
+	return Modal;
 }));
