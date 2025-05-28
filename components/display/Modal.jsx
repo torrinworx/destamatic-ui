@@ -106,6 +106,7 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 					onClick={() => !m.noClickEsc ? (m.current = false) : null}
 				/>
 				<div theme='modalWrapper'>
+					{/* Issue here with these: they disappear before the fade out is complete, and it messes with the modal layout, very noticable and annoying */}
 					{m.observer.path('template').map(T => {
 						return <T m={m}>
 							{m.observer.path('current').map(c => c ? m.modals[c]() : null)}
