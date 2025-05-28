@@ -81,7 +81,7 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 				queueMicrotask(() => {
 					setTimeout(() => {
 						show.set(false);
-					}, 1000);
+					}, 150);
 				});
 
 				Object.keys(m).forEach(key => {
