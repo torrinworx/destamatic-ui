@@ -1,4 +1,4 @@
-import { OObject } from 'destam';
+import { OObject, Observer } from 'destam';
 
 import Icon from '../display/Icon';
 import Shown from '../utils/Shown';
@@ -51,6 +51,8 @@ export const ModalContext = createContext(() => null, (value) => {
 
 export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 	return (_, cleanup) => {
+		const opacity = Observer.mutable(0);
+
 		const handleEscape = (e) => {
 			if (e.which === 27) {
 				e.preventDefault();
@@ -58,26 +60,54 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 			}
 		};
 
+		const show = Observer.mutable(false);
+
 		cleanup(m.observer.path('current').effect(mo => {
-			if (mo && !m.noEsc) {
-				window.addEventListener('keydown', handleEscape);
-				return () => window.removeEventListener('keydown', handleEscape);
-			}
-			if (!mo) {
+			if (mo) {
+				queueMicrotask(() => {
+					setTimeout(() => opacity.set(1), 10);
+				});
+
+				show.set(true);
+
+
+				if (!m.noEsc) {
+					window.addEventListener('keydown', handleEscape);
+					return () => window.removeEventListener('keydown', handleEscape);
+				}
+			} else {
+				opacity.set(0);
+
+				queueMicrotask(() => {
+					setTimeout(() => {
+						show.set(false);
+					}, 1000);
+				});
+
 				Object.keys(m).forEach(key => {
-					// don't need to reset modals because it's immutable
-					if (key !== 'current' && key !== 'modals' && key !== 'template') delete m[key];
+					if (key !== 'current' && key !== 'modals' && key !== 'template') {
+						delete m[key];
+					}
 				});
 				m.template = DefTemplate;
 			}
 		}));
 
-		return <Shown value={m.observer.path('current')} >
-			<Popup style={{ inset: 0 }}>
-				<div theme='modalOverlay' onClick={() => !m.noClickEsc ? (m.current = false) : null} />
+		return <Shown value={show}>
+			<Popup
+				style={{
+					inset: 0,
+					transition: 'opacity 150ms ease-in-out',
+					opacity
+				}}
+			>
+				<div
+					theme='modalOverlay'
+					onClick={() => !m.noClickEsc ? (m.current = false) : null}
+				/>
 				<div theme='modalWrapper'>
 					{m.observer.path('template').map(T => {
-						return <T m={m} >
+						return <T m={m}>
 							{m.observer.path('current').map(c => c ? m.modals[c]() : null)}
 						</T>
 					})}
