@@ -24,18 +24,75 @@ Theme.define({
 	}
 });
 
-const DefTemplate = ThemeContext.use(h => ({ m, children }) => {
-	return <Paper>
-		<div theme='row_spread'>
-			<Typography type='h2' label={m.label} />
-			<Button
-				type='icon'
-				icon={<Icon name='x' size={30} />}
-				onClick={() => m.current = false}
+const DefTemplate = ThemeContext.use(h => ({ m, children }, cleanup) => {
+	const opacity = Observer.mutable(0);
+	const show = Observer.mutable(false);
+
+	const handleEscape = (e) => {
+		if (e.which === 27) {
+			e.preventDefault();
+			m.current = false;
+		}
+	};
+
+	cleanup(m.observer.path('current').effect(mo => {
+		if (mo) {
+			queueMicrotask(() => {
+				setTimeout(() => opacity.set(1), 10);
+			});
+
+			show.set(true);
+
+
+			if (!m.noEsc) {
+				window.addEventListener('keydown', handleEscape);
+				return () => window.removeEventListener('keydown', handleEscape);
+			}
+		} else {
+			opacity.set(0);
+
+			queueMicrotask(() => {
+				setTimeout(() => {
+					show.set(false);
+				}, 150);
+			});
+
+			Object.keys(m).forEach(key => {
+				if (key !== 'current' && key !== 'modals' && key !== 'template') {
+					delete m[key];
+				}
+			});
+			m.template = DefTemplate;
+		}
+	}));
+
+	return <Shown value={show}>
+		<Popup
+			style={{
+				inset: 0,
+				transition: 'opacity 150ms ease-in-out',
+				opacity
+			}}
+		>
+			<div
+				theme='modalOverlay'
+				onClick={() => !m.noClickEsc ? (m.current = false) : null}
 			/>
-		</div>
-		{children}
-	</Paper>;
+			<div theme='modalWrapper'>
+				<Paper>
+					<div theme='row_spread'>
+						<Typography type='h2' label={m.observer.map(m => m.label ? m.label : '')} />
+						<Button
+							type='icon'
+							icon={<Icon name='x' size={30} />}
+							onClick={() => m.current = false}
+						/>
+					</div>
+					{children}
+				</Paper>
+			</div>
+		</Popup>
+	</Shown >;
 });
 
 export const ModalContext = createContext(() => null, (value) => {
@@ -50,70 +107,10 @@ export const ModalContext = createContext(() => null, (value) => {
 });
 
 export const Modal = ModalContext.use(m => ThemeContext.use(h => {
-	return (_, cleanup) => {
-		const opacity = Observer.mutable(0);
-
-		const handleEscape = (e) => {
-			if (e.which === 27) {
-				e.preventDefault();
-				m.current = false;
-			}
-		};
-
-		const show = Observer.mutable(false);
-
-		cleanup(m.observer.path('current').effect(mo => {
-			if (mo) {
-				queueMicrotask(() => {
-					setTimeout(() => opacity.set(1), 10);
-				});
-
-				show.set(true);
-
-
-				if (!m.noEsc) {
-					window.addEventListener('keydown', handleEscape);
-					return () => window.removeEventListener('keydown', handleEscape);
-				}
-			} else {
-				opacity.set(0);
-
-				queueMicrotask(() => {
-					setTimeout(() => {
-						show.set(false);
-					}, 150);
-				});
-
-				Object.keys(m).forEach(key => {
-					if (key !== 'current' && key !== 'modals' && key !== 'template') {
-						delete m[key];
-					}
-				});
-				m.template = DefTemplate;
-			}
-		}));
-
-		return <Shown value={show}>
-			<Popup
-				style={{
-					inset: 0,
-					transition: 'opacity 150ms ease-in-out',
-					opacity
-				}}
-			>
-				<div
-					theme='modalOverlay'
-					onClick={() => !m.noClickEsc ? (m.current = false) : null}
-				/>
-				<div theme='modalWrapper'>
-					{/* Issue here with these: they disappear before the fade out is complete, and it messes with the modal layout, very noticable and annoying */}
-					{m.observer.path('template').map(T => {
-						return <T m={m}>
-							{m.observer.path('current').map(c => c ? m.modals[c]() : null)}
-						</T>
-					})}
-				</div>
-			</Popup>
-		</Shown>
+	return () => {
+		/* Issue here with these: they disappear before the fade out is complete, and it messes with the modal layout, very noticable and annoying */
+		return m.observer.path('template').map(T => {
+			return <T m={m}>{m.observer.path('current').map(c => c ? m.modals[c]() : null)}</T>;
+		});
 	};
 }));
