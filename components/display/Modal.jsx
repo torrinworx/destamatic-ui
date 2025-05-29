@@ -24,7 +24,7 @@ Theme.define({
 	}
 });
 
-const DefaultTemplate = ThemeContext.use(h => ({ m, children, closeSignal }, cleanup, mounted) => {
+const DefaultTemplate = ThemeContext.use(h => ({ m, children }, cleanup, mounted) => {
 	const shown = Observer.mutable(false);
 
 	const handleEscape = (e) => {
@@ -46,40 +46,31 @@ const DefaultTemplate = ThemeContext.use(h => ({ m, children, closeSignal }, cle
 			});
 		}
 	});
-		
-	cleanup(closeSignal.watch(() => {
-		shown.set(!closeSignal.get());
+
+	cleanup(m.closeSignal.watch(() => {
+		shown.set(!m.closeSignal.get());
 	}));
-	
-/*
-	Object.keys(m).forEach(key => {
-		if (key !== 'current' && key !== 'modals' && key !== 'template') {
-			delete m[key];
-		}
-	});
-	*/
 
-	return <Popup
-		style={{
-			inset: 0,
-			transition: 'opacity 5000ms ease-in-out',
-
-			opacity: shown.map(shown => shown ? 1 : 0),
-			pointerEvents: shown.map(shown => shown ? null : 'none'),
-		}}
-	>
-		<div
-			theme='modalOverlay'
-			onClick={() => !m.noClickEsc ? (m.current = false) : null}
-		/>
+	return <Popup style={{
+		inset: 0,
+		transition: `opacity ${m.currentDelay}ms ease-in-out`,
+		opacity: shown.map(shown => shown ? 1 : 0),
+		pointerEvents: shown.map(shown => shown ? null : 'none'),
+	}}>
+		<div theme='modalOverlay'
+			onClick={() => !m.props.noClickEsc ? m.close() : null} />
 		<div theme='modalWrapper'>
 			<Paper>
 				<div theme='row_spread'>
-					<Typography type='h2' label={m.observer.map(m => m.label ? m.label : '')} />
+					<Typography
+						type='h2'
+						label={m.observer.path(['props', 'label'])
+							.map(l => l ? l : '')}
+					/>
 					<Button
 						type='icon'
 						icon={<Icon name='x' size={30} />}
-						onClick={() => m.current = false}
+						onClick={() => m.close()}
 					/>
 				</div>
 				{children}
@@ -90,48 +81,67 @@ const DefaultTemplate = ThemeContext.use(h => ({ m, children, closeSignal }, cle
 
 export const ModalContext = createContext(() => null, (value) => {
 	const { modals, ...props } = value;
+	const Modal = OObject({
+		modals,
+		props: OObject({}),
+		open: ({ name, template = DefaultTemplate, ...props }) => {
+			Modal.current = name;
+			Modal.template = template;
+			Object.assign(Modal.props, props);
+		},
+		close: () => {
+			Modal.current = null;
 
-	return OObject({
-		current: false,
-		modals: modals,
+			// TODO: Cleanup somehow? idk how from here
+			Modal.closeSignal.effect(s => {
+				if (s && !Modal.current) {
+					setTimeout(() => {
+						Modal.template = DefaultTemplate;
+						Object.keys(Modal.props).forEach(key => {
+							delete Modal.props[key];
+						});
+					}, Modal.currentDelay)
+				}
+			});
+		},
+		current: null,
+		currentDelay: 150,
 		template: DefaultTemplate,
 		...props,
 	});
+
+	return Modal;
 });
 
 export const Modal = ModalContext.use(m => ThemeContext.use(h => {
-	const Modal = ({}, cleanup) => {
+	const Modal = (_, cleanup) => {
 		const aniCurrent = Observer.mutable(null);
 		cleanup(m.observer.path('current').effect(current => {
-			if (current) {
-				aniCurrent.set(current);
-			} else {
-				const timeout = setTimeout(() => aniCurrent.set(null), 5000);
-				return () => {
-					clearTimeout(timeout);
-				};
+			if (current) aniCurrent.set(current);
+			else {
+				const timeout = setTimeout(() => aniCurrent.set(null), m.currentDelay);
+				return () => clearTimeout(timeout);
 			}
 		}));
 
-		return Observer.all([
-			m.observer.path('template'),
-			aniCurrent,
-		]).map(([T, c]) => {
-			console.log(T, c)
-			if (!c) {
-				return null;
-			}
+		return Observer.all([m.observer.path('template'), aniCurrent])
+			.map(([T, c]) => {
+				if (!c) return null;
 
-			const closeSignal = m.observer.path('current').map(current => {
-				if (!current) {
-					return true;
+				m.closeSignal = m.observer.path('current').map(current => {
+					if (!current) return true;
+					else return current !== c;
+				});
+
+				let Modal = null;
+				if (m && m.modals && typeof c === 'string' && c in m.modals) {
+					Modal = m.modals[c];
 				} else {
-					return current !== c;
+					console.error(`Modal with '${c}' does not exist in modals list.`);
 				}
-			});
 
-			return <T closeSignal={closeSignal} m={m}>{m.modals[c]()}</T>;
-		});
+				return <T m={m}><Modal /></T>;
+			});
 	};
 
 	return Modal;
