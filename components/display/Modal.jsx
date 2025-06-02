@@ -1,7 +1,6 @@
 import { OObject, Observer } from 'destam';
 
 import Icon from '../display/Icon';
-import Shown from '../utils/Shown';
 import Popup from '../utils/Popup';
 import Theme from '../utils/Theme';
 import Paper from '../display/Paper';
@@ -80,11 +79,12 @@ const DefaultTemplate = ThemeContext.use(h => ({ m, children }, cleanup, mounted
 });
 
 export const ModalContext = createContext(() => null, (value) => {
-	const { modals, ...props } = value;
+	const { modals, template: defaultTemplate = DefaultTemplate, ...props } = value;
 	const Modal = OObject({
 		modals,
 		props: OObject({}),
-		open: ({ name, template = DefaultTemplate, ...props }) => {
+		template: defaultTemplate,
+		open: ({ name, template = Modal.template, ...props }) => {
 			Modal.current = name;
 			Modal.template = template;
 			Object.assign(Modal.props, props);
@@ -96,7 +96,7 @@ export const ModalContext = createContext(() => null, (value) => {
 			Modal.closeSignal.effect(s => {
 				if (s && !Modal.current) {
 					setTimeout(() => {
-						Modal.template = DefaultTemplate;
+						Modal.template = defaultTemplate;
 						Object.keys(Modal.props).forEach(key => {
 							delete Modal.props[key];
 						});
@@ -106,7 +106,6 @@ export const ModalContext = createContext(() => null, (value) => {
 		},
 		current: null,
 		currentDelay: 150,
-		template: DefaultTemplate,
 		...props,
 	});
 
