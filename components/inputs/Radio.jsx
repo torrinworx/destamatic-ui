@@ -78,11 +78,10 @@ export default sel => ThemeContext.use(h => {
 				e.preventDefault();
 				sel.set(value);
 			}}
-			style={{ border: `3px solid ${style?.color ? style.color : '$color'}`, ...style }}
 
 			theme={['radio', 'ring', '1', hoveredTheme]}>
 			<div theme={['radio', 'ring', '2', hoveredTheme]} >
-				<div theme={['radio', 'ring', '3', hoveredTheme, selected]} style={{ background: style?.color ? style.color : '$color' }} />
+				<div theme={['radio', 'ring', '3', hoveredTheme, selected]} />
 			</div>
 			{ripples}
 		</div>;
