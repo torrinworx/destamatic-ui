@@ -35,6 +35,7 @@ export default ThemeContext.use(h => {
         // TODO: Somehow pass children? allow for custom component that takes in valid/label?
         // also make this the default child?: idk
         return <Shown value={valid} invert>
+            {/* TODO: how to make this damn thing not a text box even though this needs to be an observable label? */}
             <Typography type="p1" label={error} />
         </Shown>;
     };
