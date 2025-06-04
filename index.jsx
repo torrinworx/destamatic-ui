@@ -42,5 +42,7 @@ export { default as Switch } from './components/utils/Switch.jsx'
 export { default as suspend } from './components/utils/Suspend.jsx';
 export { default as Theme } from './components/utils/Theme.jsx';
 export { default as ThemeContext } from './components/utils/ThemeContext.jsx';
+export { default as Validate } from './components/utils/Validate.jsx';
 
+// util scripts
 export { default as useAbort } from './util/abort.js';

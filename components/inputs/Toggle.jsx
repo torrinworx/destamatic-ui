@@ -24,12 +24,10 @@ Theme.define({
 		position: 'absolute',
 		top: '50%',
 		transform: 'translateX(4px) translateY(-50%) scale(1)',
-
 		width: '23px',
 		height: '23px',
 		background: '$color_top',
 		borderRadius: '50%',
-
 		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
 	},
 
