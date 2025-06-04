@@ -26,8 +26,8 @@
     }
   ],
   "license": "MIT",
-  "dependencies": {
-    "destam": "^0.6.0",
+  "peerDependencies": {
+    "destam": "^0.6.1",
     "destam-dom": "^0.12.0"
   },
   "optionalDependencies": {
