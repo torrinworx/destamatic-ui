@@ -3,6 +3,7 @@ import { Observer } from 'destam-dom';
 import Theme from './Theme';
 import Shown from './Shown';
 import Icon from '../display/Icon';
+import createContext from './Context';
 import Typography from '../display/Typography';
 import ThemeContext from '../utils/ThemeContext';
 
@@ -24,7 +25,7 @@ Theme.define({
 });
 
 const validators = {
-	phone: async (valueObserver) => {
+	phone: (valueObserver) => {
 		let val = valueObserver.get() || '';
 		const digits = val.replace(/\D/g, '');
 
@@ -44,7 +45,7 @@ const validators = {
 		return '';
 	},
 
-	email: async (valueObserver) => {
+	email: (valueObserver) => {
 		let val = valueObserver.get() || '';
 		val = val.trim();
 
@@ -59,7 +60,7 @@ const validators = {
 	},
 
 	// 16-digit credit card format, e.g. #### #### #### ####
-	pan: async (valueObserver) => {
+	pan: (valueObserver) => {
 		let val = valueObserver.get() || '';
 		const digits = val.replace(/\D/g, '');
 
@@ -89,7 +90,7 @@ const validators = {
 		return '';
 	},
 
-	expDate: async (valueObserver) => {
+	expDate: (valueObserver) => {
 		let val = valueObserver.get() || '';
 		const digits = val.replace(/\D/g, '');
 		let mm = digits.slice(0, 2);
@@ -112,7 +113,7 @@ const validators = {
 		return '';
 	},
 
-	postalCode: async (valueObserver) => {
+	postalCode: (valueObserver) => {
 		let val = valueObserver.get() || '';
 		const alphanumeric = val.replace(/\s|-/g, '').toUpperCase();
 
@@ -148,22 +149,28 @@ const validators = {
 	},
 };
 
-export default ThemeContext.use((h) => {
-	const Validate = ({ value = true, validate, valid, signal, error = '' }, cleanup) => {
-		if (!(valid instanceof Observer)) {
-			valid = Observer.mutable(valid);
-		}
-		if (!(error instanceof Observer)) {
-			error = Observer.mutable(error);
-		}
+export const ValidateContext = createContext(() => null, (value) => {
+	const values = Observer.mutable([])
+	Observer.all(values).watch(() => {
+		const result = values.get().every(value => value.get() === true);
+		value.set(result);
+	});
 
-		const runValidation = async (val) => {
+	return values;
+});
+
+export const Validate = ValidateContext.use(v => ThemeContext.use(h => {
+	return ({ value = true, validate, valid = true, signal, error = '' }, cleanup) => {
+		if (!(valid instanceof Observer)) valid = Observer.mutable(valid);
+		if (!(error instanceof Observer)) error = Observer.mutable(error);
+		if (v instanceof Observer) v.set([...v.get(), valid]);
+
+		const runValidation = (val) => {
 			let result = '';
-
 			if (typeof validate === 'string' && validate in validators) {
-				result = await validators[validate](val);
+				result = validators[validate](val);
 			} else if (typeof validate === 'function') {
-				result = await validate(val);
+				result = validate(val);
 			} else {
 				console.error(`Validator '${validate}' is not defined or is invalid.`);
 			}
@@ -182,14 +189,12 @@ export default ThemeContext.use((h) => {
 				runValidation(value);
 			}));
 		} else {
-			cleanup(
-				signal.watch((trigger) => {
-					if (trigger) {
-						runValidation(value);
-						signal.set(false);
-					}
-				})
-			);
+			cleanup(signal.watch(trigger => {
+				if (trigger.value) {
+					runValidation(value);
+					signal.set(false);
+				}
+			}));
 		}
 
 		return <Shown value={valid} invert>
@@ -199,6 +204,4 @@ export default ThemeContext.use((h) => {
 			</div>
 		</Shown>;
 	};
-
-	return Validate;
-});
+}));

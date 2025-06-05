@@ -1,24 +1,17 @@
 import { mount, Observer } from 'destam-dom';
-import { TextField, Validate, Button, Icons, Icon } from 'destamatic-ui';
+import { TextField, Validate, Button, Icons, ValidateContext } from 'destamatic-ui';
 import FeatherIcons from 'destamatic-ui/components/icons/FeatherIcons';
 
-// Create Observers for each field and a "valid" tracker
 const phoneObserver = Observer.mutable('');
-const phoneValid = Observer.mutable(true);
-
 const emailObserver = Observer.mutable('');
-const emailValid = Observer.mutable(true);
-
 const panObserver = Observer.mutable('');
-const panValid = Observer.mutable(true);
-
 const expDateObserver = Observer.mutable('');
-const expDateValid = Observer.mutable(true);
-
 const postalObserver = Observer.mutable('');
-const postalValid = Observer.mutable(true);
 
 const submit = Observer.mutable(false);
+const valid = Observer.mutable(true);
+const name = Observer.mutable('');
+const age = Observer.mutable('');
 
 mount(document.body, <Icons value={[FeatherIcons]} >
     <div style={{ padding: '16px', maxWidth: '480px', margin: '0 auto' }}>
@@ -27,7 +20,6 @@ mount(document.body, <Icons value={[FeatherIcons]} >
         <Validate
             value={phoneObserver}
             validate="phone"
-            valid={phoneValid}
         />
 
         <hr />
@@ -37,7 +29,6 @@ mount(document.body, <Icons value={[FeatherIcons]} >
         <Validate
             value={emailObserver}
             validate="email"
-            valid={emailValid}
         />
 
         <hr />
@@ -47,7 +38,6 @@ mount(document.body, <Icons value={[FeatherIcons]} >
         <Validate
             value={panObserver}
             validate="pan"
-            valid={panValid}
         />
 
         <hr />
@@ -57,26 +47,48 @@ mount(document.body, <Icons value={[FeatherIcons]} >
         <Validate
             value={expDateObserver}
             validate="expDate"
-            valid={expDateValid}
         />
 
         <hr />
 
         <h2>Postal Code (US ZIP or ZIP+4)</h2>
         <TextField placeholder="Postal Code" value={postalObserver} />
-        {/* This validator only runs when the submit variable is set to true, 
-        such as on button click. */}
         <Validate
             value={postalObserver}
             validate="postalCode"
-            valid={postalValid}
-            signal={submit}
         />
-        <Button
-            type='contained'
-            label="Validate Postal Code"
-            onClick={() => submit.set(true)}
-            style={{ marginTop: '8px' }}
-        />
+
+        <hr />
+        <h2>Multiple input validation with validation signal</h2>
+        <p>In forms you have multiple inputs, and when you submit you would like to check if they are all valid or not</p>
+        <ValidateContext value={valid}>
+            <TextField placeholder="Name" value={name} />
+            <Validate
+                value={name}
+                validate={value => {
+                    if (/\d/.test(value.get())) return 'Name must be a valid string.';
+                    return null
+                }}
+                signal={submit}
+            />
+            <TextField placeholder="Age" value={age} />
+            <Validate
+                value={age}
+                validate={value => {
+                    if (isNaN(value.get())) return 'Age must be a number.';
+                    return null;
+                }}
+                signal={submit}
+            />
+            <Button type='contained' label='submit' onClick={() => {
+                submit.set(true)
+
+                if (valid.get()) {
+                    console.log('Form submitted!');
+                } else {
+                    console.log('Please resolve issues with form before submitting.');
+                }
+            }} />
+        </ValidateContext>
     </div>
 </Icons>);
