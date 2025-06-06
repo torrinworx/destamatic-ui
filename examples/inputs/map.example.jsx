@@ -3,8 +3,9 @@ import { Icons } from 'destamatic-ui';
 import Map from 'destamatic-ui/components/inputs/Map';
 import FeatherIcons from 'destamatic-ui/components/icons/FeatherIcons'
 
-mount(document.body, <>
+document.getElementsByTagName("body")[0].style.margin = 0;
+mount(document.body, <div>
     <Icons value={[FeatherIcons]} >
         <Map />
     </Icons>
-</>);
+</div>);

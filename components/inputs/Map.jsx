@@ -1,41 +1,81 @@
-// Note: since this file depends on an external/optional library to display the map, it needs to be directly rather than through the index.js.
-
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { Observer } from 'destam-dom';
 
 import Button from './Button';
-import Theme from '../utils/Theme';
 import Icon from '../display/Icon';
+import Theme from '../utils/Theme';
+import Paper from '../display/Paper';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
 	map: {
-		height: '400px',
+		extends: 'radius',
+		height: '100vh',
 		width: '100%',
-		borderRadius: '10px',
-		overflow: 'hidden',
+		position: 'relative',
+	},
+	zoom: {
+		position: 'absolute',
+		top: 20,
+		right: 20,
+		display: 'flex',
+		flexDirection: 'column',
+		zIndex: 1000, // leaflet uses zIndex to render tiles, I'm so exausted trying to find a way around this, but this is the only way that will let you render something ontop of their god forsaken zindex based tiling system.
+		// maybe we could create some kind of zIndex flattener that flattens all the elements of a Ref into their appropriate dom orders before rendering?
 	},
 });
 
-// TODO: Possible to use our own custom buttons inside the map itself (not off to the side)? in place of the default ones?
-const Zoom = () => {
-	return <div theme='row'>
-		<Button type='icon' icon={<Icon name='plus' size={20} onClick={() => { }} />} />
-		<Button type='icon' icon={<Icon name='minus' size={20} onClick={() => { }} />} />
-	</div>
-}
+const Zoom = ({ map }) => {
+	const handleZoom = (delta) => {
+		if (map.get()) {
+			const currentZoom = map.get().getZoom();
+			map.get().setZoom(currentZoom + delta);
+		}
+	};
+
+	return <Paper theme="zoom">
+		<Button
+			type="icon"
+			icon={<Icon name="plus" size={20} />}
+			onClick={() => handleZoom(1)}
+		/>
+		<Button
+			type="icon"
+			icon={<Icon name="minus" size={20} />}
+			onClick={() => handleZoom(-1)}
+		/>
+	</Paper>;
+};
 
 export default ThemeContext.use(h => {
 	const Map = ({ location = Observer.mutable({ lat: 0, lng: 0 }) }, cleanup, mounted) => {
-		const Ref = <raw:div />;
-
-		location.watch(() => console.log(location.get()));
+		const Ref = <raw:div theme="map" />;
+		const map = Observer.mutable(null);
 
 		mounted(() => {
-			let map;
 			let initialLocation = [0, 0];
+
+			const renderMap = () => {
+				const leafletMap = L.map(Ref, {
+					attributionControl: false,
+					zoomControl: false,
+				}).setView(initialLocation, 13);
+
+				map.set(leafletMap);
+
+				L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					attribution: '&copy; OpenStreetMap contributors',
+				}).addTo(leafletMap);
+
+				const marker = L.marker(initialLocation).addTo(leafletMap);
+				leafletMap.on('click', (e) => {
+					const { lat, lng } = e.latlng;
+					location.set({ lat, lng });
+					marker.setLatLng([lat, lng]);
+				});
+			};
 
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(
@@ -48,46 +88,26 @@ export default ThemeContext.use(h => {
 						console.error("Geolocation error: ", error);
 						queueMicrotask(renderMap);
 					},
-					// Have these option params?
 					{
 						enableHighAccuracy: false,
-						timeout: 5000,
+						timeout: 10000,
 						maximumAge: Infinity,
 					}
 				);
 			} else {
-				console.warn("Geolocation is not supported by this browser.");
+				console.warn("Geolocation not supported on this browser.");
 				queueMicrotask(renderMap);
 			}
 
-			const renderMap = () => {
-				map = L.map(Ref, { attributionControl: false }).setView(initialLocation, 13);
-
-				L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-					attribution: '&copy; OpenStreetMap contributors',
-				}).addTo(map);
-
-				const marker = L.marker(initialLocation).addTo(map);
-
-				map.on('click', (e) => {
-					const { lat, lng } = e.latlng;
-					location.set({ lat, lng });
-					marker.setLatLng([lat, lng]);
-				});
-			};
-
 			cleanup(() => {
-				if (map) map.remove();
+				if (map.get()) map.get().remove();
 			});
 		});
 
-		return <Ref
-			style={{
-				height: '400px',
-				width: '100%',
-			}}
-			theme="map"
-		/>;
+		return <div>
+				<Ref theme='map' />
+				<Zoom map={map} />
+		</div>;
 	};
 
 	return Map;
