@@ -25,8 +25,8 @@ Theme.define({
 });
 
 const validators = {
-	phone: (valueObserver) => {
-		let val = valueObserver.get() || '';
+	phone: (value) => {
+		let val = value.get() || '';
 		const digits = val.replace(/\D/g, '');
 
 		let formatted = digits;
@@ -37,7 +37,7 @@ const validators = {
 			formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
 		}
 
-		valueObserver.set(formatted);
+		value.set(formatted);
 
 		if (digits.length < 10) {
 			return 'Please enter a valid 10-digit phone number.';
@@ -45,13 +45,13 @@ const validators = {
 		return '';
 	},
 
-	email: (valueObserver) => {
-		let val = valueObserver.get() || '';
+	email: (value) => {
+		let val = value.get() || '';
 		val = val.trim();
 
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-		valueObserver.set(val);
+		value.set(val);
 
 		if (val && !emailRegex.test(val)) {
 			return 'Please enter a valid email address.';
@@ -60,8 +60,8 @@ const validators = {
 	},
 
 	// 16-digit credit card format, e.g. #### #### #### ####
-	pan: (valueObserver) => {
-		let val = valueObserver.get() || '';
+	pan: (value) => {
+		let val = value.get() || '';
 		const digits = val.replace(/\D/g, '');
 
 		let formatted = digits;
@@ -82,7 +82,7 @@ const validators = {
 				digits.slice(12, 16);
 		}
 
-		valueObserver.set(formatted);
+		value.set(formatted);
 
 		if (digits.length < 16) {
 			return 'Invalid credit card number. Must be 16 digits.';
@@ -90,8 +90,8 @@ const validators = {
 		return '';
 	},
 
-	expDate: (valueObserver) => {
-		let val = valueObserver.get() || '';
+	expDate: (value) => {
+		let val = value.get() || '';
 		const digits = val.replace(/\D/g, '');
 		let mm = digits.slice(0, 2);
 		let yy = digits.slice(2, 4);
@@ -101,7 +101,7 @@ const validators = {
 			formatted += `/${yy}`;
 		}
 
-		valueObserver.set(formatted);
+		value.set(formatted);
 
 		if (digits.length < 4) {
 			return 'Expiration date must be in MM/YY format.';
@@ -113,8 +113,8 @@ const validators = {
 		return '';
 	},
 
-	postalCode: (valueObserver) => {
-		let val = valueObserver.get() || '';
+	postalCode: (value) => {
+		let val = value.get() || '';
 		const alphanumeric = val.replace(/\s|-/g, '').toUpperCase();
 
 		const hasLetters = /[A-Z]/.test(alphanumeric);
@@ -126,7 +126,7 @@ const validators = {
 			if (p2) {
 				formatted += ` ${p2}`;
 			}
-			valueObserver.set(formatted);
+			value.set(formatted);
 
 			const caRegex = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z]\s?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
 			if (!caRegex.test(formatted)) {
@@ -139,13 +139,87 @@ const validators = {
 			if (digits.length > 5) {
 				formatted = digits.slice(0, 5) + '-' + digits.slice(5, 9);
 			}
-			valueObserver.set(formatted);
+			value.set(formatted);
 
 			if (digits.length !== 5 && digits.length !== 9) {
 				return 'Invalid US ZIP code. Use 5 or 9 digits (e.g., 12345 or 12345-6789).';
 			}
 			return '';
 		}
+	},
+
+	date: (value) => {
+		// Get the raw user input, default to empty string if null/undefined:
+		let val = value.get() || '';
+
+		// Strip out any non-digit characters:
+		const digits = val.replace(/\D/g, '');
+
+		// Extract the potential dd, mm, and yyyy:
+		const dd = digits.slice(0, 2);
+		const mm = digits.slice(2, 4);
+		const yyyy = digits.slice(4, 8);
+
+		// Build the formatted string with slashes:
+		let formatted = dd;
+		if (mm) {
+			formatted += `/${mm}`;
+		}
+		if (yyyy) {
+			formatted += `/${yyyy}`;
+		}
+
+		// Update the underlying observable with the formatted value:
+		value.set(formatted);
+
+		if (digits.length < 8) {
+			return 'Please use dd/mm/yyyy format.';
+		}
+
+		const day = parseInt(dd, 10);
+		const month = parseInt(mm, 10);
+		const year = parseInt(yyyy, 10);
+
+		// Simple validations: day 1–31, month 1–12, naive year range check:
+		if (month < 1 || month > 12) {
+			return 'Invalid month (must be between 01 and 12).';
+		}
+		if (day < 1 || day > 31) {
+			return 'Invalid day (must be between 01 and 31).';
+		}
+
+		const testDate = new Date(year, month - 1, day);
+		// Month/day check after construction to ensure it didn’t roll over:
+		if (
+			testDate.getFullYear() !== year ||
+			testDate.getMonth() !== month - 1 ||
+			testDate.getDate() !== day
+		) {
+			return 'This date is invalid—please check day/month/year.';
+		}
+
+		// If no errors, return an empty string:
+		return '';
+	},
+
+	number: (value) => {
+		let val = value.get() || '';
+		const intRegex = /^-?\d+$/;
+
+		if (!intRegex.test(val)) {
+			return 'Please enter a valid integer.';
+		}
+		return '';
+	},
+
+	float: (value) => {
+		let val = value.get() || '';
+		const floatRegex = /^\d+\.\d+$/;
+
+		if (!floatRegex.test(val)) {
+			return 'Please enter a valid decimal number with a fractional part.';
+		}
+		return '';
 	},
 };
 
