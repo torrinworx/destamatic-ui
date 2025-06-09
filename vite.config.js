@@ -1,8 +1,10 @@
+import fs from 'fs';
+import path from 'path';
+
 import { defineConfig } from 'vite';
+import copy from 'rollup-plugin-copy';
 import assertRemove from 'destam-dom/transform/assertRemove';
 import compileHTMLLiteral from 'destam-dom/transform/htmlLiteral';
-import fs from 'fs';
-import { resolve, join } from 'path';
 
 const createTransform = (name, transform, jsx, options) => ({
 	name,
@@ -22,6 +24,35 @@ const createTransform = (name, transform, jsx, options) => ({
 });
 
 const plugins = [];
+
+plugins.push(
+	copy({
+		hook: 'writeBundle',
+		targets: [
+			{ src: 'README.md', dest: 'dist' },
+			{ src: 'LICENSE.md', dest: 'dist' },
+			{
+				src: 'package.json',
+				dest: 'dist',
+				transform(contents) {
+					const pkg = JSON.parse(contents);
+					pkg.main = 'index.cjs';
+					pkg.module = 'index.js';
+					pkg.exports = {
+						'.': {
+							import: './index.js',
+							require: './index.cjs',
+						},
+					};
+					delete pkg.scripts;
+					delete pkg.devDependencies;
+					return JSON.stringify(pkg, null, 2);
+				},
+			},
+		],
+	})
+);
+
 plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {
 	jsx_auto_import: {
 		'h': 'destamatic-ui',
@@ -36,7 +67,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const recursiveReadDir = (dir, fileList = []) => {
 	fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
-		const fullPath = resolve(dir, entry.name);
+		const fullPath = path.resolve(dir, entry.name);
 		if (entry.isDirectory()) {
 			recursiveReadDir(fullPath, fileList);
 		} else if (entry.name.endsWith('.js') || entry.name.endsWith('.jsx')) {
@@ -50,22 +81,22 @@ const getExample = name => {
 	name = name.endsWith('.html') ? name.slice(0, -5) : name + 'index';
 	name = name.startsWith('/') ? name.slice(1) : name;
 	const variants = ['.js', '.jsx', '.example.js', '.example.jsx'];
-	const existed = variants.find(v => fs.existsSync(resolve(__dirname, 'examples', name + v)));
+	const existed = variants.find(v => fs.existsSync(path.resolve(__dirname, 'examples', name + v)));
 	if (!existed) return null;
 	const relative = '/' + name + '.html';
 	return {
 		name,
 		file: name + existed,
 		relative,
-		location: resolve(__dirname, 'examples', name + existed),
-		resolved: join(__dirname, relative),
+		location: path.resolve(__dirname, 'examples', name + existed),
+		resolved: path.join(__dirname, relative),
 	};
 };
 
 let examples;
 const getExamples = () => {
 	if (examples) return examples;
-	const examplesDir = resolve(__dirname, 'examples');
+	const examplesDir = path.resolve(__dirname, 'examples');
 	return examples = recursiveReadDir(examplesDir).map(fullPath => {
 		const relativePath = fullPath.substring(fullPath.indexOf('examples') + 'examples/'.length);
 		const name = relativePath.substring(0, relativePath.lastIndexOf('.'));
@@ -125,6 +156,30 @@ export default defineConfig({
 		alias: [
 			{ find: /^destamatic-ui($|\/)/, replacement: '/' },
 			{ find: '@public', replacement: '/examples' },
-		]
-	}
+		],
+	},
+	build: {
+		lib: {
+			entry: path.resolve(__dirname, 'index.js'),
+			formats: ['es', 'cjs'],
+			fileName: 'index',
+		},
+		rollupOptions: {
+			external: [
+				...Object.keys(require('./package.json').peerDependencies || {}),
+				...Object.keys(require('./package.json').optionalDependencies || {}),
+			],
+			output: {
+				globals: {
+					destam: 'destam',
+					'destam-dom': 'destam-dom',
+					'@material-design-icons/svg': 'MaterialDesignIcons',
+					'feather-icons': 'FeatherIcons',
+					'simple-icons': 'SimpleIcons',
+					leaflet: 'Leaflet',
+				},
+			},
+		},
+		minify: 'esbuild',
+	},
 });
