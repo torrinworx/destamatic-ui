@@ -36,7 +36,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Run Tests
+        run: npm run test
+
+      - name: Build Project
+        run: npm run build
+
       - name: Publish to NPM
-        run: npm publish
+        run: npm publish ./dist
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
