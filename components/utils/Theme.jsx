@@ -477,8 +477,9 @@ const Theme = createContext(createTheme(theme), (nextTheme, { theme: prevTheme }
 
 	const out = update([]);
 	const listener = delta => {
-		const current = out.observer.path(delta.path());
-		current.set(update(delta.path()));
+		const path = delta.path;
+		const current = out.observer.path(path);
+		current.set(update(path));
 	};
 
 	if (nextTheme.observer) nextTheme.observer.watch(listener);
