@@ -289,7 +289,7 @@ let themeIDCounter = 0;
 const createTheme = theme => {
 	const themeID = themeIDCounter++;
 
-	const trie = ignoreMutates(theme.observer.shallow()).map(theme => {
+	const trie = ignoreMutates(theme.observer.shallow(1)).map(theme => {
 		const trie = [];
 		trie.cache = new Map();
 

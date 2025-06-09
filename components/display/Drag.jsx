@@ -116,7 +116,7 @@ export default ThemeContext.use(h => {
 		let isMounted = false;
 
 		const ownChange = Symbol();
-		cleanup(array.observer.shallow().watchCommit((deltas, meta) => {
+		cleanup(array.observer.shallow(1).watchCommit((deltas, meta) => {
 			if (meta === ownChange) return;
 
 			for (const delta of deltas) {

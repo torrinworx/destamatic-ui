@@ -116,7 +116,7 @@ const FileDrop = ThemeContext.use(h => {
 		...props
 	}, cleanup, mounted) => {
 		if (!files) files = OArray();
-		const isEmpty = files.observer.shallow().map(files => files.length === 0);
+		const isEmpty = files.observer.shallow(1).map(files => files.length === 0);
 		const dropping = Observer.mutable(false);
 		const Div = <raw:div />;
 
