@@ -191,14 +191,20 @@ export default defineConfig({
 			fileName: 'index',
 		},
 		rollupOptions: {
-			external: (id) => {
-				return (
-					id.startsWith('./components') ||
-					id.startsWith('components/') ||
-					id === 'feather-icons' ||
-					/^(?!\/)/.test(id)
-				);
-			},
+			// external: (id) => {
+			// 	return (
+			// 		id.startsWith('./components') ||
+			// 		id.startsWith('components/') ||
+			// 		id === 'feather-icons' ||
+			// 		/^(?!\/)/.test(id)
+			// 	);
+			// },
+
+			external: [
+				...Object.keys(require('./package.json').peerDependencies || {}),
+				...Object.keys(require('./package.json').optionalDependencies || {}),
+				(id) => id === 'feather-icons' || /^(?!\/)/.test(id)
+			],
 			output: {
 				globals: {
 					destam: 'destam',
