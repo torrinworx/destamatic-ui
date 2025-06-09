@@ -28,7 +28,28 @@ const plugins = [];
 plugins.push(
 	copy({
 		hook: 'writeBundle',
+		verbose: true,
 		targets: [
+			{
+				src: 'components/**/*',
+				dest: 'dist/components',
+				flatten: false,
+				rename: (_name, _ext, fullpath) => {
+					const parts = fullpath.split(path.sep);
+					const idx = parts.indexOf('components');
+					return parts.slice(idx + 1).join(path.sep);
+				},
+			},
+			{
+				src: 'util/**/*',
+				dest: 'dist/util',
+				flatten: false,
+				rename: (_name, _ext, fullpath) => {
+					const parts = fullpath.split(path.sep);
+					const idx = parts.indexOf('util');
+					return parts.slice(idx + 1).join(path.sep);
+				},
+			},
 			{ src: 'README.md', dest: 'dist' },
 			{ src: 'LICENSE.md', dest: 'dist' },
 			{
@@ -36,14 +57,18 @@ plugins.push(
 				dest: 'dist',
 				transform(contents) {
 					const pkg = JSON.parse(contents);
-					pkg.main = 'index.cjs';
+					pkg.type = 'module';
+					pkg.main = 'index.js';
 					pkg.module = 'index.js';
 					pkg.exports = {
 						'.': {
-							import: './index.js',
-							require: './index.cjs',
+							import: './index.js'
 						},
+						'./components/*': {
+							import: './components/*'
+						}
 					};
+
 					delete pkg.scripts;
 					delete pkg.devDependencies;
 					return JSON.stringify(pkg, null, 2);
@@ -52,6 +77,7 @@ plugins.push(
 		],
 	})
 );
+
 
 plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {
 	jsx_auto_import: {
@@ -161,14 +187,11 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: path.resolve(__dirname, 'index.js'),
-			formats: ['es', 'cjs'],
+			formats: ['es'],
 			fileName: 'index',
 		},
 		rollupOptions: {
-			external: [
-				...Object.keys(require('./package.json').peerDependencies || {}),
-				...Object.keys(require('./package.json').optionalDependencies || {}),
-			],
+			external: (id) => id.startsWith('./components') || id.startsWith('components/'),
 			output: {
 				globals: {
 					destam: 'destam',
@@ -178,8 +201,8 @@ export default defineConfig({
 					'simple-icons': 'SimpleIcons',
 					leaflet: 'Leaflet',
 				},
+				exports: 'auto',
 			},
 		},
-		minify: 'esbuild',
 	},
 });
