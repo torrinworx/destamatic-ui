@@ -23,7 +23,7 @@ Theme.define({
 	}
 });
 
-const DefaultTemplate = ThemeContext.use(h => ({ m, children }, cleanup, mounted) => {
+const DefaultTemplate = ThemeContext.use(h => ({ m, closeSignal, children }, cleanup, mounted) => {
 	const shown = Observer.mutable(false);
 
 	const handleEscape = (e) => {
@@ -46,8 +46,8 @@ const DefaultTemplate = ThemeContext.use(h => ({ m, children }, cleanup, mounted
 		}
 	});
 
-	cleanup(m.closeSignal.watch(() => {
-		shown.set(!m.closeSignal.get());
+	cleanup(closeSignal.watch(() => {
+		shown.set(!closeSignal.get());
 	}));
 
 	return <Popup style={{
@@ -79,34 +79,20 @@ const DefaultTemplate = ThemeContext.use(h => ({ m, children }, cleanup, mounted
 });
 
 export const ModalContext = createContext(() => null, (value) => {
-	const { modals, template: defaultTemplate = DefaultTemplate, ...props } = value;
+	const { modals, template: defaultTemplate = DefaultTemplate, ...globalProps } = value;
 	const Modal = OObject({
 		modals,
-		props: OObject({}),
 		template: defaultTemplate,
 		open: ({ name, template = Modal.template, ...props }) => {
-			Modal.current = name;
+			Modal.props = {...globalProps, ...props};
 			Modal.template = template;
-			Object.assign(Modal.props, props);
+			Modal.current = name;
 		},
 		close: () => {
 			Modal.current = null;
-
-			// TODO: Cleanup somehow? idk how from here
-			Modal.closeSignal.effect(s => {
-				if (s && !Modal.current) {
-					setTimeout(() => {
-						Modal.template = defaultTemplate;
-						Object.keys(Modal.props).forEach(key => {
-							delete Modal.props[key];
-						});
-					}, Modal.currentDelay)
-				}
-			});
 		},
 		current: null,
 		currentDelay: 150,
-		...props,
 	});
 
 	return Modal;
@@ -124,10 +110,10 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 		}));
 
 		return Observer.all([m.observer.path('template'), aniCurrent])
-			.map(([T, c]) => {
+			.map(([Template, c]) => {
 				if (!c) return null;
 
-				m.closeSignal = m.observer.path('current').map(current => {
+				const closeSignal = m.observer.path('current').map(current => {
 					if (!current) return true;
 					else return current !== c;
 				});
@@ -139,7 +125,9 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 					console.error(`Modal with '${c}' does not exist in modals list.`);
 				}
 
-				return <T m={m}><Modal /></T>;
+				return <Template closeSignal={closeSignal} m={m}>
+					<Modal modal={m} {...m.props} />
+				</Template>;
 			});
 	};
 
