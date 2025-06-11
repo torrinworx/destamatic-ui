@@ -24,7 +24,3 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: Build
-        run: |
-          chmod +x ./build.sh
-          ./build.sh
