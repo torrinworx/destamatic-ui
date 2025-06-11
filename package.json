@@ -5,7 +5,7 @@
   "main": "./index.js",
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "bash ./build.sh",
     "dev": "vite",
     "test": "vitest --silent=false"
   },

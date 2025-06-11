@@ -2,10 +2,8 @@ import fs from 'fs';
 import path from 'path';
 
 import { defineConfig } from 'vite';
-import copy from 'rollup-plugin-copy';
 import assertRemove from 'destam-dom/transform/assertRemove';
 import compileHTMLLiteral from 'destam-dom/transform/htmlLiteral';
-import { optionalDependencies, peerDependencies } from './package.json';
 
 const createTransform = (name, transform, jsx, options) => ({
 	name,
@@ -25,34 +23,6 @@ const createTransform = (name, transform, jsx, options) => ({
 });
 
 const plugins = [];
-
-plugins.push(
-	copy({
-		hook: 'writeBundle',
-		targets: [
-			{ src: 'README.md', dest: 'dist' },
-			{ src: 'LICENSE', dest: 'dist' },
-			{
-				src: 'package.json',
-				dest: 'dist',
-				transform(contents) {
-					const pkg = JSON.parse(contents);
-					pkg.main = 'destamatic-ui.cjs';
-					pkg.module = 'destamatic-ui.js';
-					pkg.exports = {
-						'.': {
-							import: './destamatic-ui.js',
-							require: './destamatic-ui.cjs',
-						},
-					};
-					delete pkg.scripts;
-					delete pkg.devDependencies;
-					return JSON.stringify(pkg, null, 2);
-				},
-			},
-		],
-	})
-);
 
 plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {
 	jsx_auto_import: {
@@ -148,38 +118,6 @@ plugins.push({
 	},
 });
 
-console.log([
-	...Object.keys(optionalDependencies),
-	...Object.keys(peerDependencies)
-]);
-
-const getInput = (dirPaths, arrayOfFiles = []) => {
-	dirPaths.forEach(dirPath => {
-		const files = fs.readdirSync(dirPath);
-		files.forEach(file => {
-			const fullPath = path.join(dirPath, file);
-			if (fs.statSync(fullPath).isDirectory()) {
-				getInput([fullPath], arrayOfFiles);
-			} else {
-				arrayOfFiles.push(path.resolve(__dirname, fullPath));
-			}
-		});
-	});
-
-	return arrayOfFiles;
-};
-
-const input = getInput([
-	path.resolve(__dirname, './util'),
-	path.resolve(__dirname, './components'),
-]);
-
-const external = [ // somehow need to do this so that the import statements that rollup re builds are externalized rather than hard coding dirs on the local machine.
-	...Object.keys(optionalDependencies),
-	...Object.keys(peerDependencies),
-	'node_modules',
-];
-
 export default defineConfig({
 	plugins,
 	esbuild: {
@@ -190,31 +128,5 @@ export default defineConfig({
 			{ find: /^destamatic-ui($|\/)/, replacement: '/' },
 			{ find: '@public', replacement: '/examples' },
 		],
-	},
-	build: {
-		outDir: 'dist',
-		sourcemap: true,
-		lib: {
-			entry: path.resolve(__dirname, 'index.js'),
-			formats: ['es'],
-			fileName: (format, name) => `${name}.js`,
-		},
-		rollupOptions: {
-			input: [...input, 'index.js'],
-			output: {
-				preserveModules: true,
-				preserveModulesRoot: __dirname,
-				entryFileNames: '[name].js',
-				chunkFileNames: '[name].js',
-				assetFileNames: '[name].[ext]',
-				// preserveEntrySignatures: 'strict',
-			},
-			external: id => {
-				console.log("ID: ", id);
-				const something = external.some(pkg => id === pkg || id.includes(pkg + '/'));
-				console.log("Something: ", something);
-				return something;
-			},
-		},
-	},
+	}
 });
