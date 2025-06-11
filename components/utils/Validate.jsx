@@ -274,7 +274,7 @@ export const Validate = ValidateContext.use(v => ThemeContext.use(h => {
 		return <Shown value={valid} invert>
 			<div theme="row_validate_wrapper">
 				<Icon name="alert-circle" theme="validate_icon" />
-				<Typography type="validate" label={error} />
+				<Typography type="validate" label={Observer.immutable(error)} />
 			</div>
 		</Shown>;
 	};
