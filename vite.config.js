@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 import copy from 'rollup-plugin-copy';
 import assertRemove from 'destam-dom/transform/assertRemove';
 import compileHTMLLiteral from 'destam-dom/transform/htmlLiteral';
+import { optionalDependencies, peerDependencies } from './package.json';
 
 const createTransform = (name, transform, jsx, options) => ({
 	name,
@@ -29,26 +30,6 @@ plugins.push(
 	copy({
 		hook: 'writeBundle',
 		targets: [
-			{
-				src: 'components/**/*',
-				dest: 'dist/components',
-				flatten: false,
-				rename: (_name, _ext, fullpath) => {
-					const parts = fullpath.split(path.sep);
-					const idx = parts.indexOf('components');
-					return parts.slice(idx + 1).join(path.sep);
-				},
-			},
-			{
-				src: 'util/**/*',
-				dest: 'dist/util',
-				flatten: false,
-				rename: (_name, _ext, fullpath) => {
-					const parts = fullpath.split(path.sep);
-					const idx = parts.indexOf('util');
-					return parts.slice(idx + 1).join(path.sep);
-				},
-			},
 			{ src: 'README.md', dest: 'dist' },
 			{ src: 'LICENSE', dest: 'dist' },
 			{
@@ -56,12 +37,12 @@ plugins.push(
 				dest: 'dist',
 				transform(contents) {
 					const pkg = JSON.parse(contents);
-					pkg.main = 'index.cjs';
-					pkg.module = 'index.js';
+					pkg.main = 'destamatic-ui.cjs';
+					pkg.module = 'destamatic-ui.js';
 					pkg.exports = {
 						'.': {
-							import: './index.js',
-							require: './index.cjs',
+							import: './destamatic-ui.js',
+							require: './destamatic-ui.cjs',
 						},
 					};
 					delete pkg.scripts;
@@ -86,7 +67,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const recursiveReadDir = (dir, fileList = []) => {
-	fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
+	fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
 		const fullPath = path.resolve(dir, entry.name);
 		if (entry.isDirectory()) {
 			recursiveReadDir(fullPath, fileList);
@@ -167,6 +148,38 @@ plugins.push({
 	},
 });
 
+console.log([
+	...Object.keys(optionalDependencies),
+	...Object.keys(peerDependencies)
+]);
+
+const getInput = (dirPaths, arrayOfFiles = []) => {
+	dirPaths.forEach(dirPath => {
+		const files = fs.readdirSync(dirPath);
+		files.forEach(file => {
+			const fullPath = path.join(dirPath, file);
+			if (fs.statSync(fullPath).isDirectory()) {
+				getInput([fullPath], arrayOfFiles);
+			} else {
+				arrayOfFiles.push(path.resolve(__dirname, fullPath));
+			}
+		});
+	});
+
+	return arrayOfFiles;
+};
+
+const input = getInput([
+	path.resolve(__dirname, './util'),
+	path.resolve(__dirname, './components'),
+]);
+
+const external = [ // somehow need to do this so that the import statements that rollup re builds are externalized rather than hard coding dirs on the local machine.
+	...Object.keys(optionalDependencies),
+	...Object.keys(peerDependencies),
+	'node_modules',
+];
+
 export default defineConfig({
 	plugins,
 	esbuild: {
@@ -179,31 +192,29 @@ export default defineConfig({
 		],
 	},
 	build: {
+		outDir: 'dist',
+		sourcemap: true,
 		lib: {
 			entry: path.resolve(__dirname, 'index.js'),
-			formats: ['es', 'cjs'],
-			fileName: 'index',
+			formats: ['es'],
+			fileName: (format, name) => `${name}.js`,
 		},
 		rollupOptions: {
-			external: (id) => {
-				return (
-					id.startsWith('./components') ||
-					id.startsWith('components/') ||
-					id === 'feather-icons' ||
-					/^(?!\/)/.test(id)
-				);
-			},
+			input: [...input, 'index.js'],
 			output: {
-				globals: {
-					destam: 'destam',
-					'destam-dom': 'destam-dom',
-					'@material-design-icons/svg': 'MaterialDesignIcons',
-					'feather-icons': 'FeatherIcons',
-					'simple-icons': 'SimpleIcons',
-					leaflet: 'Leaflet',
-				},
+				preserveModules: true,
+				preserveModulesRoot: __dirname,
+				entryFileNames: '[name].js',
+				chunkFileNames: '[name].js',
+				assetFileNames: '[name].[ext]',
+				// preserveEntrySignatures: 'strict',
+			},
+			external: id => {
+				console.log("ID: ", id);
+				const something = external.some(pkg => id === pkg || id.includes(pkg + '/'));
+				console.log("Something: ", something);
+				return something;
 			},
 		},
-		minify: 'esbuild',
 	},
 });
