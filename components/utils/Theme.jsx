@@ -315,12 +315,12 @@ const createTheme = theme => {
 				current = next;
 			}
 
-			current.body = theme.observer.path(key).map(theme => {
+			current.body = theme.observer.path(key).skip().map(() => {
 				const vars = new Map();
 				const raw = [];
 				let index = 0;
 
-				let text = Object.entries(theme).flatMap(([key, val]) => {
+				let text = Object.entries(theme[key]).flatMap(([key, val]) => {
 					if (key === 'extends') return '';
 
 					let directive = 'prop';
@@ -376,8 +376,8 @@ const createTheme = theme => {
 				text = reducer(text);
 
 				let exts;
-				if ('extends' in theme) {
-					let ex = theme.extends;
+				if ('extends' in theme[key]) {
+					let ex = theme[key].extends;
 					if (!Array.isArray(ex)) ex = ex.split('_');
 
 					exts = getClasses(trie, ex);
