@@ -14,13 +14,14 @@ const value = {
         }),
 
         // modal with context from where it was invoked.
-        state: ModalContext.use(m => {
-            return () => <div style={{ width: '500px', height: '500px', background: 'blue' }}>
-                {m.observer.path(['props', 'someContext']).map(s => s ? s : null)}
+        state: ModalContext.use(m => ({timer, someContext}) => {
+            console.log(timer, someContext);
+            return <div style={{ width: '500px', height: '500px', background: 'blue' }}>
+                {someContext ?? null}
                 <br />
                 Global state passed into modal from context declaration:
                 <br />
-                {m.timer}
+                {timer}
                 <br />
             </div>;
         }),
@@ -71,42 +72,37 @@ const value = {
 };
 
 // Any component can use the Modals context to retreive the currently displayed modal.
-const Comp = ModalContext.use(m => ThemeContext.use(h => {
-    console.log(m);
-    const Comp = () => <div>
-        <Button type='contained' label='Basic' onClick={() => {
-            m.open({ name: 'basic', label: 'Basic Modal' })
-        }} />
-        <Button type='contained' label='State' onClick={() => {
-            m.open({ name: 'state', someContext: 'some extra context here', label: 'Modal with state' });
-        }} />
-        <Button type='contained' label='Trapped' onClick={() => {
-            m.open({ name: 'trapped', label: 'Trapped!', noEsc: true, noClickEsc: true });
-        }} />
-        <Button type='contained' label='Paged' onClick={() => {
-            m.open({ name: 'page1', label: 'Page 1' });
-        }} />
-        <Button type='contained' label='Template' onClick={() => {
-            const customTemplate = ({ m, children }) => {
-                return <Popup style={{ inset: 0 }}>
-                    <div theme='modalOverlay' onClick={() => !m.noClickEsc ? m.close() : null} />
-                    <div theme='modalWrapper' style={{ background: 'purple' }}>
-                        <Typography
-                            type='p1'
-                            label={m.observer.path('label')
-                                .map(l => `this is the label: ${l}`)}
-                        />
-                        These are the child elements:
-                        {children}
-                    </div>
-                </Popup>;
-            };
+const Comp = ModalContext.use(m => ThemeContext.use(h => ({label}) => <div>
+    <Button type='contained' label='Basic' onClick={() => {
+        m.open({ name: 'basic', label: 'Basic Modal' })
+    }} />
+    <Button type='contained' label='State' onClick={() => {
+        m.open({ name: 'state', someContext: 'some extra context here', label: 'Modal with state' });
+    }} />
+    <Button type='contained' label='Trapped' onClick={() => {
+        m.open({ name: 'trapped', label: 'Trapped!', noEsc: true, noClickEsc: true });
+    }} />
+    <Button type='contained' label='Paged' onClick={() => {
+        m.open({ name: 'page1', label: 'Page 1' });
+    }} />
+    <Button type='contained' label='Template' onClick={() => {
+        const customTemplate = ({ m, children }) => {
+            return <Popup style={{ inset: 0 }}>
+                <div theme='modalOverlay' onClick={() => !m.noClickEsc ? m.close() : null} />
+                <div theme='modalWrapper' style={{ background: 'purple' }}>
+                    <Typography
+                        type='p1'
+                        label={`this is the label: ${label}`}
+                    />
+                    These are the child elements:
+                    {children}
+                </div>
+            </Popup>;
+        };
 
-            m.open({ name: 'template', template: customTemplate, label: 'Template' });
-        }} />
-    </div>;
-    return Comp
-}));
+        m.open({ name: 'template', template: customTemplate, label: 'Template' });
+    }} />
+</div>));
 
 mount(document.body, <div>
     <Icons value={[FeatherIcons]}>
