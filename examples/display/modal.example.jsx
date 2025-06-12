@@ -7,15 +7,14 @@ const timer = Observer.timer(1000);
 const value = {
     modals: {
         // basic modal
-        basic: ModalContext.use(m => {
-            return () => <div style={{ width: '500px', height: '500px', background: 'red' }}>
+        basic: ({}) => {
+            return <div style={{ width: '500px', height: '500px', background: 'red' }}>
                 test
             </div>;
-        }),
+        },
 
         // modal with context from where it was invoked.
-        state: ModalContext.use(m => ({timer, someContext}) => {
-            console.log(timer, someContext);
+        state: ({timer, someContext}) => {
             return <div style={{ width: '500px', height: '500px', background: 'blue' }}>
                 {someContext ?? null}
                 <br />
@@ -24,48 +23,45 @@ const value = {
                 {timer}
                 <br />
             </div>;
-        }),
+        },
 
         // disable click away and esc button
-        trapped: ModalContext.use(m => {
-            return () => <div style={{ width: '500px', height: '500px', background: 'green' }}>
+        trapped: ({modal}) => {
+            return <div style={{ width: '500px', height: '500px', background: 'green' }}>
                 you can't escape!
-                <Button type='contained' label='Exit' onClick={() => m.close()} />
+                <Button type='contained' label='Exit' onClick={() => modal.close()} />
             </div>;
-        }),
+        },
 
         // cross modal context
-        page1: ModalContext.use(m => {
-            return () => {
-                m.value = '';
+        page1: ({modal}) => {
+            const val = Observer.mutable();
 
-                return <div style={{ width: '500px', height: '500px', background: 'blue' }}>
-                    Welcome to Page 1.
-                    <br />
-                    clicking this button will move you to page2 without losing context
+            return <div style={{ width: '500px', height: '500px', background: 'blue' }}>
+                Welcome to Page 1.
+                <br />
+                clicking this button will move you to page2 without losing context
 
-                    <TextField placholder='Enter some context' value={m.observer.path('value')} />
-                    <Button type='contained' label='page2' onClick={() => {
-                        m.label = 'Page 2'
-                        m.current = 'page2'
-                    }} />
-                </div>
-            };
-        }),
-        page2: ModalContext.use(m => {
-            return () => <div style={{ width: '500px', height: '500px', background: 'green' }}>
+                <TextField placholder='Enter some context' value={val} />
+                <Button type='contained' label='page2' onClick={() => {
+                    modal.open({name: 'page2', label: 'Page 2', val})
+                }} />
+            </div>
+        },
+        page2: ({val}) => {
+            return <div style={{ width: '500px', height: '500px', background: 'green' }}>
                 Here is your context from page1!!!
                 <br />
-                {m.value}
+                {val}
             </div>;
-        }),
+        },
 
         // Custom modal template:
-        template: ModalContext.use(m => {
-            return () => <div style={{ width: '500px', height: '500px', background: 'orange' }}>
+        template: ({}) => {
+            return <div style={{ width: '500px', height: '500px', background: 'orange' }}>
                 Custom template!
             </div>;
-        })
+        }
     },
     // place any state you want into value when sending it to ModalContext, it will get sent to the modal automatically.
     timer,
