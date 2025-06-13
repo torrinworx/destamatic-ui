@@ -116,7 +116,7 @@ const getClasses = (trie, classes) => {
 				let existing = map.get(child.name);
 				if (!existing) map.set(child.name, existing = []);
 
-				existing.push({node: child, index: node.index});
+				existing.push({ node: child, index: node.index });
 			}
 		}
 
@@ -318,6 +318,7 @@ const createTheme = theme => {
 			current.body = theme.observer.path(key).skip().map(() => {
 				const vars = new Map();
 				const raw = [];
+				const fonts = [];
 				let index = 0;
 
 				let text = Object.entries(theme[key]).flatMap(([key, val]) => {
@@ -363,16 +364,27 @@ const createTheme = theme => {
 						raw.push('.', nameItem, ':', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
 							return buildProperty(key, val, index);
 						}), '\n}\n');
+					} else if (directive === 'fontUrl') {
+						fonts.push("@import url('" + val.url + "');");
+					} else if (directive === 'fontFile') { // directly load font from font file
+						// untested, unlike @import we don't have to append @font-face to the top of the file.
+						raw.push(`
+							@font-face {
+								font-family: '${val.name}';
+								src: local('${val.name}'), url('${val.url}') format('${val.format || 'truetype'}');
+								font-weight: ${val.weight || 'normal'};
+								font-style: ${val.style || 'normal'};
+							}
+						`);
 					} else {
 						throw new Error("Unknown theme directive: " + directive);
 					}
-
 					return '';
 				});
 
 				if (text.length) text = ['.', nameItem, ' {\n', ...text, '\n}\n'];
+				text = [...fonts, ...text];
 				text.push(...raw);
-
 				text = reducer(text);
 
 				let exts;

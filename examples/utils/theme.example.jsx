@@ -1,7 +1,7 @@
-import {mount, Observer, OObject} from 'destam-dom';
-import {Theme, Button} from '../..';
+import { mount, Observer, OObject } from 'destam-dom';
+import { Theme, Button, Typography } from '../..';
 
-const MyComponent = ({type}) => {
+const MyComponent = ({ type }) => {
 	const hovered = Observer.mutable(false);
 
 	return <div
@@ -18,8 +18,32 @@ const MyComponent = ({type}) => {
 
 const theme = OObject({
 	"*": {
+		// importing fonts into the document, could be from a local css file or url.
+		_fontUrl_Edu: {
+			url: 'https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand+Pre:wght@400..700&display=swap'
+		},
+		_fontUrl_Roboto: {
+			url: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap'
+		},
+		_fontUrl_PresStart2P: {
+			url: 'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap'
+		},
+
 		fontFamily: 'arial',
+		fontWeight: 400,
+		fontStyle: 'normal',
 		transition: null,
+	},
+
+	edu: {
+		fontFamily: '"Edu NSW ACT Hand Pre", cursive',
+	},
+	roboto: {
+		fontFamily: '"Roboto", sans-serif',
+	},
+
+	presStart2P: {
+		fontFamily: '"Press Start 2P", system-ui',
 	},
 
 	myPrimary: OObject({
@@ -68,12 +92,12 @@ const theme = OObject({
 mount(document.body, <Theme value={theme}>
 	<div theme="body">
 		<div theme="row">
-			<MyComponent type="myPrimary"/>
-			<MyComponent type="myPrimary_shiftHue"/>
+			<MyComponent type="myPrimary" />
+			<MyComponent type="myPrimary_shiftHue" />
 		</div>
 		<div theme="row">
-			<MyComponent type="mySecondary"/>
-			<MyComponent type="mySecondary_shiftHue"/>
+			<MyComponent type="mySecondary" />
+			<MyComponent type="mySecondary_shiftHue" />
 		</div>
 		<Button label="hello world" type="contained" />
 
@@ -82,6 +106,11 @@ mount(document.body, <Theme value={theme}>
 			height: 200,
 			background: 'linear-gradient($color, $invert($color))'
 		}} />
+
+		<Typography type='h4_edu' label='Hello World with edu' />
+		<Typography type='h4_roboto' label='Hello World with roboto' />
+		<Typography type='h4_presStart2P' label='Hello World with presStart2P' />
+		<Typography type='h4_LilitaOne' label='Hello World with LilitaOne' />
 	</div>
 </Theme>);
 
