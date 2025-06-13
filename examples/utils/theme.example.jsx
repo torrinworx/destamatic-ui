@@ -110,7 +110,6 @@ mount(document.body, <Theme value={theme}>
 		<Typography type='h4_edu' label='Hello World with edu' />
 		<Typography type='h4_roboto' label='Hello World with roboto' />
 		<Typography type='h4_presStart2P' label='Hello World with presStart2P' />
-		<Typography type='h4_LilitaOne' label='Hello World with LilitaOne' />
 	</div>
 </Theme>);
 

@@ -334,50 +334,67 @@ const createTheme = theme => {
 						key = key.substring(1);
 					}
 
-					if (directive === 'prop') {
-						return buildProperty(key, val, index);
-					} else if (directive === 'elem') {
-						raw.push(key, '.', nameItem, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
+					switch (directive) {
+						case 'prop':
 							return buildProperty(key, val, index);
-						}), '\n}\n');
-					} else if (directive === 'keyframes') {
-						const name = key + themeID;
-						raw.push('@keyframes ', name, '-', key, ' {\n', val, '\n}\n');
 
-						const v = [name, '-' + key];
-						v.index = index++;
-						vars.set(key, v);
-					} else if (directive === 'var') {
-						if (typeof val === 'string') {
-							val = parse(val, index);
-						} else {
-							val = { value: val };
-						}
+						case 'elem':
+							raw.push(key, '.', nameItem, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
+								return buildProperty(key, val, index);
+							}), '\n}\n');
+							break;
 
-						val.index = index++;
-						vars.set(key, val);
-					} else if (directive === 'children') {
-						raw.push('.', nameItem, ' > ', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
-							return buildProperty(key, val, index);
-						}), '\n}\n');
-					} else if (directive === 'cssProp') {
-						raw.push('.', nameItem, ':', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
-							return buildProperty(key, val, index);
-						}), '\n}\n');
-					} else if (directive === 'fontUrl') {
-						fonts.push("@import url('" + val.url + "');");
-					} else if (directive === 'fontFile') { // directly load font from font file
-						// untested, unlike @import we don't have to append @font-face to the top of the file.
-						raw.push(`
-							@font-face {
-								font-family: '${val.name}';
-								src: local('${val.name}'), url('${val.url}') format('${val.format || 'truetype'}');
-								font-weight: ${val.weight || 'normal'};
-								font-style: ${val.style || 'normal'};
+						case 'keyframes':
+							const name = key + themeID;
+							raw.push('@keyframes ', name, '-', key, ' {\n', val, '\n}\n');
+
+							const v = [name, '-' + key];
+							v.index = index++;
+							vars.set(key, v);
+							break;
+
+						case 'var':
+							if (typeof val === 'string') {
+								val = parse(val, index);
+							} else {
+								val = { value: val };
 							}
-						`);
-					} else {
-						throw new Error("Unknown theme directive: " + directive);
+
+							val.index = index++;
+							vars.set(key, val);
+							break;
+
+						case 'children':
+							raw.push('.', nameItem, ' > ', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
+								return buildProperty(key, val, index);
+							}), '\n}\n');
+							break;
+
+						case 'cssProp':
+							raw.push('.', nameItem, ':', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
+								return buildProperty(key, val, index);
+							}), '\n}\n');
+							break;
+
+						case 'fontUrl':
+							fonts.push("@import url('" + val.url + "');");
+							break;
+
+						case 'fontFile':
+							// directly load font from font file
+							// untested, unlike @import we don't have to append @font-face to the top of the file.
+							raw.push(`
+								@font-face {
+									font-family: '${val.name}';
+									src: local('${val.name}'), url('${val.url}') format('${val.format || 'truetype'}');
+									font-weight: ${val.weight || 'normal'};
+									font-style: ${val.style || 'normal'};
+								}
+							`);
+							break;
+
+						default:
+							throw new Error("Unknown theme directive: " + directive);
 					}
 					return '';
 				});
