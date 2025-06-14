@@ -65,7 +65,7 @@ Theme.define({
 export default sel => ThemeContext.use(h => {
 	const selector = sel.selector('selected', null);
 
-	const Radio = ({ style, value, label }) => {
+	const Radio = ({ value, label }) => {
 		const hovered = Observer.mutable(false);
 		const hoveredTheme = hovered.map(h => h ? 'hovered' : null);
 		const selected = selector(value);
