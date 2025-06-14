@@ -72,10 +72,12 @@ Theme.define({
 
 	button_icon: {
 		color: '$color_top',
+		fill: '$color_top',
 	},
 
 	button_icon_hovered: {
 		color: '$color_hover',
+		fill: '$color_hover',
 	},
 });
 
