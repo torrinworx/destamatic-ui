@@ -380,17 +380,10 @@ const createTheme = theme => {
 							fonts.push("@import url('" + val.url + "');");
 							break;
 
-						case 'fontFile':
-							// directly load font from font file
-							// untested, unlike @import we don't have to append @font-face to the top of the file.
-							raw.push(`
-								@font-face {
-									font-family: '${val.name}';
-									src: local('${val.name}'), url('${val.url}') format('${val.format || 'truetype'}');
-									font-weight: ${val.weight || 'normal'};
-									font-style: ${val.style || 'normal'};
-								}
-							`);
+						case 'fontFace':
+							raw.push('@font-face ' + ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
+								return buildProperty(key, val, index);
+							}), '\n}\n');
 							break;
 
 						default:
