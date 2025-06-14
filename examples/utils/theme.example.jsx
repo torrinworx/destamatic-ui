@@ -19,13 +19,13 @@ const MyComponent = ({ type }) => {
 const theme = OObject({
 	"*": {
 		// importing fonts into the document, could be from a local css file or url.
-		_fontUrl_Edu: {
+		_import_Edu: {
 			url: 'https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand+Pre:wght@400..700&display=swap'
 		},
-		_fontUrl_Roboto: {
+		_import_Roboto: {
 			url: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap'
 		},
-		_fontUrl_PresStart2P: {
+		_import_PresStart2P: {
 			url: 'https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap'
 		},
 

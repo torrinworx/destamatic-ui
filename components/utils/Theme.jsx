@@ -318,7 +318,7 @@ const createTheme = theme => {
 			current.body = theme.observer.path(key).skip().map(() => {
 				const vars = new Map();
 				const raw = [];
-				const fonts = [];
+				const imports = [];
 				let index = 0;
 
 				let text = Object.entries(theme[key]).flatMap(([key, val]) => {
@@ -376,7 +376,7 @@ const createTheme = theme => {
 							}), '\n}\n');
 							break;
 
-						case 'fontUrl':
+						case 'import': // not a complete implementation of import: https://developer.mozilla.org/en-US/docs/Web/CSS/@import
 							fonts.push("@import url('" + val.url + "');");
 							break;
 
@@ -393,7 +393,7 @@ const createTheme = theme => {
 				});
 
 				if (text.length) text = ['.', nameItem, ' {\n', ...text, '\n}\n'];
-				text = [...fonts, ...text];
+				text = [...imports, ...text];
 				text.push(...raw);
 				text = reducer(text);
 
