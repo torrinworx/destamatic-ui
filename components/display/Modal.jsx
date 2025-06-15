@@ -37,8 +37,7 @@ const DefaultTemplate = ThemeContext.use(h => ({ m, closeSignal, children }, cle
 		queueMicrotask(() => {
 			setTimeout(() => shown.set(true), 10);
 		});
-
-		if (!m.noEsc) {
+		if (!m.props.noEsc) {
 			window.addEventListener('keydown', handleEscape);
 			cleanup(() => {
 				window.removeEventListener('keydown', handleEscape);
@@ -80,16 +79,20 @@ const DefaultTemplate = ThemeContext.use(h => ({ m, closeSignal, children }, cle
 
 export const ModalContext = createContext(() => null, (value) => {
 	const { modals, template: defaultTemplate = DefaultTemplate, ...globalProps } = value;
+
 	const Modal = OObject({
 		modals,
 		template: defaultTemplate,
 		open: ({ name, template = Modal.template, ...props }) => {
-			Modal.props = {...globalProps, ...props};
+			Modal.props = { ...globalProps, ...props };
 			Modal.template = template;
 			Modal.current = name;
 		},
 		close: () => {
 			Modal.current = null;
+		},
+		cleanup: () => {
+			Modal.template = defaultTemplate;
 		},
 		current: null,
 		currentDelay: 150,
@@ -104,7 +107,11 @@ export const Modal = ModalContext.use(m => ThemeContext.use(h => {
 		cleanup(m.observer.path('current').effect(current => {
 			if (current) aniCurrent.set(current);
 			else {
-				const timeout = setTimeout(() => aniCurrent.set(null), m.currentDelay);
+				const timeout = setTimeout(() => {
+					m.cleanup();
+					aniCurrent.set(null);
+				}, m.currentDelay);
+
 				return () => clearTimeout(timeout);
 			}
 		}));

@@ -7,14 +7,14 @@ const timer = Observer.timer(1000);
 const value = {
     modals: {
         // basic modal
-        basic: ({}) => {
+        basic: ({ }) => {
             return <div style={{ width: '500px', height: '500px', background: 'red' }}>
                 test
             </div>;
         },
 
         // modal with context from where it was invoked.
-        state: ({timer, someContext}) => {
+        state: ({ timer, someContext }) => {
             return <div style={{ width: '500px', height: '500px', background: 'blue' }}>
                 {someContext ?? null}
                 <br />
@@ -26,7 +26,7 @@ const value = {
         },
 
         // disable click away and esc button
-        trapped: ({modal}) => {
+        trapped: ({ modal }) => {
             return <div style={{ width: '500px', height: '500px', background: 'green' }}>
                 you can't escape!
                 <Button type='contained' label='Exit' onClick={() => modal.close()} />
@@ -34,7 +34,7 @@ const value = {
         },
 
         // cross modal context
-        page1: ({modal}) => {
+        page1: ({ modal }) => {
             const val = Observer.mutable();
 
             return <div style={{ width: '500px', height: '500px', background: 'blue' }}>
@@ -44,11 +44,11 @@ const value = {
 
                 <TextField placholder='Enter some context' value={val} />
                 <Button type='contained' label='page2' onClick={() => {
-                    modal.open({name: 'page2', label: 'Page 2', val})
+                    modal.open({ name: 'page2', label: 'Page 2', val })
                 }} />
             </div>
         },
-        page2: ({val}) => {
+        page2: ({ val }) => {
             return <div style={{ width: '500px', height: '500px', background: 'green' }}>
                 Here is your context from page1!!!
                 <br />
@@ -57,7 +57,7 @@ const value = {
         },
 
         // Custom modal template:
-        template: ({}) => {
+        template: ({ }) => {
             return <div style={{ width: '500px', height: '500px', background: 'orange' }}>
                 Custom template!
             </div>;
@@ -68,7 +68,7 @@ const value = {
 };
 
 // Any component can use the Modals context to retreive the currently displayed modal.
-const Comp = ModalContext.use(m => ThemeContext.use(h => ({label}) => <div>
+const Comp = ModalContext.use(m => ThemeContext.use(h => ({ label }) => <div>
     <Button type='contained' label='Basic' onClick={() => {
         m.open({ name: 'basic', label: 'Basic Modal' })
     }} />
