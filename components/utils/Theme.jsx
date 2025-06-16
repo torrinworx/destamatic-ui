@@ -421,7 +421,7 @@ const createTheme = theme => {
 				styles.splice(i, 1);
 			}
 		});
-	}).unwrap();
+	}).unwrap().memo();
 
 	const out = (...classes) => {
 		const defines = Observer.all([trie, ...classes.flat(Infinity).map(Observer.immutable)]).map(([trie, ...classes]) => {
@@ -439,7 +439,7 @@ const createTheme = theme => {
 
 			trie.cache.set(classes.join(' '), defines);
 			return defines;
-		}).unwrap();
+		}).unwrap().memo();
 
 		const out = defines.map(insertStyle);
 		out.defines = defines;
