@@ -138,7 +138,7 @@ const modals = {
             </div>;
         }
     },
-    // place any state you want into value when sending it to ModalContext, it will get sent to the modal automatically.
+    // place any state you want into value when sending it to StageContext, it will get sent to the modal automatically.
     timer,
 };
 

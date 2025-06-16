@@ -131,8 +131,8 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 				console.error(`Stage with '${c}' does not exist in stages list.`);
 			}
 
-			return <Template closeSignal={closeSignal} s={s}>
-				<Stage stage={s} {...s.props} />
+			return <Template closeSignal={closeSignal} s={s} m={s}>
+				<Stage stage={s} modal={s} {...s.props} />
 			</Template>;
 		});
 }));
