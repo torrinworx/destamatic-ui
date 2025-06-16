@@ -377,7 +377,7 @@ const createTheme = theme => {
 							break;
 
 						case 'import': // not a complete implementation of import: https://developer.mozilla.org/en-US/docs/Web/CSS/@import
-							fonts.push("@import url('" + val.url + "');");
+							//fonts.push("@import url('" + val.url + "');");
 							break;
 
 						case 'fontFace':
