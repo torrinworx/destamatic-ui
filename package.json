@@ -27,8 +27,8 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "destam": "^0.7.0",
-    "destam-dom": "^0.13.0"
+    "destam": "^0.8.0",
+    "destam-dom": "^0.14.0"
   },
   "optionalDependencies": {
     "@material-design-icons/svg": "^0.14.15",
