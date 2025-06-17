@@ -33,8 +33,8 @@ export default ThemeContext.use(h => {
 	 *
 	 * @returns {JSX.Element} The rendered loading dots component.
 	 */
-	const LoadingDots = () => {
-		return <div theme='loadingDots'>
+	const LoadingDots = ({style}) => {
+		return <div theme='loadingDots' style={style}>
 			<span theme='loadingDots_dot' style={{ animationDelay: '0s' }}></span>
 			<span theme='loadingDots_dot' style={{ animationDelay: '.2s' }}></span>
 			<span theme='loadingDots_dot' style={{ animationDelay: '.4s' }}></span>
