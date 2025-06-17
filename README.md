@@ -9,13 +9,8 @@
 
 Destamatic UI is a UI library built on the delta state management library [destam](https://github.com/equator-studios/destam) and the DOM manipulation library [destam-dom](https://github.com/Nefsen402/destam-dom). The base set of components take inspiration from MUI and standard HTML tags, with additional ease-of-use features integrated.
 
-## Installation
-
-Install Destamatic UI via npm:
-
-```bash
-npm install destamatic-ui
-```
+## To get started, checkout the destamatic-template repository, clone it and set it up like an other js project!
+[destamatic-template](https://github.com/torrinworx/destamatic-template)
 
 ## Features Overview
 
