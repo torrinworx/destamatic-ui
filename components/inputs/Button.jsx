@@ -4,7 +4,7 @@ import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 
 import useRipples from '../utils/Ripple';
-import '../display/Typography';
+import Typography from '../display/Typography';
 
 Theme.define({
 	button: {
@@ -108,7 +108,6 @@ export default ThemeContext.use(h => {
 		onMouseDown,
 		onMouseUp,
 		icon = null,
-		Icon = null,
 		style,
 		disabled,
 		hover,
@@ -118,8 +117,7 @@ export default ThemeContext.use(h => {
 		iconPosition = 'left',
 		...props
 	}) => {
-		if (!icon) icon = Icon;
-
+		if (typeof label === 'string') label = <Typography type='p1' label={label} />
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
