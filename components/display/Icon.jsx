@@ -61,7 +61,7 @@ export const Icons = createContext(() => null, (next, prev) => {
  * @returns {JSX.Element} The rendered SVG icon element.
  */
 export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
-	return ({ name, size = 24, ref: Ref, style, ...props }, cleanup) => {
+	return ({ name, size = null, ref: Ref, style, ...props }, cleanup) => {
 		if (!(name instanceof Observer)) name = Observer.immutable(name);
 		if (!(size instanceof Observer)) size = Observer.immutable(size);
 		if (!Ref) Ref = <svg:svg />;
