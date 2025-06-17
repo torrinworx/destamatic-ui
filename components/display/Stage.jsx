@@ -83,10 +83,14 @@ export const StageContext = createContext(() => null, (value) => {
 	const Stage = OObject({
 		stages,
 		template: defaultTemplate,
-		open: ({ name, template = Stage.template, ...props }) => {
+		open: ({ name, template = Stage.template, onClose, ...props }) => {
 			Stage.props = { ...globalProps, ...props };
 			Stage.template = template;
 			Stage.current = name;
+
+			if (onClose) {
+				Stage.observer.path('current').defined(val => val !== name).then(onClose);
+			}
 		},
 		close: () => {
 			Stage.current = null;
