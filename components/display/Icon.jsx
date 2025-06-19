@@ -61,7 +61,7 @@ export const Icons = createContext(() => null, (next, prev) => {
  * @returns {JSX.Element} The rendered SVG icon element.
  */
 export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
-	return ({ name, size = null, ref: Ref, style, ...props }, cleanup) => {
+	return ({ name, size = null, ref: Ref, style = {}, rot, ...props }, cleanup) => {
 		if (!(name instanceof Observer)) name = Observer.immutable(name);
 		if (!(size instanceof Observer)) size = Observer.immutable(size);
 		if (!Ref) Ref = <svg:svg />;
@@ -69,6 +69,11 @@ export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
 		const oldIconAttrs = []; // non-parent attributes, to remove on name change
 		const libClass = Observer.mutable('');
 		const children = OArray();
+
+		if (rot) {
+			style.transition = 'transform 100ms';
+			style.transform = Observer.immutable(rot).map(rot => `rotate(${rot}deg)`);
+		}
 
 		cleanup(name.effect(iconName => {
 			Promise.resolve(iconPack(iconName)).then(svg => {
