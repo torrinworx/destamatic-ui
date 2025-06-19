@@ -6,22 +6,49 @@ import useAbort from '../../util/abort';
 Theme.define({
 	slider: {
 		$size: 25,
+		$trackSize: 8,
+
+		position: 'relative',
+	},
+
+	slider_horizontal: {
+		$movementAnchor: 'left',
+		$eventAnchor: 'clientX',
+		$sizeAnchor: 'width',
 
 		width: '100%',
 		height: '$size$px',
-		position: 'relative',
+	},
+
+	slider_vertical: {
+		$movementAnchor: 'top',
+		$eventAnchor: 'clientY',
+		$sizeAnchor: 'height',
+
+		width: '$size$px',
+		height: '100%',
 	},
 
 	slider_track: {
 		background: '$shiftBrightness($color, 0.1)',
 
 		position: 'absolute',
+		borderRadius: '$div($trackSize, 2)px',
+		cursor: 'pointer',
+	},
+
+	slider_horizontal_track: {
 		top: '50%',
 		width: '100%',
-		height: '8px',
-		borderRadius: '4px',
+		height: '$trackSize$px',
 		transform: 'translateY(-50%)',
-		cursor: 'pointer',
+	},
+
+	slider_vertical_track: {
+		left: '50%',
+		width: '$trackSize$px',
+		height: '100%',
+		transform: 'translateX(-50%)',
 	},
 
 	slider_track_hovered: {
@@ -34,10 +61,18 @@ Theme.define({
 		background: '$color',
 
 		position: 'absolute',
-		top: '50%',
 		borderRadius: '50%',
 		cursor: 'pointer',
+	},
+
+	slider_horizontal_thumb: {
+		top: '50%',
 		transform: 'translateY(-50%)'
+	},
+
+	slider_vertical_thumb: {
+		left: '50%',
+		transform: 'translateX(-50%)'
 	},
 
 	slider_thumb_hovered: {
@@ -63,6 +98,7 @@ export default ThemeContext.use(h => {
 	 * @returns {JSX.Element} The rendered slider element.
 	 */
 	const Slider = Theme.use(themer => ({
+		type="horizontal",
 		min,
 		max,
 		value,
@@ -82,15 +118,20 @@ export default ThemeContext.use(h => {
 
 		const TrackRef = <raw:div />;
 		const dragging = Observer.mutable(false);
-		const size = themer(theme, 'slider', 'thumb').vars('size');
+
+		const vars = themer(theme, 'slider', type, 'thumb');
+		const size = vars.vars('size');
+		const movementAnchor = vars.vars('movementAnchor').get();
+		const eventAnchor = vars.vars('eventAnchor').get();
+		const sizeAnchor = vars.vars('sizeAnchor').get();
 
 		cleanup(dragging.effect(event => {
 			if (!event) return;
 			if (disabled.get()) return;
 
 			const rect = TrackRef.getBoundingClientRect();
-			const trackWidth = rect.width - size.get();
-			const clickX = event.clientX - rect.left - size.get() / 2;
+			const trackWidth = rect[sizeAnchor] - size.get();
+			const clickX = event[eventAnchor] - rect[movementAnchor] - size.get() / 2;
 			const minVal = min.get();
 			const maxVal = max.get();
 			const newValue = minVal + ((clickX / trackWidth) * (maxVal - minVal));
@@ -120,11 +161,11 @@ export default ThemeContext.use(h => {
 
 		return <Ref
 			{...props}
-			theme="slider"
+			theme={["slider", type]}
 		>
 			<TrackRef
 				theme={[
-					"slider", "track",
+					"slider", type, "track",
 					renderHover.map(h => h ? 'hovered' : null),
 					disabled.map(d => d ? 'disabled' : null),
 				]}
@@ -140,12 +181,12 @@ export default ThemeContext.use(h => {
 			/>
 			{value.isImmutable() ? null : <div
 				theme={[
-					"slider", "thumb",
+					"slider", type, "thumb",
 					dragging.map(h => h ? 'hovered' : null),
 					disabled.map(d => d ? 'disabled' : null),
 				]}
 				style={{
-					left: percentage,
+					[movementAnchor]: percentage,
 					...styleThumb,
 				}}
 				isHovered={hover}
