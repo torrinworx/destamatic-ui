@@ -22,6 +22,8 @@ const luminance = (r, g, b) => {
 	return 0.2126 * adjust(r) + 0.7152 * adjust(g) + 0.0722 * adjust(b);
 };
 
+const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
 export default {
 	"*": {
 		fontFamily: 'Roboto, sans-serif',
@@ -47,7 +49,7 @@ export default {
 		in hexadecimal, RGB, or HSV.
 		*/
 		$saturate: transformHSV((h, s, v, amount) => {
-			return [h, s + amount, v];
+			return [h, clamp(s + amount, 0, 1), v];
 		}),
 
 		/*
@@ -55,7 +57,7 @@ export default {
 		hexadecimal, RGB, or HSV.
 		*/
 		$hue: transformHSV((h, s, v, amount) => {
-			return [h + amount, s, v];
+			return [clamp(h + amount, 0, 1), s, v];
 		}),
 
 		/*
