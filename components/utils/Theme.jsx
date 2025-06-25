@@ -25,7 +25,7 @@ const varWalk = (item, exts) => {
 
 	if (item.params) ret = Observer
 		.all([ret, ...item.params.map(param => getVar(param, exts))])
-		.map(([func, ...params]) => func?.(...params));
+		.map(([func, ...params]) => func?.(...params) ?? null);
 
 	return ret;
 };
