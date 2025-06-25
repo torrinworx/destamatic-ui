@@ -85,7 +85,12 @@ export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
 				// clear the svg from all children so that we can append our new children
 				children.splice(0, children.length);
 
-				if (!svg) return;
+				if (!svg) {
+					Ref.style.display = 'none';
+					return;
+				} else {
+					Ref.style.display = 'block';
+				}
 
 				if (typeof svg === 'string') {
 					svg = parser.parseFromString(svg, 'image/svg+xml').children[0];
