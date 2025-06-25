@@ -65,11 +65,11 @@ export default ThemeContext.use(h => {
 
 		const buttonRef = <raw:button />;
 
-		const Popup = Theme.use(themer => ({ }, cleanup, mounted) => {
+		const Popup = Theme.use(themer => (_, cleanup, mounted) => {
 			const paper = <raw:div />;
 			const Selectable = ({ each: option }) => {
 				return <Button
-					$key={option}
+					$option={option}
 					focused={Observer.immutable(false)}
 					type={[
 						"select_selectable",
@@ -159,7 +159,7 @@ export default ThemeContext.use(h => {
 
 							for (let i = 0; i < str.length; i++) {
 								if (str[i] === key) {
-									currentKeys.push({str, i, option});
+									currentKeys.push({ str, i, option });
 								}
 							}
 						}
@@ -212,7 +212,7 @@ export default ThemeContext.use(h => {
 					...style,
 				}}
 			>
-				<Typography type='p1_inline'>
+				<Typography type='p1'>
 					{value.map(val => {
 						if (options.get().includes(val)) {
 							return display(val);
