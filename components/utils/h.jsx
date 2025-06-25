@@ -174,13 +174,13 @@ const hypertext = (useThemes, name, props = {}, ...children) => {
 				name.setAttribute('style', "");
 
 				// set new styles
-				for (let o of Object.keys(style)) {
+				if (style != null) for (let o of Object.keys(style)) {
 					set(o, style[o]);
 				}
 			};
 
 			reset();
-			if (!style[observerGetter] && dynamicProps.length === 0) {
+			if (!style?.[observerGetter] && dynamicProps.length === 0) {
 				return null;
 			}
 
@@ -200,7 +200,7 @@ const hypertext = (useThemes, name, props = {}, ...children) => {
 					dynamicSet(key, value);
 				}
 
-				const observer = style[observerGetter] &&
+				const observer = style?.[observerGetter] &&
 					shallowListener(style[observerGetter], commit => {
 						// has the entire object been switched out?
 						for (let delta of commit) {
