@@ -60,6 +60,10 @@ export default {
 			return [clamp(h + amount, 0, 1), s, v];
 		}),
 
+		$brightness: transformHSV((h, s, v, amount) => {
+			return [h, s, clamp(v + amount, 0, 1)];
+		}),
+
 		/*
 		Inverts the RGB components of the input colour. Accepts colours in hexadecimal, RGB, or HSV.
 		*/
