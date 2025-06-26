@@ -12,6 +12,7 @@ import useAbort from '../../util/abort';
 Theme.define({
 	select_paper: {
 		boxShadow: 'none',
+		maxHeight: 500,
 	},
 
 	select_selectable: {
@@ -182,27 +183,27 @@ export default ThemeContext.use(h => {
 			})());
 
 			return <Paper
-			ref={paper}
-			tight
-			theme='select'
-			type={foc.map(f => f ? 'focused' : null)}
-			style={{
-				width: style.width,
-				overflow: 'auto',
-				borderTopLeftRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
-				borderTopRightRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
-				borderBottomLeftRadius: focused.map(f => f !== Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
-				borderBottomRightRadius: focused.map(f => f !== Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
-				clipPath: Observer.all([focused, radius]).map(([f, r]) => {
-					if (f === Detached.TOP_LEFT_RIGHT) {
-						return `inset(-${r} -${r} 0px -${r})`;
-					} else if (f === Detached.BOTTOM_LEFT_RIGHT) {
-						return `inset(0px -${r} -${r} -${r})`;
-					} else {
-						return null;
-					}
-				}),
-			}}>
+				ref={paper}
+				tight
+				theme='select'
+				type={foc.map(f => f ? 'focused' : null)}
+				style={{
+					width: style.width,
+					overflow: 'auto',
+					borderTopLeftRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
+					borderTopRightRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
+					borderBottomLeftRadius: focused.map(f => f !== Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
+					borderBottomRightRadius: focused.map(f => f !== Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
+					clipPath: Observer.all([focused, radius]).map(([f, r]) => {
+						if (f === Detached.TOP_LEFT_RIGHT) {
+							return `inset(-${r} -${r} 0px -${r})`;
+						} else if (f === Detached.BOTTOM_LEFT_RIGHT) {
+							return `inset(0px -${r} -${r} -${r})`;
+						} else {
+							return null;
+						}
+					}),
+				}}>
 				<Selectable each={options} />
 			</Paper>
 		});
