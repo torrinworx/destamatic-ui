@@ -31,11 +31,11 @@ const calculate = (bounds, rot, popup) => {
 	} else {
 		// check if there is enough space for this configuration.
 		if ([
-					bounds.top,
-					window.innerWidth - bounds.right,
-					window.innerHeight - bounds.bottom,
-					bounds.left,
-				][rot - 8] < (rot & 1 ? popup.width : popup.height)) {
+			bounds.top,
+			window.innerWidth - bounds.right,
+			window.innerHeight - bounds.bottom,
+			bounds.left,
+		][rot - 8] < (rot & 1 ? popup.width : popup.height)) {
 			return null;
 		}
 
@@ -148,7 +148,7 @@ const Detached = ThemeContext.use(h => {
 					const y = (calc.top + (wh - calc.bottom)) / 2 - surround.top
 						- surround.height * [0, .5, 1, .5][rot - 9];
 
-					fits.push({ weight: 1 / Math.sqrt(x * x + y * y), rot});
+					fits.push({ weight: 1 / Math.sqrt(x * x + y * y), rot });
 				}
 			}
 
@@ -166,9 +166,9 @@ const Detached = ThemeContext.use(h => {
 						const updated = getBounds(elems);
 
 						if (surround.left !== updated.left ||
-								surround.right !== updated.right ||
-								surround.top !== updated.top ||
-								surround.bottom !== updated.bottom) {
+							surround.right !== updated.right ||
+							surround.top !== updated.top ||
+							surround.bottom !== updated.bottom) {
 							focused.set(false);
 							return;
 						}
@@ -185,7 +185,7 @@ const Detached = ThemeContext.use(h => {
 			}
 		}));
 
-		const Contents = ({}, cleanup, mounted) => {
+		const Contents = (_, cleanup, mounted) => {
 			mounted(() => {
 				computed.set(true);
 			});

@@ -49,7 +49,7 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Select = ({ value, options, display, style, type = 'text', placeholder = "None" }, cleanup, mounted) => {
+	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None' }, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(options instanceof Observer)) options = Observer.immutable(options);
 
@@ -72,7 +72,7 @@ export default ThemeContext.use(h => {
 					$option={option}
 					focused={Observer.immutable(false)}
 					type={[
-						"select_selectable",
+						'select_selectable',
 						selector(option)
 					]}
 					onMouseDown={e => e.preventDefault()}
@@ -85,6 +85,7 @@ export default ThemeContext.use(h => {
 				</Button>;
 			};
 
+			// auto scroll to selected value on popup open
 			queueMicrotask(() => {
 				cleanup(value.effect(val => {
 					let elem = paper.firstChild;
@@ -111,13 +112,24 @@ export default ThemeContext.use(h => {
 
 				const currentKeys = [];
 
+				// two issues: if the placeholder is selected then arrow keys brick the dropdown and the arrow keys automatically close the dropdown
+				// arrow keys are for navigating not for selecting, Enter/Space should be for selecting the value.
+				// Some how focused/prefocus is getting set to false on key down, not value update, something is watching keydown and triggering `focused`
+				// to be set to false.
+
+				// TODO: Fix search so it instead removes all options that don't match the search from the options array while remaining open.
+				// Currently when the user is typing, it's a single key that selects the option instead of an aggregate string input.
+				// focus should be placed simply on the top option in the list while the search happens.
+				// enter/space select the items from options (as handled already).
+				// arrow keys still allow user to move focus up/down list of searched options.
+
 				window.addEventListener('keydown', e => {
 					if (!options.get().length) return;
 
 					if (e.key === 'ArrowUp') {
 						let index = options.get().indexOf(value.get());
 						if (index === -1) {
-							index = 0;
+							index = options.length - 1;
 						} else if (index !== 0) {
 							index--;
 						} else {
@@ -128,7 +140,7 @@ export default ThemeContext.use(h => {
 					} else if (e.key === 'ArrowDown') {
 						let index = options.get().indexOf(value.get());
 						if (index === -1) {
-							index = options.length - 1;
+							index = 0;
 						} else if (index !== options.get().length - 1) {
 							index++;
 						} else {
@@ -169,10 +181,14 @@ export default ThemeContext.use(h => {
 				}, { signal });
 			})());
 
-			return <Paper ref={paper} tight theme="select" type={foc.map(f => f ? 'focused' : null)} style={{
+			return <Paper
+			ref={paper}
+			tight
+			theme='select'
+			type={foc.map(f => f ? 'focused' : null)}
+			style={{
 				width: style.width,
 				overflow: 'auto',
-
 				borderTopLeftRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
 				borderTopRightRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
 				borderBottomLeftRadius: focused.map(f => f !== Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
@@ -191,12 +207,14 @@ export default ThemeContext.use(h => {
 			</Paper>
 		});
 
-		return <Detached enabled={focused} locations={[
-			Detached.BOTTOM_LEFT_RIGHT,
-			Detached.TOP_LEFT_RIGHT,
-		]}>
+		return <Detached
+			enabled={focused}
+			locations={[
+				Detached.BOTTOM_LEFT_RIGHT,
+				Detached.TOP_LEFT_RIGHT,
+			]}
+		>
 			<Button
-				theme={[]}
 				type={['select', 'base', type]}
 				ref={buttonRef}
 				onMouseDown={e => {
@@ -222,7 +240,7 @@ export default ThemeContext.use(h => {
 					})}
 				</Typography>
 				<Icon
-					name="chevron-down"
+					name='chevron-down'
 					size={16}
 					style={{
 						marginLeft: 'auto',
