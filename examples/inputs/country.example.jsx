@@ -14,10 +14,7 @@ mount(document.body, <>
 	<Typography type='h4' label='Country' />
 	<Country value={value} type='contained' country={country} placeholder='Select a Country' />
 
-	<Shown value={country.map(c => {
-		region.set('Select a Region');
-		return c && Array.isArray(c[2]);
-	})}>
+	<Shown value={country.map(c => region.set('Select a Region') && c && Array.isArray(c[2]))}>
 		<Typography type='h4' label='Region' />
 		<Select
 			type='contained'
