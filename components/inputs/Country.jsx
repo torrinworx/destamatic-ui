@@ -17,14 +17,12 @@ export default ThemeContext.use(h => {
 		const countries = allCountries.map(c => c[0]);
 		cleanup(value.effect(c => country.set(allCountries.find(ac => ac[0] === c))));
 
-		return <div theme='countryWrapper'>
-			<Select
+		return <Select
 				theme='country'
 				value={value}
 				options={countries}
 				{...props}
-			/>
-		</div>;
+			/>;
 	};
 	return Country;
 });
