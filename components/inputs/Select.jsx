@@ -65,6 +65,7 @@ export default ThemeContext.use(h => {
 		const selector = value.selector('selected', null);
 
 		const buttonRef = <raw:button />;
+		const resizeObserver = Observer.mutable(0);
 
 		const Popup = Theme.use(themer => (_, cleanup, mounted) => {
 			const paper = <raw:div />;
@@ -92,7 +93,7 @@ export default ThemeContext.use(h => {
 					let elem = paper.firstChild;
 
 					while (elem) {
-						if (elem.key === val) {
+						if (elem.option === val) {
 							elem.scrollIntoView();
 							break;
 						}
@@ -102,7 +103,7 @@ export default ThemeContext.use(h => {
 			});
 
 			const radius = Observer.immutable('50px'); //themer(theme, 'select').vars('radius');
-			const style = getComputedStyle(buttonRef);
+			const style = resizeObserver.map(() => getComputedStyle(buttonRef));
 
 			const foc = Observer.mutable(false);
 
@@ -112,11 +113,6 @@ export default ThemeContext.use(h => {
 				}, { signal });
 
 				const currentKeys = [];
-
-				// two issues: if the placeholder is selected then arrow keys brick the dropdown and the arrow keys automatically close the dropdown
-				// arrow keys are for navigating not for selecting, Enter/Space should be for selecting the value.
-				// Some how focused/prefocus is getting set to false on key down, not value update, something is watching keydown and triggering `focused`
-				// to be set to false.
 
 				// TODO: Fix search so it instead removes all options that don't match the search from the options array while remaining open.
 				// Currently when the user is typing, it's a single key that selects the option instead of an aggregate string input.
@@ -163,22 +159,27 @@ export default ThemeContext.use(h => {
 							}
 						}
 
+						const ne = [];
+
 						// search and add strings
 						// TODO: Fix non latin languages
 						for (const option of options.get()) {
 							let str = display(option);
 							if (str instanceof Observer) str = str.get();
-							str = str.toString();
+							str = str.toString().toLowerCase();
 
 							for (let i = 0; i < str.length; i++) {
 								if (str[i] === key) {
-									currentKeys.push({ str, i, option });
+									ne.push({ str, i, option });
 								}
 							}
 						}
 
+						currentKeys.push(...ne.sort((a, b) => a.i - b.i));
 						if (currentKeys.length) value.set(currentKeys[0].option);
 					}
+
+					e.preventDefault();
 				}, { signal });
 			})());
 
@@ -188,7 +189,7 @@ export default ThemeContext.use(h => {
 				theme='select'
 				type={foc.map(f => f ? 'focused' : null)}
 				style={{
-					width: style.width,
+					width: style.map(style => style.width),
 					overflow: 'auto',
 					borderTopLeftRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
 					borderTopRightRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
@@ -214,6 +215,9 @@ export default ThemeContext.use(h => {
 				Detached.BOTTOM_LEFT_RIGHT,
 				Detached.TOP_LEFT_RIGHT,
 			]}
+			onResize={() => {
+				resizeObserver.set(resizeObserver.get() + 1);
+			}}
 		>
 			<Button
 				type={['select', 'base', type]}
