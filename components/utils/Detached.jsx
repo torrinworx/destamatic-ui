@@ -93,7 +93,7 @@ const getBounds = (elems) => {
 };
 
 const Detached = ThemeContext.use(h => {
-	const Detached = ({ children, locations = defaultLocations, enabled }, cleanup) => {
+	const Detached = ({ children, locations = defaultLocations, enabled, onResize }, cleanup) => {
 		const focused = enabled || Observer.mutable(false);
 		const popupRef = <raw:div />;
 		const computed = Observer.mutable(false);
@@ -117,11 +117,13 @@ const Detached = ThemeContext.use(h => {
 		const [elems, virtual] = trackedMount(anchor);
 
 		const [focusedRender, focusedAfter] = focused.memo(2);
+		const resizeSignal = Observer.mutable(0);
+
 		cleanup(focusedAfter.effect(value => {
 			if (value !== true) return;
 
 			const bounds = popupRef.getBoundingClientRect();
-			const surround = getBounds(elems);
+			let surround = getBounds(elems);
 
 			const ww = window.innerWidth;
 			const wh = window.innerHeight;
@@ -162,19 +164,28 @@ const Detached = ThemeContext.use(h => {
 
 				let checking = true;
 				const check = () => {
-					if (checking) {
-						const updated = getBounds(elems);
+					if (!checking) return;
 
-						if (surround.left !== updated.left ||
+					const updated = getBounds(elems);
+
+					// if the size changes - update the size if we can
+					if (onResize && (surround.width !== updated.width ||
+							surround.height !== updated.height)) {
+						surround = updated;
+						resizeSignal.set(resizeSignal.get() + 1);
+						onResize();
+
+						// if the dimensions change assume that the page has
+						// been scrolled or whatever and defocus.
+					} else if (surround.left !== updated.left ||
 							surround.right !== updated.right ||
 							surround.top !== updated.top ||
 							surround.bottom !== updated.bottom) {
-							focused.set(false);
-							return;
-						}
-
-						window.requestAnimationFrame(check);
+						focused.set(false);
+						return;
 					}
+
+					window.requestAnimationFrame(check);
 				};
 				window.requestAnimationFrame(check);
 
@@ -213,7 +224,7 @@ const Detached = ThemeContext.use(h => {
 						return true;
 					}}
 					ref={popupRef}
-					placement={focusedAfter.map(rot => {
+					placement={Observer.all([focusedAfter, resizeSignal]).map(([rot]) => {
 						if (typeof rot !== 'number') return null;
 
 						const bounds = getBounds(elems);
