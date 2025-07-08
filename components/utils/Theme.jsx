@@ -466,10 +466,11 @@ const Theme = createContext(createTheme(theme), (nextTheme, { theme: prevTheme }
 			} else {
 				return prev.concat(next);
 			}
-		} else if (typeof prev === 'object' && typeof next === 'object') {
-			const keys = new Set([...Object.keys(next), ...Object.keys(prev)]);
+		} else if (typeof next === 'object') {
+			if (!prev) prev = {};
 
 			let out;
+			const keys = new Set([...Object.keys(next), ...Object.keys(prev)]);
 			if (prev instanceof OObject || next instanceof OObject) {
 				out = OObject();
 			} else {
@@ -488,13 +489,13 @@ const Theme = createContext(createTheme(theme), (nextTheme, { theme: prevTheme }
 		}
 	};
 
-	const update = p => {
+	const update = (p, prop) => {
 		const walk = current => {
 			for (let i = 0; i < p.length && current != null; i++) current = current[p[i]];
 			return current;
 		};
 
-		return zip(walk(prevTheme), walk(nextTheme));
+		return zip(walk(prevTheme), walk(nextTheme), p[p.length - 1]);
 	};
 
 	const out = update([]);
