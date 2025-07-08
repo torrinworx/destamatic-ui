@@ -1,13 +1,9 @@
 import { h } from './h';
 import { OArray, Observer } from 'destam-dom';
 import useAbort from '../../util/abort';
+import createContext from './Context';
 
-/**
- * Global array to hold active popup components.
- * 
- * @type {Array<JSX.Element>}
- */
-export const popups = OArray();
+const RawContext = createContext();
 
 /**
  * Popup component that positions its children absolutely based on the given placement.
@@ -22,7 +18,9 @@ export const popups = OArray();
  * 
  * @returns {null} The popup component does not return a DOM element directly; it sets up an element in the global `popups` array.
  */
-const Popup = ({ children, style, placement, canClose, ref: Ref }, cleanup) => {
+const Popup = RawContext.use(context => ({ children, style, placement, canClose, ref: Ref }, cleanup) => {
+    if (!context) throw new Error("No popup context");
+
     if (!Ref) Ref = <raw:div />;
     if (!(placement instanceof Observer)) placement = Observer.immutable(placement);
 
@@ -41,6 +39,7 @@ const Popup = ({ children, style, placement, canClose, ref: Ref }, cleanup) => {
         maxHeight: placement.map(p => getter(p, 'maxHeight')),
         width: 'max-content',
         height: 'max-content',
+        ...context.style,
         ...style
     }}>
         {children}
@@ -64,14 +63,23 @@ const Popup = ({ children, style, placement, canClose, ref: Ref }, cleanup) => {
         }, {abort}))());
     }
 
-    popups.push(dom);
+    context.popups.push(dom);
 
     cleanup(() => {
-        const index = popups.indexOf(dom);
-        if (index >= 0) popups.splice(index, 1);
+        const index = context.popups.indexOf(dom);
+        if (index >= 0) context.popups.splice(index, 1);
     });
 
     return null;
+});
+
+export const PopupContext = ({children, style}) => {
+    const popups = OArray();
+
+    return <RawContext value={{popups, style}}>
+        {children}
+        {popups}
+    </RawContext>;
 };
 
 export default Popup;

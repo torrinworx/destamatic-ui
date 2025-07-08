@@ -35,7 +35,7 @@ export { default as Gradient } from './components/utils/Gradient.jsx';
 export * from './components/utils/h.jsx';
 export { default as LoadingDots } from './components/utils/LoadingDots.jsx';
 export { default as Popup } from './components/utils/Popup.jsx';
-export { popups } from './components/utils/Popup.jsx';
+export { PopupContext } from './components/utils/Popup.jsx';
 export { default as Ripple } from './components/utils/Ripple.jsx';
 export { default as useRipples } from './components/utils/Ripple.jsx';
 export { default as Shown } from './components/utils/Shown.jsx'
