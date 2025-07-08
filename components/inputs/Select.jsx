@@ -94,7 +94,15 @@ export default ThemeContext.use(h => {
 
 					while (elem) {
 						if (elem.option === val) {
+							let prevX = window.scrollX;
+							let prevY = window.scrollY;
+
 							elem.scrollIntoView();
+
+							// hack: sometimes the above line will scroll the entire
+							// page when it shouldn't. This completely breaks single
+							// page apps.
+							window.scroll(prevX, prevY);
 							break;
 						}
 						elem = elem.nextSibling
