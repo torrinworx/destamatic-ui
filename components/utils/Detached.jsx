@@ -70,6 +70,7 @@ const calculate = (bounds, rot, popup) => {
 		[yProp]: y,
 		maxWidth: window.innerWidth - x,
 		maxHeight: window.innerHeight - y,
+		transformOrigin: `${yProp} ${xProp}`,
 	};
 };
 
