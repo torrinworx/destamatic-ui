@@ -229,7 +229,7 @@ const Detached = ThemeContext.use(h => {
 
 						const bounds = getBounds(elems);
 						return calculate(bounds, rot, popupRef.getBoundingClientRect());
-					}).setter(() => focused.set(false))}
+					}).memo().setter(() => focused.set(false))}
 					style={{
 						visibility: computed.map(c => c ? 'visible' : 'hidden'),
 					}}
