@@ -24,19 +24,29 @@ const Popup = RawContext.use(context => ({ children, style, placement, canClose,
     if (!Ref) Ref = <raw:div />;
     if (!(placement instanceof Observer)) placement = Observer.immutable(placement);
 
-    const getter = (obj, name) => {
-        if (obj?.[name] !== undefined) return obj[name];
-        return undefined;
+    const getter = (name, scale) => {
+        if (scale) {
+            return Observer.all([placement, Observer.immutable(scale)]).map(([obj, scale]) => {
+                if (obj?.[name] !== undefined) return obj[name] / scale;
+                return undefined;
+            });
+        } else {
+            return placement.map(obj => {
+                if (obj?.[name] !== undefined) return obj[name];
+                return undefined;
+            });
+        }
     };
 
     const dom = <Ref style={{
         position: 'absolute',
-        left: placement.map(p => getter(p, 'left')),
-        top: placement.map(p => getter(p, 'top')),
-        right: placement.map(p => getter(p, 'right')),
-        bottom: placement.map(p => getter(p, 'bottom')),
-        maxWidth: placement.map(p => getter(p, 'maxWidth')),
-        maxHeight: placement.map(p => getter(p, 'maxHeight')),
+        left: getter('left'),
+        top: getter('top'),
+        right: getter('right'),
+        bottom: getter('bottom'),
+        maxWidth: getter('maxWidth', context.scale),
+        maxHeight: getter('maxHeight', context.scale),
+        transformOrigin: getter('transformOrigin'),
         width: 'max-content',
         height: 'max-content',
         ...context.style,
@@ -44,6 +54,10 @@ const Popup = RawContext.use(context => ({ children, style, placement, canClose,
     }}>
         {children}
     </Ref>;
+
+    // assign the actual dom node to the element. Sometimes it's useful to get the
+    // dom node from a list of popups
+    dom.elem = Ref;
 
     if (!placement.isImmutable()) {
         cleanup(useAbort(abort => document.body.addEventListener('mousedown', e => {
@@ -73,10 +87,10 @@ const Popup = RawContext.use(context => ({ children, style, placement, canClose,
     return null;
 });
 
-export const PopupContext = ({children, style}) => {
-    const popups = OArray();
+export const PopupContext = ({children, popups, ...stuff}) => {
+    if (!popups) popups = OArray();
 
-    return <RawContext value={{popups, style}}>
+    return <RawContext value={{popups, ...stuff}}>
         {children}
         {popups}
     </RawContext>;
