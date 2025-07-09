@@ -2,7 +2,6 @@ import { mark } from '../utils/h';
 import Observer from 'destam/Observer';
 import Typography from '../display/Typography';
 import { Icon } from '../display/Icon';
-import Paper from '../display/Paper';
 import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
 import Detached from '../utils/Detached';
@@ -10,9 +9,22 @@ import Button from '../inputs/Button';
 import useAbort from '../../util/abort';
 
 Theme.define({
-	select_paper: {
+	select: {
+		extends: 'radius',
+	},
+
+	select_popup: {
 		boxShadow: 'none',
-		maxHeight: 500,
+		background: '$invert($color_top)',
+		color: '$color_top',
+	},
+
+	select_icon: {
+		display: 'flex',
+		justifyContent: 'right',
+		marginLeft: 'auto',
+		transition: 'transform 100ms ease-in-out',
+		width: 25,
 	},
 
 	select_selectable: {
@@ -50,7 +62,7 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None' }, cleanup, mounted) => {
+	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None', theme }, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(options instanceof Observer)) options = Observer.immutable(options);
 
@@ -68,7 +80,7 @@ export default ThemeContext.use(h => {
 		const resizeObserver = Observer.mutable(0);
 
 		const Popup = Theme.use(themer => (_, cleanup, mounted) => {
-			const paper = <raw:div />;
+			const Paper = <raw:div />;
 			const Selectable = ({ each: option }) => {
 				return <Button
 					$option={option}
@@ -90,7 +102,7 @@ export default ThemeContext.use(h => {
 			// auto scroll to selected value on popup open
 			queueMicrotask(() => {
 				cleanup(value.effect(val => {
-					let elem = paper.firstChild;
+					let elem = Paper.firstChild;
 
 					while (elem) {
 						if (elem.option === val) {
@@ -110,7 +122,7 @@ export default ThemeContext.use(h => {
 				}));
 			});
 
-			const radius = Observer.immutable('50px'); //themer(theme, 'select').vars('radius');
+			const radius = themer(theme, 'select', type).vars('radius');
 			const style = resizeObserver.map(() => getComputedStyle(buttonRef));
 
 			const foc = Observer.mutable(false);
@@ -192,10 +204,8 @@ export default ThemeContext.use(h => {
 			})());
 
 			return <Paper
-				ref={paper}
 				tight
-				theme='select'
-				type={foc.map(f => f ? 'focused' : null)}
+				theme={['select', 'popup', foc.bool('focused', null)]}
 				style={{
 					width: style.map(style => style.width),
 					overflow: 'auto',
@@ -252,15 +262,13 @@ export default ThemeContext.use(h => {
 						}
 					})}
 				</Typography>
-				<Icon
-					name='chevron-down'
-					size={16}
-					style={{
-						marginLeft: 'auto',
-						transform: focused.map(f => f ? 'rotate(180deg)' : null),
-						transition: 'transform 100ms ease-in-out',
-					}}
-				/>
+				<div theme="select_icon">
+					<Icon
+						name='chevron-down'
+						size={16}
+						rot={focused.bool(180, 0)}
+					/>
+				</div>
 			</Button>
 
 			<mark:popup>
