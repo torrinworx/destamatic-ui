@@ -1,6 +1,6 @@
 import { mount, Observer } from 'destam-dom';
 import FeatherIcons from "destamatic-ui/components/icons/FeatherIcons";
-import { Button, Stage, StageContext, popups, TextField, Typography, Icons, Popup, Paper } from 'destamatic-ui';
+import { Button, Stage, StageContext, TextField, Typography, Icons, Popup, PopupContext } from 'destamatic-ui';
 
 const pages = {
     stages: {
@@ -39,7 +39,7 @@ const pages = {
     }
 };
 
-const Pages = StageContext.use(s => (_,__, mounted) => {
+const Pages = StageContext.use(s => (_, __, mounted) => {
     const buttons = [
         {
             label: 'Home',
@@ -180,15 +180,17 @@ const Modals = StageContext.use(s => () => <>
 
 mount(document.body, <div>
     <Icons value={[FeatherIcons]}>
-        <Typography type='h1' label='Stage' />
-        <Typography type='p1' label='A Stage allows you to display, transition between, template, and control different components.' />
-        <StageContext value={pages}>
-            <Pages />
-        </StageContext>
-        <StageContext value={modals}>
-            <Modals />
-            <Stage />
-            {popups}
-        </StageContext>
+        <PopupContext>
+            <Typography type='h1' label='Stage' />
+            <Typography type='p1' label='A Stage allows you to display, transition between, template, and control different components.' />
+            <StageContext value={pages}>
+                <Pages />
+            </StageContext>
+            <StageContext value={modals}>
+                <Modals />
+                <Stage />
+                <Popup />
+            </StageContext>
+        </PopupContext>
     </Icons>
-</div>);
+</div >);
