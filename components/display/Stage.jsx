@@ -119,7 +119,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 		}
 	}));
 
-	return Observer.all([s.observer.path('template'), aniCurrent])
+	return Observer.all([s.observer.path('template').unwrap(), aniCurrent])
 		.map(([Template, c]) => {
 			if (!c) return null;
 
