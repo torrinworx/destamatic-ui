@@ -1,10 +1,9 @@
 import { Observer } from 'destam-dom';
 
 import Theme from '../utils/Theme';
+import useRipples from '../utils/Ripple';
 import ThemeContext from '../utils/ThemeContext';
 
-import useRipples from '../utils/Ripple';
-import Typography from '../display/Typography';
 
 Theme.define({
 	button: {
@@ -117,7 +116,6 @@ export default ThemeContext.use(h => {
 		iconPosition = 'left',
 		...props
 	}) => {
-		if (typeof label === 'string') label = <Typography type='p1' label={label} />
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
