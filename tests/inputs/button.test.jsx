@@ -57,18 +57,7 @@ describe('Button', () => {
 		const button = tree.children[0];
 		expect(button.name).toBe('button');
 
-		// Check the button's container structure
-		expect(button.children.length).toBeGreaterThan(0);
-
-		// Look for Typography div
-		const div = button.children.find(child => child.name === 'div' && child.children);
-
-		// Check for Typography component wrapped around the label inside the div
-		expect(div).toBeDefined();
-
-		// Check the button's text content is the new label
-		expect(div.children).toContain(testLabel);
-
+		expect(button.children).toContain(testLabel);
 	});
 
 	it('Should render all button types without error', () => {
