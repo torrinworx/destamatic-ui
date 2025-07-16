@@ -78,12 +78,20 @@ const DefaultTemplate = ThemeContext.use(h => ({ s, closeSignal, children }, cle
 });
 
 export const StageContext = createContext(() => null, (value) => {
-	const { stages, template: defaultTemplate = DefaultTemplate, ...globalProps } = value;
+	const { stages, onOpen, template: defaultTemplate = DefaultTemplate, ...globalProps } = value;
 
 	const Stage = OObject({
 		stages,
 		template: defaultTemplate,
 		open: ({ name, template = Stage.template, onClose, ...props }) => {
+			if (Stage.onOpen) {
+				const result = Stage.onOpen({ name, template, props });
+
+				name = result?.name || name;
+				template = result?.template || template;
+				props = result?.props || props;
+			}
+
 			Stage.props = { ...globalProps, ...props };
 			Stage.template = template;
 			Stage.current = name;
@@ -100,6 +108,7 @@ export const StageContext = createContext(() => null, (value) => {
 		},
 		current: null,
 		currentDelay: 150,
+		onOpen,
 	});
 
 	return Stage;
