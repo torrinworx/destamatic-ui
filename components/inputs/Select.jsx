@@ -9,10 +9,6 @@ import Button from '../inputs/Button';
 import useAbort from '../../util/abort';
 
 Theme.define({
-	select: {
-		extends: 'radius',
-	},
-
 	select_popup: {
 		boxShadow: 'none',
 		background: '$invert($color_top)',
@@ -129,7 +125,7 @@ export default ThemeContext.use(h => {
 				}));
 			});
 
-			const radius = themer(theme, 'select', type).vars('radius');
+			const radius = themer(theme, 'button', 'select', 'base', type).vars('radius');
 			const style = resizeObserver.map(() => getComputedStyle(buttonRef));
 
 			const foc = Observer.mutable(false);
@@ -216,10 +212,15 @@ export default ThemeContext.use(h => {
 				style={{
 					width: style.map(style => style.width),
 					overflow: 'auto',
-					borderTopLeftRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
-					borderTopRightRadius: focused.map(f => f !== Detached.TOP_LEFT_RIGHT ? 0 : null),
-					borderBottomLeftRadius: focused.map(f => f !== Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
-					borderBottomRightRadius: focused.map(f => f !== Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
+					borderRadius: Observer.all([focused, radius]).map(([f, r]) => {
+						if (f === Detached.TOP_LEFT_RIGHT) {
+							return `${r} ${r} 0px 0px`;
+						} else if (f === Detached.BOTTOM_LEFT_RIGHT) {
+							return `0px 0px ${r} ${r}`;
+						} else {
+							return null;
+						}
+					}),
 					clipPath: Observer.all([focused, radius]).map(([f, r]) => {
 						if (f === Detached.TOP_LEFT_RIGHT) {
 							return `inset(-${r} -${r} 0px -${r})`;
