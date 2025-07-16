@@ -72,7 +72,6 @@ export default ThemeContext.use(h => {
 			// create list of options from keys from options object and set as objects
 			optionsObj = options;
 			if (!(options instanceof Observer)) options = Observer.immutable(Object.keys(options));
-			console.log(optionsObj);
 		}
 
 		if (Array.isArray(display)) {
