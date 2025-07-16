@@ -62,16 +62,23 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None', theme }, cleanup, mounted) => {
+	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None', theme }) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
-		if (!(options instanceof Observer)) options = Observer.immutable(options);
+
+		let optionsObj;
+		if (Array.isArray(options)) {
+			if (!(options instanceof Observer)) options = Observer.immutable(options);
+		} else if (typeof options === 'object') {
+			// create list of options from keys from options object and set as objects
+			optionsObj = options;
+			if (!(options instanceof Observer)) options = Observer.immutable(Object.keys(options));
+			console.log(optionsObj);
+		}
 
 		if (Array.isArray(display)) {
 			let arr = display;
 			display = a => arr[options.get().indexOf(a)];
-		} else if (!display) {
-			display = a => a;
-		}
+		} else if (!display) display = a => a;
 
 		const [preFocus, focused] = Observer.mutable(false).memo(2);
 		const selector = value.selector('selected', null);
@@ -79,7 +86,7 @@ export default ThemeContext.use(h => {
 		const buttonRef = <raw:button />;
 		const resizeObserver = Observer.mutable(0);
 
-		const Popup = Theme.use(themer => (_, cleanup, mounted) => {
+		const Popup = Theme.use(themer => (_, cleanup) => {
 			const Paper = <raw:div />;
 			const Selectable = ({ each: option }) => {
 				return <Button
@@ -90,7 +97,8 @@ export default ThemeContext.use(h => {
 						selector(option)
 					]}
 					onMouseDown={e => e.preventDefault()}
-					onMouseUp={e => {
+					onMouseUp={() => {
+						if (optionsObj) optionsObj[option]();
 						value.set(option);
 						focused.set(false);
 					}}
