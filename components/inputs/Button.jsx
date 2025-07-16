@@ -170,9 +170,9 @@ export default ThemeContext.use(h => {
 			theme={[
 				'button',
 				type,
-				hover.map(h => h ? 'hovered' : null),
-				disabled.map(d => d ? 'disabled' : null),
-				focused.map(d => d ? 'focused' : null),
+				hover.bool('hovered', null),
+				disabled.bool('disabled', null),
+				focused.bool('focused', null),
 			]}
 		>
 			{iconPosition === 'left' ? icon : null}
