@@ -7,6 +7,7 @@ import ThemeContext from '../utils/ThemeContext';
 import Paper from '../display/Paper';
 import '../display/Typography';
 import trackedMount from '../../util/trackedMount';
+import categories from '../../util/categories';
 
 Theme.define({
 	tooltip_paper: {
@@ -26,21 +27,8 @@ const defaultLocations = [
 
 export default ThemeContext.use(h => {
 	const Tooltip = ({children, label, enabled = false, locations = defaultLocations, type}, cleanup, mounted) => {
-		const popup = [];
-		for (let i = 0; i < children.length; i++) {
-			const item = children[i];
-			if (item instanceof mark) {
-				if (item.name === 'popup') {
-					popup.push(...item.props.children);
-					children.splice(i--, 1);
-				} else {
-					throw new Error("Tooltip does not take a mark other than popup");
-				}
-			}
-		}
-
-
-		const [elems, virtual] = trackedMount(children);
+		const [popup, anchor] = categories(children, ['popup', 'anchor'], 'anchor');
+		const [elems, virtual] = trackedMount(anchor);
 		if (!(enabled instanceof Observer)) enabled = Observer.mutable(enabled);
 
 		if (!enabled.isImmutable()) {

@@ -1,4 +1,3 @@
-import { mark } from './h';
 import Observer from 'destam/Observer';
 import Popup from './Popup';
 import Shown from './Shown';
@@ -6,6 +5,7 @@ import ThemeContext from './ThemeContext';
 
 import { mount } from 'destam-dom';
 import trackedMount from '../../util/trackedMount';
+import categories from '../../util/categories';
 
 const clamp = (x, l, h) => Math.max(l, Math.min(h, x));
 
@@ -99,22 +99,7 @@ const Detached = ThemeContext.use(h => {
 		const popupRef = <raw:div />;
 		const computed = Observer.mutable(false);
 
-		const popup = [];
-		const anchor = [];
-		for (const child of children) {
-			if (child instanceof mark) {
-				if (child.name === 'popup') {
-					popup.push(...child.props.children);
-				} else if (child.name === 'anchor') {
-					anchor.push(...child.props.children);
-				} else {
-					throw new Error("Detached only accepts popup and anchor mark elements");
-				}
-			} else {
-				anchor.push(child);
-			}
-		}
-
+		const [popup, anchor] = categories(children, ['popup', 'anchor'], 'anchor');
 		const [elems, virtual] = trackedMount(anchor);
 
 		const [focusedRender, focusedAfter] = focused.memo(2);
