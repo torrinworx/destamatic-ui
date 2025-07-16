@@ -149,7 +149,6 @@ const FileDrop = ThemeContext.use(h => {
 					}
 				}
 
-				console.log(readyFiles);
 				if (readyFiles.length === 0) {
 					ready.set(null);
 				} else if (multiple) {
