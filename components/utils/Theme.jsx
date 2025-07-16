@@ -444,7 +444,7 @@ const createTheme = theme => {
 		const out = defines.map(insertStyle);
 		out.defines = defines;
 		out.vars = (name, ...params) =>
-			defines.map(defines => getVar({ name, params: params.length ? params : null, index: Infinity }, defines)).unwrap();
+			defines.map(defines => getVar({ name, params: params.length ? params : null, index: Infinity }, defines)).unwrap().memo();
 		return out;
 	};
 
