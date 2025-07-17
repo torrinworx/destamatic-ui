@@ -210,6 +210,7 @@ export default ThemeContext.use(h => {
 				tight
 				theme={['select', 'popup', foc.bool('focused', null)]}
 				style={{
+					flex: '1 1 auto',
 					width: style.map(style => style.width),
 					overflow: 'auto',
 					borderRadius: Observer.all([focused, radius]).map(([f, r]) => {
@@ -243,6 +244,10 @@ export default ThemeContext.use(h => {
 			]}
 			onResize={() => {
 				resizeObserver.set(resizeObserver.get() + 1);
+			}}
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
 			}}
 		>
 			<Button
