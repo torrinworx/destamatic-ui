@@ -60,15 +60,7 @@ Theme.define({
 export default ThemeContext.use(h => {
 	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None', theme }) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
-
-		let optionsObj;
-		if (Array.isArray(options)) {
-			if (!(options instanceof Observer)) options = Observer.immutable(options);
-		} else if (typeof options === 'object') {
-			// create list of options from keys from options object and set as objects
-			optionsObj = options;
-			if (!(options instanceof Observer)) options = Observer.immutable(Object.keys(options));
-		}
+		if (!(options instanceof Observer)) options = Observer.immutable(options);
 
 		if (Array.isArray(display)) {
 			let arr = display;
