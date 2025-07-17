@@ -94,7 +94,7 @@ const getBounds = (elems) => {
 };
 
 const Detached = ThemeContext.use(h => {
-	const Detached = ({ children, locations = defaultLocations, enabled, onResize }, cleanup) => {
+	const Detached = ({ children, locations = defaultLocations, enabled, onResize, style }, cleanup) => {
 		const focused = enabled || Observer.mutable(false);
 		const popupRef = <raw:div />;
 		const computed = Observer.mutable(false);
@@ -218,6 +218,7 @@ const Detached = ThemeContext.use(h => {
 					}).memo().setter(() => focused.set(false))}
 					style={{
 						visibility: computed.map(c => c ? 'visible' : 'hidden'),
+						...style,
 					}}
 				>
 					<Contents />
