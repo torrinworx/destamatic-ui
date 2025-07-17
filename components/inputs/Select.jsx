@@ -93,7 +93,6 @@ export default ThemeContext.use(h => {
 					]}
 					onMouseDown={e => e.preventDefault()}
 					onMouseUp={() => {
-						if (optionsObj) optionsObj[option]();
 						if (!value.isImmutable()) value.set(option);
 						focused.set(false);
 					}}
