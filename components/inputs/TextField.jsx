@@ -10,16 +10,18 @@ export default ThemeContext.use(h => {
 		onEnter,
 		error,
 		focus = false,
-		autofocus,
 		Ref = <raw:input />,
 		...props
-	}, cleanup, mounted) => {
+	}, cleanup) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
 		if (!(expand instanceof Observer)) expand = Observer.immutable(expand);
 		if (!(focus instanceof Observer)) focus = Observer.mutable(focus);
 
-		if (autofocus) mounted(() => Ref.focus());
+		cleanup(focus.effect(e => {
+			if (e) Ref.focus();
+			else Ref.blur();
+		}));
 
 		return <Ref
 			$value={value.def('')}
