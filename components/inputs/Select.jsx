@@ -2,11 +2,13 @@ import { mark } from '../utils/h';
 import Observer from 'destam/Observer';
 import Typography from '../display/Typography';
 import { Icon } from '../display/Icon';
-import Theme from '../utils/Theme';
 import ThemeContext from '../utils/ThemeContext';
-import Detached from '../utils/Detached';
 import Button from '../inputs/Button';
 import useAbort from '../../util/abort';
+import Attached from '../utils/Attached';
+import Theme from '../utils/Theme';
+
+import categories from '../../util/categories';
 
 Theme.define({
 	select_popup: {
@@ -69,34 +71,13 @@ export default ThemeContext.use(h => {
 
 		const [preFocus, focused] = Observer.mutable(false).memo(2);
 		const selector = value.selector('selected', null);
+		const refPopup = <raw:div />;
 
-		const buttonRef = <raw:button />;
-		const resizeObserver = Observer.mutable(0);
-
-		const Popup = Theme.use(themer => (_, cleanup) => {
-			const Paper = <raw:div />;
-			const Selectable = ({ each: option }) => {
-				return <Button
-					$option={option}
-					focused={Observer.immutable(false)}
-					type={[
-						'select_selectable',
-						selector(option)
-					]}
-					onMouseDown={e => e.preventDefault()}
-					onMouseUp={() => {
-						if (!value.isImmutable()) value.set(option);
-						focused.set(false);
-					}}
-				>
-					{display(option)}
-				</Button>;
-			};
-
+		const Popup = (_, cleanup) => {
 			// auto scroll to selected value on popup open
 			queueMicrotask(() => {
 				cleanup(value.effect(val => {
-					let elem = Paper.firstChild;
+					let elem = refPopup.firstChild;
 
 					while (elem) {
 						if (elem.option === val) {
@@ -116,16 +97,7 @@ export default ThemeContext.use(h => {
 				}));
 			});
 
-			const radius = themer(theme, 'button', 'select', 'base', type).vars('radius');
-			const style = resizeObserver.map(() => getComputedStyle(buttonRef));
-
-			const foc = Observer.mutable(false);
-
 			cleanup(useAbort(signal => {
-				requestAnimationFrame(() => {
-					foc.set(true);
-				}, { signal });
-
 				const currentKeys = [];
 
 				// TODO: Fix search so it instead removes all options that don't match the search from the options array while remaining open.
@@ -197,65 +169,40 @@ export default ThemeContext.use(h => {
 				}, { signal });
 			})());
 
-			return <Paper
-				tight
-				theme={['select', 'popup', foc.bool('focused', null)]}
-				style={{
-					flex: '1 1 auto',
-					width: style.map(style => style.width),
-					overflow: 'auto',
-					borderRadius: Observer.all([focused, radius]).map(([f, r]) => {
-						if (f === Detached.TOP_LEFT_RIGHT) {
-							return `${r} ${r} 0px 0px`;
-						} else if (f === Detached.BOTTOM_LEFT_RIGHT) {
-							return `0px 0px ${r} ${r}`;
-						} else {
-							return null;
-						}
-					}),
-					clipPath: Observer.all([focused, radius]).map(([f, r]) => {
-						if (f === Detached.TOP_LEFT_RIGHT) {
-							return `inset(-${r} -${r} 0px -${r})`;
-						} else if (f === Detached.BOTTOM_LEFT_RIGHT) {
-							return `inset(0px -${r} -${r} -${r})`;
-						} else {
-							return null;
-						}
-					}),
-				}}>
-				<Selectable each={options} />
-			</Paper>
-		});
+			return <Selectable each={options} />
+		};
 
-		return <Detached
-			enabled={focused}
-			locations={[
-				Detached.BOTTOM_LEFT_RIGHT,
-				Detached.TOP_LEFT_RIGHT,
-			]}
-			onResize={() => {
-				resizeObserver.set(resizeObserver.get() + 1);
-			}}
-			style={{
-				display: 'flex',
-				flexDirection: 'column',
-			}}
-		>
-			<Button
-				type={['select', 'base', type]}
-				ref={buttonRef}
+		const Selectable = ({ each: option }) => {
+			return <Button
+				$option={option}
+				focused={Observer.immutable(false)}
+				type={[
+					'select_selectable',
+					selector(option)
+				]}
+				onMouseDown={e => e.preventDefault()}
+				onMouseUp={() => {
+					if (!value.isImmutable()) value.set(option);
+					focused.set(false);
+				}}
+			>
+				{display(option)}
+			</Button>;
+		};
+
+		return <Attached
+			Anchor={Button}
+			anchorTheme='button'
+			focused={preFocus}
+			type='select'
+		 >
+		 	<mark:anchor
+		 		type={['select', 'base', type]}
 				onMouseDown={e => {
 					e.preventDefault();
 					focused.set(!focused.get());
 				}}
-				focused={preFocus}
-				style={{
-					borderTopLeftRadius: focused.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
-					borderTopRightRadius: focused.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
-					borderBottomLeftRadius: focused.map(f => f === Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
-					borderBottomRightRadius: focused.map(f => f === Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
-					...style,
-				}}
+				style={style}
 			>
 				<Typography type='p1'>
 					{value.map(val => {
@@ -273,12 +220,12 @@ export default ThemeContext.use(h => {
 						rot={focused.bool(180, 0)}
 					/>
 				</div>
-			</Button>
+			</mark:anchor>
 
-			<mark:popup>
+			<mark:popup theme={['button', 'select', 'base', type]} ref={refPopup}>
 				<Popup />
 			</mark:popup>
-		</Detached>;
+		</Attached>;
 	};
 
 	return Select;
