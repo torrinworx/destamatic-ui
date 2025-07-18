@@ -222,7 +222,7 @@ export default ThemeContext.use(h => {
 				</div>
 			</mark:anchor>
 
-			<mark:popup theme={['button', 'select', 'base', type]} ref={refPopup}>
+			<mark:popup ref={refPopup}>
 				<Popup />
 			</mark:popup>
 		</Attached>;
