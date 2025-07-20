@@ -3,7 +3,7 @@ import Observer, { observerGetter, shallowListener } from 'destam/Observer';
 import { sizeProperties } from '../../util/index.js';
 import Theme from './Theme';
 import useAbort from '../../util/abort.js';
-import {assert} from 'destam/util.js';
+import { assert } from 'destam/util.js';
 
 // This h element overrides the default behavoior that destam-dom gives for
 // overriding styles. destam-dom will never try to be more fancy than the browser
@@ -101,7 +101,7 @@ const hypertext = (useThemes, name, props = {}, ...children) => {
 			delete props[o];
 
 			signals.push(useAbort(signal => {
-				name.addEventListener(handlerName, handler, {signal});
+				name.addEventListener(handlerName, handler, { signal });
 			}));
 		} else if (o.length >= 3 && o.startsWith('is') && o[2].toLowerCase() !== o[2]) {
 			const handlers = {
@@ -123,8 +123,8 @@ const hypertext = (useThemes, name, props = {}, ...children) => {
 			signals.push(useAbort(signal => {
 				let enter = () => obs.set(true);
 				let leave = () => obs.set(false);
-				name.addEventListener(handler[0], enter, {signal});
-				name.addEventListener(handler[1], leave, {signal});
+				name.addEventListener(handler[0], enter, { signal });
+				name.addEventListener(handler[1], leave, { signal });
 			}));
 		}
 	}
