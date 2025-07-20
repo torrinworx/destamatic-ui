@@ -1,5 +1,5 @@
 import { mount, Observer } from 'destam-dom';
-import { Country, popups, Select, Typography, Shown } from 'destamatic-ui';
+import { Country, Select, Typography, Shown, PopupContext, Popup } from 'destamatic-ui';
 
 const value = Observer.mutable(null);
 const country = Observer.mutable(null);
@@ -10,7 +10,8 @@ country.watch(() => console.log('country: ', country.get()));
 const region = Observer.mutable(null);
 region.watch(() => console.log('region: ', region.get()));
 
-mount(document.body, <>
+mount(document.body, <PopupContext>
+
 	<Typography type='h4' label='Country' />
 	<Country value={value} type='contained' country={country} placeholder='Select a Country' />
 
@@ -26,5 +27,5 @@ mount(document.body, <>
 			options={country.map(c => c[2].map(r => r[0]))} // we set region to the string, but r contains region name and code: ['Ontario', 'ON']
 		/>
 	</Shown>
-	{popups}
-</>);
+	<Popup />
+</PopupContext>);
