@@ -7,7 +7,6 @@ import TextField from '../inputs/TextField';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
-	typography: { display: 'block' },
 	typography_h1: { fontSize: 62 },
 	typography_h2: { fontSize: 56 },
 	typography_h3: { fontSize: 36 },
