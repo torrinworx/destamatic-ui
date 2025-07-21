@@ -27,6 +27,12 @@ export default ThemeContext.use(h => {
 				requestAnimationFrame(() => {
 					foc.set(true);
 				}, {signal});
+
+				window.addEventListener('keydown', e => {
+					if (e.key === 'Escape') {
+						focused.set(false);
+					}
+				}, { signal });
 			})());
 
 			return <Paper
@@ -60,7 +66,7 @@ export default ThemeContext.use(h => {
 		});
 
 		return <Detached
-			enabled={preFocus}
+			enabled={postFocus}
 			locations={[
 				Detached.BOTTOM_LEFT_RIGHT,
 				Detached.TOP_LEFT_RIGHT,
@@ -74,9 +80,9 @@ export default ThemeContext.use(h => {
 			}}
 		>
 			<Anchor
+				focused={preFocus}
 				{...anchor.props}
 				ref={ref}
-				focused={preFocus}
 				style={{
 					borderTopLeftRadius: postFocus.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
 					borderTopRightRadius: postFocus.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
