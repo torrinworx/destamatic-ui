@@ -40,6 +40,7 @@ export default ThemeContext.use(h => {
 			theme,
 			type,
 			autofocus,
+			ref: Ref = <raw:textarea />,
 			...props
 		},
 		_,
@@ -48,7 +49,6 @@ export default ThemeContext.use(h => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
 
-		const Ref = <raw:textarea />;
 		const isMounted = Observer.mutable(false);
 		const isFocused = Observer.mutable(false);
 
