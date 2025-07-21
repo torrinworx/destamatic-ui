@@ -4,7 +4,7 @@ import Shown from '../utils/Shown';
 import Paper from '../display/Paper';
 import Button from '../inputs/Button';
 import Icon from '../display/Icon';
-import Typography from '../display/Typography';
+import { Typography } from '../display/Typography';
 import LoadingDots from '../utils/LoadingDots';
 import Context from '../utils/Context';
 import { h } from '../utils/h';
@@ -62,10 +62,10 @@ Theme.define({
 
 const FileDropContext = Context(null);
 
-const Listing = FileDropContext.use(({files}) => () => {
-	const File = ({each: file}) => {
+const Listing = FileDropContext.use(({ files }) => () => {
+	const File = ({ each: file }) => {
 		return <Paper type='fileDrop'>
-			<Icon name="file" style={{margin: 10}} />
+			<Icon name="file" style={{ margin: 10 }} />
 			<Typography type="fileDrop_expand" label={file.observer.path('name')} />
 			{file.observer.path('status').map(status => {
 				if (status === 'loading') {
@@ -92,7 +92,7 @@ const Listing = FileDropContext.use(({files}) => () => {
 	return <File each={files} />;
 });
 
-const UploadButton = FileDropContext.use(({files, handleFiles, extensions, multiple}) => props => {
+const UploadButton = FileDropContext.use(({ files, handleFiles, extensions, multiple }) => props => {
 	return <Button {...props} onClick={event => {
 		if (props.onClick) props.onClick(event);
 
@@ -128,7 +128,7 @@ const FileDrop = ThemeContext.use(h => {
 					textAlign: 'center',
 				}}>
 					<Icon name='download' style={{ color: '$color' }} />
-					<div style={{padding: 10}}>Drop your file here or <span theme={theme} style={{ color: '$color' }}>browse</span></div>
+					<div style={{ padding: 10 }}>Drop your file here or <span theme={theme} style={{ color: '$color' }}>browse</span></div>
 					<Shown value={extensions.length}>
 						<Typography type='p12_subtext' label={"Supports: " + extensions.join(', ')} />
 					</Shown>
@@ -270,7 +270,7 @@ const FileDrop = ThemeContext.use(h => {
 				selectFile(extensions, multiple).then(handleFiles);
 			}}
 		>
-			<FileDropContext value={{files, handleFiles, extensions, multiple}}>
+			<FileDropContext value={{ files, handleFiles, extensions, multiple }}>
 				{children}
 			</FileDropContext>
 		</Div>;

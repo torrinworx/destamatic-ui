@@ -5,7 +5,7 @@ import Popup from '../utils/Popup';
 import Theme from '../utils/Theme';
 import Paper from './Paper';
 import Button from '../inputs/Button';
-import Typography from './Typography';
+import { Typography } from './Typography';
 import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
 

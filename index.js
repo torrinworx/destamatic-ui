@@ -7,7 +7,7 @@ export { default as Paper } from './components/display/Paper.jsx';
 export { default as Row } from './components/display/Row.jsx';
 export * from './components/display/Stage.jsx';
 export { default as Tooltip } from './components/display/Tooltip.jsx';
-export { default as Typography } from './components/display/Typography.jsx';
+export * from './components/display/Typography.jsx';
 
 // inputs
 export { default as Button } from './components/inputs/Button.jsx';

@@ -1,6 +1,6 @@
 import { mark } from '../utils/h';
 import Observer from 'destam/Observer';
-import Typography from '../display/Typography';
+import { Typography } from '../display/Typography';
 import { Icon } from '../display/Icon';
 import ThemeContext from '../utils/ThemeContext';
 import Button from '../inputs/Button';
@@ -193,9 +193,9 @@ export default ThemeContext.use(h => {
 			anchorTheme='button'
 			focused={preFocus}
 			type='select'
-		 >
-		 	<mark:anchor
-		 		type={['select', 'base', type]}
+		>
+			<mark:anchor
+				type={['select', 'base', type]}
 				onMouseDown={e => {
 					e.preventDefault();
 					focused.set(!focused.get());

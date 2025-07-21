@@ -4,7 +4,7 @@ import Theme from './Theme';
 import Shown from './Shown';
 import Icon from '../display/Icon';
 import createContext from './Context';
-import Typography from '../display/Typography';
+import { Typography } from '../display/Typography';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
