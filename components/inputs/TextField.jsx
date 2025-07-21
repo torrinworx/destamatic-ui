@@ -10,7 +10,7 @@ export default ThemeContext.use(h => {
 		onEnter,
 		error,
 		focus = false,
-		Ref = <raw:input />,
+		ref: Ref = <raw:input />,
 		...props
 	}, cleanup) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
