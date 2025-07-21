@@ -99,8 +99,6 @@ export const Typography = ThemeContext.use(h => {
 			}
 		}
 
-		console.log(display);
-
 		return <Ref
 			{...props}
 			theme={['row', 'typography', ...Array.isArray(type) ? type : type.split('_')]}
