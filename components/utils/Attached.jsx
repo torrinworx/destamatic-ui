@@ -36,7 +36,7 @@ export default ThemeContext.use(h => {
 			})());
 
 			return <Paper
-				theme={[theme, type, 'popup', foc.bool('focused', null)]}
+				theme={[theme, popup.props.theme, type, 'popup', foc.bool('focused', null)]}
 				style={{
 					flex: '1 1 auto',
 					width: style.map(style => style.width),
@@ -59,6 +59,7 @@ export default ThemeContext.use(h => {
 							return null;
 						}
 					}),
+					...popup.props.style,
 				}}
 			>
 				{popup}
