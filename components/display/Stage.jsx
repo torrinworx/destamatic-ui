@@ -141,7 +141,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 			if (s && s.stages && typeof c === 'string' && c in s.stages) {
 				Stage = s.stages[c];
 			} else {
-				console.error(`Stage with '${c}' does not exist in stages list.`);
+				console.error(`Stage component with '${c}' does not exist in stages list.`);
 			}
 
 			return <Template closeSignal={closeSignal} s={s} m={s}>
