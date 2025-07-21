@@ -2,7 +2,7 @@ import { Observer } from 'destam';
 import { mount } from 'destam-dom';
 import { Button, TextField, Typography, TextModifiers } from 'destamatic-ui';
 
-const value = Observer.mutable('Hello World! --> :frog: :heart: :turtle: ????');
+const value = Observer.mutable('Hello World! --> :frog: :heart: :turtle: --> ????');
 
 const emojis = {
     frog: '🐸',
