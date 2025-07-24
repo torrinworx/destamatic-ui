@@ -142,7 +142,7 @@ export const Typography = ThemeContext.use(h => {
 		if (children.length > 0) {
 			display = children
 		} else if (label) { // modifiers only run on label and if modifiers provided.
-			if (modifiers.length > 0) {
+			if (modifiers.length > 0 || displayMap) {
 				display = label.map(l => applyModifiers(l, modifiers, displayMap));
 			} else {
 				display = label;
