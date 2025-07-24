@@ -1,3 +1,4 @@
+import { UUID } from 'destam';
 import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
 import Theme from '../utils/Theme';
@@ -23,8 +24,12 @@ export const TextModifiers = createContext(() => null, (value) => {
 });
 
 export const Typography = ThemeContext.use(h => {
-	const applyModifiers = (label, modifiers) => {
+	const applyModifiers = (label, modifiers, displayMap) => {
 		if (!label) return [];
+
+		if (displayMap.length > 0) {
+			displayMap.splice(0, displayMap.length);
+		}
 
 		let result = [];
 		let cursor = 0;
@@ -62,27 +67,72 @@ export const Typography = ThemeContext.use(h => {
 		}
 
 		for (let i = 0; i <= filtered.length; i++) {
-			const prev = filtered[i - 1];
 			const next = filtered[i];
+			const end = next ? next.start : label.length;
 
-			const textBefore = label.slice(cursor, next ? next.start : label.length);
-			if (textBefore) {
-				result.push(<span key={`text-${cursor}`}>{textBefore}</span>);
+			const txt = label.slice(cursor, end);
+			if (txt) { // nromal text
+				for (let j = 0; j < txt.length; j++) {
+					const char = txt[j];
+					const displayId = UUID().toHex();
+					const span = <raw:span displayId={displayId}>{char}</raw:span>;
+					result.push(span);
+
+					displayMap.push({
+						index: cursor + j,
+						node: span,
+						displayId,
+					});
+				}
 			}
 
-			if (next) {
+			if (next) { // non-atomic elements
+				const { return: _return, check: _check, atomic, ...props } = next.mod;
 				const rendered = next?.mod?.return?.(next.match);
-				if (rendered != null) result.push(rendered);
+				const displayId = UUID().toHex();
+				const span = <raw:span displayId={displayId} atomic={`${atomic}`}>{rendered}</raw:span>;
+
+				result.push(span);
 				cursor = next.end;
+
+				// treat element as if each character is it's own element.
+				if (atomic === false) { // add element to displayMap for each character the cursor is expected to move between.
+					const index = next.start;
+
+					let count = 0;
+					next.match.split('').forEach(c => {
+						displayMap.push({
+							index,
+							atomicIndex: index + count, // index of item in value, expectec to be used when referencing a Selection anchor offset/focus offset.
+							node: span.elem_ ? span.elem_ : span,
+							match: next.match,
+							char: c,
+							displayId,
+							atomic,
+							...props,
+						});
+						count++
+					});
+				} else {
+					displayMap.push({
+						index: next.start,
+						length: next.end - next.start,
+						node: span.elem_ ? span.elem_ : span,
+						displayId,
+						...props,
+					});
+				}
+			} else { // if next is undefined, we have reached the end of the label.
+				cursor = label.length;
 			}
 		}
-
 		return result;
 	};
 
 	return TextModifiers.use(modifiers => ({
 		type = 'h1',
 		label = '',
+		displayMap,
 		children,
 		ref: Ref = <raw:span />,
 		...props
@@ -93,7 +143,7 @@ export const Typography = ThemeContext.use(h => {
 			display = children
 		} else if (label) { // modifiers only run on label and if modifiers provided.
 			if (modifiers.length > 0) {
-				display = label.map(l => applyModifiers(l, modifiers));
+				display = label.map(l => applyModifiers(l, modifiers, displayMap));
 			} else {
 				display = label;
 			}
