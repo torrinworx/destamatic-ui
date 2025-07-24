@@ -26,10 +26,7 @@ export const TextModifiers = createContext(() => null, (value) => {
 export const Typography = ThemeContext.use(h => {
 	const applyModifiers = (label, modifiers, displayMap) => {
 		if (!label) return [];
-
-		if (displayMap.length > 0) {
-			displayMap.splice(0, displayMap.length);
-		}
+		if (displayMap.length > 0) displayMap.length = 0;
 
 		let result = [];
 		let cursor = 0;
