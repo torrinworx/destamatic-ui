@@ -12,14 +12,14 @@ export default ThemeContext.use(h => {
 		const [popup, anchor] = categories(children, ['popup', 'anchor'], 'anchor');
 		const [preFocus, postFocus] = focused.memo(2);
 
-		const ref = anchor.props.ref ?? <raw:button />;
+		const ref = anchor.props.ref ?? Observer.mutable(null);
 		const Paper = popup.props.ref ?? <raw:div />;
 
 		const resizeObserver = Observer.mutable(0);
 
 		const Popup = Theme.use(themer => (_, cleanup) => {
 			const radius = themer(theme, anchorTheme, type).vars('radius');
-			const style = resizeObserver.map(() => getComputedStyle(ref));
+			const style = resizeObserver.map(() => getComputedStyle(ref instanceof Observer ? ref.get() : ref));
 
 			const foc = Observer.mutable(false);
 
