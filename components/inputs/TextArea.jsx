@@ -39,34 +39,37 @@ export default ThemeContext.use(h => {
 			error,
 			theme,
 			type,
-			autofocus,
-			ref: Ref = <raw:textarea />,
+			focus = false,
 			...props
 		},
-		_,
+		cleanup,
 		mounted
 	) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
+		if (!(focus instanceof Observer)) focus = Observer.mutable(focus);
 
 		const isMounted = Observer.mutable(false);
-		const isFocused = Observer.mutable(false);
+		const ref = Observer.mutable(null);
 
 		// TODO: Figure out why the microtask is needed. Sometimes without it,
 		// the text area won't have the right initial size.
 		mounted(() => queueMicrotask(() => isMounted.set(true)));
 
-		if (autofocus) mounted(() => Ref.focus());
+		mounted(() => cleanup(focus.effect(e => {
+			if (e) ref.get().focus();
+			else ref.get().blur();
+		})));
 
 		const _class = themer(
 			theme,
 			'field',
 			'area',
 			type,
-			isFocused.map(e => e ? 'focused' : null),
+			focus.map(e => e ? 'focused' : null),
 			error.map(e => e ? 'error' : null));
 
-		return <Ref
+		return <textarea ref={ref}
 			class={_class}
 			placeholder={placeholder}
 			$value={value}
@@ -79,20 +82,20 @@ export default ThemeContext.use(h => {
 			}}
 			onInput={e => {
 				if (value.isImmutable()) {
-					Ref.value = value.get() || '';
+					ref.get().value = value.get() || '';
 					return;
 				}
 
 				value.set(e.target.value);
 			}}
-			isFocused={isFocused}
+			isFocused={focus}
 			style={{
 				height: isMounted.map(mounted => {
 					if (!mounted) return 'auto';
 
 					return value.map(val => {
 						const elem = <raw:textarea class={_class.get()} rows={1} $value={val} $style={{
-							width: Ref.clientWidth + 'px',
+							width: ref.get().clientWidth + 'px',
 						}} />;
 
 						document.body.appendChild(elem);

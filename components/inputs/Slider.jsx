@@ -155,11 +155,9 @@ export default ThemeContext.use(h => {
 			return `calc(${prc * 100}% - (${thumbWidth * prc}px))`;
 		});
 
-		const Ref = <raw:div />;
-
 		const renderHover = Observer.all([dragging, hover]).map(([a, b]) => a || b)
 
-		return <Ref
+		return <div ref
 			{...props}
 			theme={["slider", type]}
 		>
@@ -195,7 +193,7 @@ export default ThemeContext.use(h => {
 					dragging.set(event);
 				}}
 			/>}
-		</Ref>;
+		</div>;
 	});
 
 	return Slider;

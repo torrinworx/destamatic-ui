@@ -10,24 +10,25 @@ export default ThemeContext.use(h => {
 		onEnter,
 		error,
 		focus = false,
-		ref: Ref = <raw:input />,
 		...props
-	}, cleanup) => {
+	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
 		if (!(expand instanceof Observer)) expand = Observer.immutable(expand);
 		if (!(focus instanceof Observer)) focus = Observer.mutable(focus);
 
-		cleanup(focus.effect(e => {
-			if (e) Ref.focus();
-			else Ref.blur();
-		}));
+		const ref = Observer.mutable(null);
 
-		return <Ref
+		mounted(() => cleanup(focus.effect(e => {
+			if (e) ref.get().focus();
+			else ref.get().blur();
+		})));
+
+		return <input ref={ref}
 			$value={value.def('')}
 			onInput={(e) => {
 				if (value.isImmutable()) {
-					Ref.value = value.get() || '';
+					ref.get().value = value.get() || '';
 					return;
 				}
 				value.set(e.target.value);

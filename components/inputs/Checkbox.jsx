@@ -58,7 +58,6 @@ export default ThemeContext.use(h => {
 		onChange,
 		invert = false,
 		disabled,
-		Ref = <raw:input />,
 		...props
 	}) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
@@ -67,10 +66,9 @@ export default ThemeContext.use(h => {
 		const [ripples, createRipple] = useRipples();
 		const hover = Observer.mutable(false);
 
-		const Span = <raw:span />;
 		// Disable user able to grab and drag the checkbox:
 		return <div theme='checkboxwrapper'>
-			<Span
+			<span
 				theme={[
 					'checkboxspan',
 					disabled.map(d => d ? 'disabled' : null),
@@ -101,7 +99,7 @@ export default ThemeContext.use(h => {
 				}}
 				draggable="false"
 			>
-				<Ref
+				<input ref
 					type="checkbox"
 					theme={[
 						"checkbox",
@@ -115,7 +113,7 @@ export default ThemeContext.use(h => {
 				/>
 				<span draggable="false" theme={[disabled.map(d => d ? 'checkboxoverlay' : null)]} />
 				{ripples}
-			</Span>
+			</span>
 		</div>
 	};
 

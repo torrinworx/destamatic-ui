@@ -1,7 +1,8 @@
-import { h } from './h';
 import { OArray, Observer } from 'destam-dom';
 import useAbort from '../../util/abort';
 import createContext from './Context';
+import ThemeContext from './ThemeContext';
+import { h } from './h';
 
 const RawContext = createContext();
 
@@ -18,11 +19,11 @@ const RawContext = createContext();
  * 
  * @returns {null} The popup component does not return a DOM element directly; it sets up an element in the global `popups` array.
  */
-const Popup = RawContext.use(context => ({ children, style, placement, canClose, ref: Ref }, cleanup) => {
+const Popup = ThemeContext.use(h => RawContext.use(context => ({ children, style, placement, canClose }, cleanup) => {
     if (!context) throw new Error("No popup context");
-
-    if (!Ref) Ref = <raw:div />;
     if (!(placement instanceof Observer)) placement = Observer.immutable(placement);
+
+    const ref = Observer.mutable(null);
 
     const getter = (name, scale) => {
         if (scale) {
@@ -38,7 +39,7 @@ const Popup = RawContext.use(context => ({ children, style, placement, canClose,
         }
     };
 
-    const dom = <Ref style={{
+    const dom = <div ref={ref} style={{
         position: 'absolute',
         left: getter('left'),
         top: getter('top'),
@@ -53,18 +54,18 @@ const Popup = RawContext.use(context => ({ children, style, placement, canClose,
         ...style
     }}>
         {children}
-    </Ref>;
+    </div>;
 
     // assign the actual dom node to the element. Sometimes it's useful to get the
     // dom node from a list of popups
-    dom.elem = Ref;
+    dom.elem = ref.get();
 
     if (!placement.isImmutable()) {
         cleanup(useAbort(abort => document.body.addEventListener('mousedown', e => {
             let target = e.target;
             let found = false;
             while (target) {
-                if (target === Ref) {
+                if (target === ref.get()) {
                     found = true;
                     break;
                 }
@@ -85,7 +86,7 @@ const Popup = RawContext.use(context => ({ children, style, placement, canClose,
     });
 
     return null;
-});
+}));
 
 export const PopupContext = ({children, popups, ...stuff}) => {
     if (!popups) popups = OArray();

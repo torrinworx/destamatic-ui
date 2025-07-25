@@ -16,11 +16,11 @@ export default ThemeContext.use(h => {
 		cleanup(value.effect(c => country.set(allCountries.find(ac => ac[0] === c))));
 
 		return <Select
-				theme='country'
-				value={value}
-				options={countries}
-				{...props}
-			/>;
+			theme='country'
+			value={value}
+			options={countries}
+			{...props}
+		/>;
 	};
 	return Country;
 });

@@ -111,7 +111,6 @@ export default ThemeContext.use(h => {
 		disabled,
 		hover,
 		focused,
-		ref: Ref,
 		children,
 		iconPosition = 'left',
 		...props
@@ -119,7 +118,6 @@ export default ThemeContext.use(h => {
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
-		if (!Ref) Ref = <raw:button />;
 
 		disabled = disabled.map(d => !!d);
 
@@ -128,7 +126,7 @@ export default ThemeContext.use(h => {
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
 
-		return <Ref
+		return <button ref
 			onClick={(event) => {
 				if (disabled.get()) return;
 
@@ -180,7 +178,7 @@ export default ThemeContext.use(h => {
 			{children}
 			{iconPosition === 'right' ? icon : null}
 			{ripples}
-		</Ref>;
+		</button>;
 	};
 
 	return Button;
