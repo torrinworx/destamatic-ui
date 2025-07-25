@@ -63,6 +63,8 @@ export default ThemeContext.use(h => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(disabled instanceof Observer)) disabled = Observer.immutable(disabled);
 
+		const ref = Observer.mutable(null);
+
 		const [ripples, createRipple] = useRipples();
 		const hover = Observer.mutable(false);
 
@@ -92,14 +94,14 @@ export default ThemeContext.use(h => {
 						throw e;
 					} finally {
 						// make sure that the chekbox is always in sync with the observer
-						Ref.checked = value.get();
+						ref.get().checked = value.get();
 					}
 
 					e.preventDefault();
 				}}
 				draggable="false"
 			>
-				<input ref
+				<input ref={ref}
 					type="checkbox"
 					theme={[
 						"checkbox",
