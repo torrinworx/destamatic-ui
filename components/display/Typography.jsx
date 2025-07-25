@@ -77,6 +77,7 @@ export const Typography = ThemeContext.use(h => {
 
 					displayMap.push({
 						index: cursor + j,
+						char,
 						node: span,
 						displayId,
 					});
@@ -97,13 +98,13 @@ export const Typography = ThemeContext.use(h => {
 					const index = next.start;
 
 					let count = 0;
-					next.match.split('').forEach(c => {
+					next.match.split('').forEach(char => {
 						displayMap.push({
 							index,
-							atomicIndex: index + count, // index of item in value, expectec to be used when referencing a Selection anchor offset/focus offset.
+							atomicIndex: index + count,
 							node: span.elem_ ? span.elem_ : span,
 							match: next.match,
-							char: c,
+							char,
 							displayId,
 							atomic,
 							...props,
@@ -123,6 +124,7 @@ export const Typography = ThemeContext.use(h => {
 				cursor = label.length;
 			}
 		}
+		console.log(displayMap);
 		return result;
 	};
 
