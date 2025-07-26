@@ -1,9 +1,11 @@
-import { UUID } from 'destam';
+import { UUID, Observer } from 'destam';
+
+import Theme from '../utils/Theme';
 import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
-import Theme from '../utils/Theme';
 
 Theme.define({
+	typography: { whiteSpace: 'pre-wrap' },
 	typography_h1: { fontSize: 62 },
 	typography_h2: { fontSize: 56 },
 	typography_h3: { fontSize: 36 },
@@ -133,7 +135,6 @@ export const Typography = ThemeContext.use(h => {
 		label = '',
 		displayMap,
 		children,
-		ref: Ref = <raw:span />,
 		...props
 	}) => {
 		let display = null;
@@ -148,11 +149,12 @@ export const Typography = ThemeContext.use(h => {
 			}
 		}
 
-		return <Ref
+		return <span
+			ref
 			{...props}
 			theme={['row', 'typography', ...Array.isArray(type) ? type : type.split('_')]}
 		>
 			{display}
-		</Ref>;
+		</span>;
 	})
 });
