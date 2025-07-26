@@ -1,6 +1,5 @@
 import { Observer, OArray } from 'destam';
 
-import { svg } from '../utils/h';
 import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
 
@@ -60,11 +59,11 @@ export const Icons = createContext(() => null, (next, prev) => {
  * 
  * @returns {JSX.Element} The rendered SVG icon element.
  */
-export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
-	return ({ name, size = null, ref: Ref, style = {}, rot, ...props }, cleanup) => {
+export const Icon = Icons.use(iconPack => ThemeContext.use(svg => {
+	return ({ name, size = null, style = {}, rot, ...props }, cleanup) => {
 		if (!(name instanceof Observer)) name = Observer.immutable(name);
 		if (!(size instanceof Observer)) size = Observer.immutable(size);
-		if (!Ref) Ref = <svg:svg />;
+		const ref = Observer.mutable(null);
 
 		const oldIconAttrs = []; // non-parent attributes, to remove on name change
 		const libClass = Observer.mutable('');
@@ -77,19 +76,21 @@ export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
 
 		cleanup(name.effect(iconName => {
 			Promise.resolve(iconPack(iconName)).then(svg => {
+				const svgRef = ref.get();
+
 				// remove all the old attributes
 				for (const name of oldIconAttrs.splice(0, oldIconAttrs.length)) {
-					Ref.removeAttribute(name);
+					svgRef.removeAttribute(name);
 				}
 
 				// clear the svg from all children so that we can append our new children
 				children.splice(0, children.length);
 
 				if (!svg) {
-					Ref.style.display = 'none';
+					svgRef.style.display = 'none';
 					return;
 				} else {
-					Ref.style.display = 'block';
+					svgRef.style.display = 'block';
 				}
 
 				if (typeof svg === 'string') {
@@ -104,7 +105,7 @@ export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
 						libClass.set(attr.nodeValue);
 					} else {
 						oldIconAttrs.push(attr.nodeName); // track it so we can remove it next load() call
-						Ref.setAttribute(attr.nodeName, attr.nodeValue);
+						svgRef.setAttribute(attr.nodeName, attr.nodeValue);
 					}
 				}
 
@@ -117,13 +118,15 @@ export const Icon = Icons.use(iconPack => ThemeContext.use(h => {
 			});
 		}));
 
-		return <Ref
+		return <svg:svg ref={ref}
 			class={libClass}
 			style={{ width: size, height: size, ...style }}
 			{...props}
 			theme="icon"
-		>{children}</Ref>;
+		>
+			{children}
+		</svg:svg>;
 	};
-}));
+}, 'http://www.w3.org/2000/svg'));
 
 export default Icon;
