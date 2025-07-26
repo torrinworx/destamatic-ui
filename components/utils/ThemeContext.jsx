@@ -5,30 +5,40 @@ import Observer from 'destam/Observer';
 
 const ThemeContext = createContext('primary');
 
+const createNode = (name, namespace) => {
+	if (namespace) {
+		return document.createElementNS(namespace, name);
+	} else {
+		return document.createElement(name);
+	}
+};
+
 const use = ThemeContext.use;
-ThemeContext.use = (component) =>
+ThemeContext.use = (component, namespace) =>
 		use(context => ({theme = context, ref, ...props}, cleanup, mounted) => {
 	assert(!ref || ref instanceof Node || ref instanceof Observer, "ref must either be a node or an observer");
 
 	let lastElement = null;
 	const themedH = (name, props = {}, ...children) => {
-		if (typeof name === 'string' && props.ref) {
-			if (!ref) {
-				name = document.createElement(name);
+		if (typeof name === 'string') {
+			if (!ref || !props.ref) {
+				name = createNode(name, namespace);
 			} else if (ref instanceof Node) {
 				assert(ref.nodeName.toLowerCase() === name.toLowerCase());
+				assert(ref.namespaceURI === name.namespaceURI);
 				name = ref;
 			} else if (ref.isImmutable()) {
 				const elem = ref.get();
 				assert(elem.nodeName.toLowerCase() === name.toLowerCase());
+				assert(elem.namespaceURI === name.namespaceURI);
 				name = elem;
 			} else {
-				name = document.createElement(name);
+				name = createNode(name, namespace);
 				ref.set(name);
 			}
 
 			assert(name instanceof Node);
-			if (props.ref instanceof Observer) {
+			if (props.ref && props.ref instanceof Observer) {
 				props.ref.set(name);
 			}
 
