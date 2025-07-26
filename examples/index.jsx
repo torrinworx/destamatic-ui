@@ -1,6 +1,5 @@
 import { Observer, mount, OObject } from 'destam-dom';
 import {
-    popups,
     Theme,
     ThemeContext,
     Typography,
@@ -15,7 +14,7 @@ import {
     Paper,
     ColorPicker,
     Date as DateComponent,
-    h
+    PopupContext
 } from 'destamatic-ui';
 import color from 'destamatic-ui/util/color';
 
@@ -24,7 +23,6 @@ const DemoPage = () => {
         console.log('Button clicked');
     };
 
-    const drawerOpen = Observer.mutable(false);
     const text = Observer.mutable('');
 
     const date = Observer.mutable(new Date());
@@ -78,10 +76,10 @@ const DemoPage = () => {
         <Typography type="h3_bold" label="Heading 3 Bold" />
         <Typography type="p1" label="Paragraph 1 Regular" />
         <Typography type="p1_bold" label="Paragraph 1 Bold" />
-        <Typography type="p2" label="Paragraph 2 Regular"/>
-        <Typography type="p2_bold" label="Paragraph 2 Bold"/>
+        <Typography type="p2" label="Paragraph 2 Regular" />
+        <Typography type="p2_bold" label="Paragraph 2 Bold" />
 
-        <Typography type="h2" $style={{ marginTop: '20px' }} label="Buttons"/>
+        <Typography type="h2" $style={{ marginTop: '20px' }} label="Buttons" />
         <div $style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <Button label="Text Button" type="text" onClick={handleClick} />
             <Button label="Contained Button" type="contained" onClick={handleClick} />
@@ -132,7 +130,7 @@ const DemoPage = () => {
                 />
             </div>
 
-            <Typography type="h2" $style={{ marginTop: '20px' }} label="Dropdown"/>
+            <Typography type="h2" $style={{ marginTop: '20px' }} label="Dropdown" />
             <DropDown label="Click to Toggle">
                 <div theme="myContent">
                     Dropdown Content
@@ -140,21 +138,20 @@ const DemoPage = () => {
             </DropDown>
         </Theme>
 
-        <Typography type="h2" $style={{ marginTop: '20px' }} label="Loading Dots"/>
+        <Typography type="h2" $style={{ marginTop: '20px' }} label="Loading Dots" />
         <LoadingDots />
 
         <Typography type="h2" $style={{ marginTop: '20px' }} label="Slider" />
         <Slider min={0} max={100} value={Observer.mutable(0)} />
 
         <Paper>
-            <Typography type="h2" $style={{ marginTop: '20px' }} label="Inputs"/>
+            <Typography type="h2" $style={{ marginTop: '20px' }} label="Inputs" />
             <TextField placeholder="Type here..." style={{ marginBottom: '10px', width: '100%' }} value={text} />
             <TextArea placeholder="Enter more text here..." style={{ width: '100%' }} value={text} />
         </Paper>
     </div>;
 };
 
-mount(document.body, <>
+mount(document.body, <PopupContext>
     <DemoPage />
-    {popups}
-</>);
+</PopupContext>);
