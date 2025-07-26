@@ -7,15 +7,6 @@ import { mount } from 'destam-dom';
 import { Button, TextModifiers, Select, PopupContext, TextRich } from 'destamatic-ui';
 
 const value = Observer.mutable('hello world there!?!?!?!?!?! :frog: button');
-const selection = Observer.mutable({ start: null, end: null, side: null });
-Observer.timer(1000).watch(() => {
-    const sel = selection.get();
-    if (sel.start === 6 && sel.end === 12) {
-        selection.set({ start: 0, end: 6 });
-    } else {
-        selection.set({ start: 6, end: 12 });
-    }
-});
 
 const emojis = {
     frog: '🐸',
@@ -44,21 +35,20 @@ const extractPatterns = (grammar, parent = []) => {
             list.push(...extractPatterns(def, [...parent, tokenName]))
         }
     }
-    return list
-}
+    return list;
+};
 
 const makePrismModifiers = (lang) => {
     const grammar = Prism.languages[lang]
     if (!grammar) return []
     const patterns = extractPatterns(grammar)
     return patterns.map(([tokenClass, regex]) => {
-        // console.log(tokenClass, regex)
         return {
             check: new RegExp(regex.source, regex.flags + (regex.flags.includes('g') ? '' : 'g')),
             atomic: false,
             return: match => <span class={`token ${tokenClass}`}>{match}</span>
         }
-    })
+    });
 };
 
 const language = Observer.mutable('javascript');
