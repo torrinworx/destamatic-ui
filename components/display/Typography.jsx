@@ -126,7 +126,7 @@ export const Typography = ThemeContext.use(h => {
 				cursor = label.length;
 			}
 		}
-		console.log(displayMap);
+
 		return result;
 	};
 
