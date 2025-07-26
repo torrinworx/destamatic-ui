@@ -119,7 +119,7 @@ mount(document.body, <PopupContext>
             }
         }
     ])} >
-        <TextRich style={{ marginTop: 500, background: 'black', color: 'white' }} value={value} />
+        <TextRich style={{ background: 'black', color: 'white' }} value={value} />
     </TextModifiers>
 
     <Select options={['javascript', 'python', 'markdown']} value={language} />
