@@ -4,7 +4,7 @@ import 'prismjs/themes/prism.css'
 
 import { Observer } from 'destam';
 import { mount } from 'destam-dom';
-import { Button, TextModifiers, Select, PopupContext, TextRich } from 'destamatic-ui';
+import { Button, TextModifiers, Typography, PopupContext, TextRich } from 'destamatic-ui';
 
 const value = Observer.mutable('hello world there!?!?!?!?!?! :frog: button');
 
@@ -51,12 +51,11 @@ const makePrismModifiers = (lang) => {
     });
 };
 
-const language = Observer.mutable('javascript');
-const modifiers = language.map(l => makePrismModifiers(l));
+const modifiers = makePrismModifiers('javascript');
 const value2 = Observer.mutable('const modifiers = makePrismModifiers(language.get()); ');
 
 mount(document.body, <PopupContext>
-    <TextModifiers value={Observer.immutable([
+    <TextModifiers value={[
         {
             check: '!',
             return: (match) => <span style={{ color: 'red' }}>{match}</span>,
@@ -108,12 +107,10 @@ mount(document.body, <PopupContext>
                 return emoji ? <span>{emoji}</span> : match;
             }
         }
-    ])} >
+    ]} >
         <TextRich style={{ background: 'black', color: 'white' }} value={value} />
     </TextModifiers>
-
-    <Select options={['javascript', 'python', 'markdown']} value={language} />
-
+    <Typography label="Javascript syntax highlighting:" type='h3' />
     <TextModifiers value={modifiers} >
         <TextRich style={{ background: 'black', color: 'white' }} value={value2} />
     </TextModifiers>
