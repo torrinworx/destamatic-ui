@@ -21,9 +21,7 @@ Theme.define({
 	typography_inline: { display: 'inline' }
 });
 
-export const TextModifiers = createContext(() => null, (value) => {
-	return value;
-});
+export const TextModifiers = createContext(() => null, (value) => value);
 
 export const Typography = ThemeContext.use(h => {
 	const applyModifiers = (label, modifiers, displayMap) => {
@@ -133,20 +131,19 @@ export const Typography = ThemeContext.use(h => {
 	return TextModifiers.use(modifiers => ({
 		type = 'h1',
 		label = '',
-		displayMap,
+		displayMap = [],
 		children,
 		...props
 	}) => {
-		let display = null;
+		if (!(label instanceof Observer)) label = Observer.immutable(label);
+		let display;
 
 		if (children.length > 0) {
-			display = children
-		} else if (label) { // modifiers only run on label and if modifiers provided.
-			if (modifiers.length > 0 || displayMap) {
-				display = label.map(l => applyModifiers(l, modifiers, displayMap));
-			} else {
-				display = label;
-			}
+			display = children;
+		} else if (modifiers.length > 0) {
+			display = label.map(l => applyModifiers(l, modifiers, displayMap));
+		} else {
+			display = label;
 		}
 
 		return <span
