@@ -4,9 +4,9 @@ import 'prismjs/themes/prism.css'
 
 import { Observer } from 'destam';
 import { mount } from 'destam-dom';
-import { Button, TextModifiers, Typography, PopupContext, TextRich } from 'destamatic-ui';
+import { Button, TextModifiers, Typography, PopupContext, TextRich, Checkbox } from 'destamatic-ui';
 
-const value = Observer.mutable('hello world there!?!?!?!?!?! :frog: button');
+const value = Observer.mutable('hello world there!?!?!?!?!?! :frog: atomic non-atomic checkbox');
 
 const emojis = {
     frog: '🐸',
@@ -54,6 +54,8 @@ const makePrismModifiers = (lang) => {
 const modifiers = makePrismModifiers('javascript');
 const value2 = Observer.mutable('const modifiers = makePrismModifiers(language.get()); ');
 
+const check = Observer.mutable(false);
+
 mount(document.body, <PopupContext>
     <TextModifiers value={[
         {
@@ -95,8 +97,18 @@ mount(document.body, <PopupContext>
             atomic: false,
         },
         {
-            check: /button/gi,
+            check: /atomic/gi,
             return: (match) => <Button type='contained'>{match}</Button>,
+            atomic: true,
+        },
+        {
+            check: /non-atomic/gi,
+            return: (match) => <Button type='contained'>{match}</Button>,
+            atomic: false,
+        },
+        {
+            check: /checkbox/gi,
+            return: (match) => <Checkbox value={check} />,
             atomic: true,
         },
         {
