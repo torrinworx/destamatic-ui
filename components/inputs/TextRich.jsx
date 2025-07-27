@@ -261,7 +261,8 @@ export default ThemeContext.use(h => {
                     side = offset <= charStart ? 'left' : 'right';
                 }
             } else {
-                const rect = end.node.getBoundingClientRect();
+                const rect = end?.node?.getBoundingClientRect();
+                console.log(end, rect); // bug: some weird edge case these are undefined for some reason? randomly double clicking text somehow triggers it.
                 const mid = rect.left + rect.width / 2;
                 side = e.clientX < mid ? 'left' : 'right';
             }
