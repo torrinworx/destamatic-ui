@@ -1,9 +1,12 @@
 import { Observer } from 'destam-dom';
 
+import { mark } from '../utils/h';
+
 import Theme from '../utils/Theme';
+import Shown from '../utils/Shown';
+import LoadingDots from '../utils/LoadingDots';
 import useRipples from '../utils/Ripple';
 import ThemeContext from '../utils/ThemeContext';
-
 
 Theme.define({
 	button: {
@@ -119,7 +122,8 @@ export default ThemeContext.use(h => {
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
-		disabled = disabled.map(d => !!d);
+		const loading = Observer.mutable(false);
+		disabled = Observer.all([disabled, loading]).map(([dis, lod]) => !!dis || lod);
 
 		const [ripples, createRipple] = useRipples();
 
@@ -132,7 +136,13 @@ export default ThemeContext.use(h => {
 
 				if (onClick) {
 					createRipple(event);
-					onClick(event);
+					const ret = onClick(event);
+
+					// if the return value is a promise, replace the button with a loading animation.
+					if (ret && ret.then) {
+						loading.set(true);
+						ret.catch(() => {}).then(() => loading.set(false));
+					}
 				}
 			}}
 			onMouseDown={(event) => {
@@ -173,11 +183,18 @@ export default ThemeContext.use(h => {
 				focused.bool('focused', null),
 			]}
 		>
-			{iconPosition === 'left' ? icon : null}
-			{label}
-			{children}
-			{iconPosition === 'right' ? icon : null}
-			{ripples}
+			<Shown value={loading}>
+				<mark:then>
+					<LoadingDots />
+				</mark:then>
+				<mark:else>
+					{iconPosition === 'left' ? icon : null}
+					{label}
+					{children}
+					{iconPosition === 'right' ? icon : null}
+					{ripples}
+				</mark:else>
+			</Shown>
 		</button>;
 	};
 
