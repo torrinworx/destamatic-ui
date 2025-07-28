@@ -25,12 +25,12 @@ ThemeContext.use = (component, namespace) =>
 				name = createNode(name, namespace);
 			} else if (ref instanceof Node) {
 				assert(ref.nodeName.toLowerCase() === name.toLowerCase());
-				assert(ref.namespaceURI === name.namespaceURI);
+				assert(ref.namespaceURI === (namespace ?? "http://www.w3.org/1999/xhtml"));
 				name = ref;
 			} else if (ref.isImmutable()) {
 				const elem = ref.get();
 				assert(elem.nodeName.toLowerCase() === name.toLowerCase());
-				assert(elem.namespaceURI === name.namespaceURI);
+				assert(ref.namespaceURI === (namespace ?? "http://www.w3.org/1999/xhtml"));
 				name = elem;
 			} else {
 				name = createNode(name, namespace);
