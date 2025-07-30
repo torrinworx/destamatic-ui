@@ -149,7 +149,7 @@ export const Typography = ThemeContext.use(h => {
 		return <span
 			ref
 			{...props}
-			theme={['row', 'typography', ...Array.isArray(type) ? type : type.split('_')]}
+			theme={['typography', ...Array.isArray(type) ? type : type.split('_')]}
 		>
 			{display}
 		</span>;
