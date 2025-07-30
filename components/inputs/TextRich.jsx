@@ -88,6 +88,9 @@ Theme.define({
         outline: 'none',
         overflow: 'scroll',
     },
+    textRich_typography: {
+        extends: 'row',
+    },
     cursor: { // TODO:  some cool way to invert the colors of the contents beneath the cursor? Like in vscode?
         top: 0,
         width: 4,
@@ -329,8 +332,57 @@ export default ThemeContext.use(h => {
 
             // Get the proper index range for all selected elements, taking into account non-atomic fragment atomicIndeces.
             const getSelectionRange = () => {
+                const sel = selection.get();
+                if (!sel || !sel.start || !sel.end) return null;
 
-            } // can use this for backspace and delete buttons
+                /**
+                 * Safely gets a numeric field from an entry, falling back to a defaultValue if it's not a number.
+                 */
+                const numOrDefault = (val, defaultValue) => {
+                    return typeof val === 'number' && !Number.isNaN(val) ? val : defaultValue;
+                };
+
+                /**
+                 * Returns the absolute position for a given displayMap entry in the full text/string,
+                 * depending on whether it's atomic or not and whether we're interested in the 'left' or
+                 * 'right' boundary of the entry.
+                 */
+                const getAbsoluteIndex = (entry, side) => {
+                    if (!entry) return 0;
+
+                    // For atomic entries, .index is the first character’s position in the full text,
+                    // and .length is how many characters it represents in the full text.
+                    if (entry.atomic === true) {
+                        const atomicStart = numOrDefault(entry.index, 0);
+                        const atomicLength = numOrDefault(entry.length, 1);
+                        return side === 'right' ? atomicStart + atomicLength : atomicStart;
+                    }
+
+                    // For non-atomic entries, each fragment is broken out so that:
+                    //   - entry.index is the starting index of the parent match in the full text.
+                    //   - entry.atomicIndex is the absolute offset in the overall text for this fragment.
+                    const parentIndex = numOrDefault(entry.index, 0);
+                    const fragmentIndex = numOrDefault(entry.atomicIndex, parentIndex);
+
+                    // partialOffset is how far into the parent match this fragment is.
+                    // If side == 'right', we move one extra character.
+                    const partialOffset = fragmentIndex - parentIndex;
+                    return parentIndex + partialOffset + (side === 'right' ? 1 : 0);
+                };
+
+                // If start and end refer to the same entry, we fall back to the selection's side (or default to 'left').
+                // Otherwise, we keep side = 'left' or 'right' for each offset.
+                const startSide = sel.start === sel.end ? (sel.side ?? 'left') : 'left';
+                const endSide = sel.side ?? 'right';
+
+                const startOffset = getAbsoluteIndex(sel.start, startSide);
+                const endOffset = getAbsoluteIndex(sel.end, endSide);
+
+                const rangeStart = Math.min(startOffset, endOffset);
+                const rangeEnd = Math.max(startOffset, endOffset);
+
+                return { start: rangeStart, end: rangeEnd };
+            };
 
             switch (e.key) {
                 case 'ArrowLeft':
@@ -346,7 +398,11 @@ export default ThemeContext.use(h => {
                     // use selection, delete all items between and including start->end.
                     // within each item there is
 
-                    const curValue = value.get();
+                    const selectionRange = getSelectionRange();
+                    console.log(selectionRange.end - selectionRange.start);
+
+
+                    //.slice(selectionRange.end % selectionRange.start, selectionRange.end, 0)
 
                     break;
                 case 'Delete':
@@ -400,7 +456,7 @@ export default ThemeContext.use(h => {
         })
 
         return <div ref={wrapper} role="textbox" tabindex={tabIndex} {...props} theme='textRich'>
-            <Typography displayMap={displayMap}
+            <Typography theme='textRich' displayMap={displayMap}
                 label={value.map(v => Observer.mutable(v === '' ? '\u200B' : v)).unwrap()} />
             <Shown value={selection.map(c => c.end !== null || c.start !== null)}>
                 <div ref={cursor} theme='cursor' style={{
