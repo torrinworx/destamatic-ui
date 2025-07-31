@@ -81,6 +81,16 @@ Theme.define({
 		color: '$color_hover',
 		fill: '$color_hover',
 	},
+
+	button_link: {
+		padding: 0,
+		color: 'blue',
+		textDecoration: 'underline',
+	},
+
+	button_link_focused: {
+		boxShadow: 'none',
+	}
 });
 
 export default ThemeContext.use(h => {
