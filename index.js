@@ -20,7 +20,7 @@ export { default as Select } from './components/inputs/Select.jsx';
 export { default as Slider } from './components/inputs/Slider.jsx';
 export { default as TextArea } from './components/inputs/TextArea.jsx';
 export { default as TextField } from './components/inputs/TextField.jsx';
-export { default as TextRich } from './components/inputs/TextRich.jsx';
+export { default as Text } from './components/inputs/Text.jsx';
 export { default as Toggle } from './components/inputs/Toggle.jsx';
 export { default as FileDrop } from './components/inputs/FileDrop.jsx';
 
