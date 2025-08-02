@@ -26,7 +26,7 @@ export const TextModifiers = createContext(() => null, (value) => value);
 export const Typography = ThemeContext.use(h => {
 	const applyModifiers = (label, modifiers, displayMap) => {
 		if (!label) return [];
-		if (displayMap.length > 0) displayMap.length = 0;
+		if (displayMap.length > 0) displayMap.splice(0, displayMap.length); // Because OArray's don't allow .length = 0
 
 		let result = [];
 		let cursor = 0;
@@ -100,6 +100,7 @@ export const Typography = ThemeContext.use(h => {
 					let count = 0;
 					next.match.split('').forEach(char => {
 						displayMap.push({
+							// TODO: I think we could get away with only having index and getting rid of atomicIndex. 
 							index,
 							atomicIndex: index + count,
 							node: span.elem_ ? span.elem_ : span,
