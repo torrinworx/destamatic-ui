@@ -6,6 +6,16 @@ import { Typography } from '../display/Typography';
 import ThemeContext from '../utils/ThemeContext';
 
 /*
+New Plan for displayMap: some kind of reconcilor layer that allows us to make easy modifications to value, retreive the current index of the 
+cursor from selection in relation to value. This reconcilor system would make implementing the onKeyDown and other functionality much simpler.
+
+it would abstract away handling of atomic/non-atomic fragment elements, left/right side cursor placement index resolution.
+
+Right now working directly with displayMap is cumbersome and would take too long to implement the list of features below with the current implmeentation.
+*/
+
+
+/*
 **still experimental**
 
 TextRich is a fully custom, destamatic-ui, ground up text input component.
@@ -38,6 +48,7 @@ TODO:
 - Fix up selection api so that copying text always copies value + atomic elements' textContent. We can ignore non-atomic fragments and
   just use value since with them since their textContent must equal their modifier.
 - Ensure that cursor updates position and follows the Typography comp when scrolling events take place.
+- when cursor goes off screen, ensure that we scroll and snapp the view to the location of the cursor so it's always visible.
 
 Info:
 if an element in display map is atomic=true, element will be treated as a single item:
@@ -83,13 +94,13 @@ This can be used to delete and add characters properly within the value string. 
 */
 
 Theme.define({
-	textRich: {
+	richtext: {
 		cursor: 'text',
 		position: 'relative',
 		outline: 'none',
 		overflow: 'scroll',
 	},
-	textRich_typography: {
+	richtext_typography: {
 		extends: 'row',
 		whiteSpace: 'pre',
 	},
@@ -104,7 +115,7 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const TextRich = ({
+	const Text = ({
 		value,
 		selection = { start: null, end: null, side: null },
 		tabIndex = 0,
@@ -112,15 +123,18 @@ export default ThemeContext.use(h => {
 	}, cleanup, mounted) => {
 		if (!(selection instanceof Observer)) selection = Observer.mutable(selection);
 
+		const blinkInterval = 400; // Blink phase duration in ms
+		const timeToFirstBlink = 250; // Time in ms to wait before starting to blink
 		const displayMap = OArray([]);
 		const cursor = Observer.mutable(null);
+		const cursorPos = Observer.mutable(null);
 		const wrapper = Observer.mutable(null);
-		const isFocused = Observer.mutable(false);
 		const lastMoved = Observer.mutable(Date.now());
-		const timeToFirstBlink = 250; // Time in ms to wait before starting to blink
-		const blinkInterval = 400; // Blink phase duration in ms
 
-		const updateCursorPosition = (sel) => {
+		// TODO: Possibly simplify updateCursorPosition to use cursorPos instead and just search through displayMap?
+		// Update cursor position div within wrapper based on selection updates.
+		const updateCursorPosition = () => {
+			const sel = selection.get();
 			lastMoved.set(Date.now());
 			const wrapperRect = wrapper.get().getBoundingClientRect();
 
@@ -144,7 +158,7 @@ export default ThemeContext.use(h => {
 					}
 				}
 				return null;
-			}
+			};
 
 			const range = document.createRange();
 
@@ -190,21 +204,23 @@ export default ThemeContext.use(h => {
 			cursor.get().style.height = `${wrapperRect.height}px`;
 		};
 
-		const findDisplayNode = (node) => {
-			while (node && node !== wrapper.get()) {
-				if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('displayId')) {
-					return node;
-				}
-				node = node.parentNode;
-			}
-			return null;
-		};
-
+		// Set selection based on user clicks within the wrapper.
 		const onMouseUp = (e) => {
 			const windowSel = window.getSelection();
 			if (!windowSel || windowSel.rangeCount === 0) return;
 
+			const findDisplayNode = (node) => {
+				while (node && node !== wrapper.get()) {
+					if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('displayId')) {
+						return node;
+					}
+					node = node.parentNode;
+				}
+				return null;
+			};
+
 			const anchorNode = findDisplayNode(windowSel.anchorNode);
+			// console.log(anchorNode); // bug here with click/selection, anchor node get's updated when the users selection spans multiple atomic/non-atomic/character elements simultaneously.
 			const focusNode = findDisplayNode(windowSel.focusNode);
 
 			const getEntry = (id) => displayMap.find(f => f.displayId === id);
@@ -228,10 +244,9 @@ export default ThemeContext.use(h => {
 				// When offset === match.length, place cursor at right side of last char
 				if (offset === match.length) entries.at(-1);
 
-				// fallback for broken offset
-				const largest = entries.reduce((max, current) =>
+				// if end fragment, select end, lower side selection if/else statement handles side resolution.
+				return entries.reduce((max, current) =>
 					max.atomicIndex > current.atomicIndex ? max : current, entries[0]);
-				return displayMap.find(f => f.index === (largest.atomicIndex + 1));
 			};
 
 			let start;
@@ -267,7 +282,6 @@ export default ThemeContext.use(h => {
 				}
 			} else {
 				const rect = end?.node?.getBoundingClientRect();
-				console.log(end, rect); // bug: some weird edge case these are undefined for some reason? randomly double clicking text somehow triggers it.
 				const mid = rect.left + rect.width / 2;
 				side = e.clientX < mid ? 'left' : 'right';
 			}
@@ -275,32 +289,12 @@ export default ThemeContext.use(h => {
 			selection.set({ start, end, side });
 		};
 
-		const onFocus = () => isFocused.set(true);
-		const onBlur = () => {
-			isFocused.set(false);
-			selection.set({ start: null, end: null, side: null });
-		};
-
-		// really basic, maybe even let user define it:
-		const findWordBoundary = (text, index, direction) => {
-			let i = index;
-			if (direction === 'left') {
-				while (i > 0 && text[i - 1] === ' ') i--;
-				while (i > 0 && text[i - 1] !== ' ') i--;
-			} else if (direction === 'right') {
-				while (i < text.length && text[i] === ' ') i++;
-				while (i < text.length && text[i] !== ' ') i++;
-			}
-			return i;
-		};
-
 		const onKeyDown = async (e) => {
-			if (!isFocused.get()) return;
-
 			const sel = selection.get();
+			const cur = cursorPos.get();
+			const val = value.get();
 
-			// TODO: Ctrl + a selection disables default and only selects all text within value.
-			const onArrowKey = (direction, sel, displayMap, selection) => {
+			const onArrowKey = (direction) => {
 				const indexAdjustment = direction === 'left' ? -1 : 1;
 				const newSide = direction;
 
@@ -332,95 +326,79 @@ export default ThemeContext.use(h => {
 				}
 			};
 
-			// Get the proper index range for all selected elements, taking into account non-atomic fragment atomicIndeces.
-			const getSelectionRange = () => {
-				const sel = selection.get();
-				if (!sel || !sel.start || !sel.end) return null;
+			const handleDelete = (cur, val, backspace) => {
+				if (cur.end > 0) {
+					const arr = [...val];
+					let newStart, newEnd;
 
-				/**
-				 * Safely gets a numeric field from an entry, falling back to a defaultValue if it's not a number.
-				 */
-				const numOrDefault = (val, defaultValue) => {
-					return typeof val === 'number' && !Number.isNaN(val) ? val : defaultValue;
-				};
+					if (cur.start !== cur.end) { // Delete only the selected range
+						const safeStart = Math.max(0, cur.start);
+						const safeEnd = Math.min(cur.end, val.length);
+						arr.splice(safeStart, safeEnd - safeStart);
 
-				/**
-				 * Returns the absolute position for a given displayMap entry in the full text/string,
-				 * depending on whether it's atomic or not and whether we're interested in the 'left' or
-				 * 'right' boundary of the entry.
-				 */
-				const getAbsoluteIndex = (entry, side) => {
-					if (!entry) return 0;
-
-					// For atomic entries, .index is the first character’s position in the full text,
-					// and .length is how many characters it represents in the full text.
-					if (entry.atomic === true) {
-						const atomicStart = numOrDefault(entry.index, 0);
-						const atomicLength = numOrDefault(entry.length, 1);
-						return side === 'right' ? atomicStart + atomicLength : atomicStart;
+						// cursor should end at the beginning of the removed range
+						newStart = safeStart;
+						newEnd = safeStart;
+					} else {
+						if (backspace) { // remove the character before the cursor
+							const safeStart = Math.max(0, cur.start - 1);
+							arr.splice(safeStart, 1);
+							newStart = safeStart;
+							newEnd = safeStart;
+						} else { // remove the character at the cursor
+							const safeEnd = Math.min(cur.start, val.length);
+							arr.splice(safeEnd, 1);
+							newStart = safeEnd;
+							newEnd = safeEnd;
+						}
 					}
 
-					// For non-atomic entries, each fragment is broken out so that:
-					//   - entry.index is the starting index of the parent match in the full text.
-					//   - entry.atomicIndex is the absolute offset in the overall text for this fragment.
-					const parentIndex = numOrDefault(entry.index, 0);
-					const fragmentIndex = numOrDefault(entry.atomicIndex, parentIndex);
-
-					// partialOffset is how far into the parent match this fragment is.
-					// If side == 'right', we move one extra character.
-					const partialOffset = fragmentIndex - parentIndex;
-					return parentIndex + partialOffset + (side === 'right' ? 1 : 0);
-				};
-
-				// If start and end refer to the same entry, we fall back to the selection's side (or default to 'left').
-				// Otherwise, we keep side = 'left' or 'right' for each offset.
-				const startSide = sel.start === sel.end ? (sel.side ?? 'left') : 'left';
-				const endSide = sel.side ?? 'right';
-
-				const startOffset = getAbsoluteIndex(sel.start, startSide);
-				const endOffset = getAbsoluteIndex(sel.end, endSide);
-
-				const rangeStart = Math.min(startOffset, endOffset);
-				const rangeEnd = Math.max(startOffset, endOffset);
-
-				return { start: rangeStart, end: rangeEnd };
+					value.set(arr.join(''));
+					cursorPos.set({ start: newStart, end: newEnd, side: 'right' });
+				}
 			};
 
 			switch (e.key) {
 				case 'ArrowLeft':
-					e.preventDefault()
-					onArrowKey('left', sel, displayMap, selection);
+					e.preventDefault();
+					onArrowKey('left');
 					break;
 				case 'ArrowRight':
-					e.preventDefault()
-					onArrowKey('right', sel, displayMap, selection);
+					e.preventDefault();
+					onArrowKey('right');
 					break;
 				case 'Backspace':
-					// backspace characters, remove chunks with ctrl + Backspace using findWordBoundry
-					// use selection, delete all items between and including start->end.
-					// within each item there is
-
-					const selectionRange = getSelectionRange();
-					console.log(selectionRange.end - selectionRange.start);
-
-
-					//.slice(selectionRange.end % selectionRange.start, selectionRange.end, 0)
-
+					e.preventDefault();
+					handleDelete(cur, val, true);
 					break;
 				case 'Delete':
-					// delete characters, remove chunks with ctrl + Backspace using findWordBoundry 
+					e.preventDefault();
+					handleDelete(cur, val, false);
 					break;
 				case 'Enter':
+					// Maybe make onEnter() param?
 					break;
 				case 'Escape':
-					selection.set({ start: null, end: null, side: null });
+					cursorPos.set({ start: null, end: null, side: null });
 					break;
 				default:
-					// add characters to value
-					// resolve current selection.end and selection.side to get the index in typography value
-					// to inject characters into.
+					if (e.key.length !== 1) break;
+					e.preventDefault();
+					if (cur.start == null || cur.end == null) break;
+
+					const char = e.key;
+
+					const startIndex = Math.min(cur.start, cur.end);
+					const endIndex = Math.max(cur.start, cur.end);
+
+					const newVal = val.slice(0, startIndex) + char + val.slice(endIndex);
+					value.set(newVal);
+
+					const newCursorPos = startIndex + char.length;
+					cursorPos.set({ start: newCursorPos, end: newCursorPos, side: 'right' });
+
 					break;
-			}
+			};
 		};
 
 		const onPaste = (e) => {
@@ -438,27 +416,190 @@ export default ThemeContext.use(h => {
 			*/
 		};
 
+		const onBlur = () => selection.set({ start: null, end: null, side: null });
+
 		cleanup(() => {
 			wrapper.get().removeEventListener('mouseup', onMouseUp);
-			wrapper.get().removeEventListener('focus', onFocus, true);
-			wrapper.get().removeEventListener('blur', onBlur, true);
 			wrapper.get().removeEventListener('keydown', onKeyDown);
 			wrapper.get().removeEventListener('paste', onPaste);
+			wrapper.get().removeEventListener('blur', onBlur, true);
 		});
 
 		mounted(() => {
 			wrapper.get().addEventListener('mouseup', onMouseUp);
-			wrapper.get().addEventListener('focus', onFocus, true);
-			wrapper.get().addEventListener('blur', onBlur, true);
 			wrapper.get().addEventListener('keydown', onKeyDown);
 			wrapper.get().addEventListener('paste', onPaste);
+			wrapper.get().addEventListener('blur', onBlur, true);
 
 			cleanup(selection.effect(updateCursorPosition));
 			queueMicrotask(updateCursorPosition);
-		})
+		});
 
-		return <div ref={wrapper} role="textbox" tabindex={tabIndex} {...props} theme='textRich'>
-			<Typography theme='textRich' displayMap={displayMap}
+		const setCursorPos = Observer.mutable(false);
+
+		// cursorPos is updated when each selection effect occures and selection is updated.
+		cleanup(selection.effect(sel => {
+			setCursorPos.set(true);
+
+			const getAbsoluteIndex = (item, side) => {
+				// non-atomic fragment
+				if (item.atomic === false) {
+					// non-atomic fragments, each char has item.atomicIndex
+					return side === 'right' ? item.atomicIndex + 1 : item.atomicIndex;
+				}
+				// atomic
+				else {
+					// atomic entry with multiple characters, item.length>1
+					if (typeof item.length === 'number' && item.length > 1) {
+						return side === 'right' ? item.index + item.length : item.index;
+					}
+					// single-char entry
+					return side === 'right' ? item.index + 1 : item.index;
+				}
+			}
+
+			if (!sel || !sel.start || !sel.end) {
+				cursorPos.set({ start: null, end: null, side: null });
+				return;
+			}
+
+			// If the user clicked (start===end), or used arrows, unify them so anchor=focus.
+			if (sel.start === sel.end) {
+				const singleIndex = getAbsoluteIndex(sel.start, sel.side);
+				setCursorPos.set(true);
+				cursorPos.set({ start: singleIndex, end: singleIndex });
+				setCursorPos.set(false);
+				return;
+			}
+
+			// Otherwise do your normal multi‐item selection logic:
+			const anchorIndex = getAbsoluteIndex(sel.start, 'left');
+			const focusIndex = getAbsoluteIndex(sel.end, sel.side);
+			const lower = Math.min(anchorIndex, focusIndex);
+			const higher = Math.max(anchorIndex, focusIndex);
+
+			cursorPos.set({ start: lower, end: higher });
+			setCursorPos.set(false);
+		}));
+
+		/*  
+		This snippet is the “inverse” effect so that when you manually set
+		cursorPos, the selection is automatically recalculated — i.e. a 
+		two-way binding between “selection” and “cursorPos.”
+		*/
+		cleanup(cursorPos.effect(pos => {
+			if (setCursorPos.get()) return;
+			// If cursorPos is null, clear the selection.
+			if (!pos) {
+				selection.set({ start: null, end: null, side: null });
+				return;
+			}
+
+			// given an index (in the text) find which displayMap item that index maps to, and
+			// whether the cursor is on the left or right side of that item.
+			const getItemAndSide = (index) => {
+				let foundItem = null;
+				let side = 'left';
+				let minDistance = Infinity;
+
+				displayMap.forEach(item => {
+					if (item.atomic === false) {
+						// item.atomicIndex is the exact character boundary
+						// If index == item.atomicIndex, that’s on the left of that character
+						// If index == item.atomicIndex + 1, that’s the right edge, etc.
+						const leftEdge = item.atomicIndex;
+						const rightEdge = item.atomicIndex + 1;
+
+						// Distances from this index to edges
+						const distLeft = Math.abs(index - leftEdge);
+						const distRight = Math.abs(index - rightEdge);
+
+						// Snap to whichever edge is closer
+						if (distLeft < minDistance) {
+							foundItem = item;
+							side = 'left';
+							minDistance = distLeft;
+						}
+						if (distRight < minDistance) {
+							foundItem = item;
+							side = 'right';
+							minDistance = distRight;
+						}
+					} else {
+						// For atomic items, item.index..item.index + item.length range
+						const startIdx = item.index;
+						const endIdx = item.index + (item.length || 1);
+
+						if (index <= startIdx) {
+							// Snap to the left edge of the atomic item
+							const distance = Math.abs(index - startIdx);
+							if (distance < minDistance) {
+								foundItem = item;
+								side = 'left';
+								minDistance = distance;
+							}
+						} else if (index >= endIdx) {
+							// Snap to the right edge
+							const distance = Math.abs(index - endIdx);
+							if (distance < minDistance) {
+								foundItem = item;
+								side = 'right';
+								minDistance = distance;
+							}
+						} else {
+							// Index is in the middle of an atomic item → clamp to whichever edge is closer
+							const distToLeft = Math.abs(index - startIdx);
+							const distToRight = Math.abs(index - endIdx);
+							if (distToLeft <= distToRight) {
+								if (distToLeft < minDistance) {
+									foundItem = item;
+									side = 'left';
+									minDistance = distToLeft;
+								}
+							} else {
+								if (distToRight < minDistance) {
+									foundItem = item;
+									side = 'right';
+									minDistance = distToRight;
+								}
+							}
+						}
+					}
+				});
+
+				return { item: foundItem, side };
+			};
+
+			// Resolve the anchor (pos.start) and focus (pos.end).
+			// We’ll call them anchorRes and focusRes just for clarity.
+			const anchorRes = getItemAndSide(pos.start);
+			const focusRes = getItemAndSide(pos.end);
+
+			// If either is missing, clear the selection or handle gracefully
+			if (!anchorRes.item || !focusRes.item) {
+				selection.set({ start: null, end: null, side: null });
+				return;
+			}
+
+			// Decide which item is “start” vs. “end” in the selection. 
+			// If you want to preserve backward vs. forward selection, you can
+			// see which numeric index is smaller. In this example, we assume 
+			// “anchor” is always selection.start, “focus” is selection.end.
+			const anchorIndex = pos.start <= pos.end ? pos.start : pos.end;
+			const focusIndex = pos.end >= pos.start ? pos.end : pos.start;
+			const anchorSide = pos.start <= pos.end ? anchorRes.side : focusRes.side;
+			const focusSide = pos.end >= pos.start ? focusRes.side : anchorRes.side;
+
+			// Now update selection. The 'side' we store is the focus side.
+			selection.set({
+				start: anchorRes.item,
+				end: focusRes.item,
+				side: focusSide
+			});
+		}));
+
+		return <div ref={wrapper} role="textbox" tabindex={tabIndex} {...props} theme='richtext'>
+			<Typography theme='richtext' displayMap={displayMap}
 				label={value.map(v => Observer.mutable(v === '' ? '\u200B' : v)).unwrap()} />
 			<Shown value={selection.map(c => c.end !== null || c.start !== null)}>
 				<div ref={cursor} theme='cursor' style={{
@@ -471,5 +612,5 @@ export default ThemeContext.use(h => {
 			</Shown>
 		</div>;
 	};
-	return TextRich;
+	return Text;
 });
