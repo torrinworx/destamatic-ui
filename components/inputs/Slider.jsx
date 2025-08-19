@@ -30,11 +30,29 @@ Theme.define({
 	},
 
 	slider_track: {
-		background: '$shiftBrightness($color, 0.1)',
+		background: '$saturate($shiftBrightness($color, 0.1), -1)',
 
 		position: 'absolute',
 		borderRadius: '$div($trackSize, 2)px',
 		cursor: 'pointer',
+	},
+
+	slider_track_active: {
+		background: 'red',
+		pointerEvents: 'none',
+
+		position: 'absolute',
+
+		transition: 'width ease-in-out 100ms, height ease-in-out 100ms',
+		background: '$shiftBrightness($color, 0.1)',
+	},
+
+	slider_vertical_track_active: {
+		top: 0,
+	},
+
+	slider_horizontal_track_active: {
+		left: 0,
 	},
 
 	slider_horizontal_track: {
@@ -148,14 +166,14 @@ export default ThemeContext.use(h => {
 			window.addEventListener('mouseup', reset, {signal});
 		})));
 
-		const percentage = Observer.all([value, size, min, max]).map(([value, thumbWidth, min, max]) => {
+		const percentage = Observer.all([value, min, max]).map(([value, min, max]) => {
 			const ratio = (value - min) / (max - min);
-
-			const prc = Math.min(Math.max(ratio, 0), 1);
-			return `calc(${prc * 100}% - (${thumbWidth * prc}px))`;
+			return Math.min(Math.max(ratio, 0), 1);
 		});
 
-		const renderHover = Observer.all([dragging, hover]).map(([a, b]) => a || b)
+		const renderHover = value.isImmutable() ?
+			Observer.immutable(false) :
+			Observer.all([dragging, hover]).map(([a, b]) => a || b);
 
 		return <div ref
 			{...props}
@@ -164,8 +182,8 @@ export default ThemeContext.use(h => {
 			<TrackRef
 				theme={[
 					"slider", type, "track",
-					renderHover.map(h => h ? 'hovered' : null),
-					disabled.map(d => d ? 'disabled' : null),
+					renderHover.bool('hovered', null),
+					disabled.bool('disabled', null),
 				]}
 				style={styleTrack}
 				isHovered={hover}
@@ -177,6 +195,14 @@ export default ThemeContext.use(h => {
 				}}
 				children={children}
 			/>
+			<div
+				theme={[
+					"slider", type, "track", "active",
+					renderHover.bool('hovered', null),
+					disabled.bool('disabled', null),
+				]}
+				style={{[sizeAnchor]: percentage.map(prc => (prc * 100) + '%')}}
+			/>
 			{value.isImmutable() ? null : <div
 				theme={[
 					"slider", type, "thumb",
@@ -184,7 +210,7 @@ export default ThemeContext.use(h => {
 					disabled.map(d => d ? 'disabled' : null),
 				]}
 				style={{
-					[movementAnchor]: percentage,
+					[movementAnchor]: Observer.all([percentage, size]).map(([prc, size]) => `calc(${prc * 100}% - (${size * prc}px))`),
 					...styleThumb,
 				}}
 				isHovered={hover}
