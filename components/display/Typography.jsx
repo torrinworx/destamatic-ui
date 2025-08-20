@@ -18,7 +18,14 @@ Theme.define({
 	typography_bold: { fontWeight: 'bold' },
 	typography_italic: { fontStyle: 'italic' },
 	typography_center: { textAlign: 'center' },
-	typography_inline: { display: 'inline' }
+	typography_inline: { display: 'inline' },
+
+	typography_input: {
+		background: 'none',
+		outline: 0,
+		border: 0,
+		padding: 0,
+	},
 });
 
 export const TextModifiers = createContext(() => null, (value) => value);
@@ -129,16 +136,15 @@ export const Typography = ThemeContext.use(h => {
 		return result;
 	};
 
-	return TextModifiers.use(modifiers => ({
+	return TextModifiers.use(modifiers => Theme.use(themer => ({
 		type = 'h1',
 		label = '',
 		displayMap = [],
 		children,
+		theme,
 		...props
 	}) => {
-		if (!(label instanceof Observer)) label = Observer.immutable(label);
 		let display;
-
 		if (children.length > 0) {
 			display = children;
 		} else if (modifiers.length > 0) {
@@ -147,12 +153,63 @@ export const Typography = ThemeContext.use(h => {
 			display = label;
 		}
 
-		return <span
-			ref
-			{...props}
-			theme={['typography', type]}
-		>
-			{display}
-		</span>;
-	})
+		if (!(display instanceof Observer)) display = Observer.immutable(display);
+
+		if (display.isImmutable()) {
+			return <span
+				ref
+				{...props}
+				theme={['typography', type]}
+			>
+				{display}
+			</span>;
+		} else {
+			const editing = Observer.mutable(false);
+			const width = Observer.mutable(0);
+
+			const _class = themer(theme, 'typography', type, 'base');
+
+			const Input = (_, cleanup, mounted) => {
+				const Ref = <raw:input />;
+				mounted(() => {
+					Ref.focus();
+					Ref.select();
+				});
+
+				return <Ref
+					theme={['typography', type, 'input']}
+					type="text"
+					$value={display}
+					onInput={e => {
+						display.set(e.target.value);
+
+						const elem = <raw:span class={_class.get()} $textContent={e.target.value} />;
+						document.body.appendChild(elem);
+						width.set(elem.getBoundingClientRect().width);
+						document.body.removeChild(elem);
+					}}
+					onKeyDown={e => {
+						if (e.key === 'Enter') editing.set(false);
+					}}
+					onBlur={() => editing.set(false)}
+					style={{
+						width,
+					}}
+				/>;
+			};
+
+			const ref = Observer.mutable();
+			return <span
+				class={_class}
+				ref={ref}
+				{...props}
+				onClick={() => {
+					width.set(ref.get().getBoundingClientRect().width);
+					editing.set(true);
+				}}
+			>
+				{editing.bool(<Input />, display).unwrap()}
+			</span>;
+		}
+	}))
 });
