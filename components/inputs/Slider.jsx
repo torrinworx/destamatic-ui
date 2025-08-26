@@ -38,11 +38,8 @@ Theme.define({
 	},
 
 	slider_track_active: {
-		background: 'red',
 		pointerEvents: 'none',
-
 		position: 'absolute',
-
 		transition: 'width ease-in-out 100ms, height ease-in-out 100ms',
 		background: '$shiftBrightness($color, 0.1)',
 	},
