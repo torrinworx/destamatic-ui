@@ -123,7 +123,7 @@ export default ThemeContext.use(h => {
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
 
-		const Bttn = () => <button ref
+		return <button ref
 			onClick={(event) => {
 				if (disabled.get()) return;
 
@@ -188,14 +188,19 @@ export default ThemeContext.use(h => {
 					{ripples}
 				</mark:else>
 			</Shown>
+			<Shown value={href}>
+				<a
+					href={href}
+					aria-hidden="true"
+					onClick={(e) => e.preventDefault()}
+					style={{
+						all: "unset",
+						pointerEvents: "none",
+						display: "contents"
+					}}
+				/>
+			</Shown>
 		</button>;
-
-		return href ? <a
-			href={href}
-			target="_blank"
-			rel="noopener noreferrer"
-			style={{ textDecoration: 'none', display: inline ? 'inline-block' : 'block' }
-			}><Bttn /></a> : <Bttn />;
 	};
 
 	return Button;
