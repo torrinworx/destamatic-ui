@@ -94,24 +94,6 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	/**
-	 * Button component with ripple effect and dynamic styles based on properties.
-	 *
-	 * @param {Object} props - The properties object.
-	 * @param {string} [props.label=''] - The text label for the button.
-	 * @param {string} [props.type='text'] - The type of the button, which affects its style. Can be 'text', 'contained', 'outlined'.
-	 * @param {Function} [props.onClick] - The function to call when the button is clicked.
-	 * @param {Function} [props.onMouseDown] - The function to call when the mouse button is pressed down on the button.
-	 * @param {Function} [props.onMouseUp] - The function to call when the mouse button is released on the button.
-	 * @param {JSX.Element} [props.icon] - An optional icon element to display inside the button.
-	 * @param {Object} [props.style] - Custom styles to apply to the button.
-	 * @param {Observer<boolean>} [props.disabled] - Observable boolean to determine if the button is disabled.
-	 * @param {Observer<boolean>} [props.hover] - Observable boolean to determine if the button is in hover state.
-	 * @param {HTMLElement} [props.Ref] - A reference to the DOM element of the button.
-	 * @param {...Object} props - Additional properties to spread onto the button element.
-	 *
-	 * @returns {JSX.Element} The rendered button element.
-	 */
 	const Button = ({
 		label = '',
 		type = 'text',
@@ -126,6 +108,7 @@ export default ThemeContext.use(h => {
 		focused,
 		children,
 		iconPosition = 'left',
+		href,
 		...props
 	}) => {
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
@@ -140,7 +123,7 @@ export default ThemeContext.use(h => {
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
 
-		return <button ref
+		const Bttn = () => <button ref
 			onClick={(event) => {
 				if (disabled.get()) return;
 
@@ -151,7 +134,7 @@ export default ThemeContext.use(h => {
 					// if the return value is a promise, replace the button with a loading animation.
 					if (ret && ret.then) {
 						loading.set(true);
-						ret.catch(() => {}).then(() => loading.set(false));
+						ret.catch(() => { }).then(() => loading.set(false));
 					}
 				}
 			}}
@@ -206,6 +189,13 @@ export default ThemeContext.use(h => {
 				</mark:else>
 			</Shown>
 		</button>;
+
+		return href ? <a
+			href={href}
+			target="_blank"
+			rel="noopener noreferrer"
+			style={{ textDecoration: 'none', display: inline ? 'inline-block' : 'block' }
+			}><Bttn /></a> : <Bttn />;
 	};
 
 	return Button;
