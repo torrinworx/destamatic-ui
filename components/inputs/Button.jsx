@@ -108,6 +108,7 @@ export default ThemeContext.use(h => {
 		focused,
 		children,
 		iconPosition = 'left',
+		loading = true,
 		href,
 		...props
 	}) => {
@@ -115,7 +116,9 @@ export default ThemeContext.use(h => {
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
-		const loading = Observer.mutable(false);
+		if (!loading) loading = Observer.immutable(loading)
+		else loading = Observer.mutable(false)
+
 		disabled = Observer.all([disabled, loading]).map(([dis, lod]) => !!dis || lod);
 
 		const [ripples, createRipple] = useRipples();
@@ -132,7 +135,7 @@ export default ThemeContext.use(h => {
 					const ret = onClick(event);
 
 					// if the return value is a promise, replace the button with a loading animation.
-					if (ret && ret.then) {
+					if (ret && ret.then && !loading.isImmutable()) {
 						loading.set(true);
 						ret.catch(() => { }).then(() => loading.set(false));
 					}
