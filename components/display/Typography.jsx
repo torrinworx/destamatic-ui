@@ -5,7 +5,10 @@ import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
 
 Theme.define({
-	typography: { whiteSpace: 'pre-wrap' },
+	typography: {
+		whiteSpace: 'pre-wrap',
+		margin: 0,
+	},
 	typography_h1: { fontSize: 62 },
 	typography_h2: { fontSize: 56 },
 	typography_h3: { fontSize: 36 },
@@ -136,6 +139,29 @@ export const Typography = ThemeContext.use(h => {
 		return result;
 	};
 
+	const rawTags = {
+		span: <raw:span />,
+		h1: <raw:h1 />,
+		h2: <raw:h2 />,
+		h3: <raw:h3 />,
+		h4: <raw:h4 />,
+		h5: <raw:h5 />,
+		h6: <raw:h6 />,
+		p: <raw:p />,
+		input: <raw:input />,
+	};
+
+	const resolveTag = (type) => {
+		if (!type) return 'span';
+
+		const [first] = type.split('_');
+
+		if (/^h[1-6]$/i.test(first)) return first.toLowerCase();
+		if (first === 'p1' || first === 'p2' || first === 'p') return 'p';
+
+		return 'span';
+	};
+
 	return TextModifiers.use(modifiers => Theme.use(themer => ({
 		type = 'h1',
 		label = '',
@@ -153,24 +179,27 @@ export const Typography = ThemeContext.use(h => {
 			display = label;
 		}
 
+		const tagName = resolveTag(type);
+		const Tag = rawTags[tagName];
+
 		if (!(display instanceof Observer)) display = Observer.immutable(display);
 
 		if (display.isImmutable()) {
-			return <span
+			return <Tag
 				ref
 				{...props}
 				theme={['typography', type]}
 			>
 				{display}
-			</span>;
+			</Tag>;
 		} else {
 			const editing = Observer.mutable(false);
 			const width = Observer.mutable(0);
 
 			const _class = themer(theme, 'typography', type, 'base');
 
-			const Input = (_, cleanup, mounted) => {
-				const Ref = <raw:input />;
+			const Input = (_, __, mounted) => {
+				const Ref = rawTags.input;
 				mounted(() => {
 					Ref.focus();
 					Ref.select();
@@ -192,14 +221,12 @@ export const Typography = ThemeContext.use(h => {
 						if (e.key === 'Enter') editing.set(false);
 					}}
 					onBlur={() => editing.set(false)}
-					style={{
-						width,
-					}}
+					style={{ width }}
 				/>;
 			};
 
 			const ref = Observer.mutable();
-			return <span
+			return <Tag
 				class={_class}
 				ref={ref}
 				{...props}
@@ -209,7 +236,7 @@ export const Typography = ThemeContext.use(h => {
 				}}
 			>
 				{editing.bool(<Input />, display).unwrap()}
-			</span>;
+			</Tag>;
 		}
 	}))
 });
