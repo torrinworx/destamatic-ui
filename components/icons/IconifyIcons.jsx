@@ -15,7 +15,6 @@ const IconifyDriver = (name) => {
     const lib = libraries[pack];
     if (!lib) return null;
 
-    console.log(lib, iconName, lib.icons[iconName]);
     const icon = lib.icons[iconName];
     if (!icon) return null;
 
