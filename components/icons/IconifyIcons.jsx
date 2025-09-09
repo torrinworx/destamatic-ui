@@ -18,7 +18,6 @@ const IconifyDriver = (name) => {
     const icon = lib.icons[iconName];
     if (!icon) return null;
 
-
     const viewBox = `0 0 ${icon.width || 24} ${icon.height || 24}`;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${icon.body}</svg>`;
 };
