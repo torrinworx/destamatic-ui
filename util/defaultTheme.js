@@ -191,4 +191,11 @@ export default {
 		display: 'flex',
 		justifyContent: 'space-between',
 	},
+
+	divider: {
+		width: '100%',
+		height: '2px',
+		background: '$color_text',
+		margin: '10px 0px 10px 0px',
+	},
 };
