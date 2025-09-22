@@ -35,107 +35,126 @@ export const TextModifiers = createContext(() => null, (value) => value);
 
 export const Typography = ThemeContext.use(h => {
 	const applyModifiers = (label, modifiers, displayMap) => {
-		if (!label) return [];
-		if (displayMap.length > 0) displayMap.splice(0, displayMap.length); // Because OArray's don't allow .length = 0
+		label = label || '';
+		const indexMode = !!displayMap;
+		if (indexMode && displayMap.length > 0) displayMap.splice(0, displayMap.length);
 
 		let result = [];
 		let cursor = 0;
 		let matches = [];
 
-		// Normalize modifiers to regex
-		modifiers.forEach((mod, i) => {
+		// 1) collect matches
+		modifiers.forEach((mod, order) => {
 			const pattern = typeof mod.check === 'string'
 				? new RegExp(mod.check.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
 				: mod.check;
-
-			let match;
-			while ((match = pattern.exec(label)) !== null) {
-				matches.push({
-					start: match.index,
-					end: match.index + match[0].length,
-					match: match[0],
-					mod,
-					order: i,
-				});
+			let m;
+			while ((m = pattern.exec(label)) !== null) {
+				matches.push({ start: m.index, end: m.index + m[0].length, match: m[0], mod, order });
 			}
 		});
 
-		// Sort by start index, then modifier order
+		// 2) sort and de-overlap
 		matches.sort((a, b) => a.start - b.start || a.order - b.order);
-
-		// Remove overlaps (prioritize earlier modifiers)
 		const filtered = [];
 		let lastEnd = 0;
 		for (const m of matches) {
-			if (m.start >= lastEnd) {
-				filtered.push(m);
-				lastEnd = m.end;
-			}
+			if (m.start >= lastEnd) { filtered.push(m); lastEnd = m.end; }
 		}
+
+		// helper: create a span with optional data-* only in index mode
+		const makeSpan = (children, attrs) => {
+			if (indexMode) {
+				return <raw:span {...attrs}>{children}</raw:span>;
+			} else {
+				// If attrs are only for indexing, omit them for perf
+				return <raw:span>{children}</raw:span>;
+			}
+		};
 
 		for (let i = 0; i <= filtered.length; i++) {
 			const next = filtered[i];
 			const end = next ? next.start : label.length;
 
-			const txt = label.slice(cursor, end);
-			if (txt) { // nromal text
-				for (let j = 0; j < txt.length; j++) {
-					const char = txt[j];
+			// 3a) gap text (plain text between matches)
+			if (end > cursor) {
+				const text = label.slice(cursor, end);
+
+				if (!indexMode) {
+					// minimal DOM, no indexing
+					result.push(text); // or makeSpan(text) if you need a span for styling
+				} else {
 					const displayId = UUID().toHex();
-					const span = <raw:span displayId={displayId}>{char}</raw:span>;
+					const span = makeSpan(text, {
+						'data-display-id': displayId,
+						'data-kind': 'fragment',
+						'data-atomic': 'false',
+					});
 					result.push(span);
 
-					displayMap.push({
-						index: cursor + j,
-						char,
-						node: span,
-						displayId,
-					});
+					// push per-char segments referencing this single span
+					for (let j = 0; j < text.length; j++) {
+						const start = cursor + j;
+						displayMap.push({
+							kind: 'char',
+							start,
+							end: start + 1,
+							displayId,
+							atomic: false,
+							char: text[j],
+						});
+					}
 				}
+
+				cursor = end;
 			}
 
-			if (next) { // non-atomic elements
-				const { return: _return, check: _check, atomic, ...props } = next.mod;
-				const rendered = next?.mod?.return?.(next.match);
-				const displayId = UUID().toHex();
-				const span = <raw:span displayId={displayId} atomic={`${atomic}`}>{rendered}</raw:span>;
+			// 3b) matched range
+			if (next) {
+				const { return: renderFn, check: _ignored, atomic, ...props } = next.mod;
+				const rendered = renderFn?.(next.match);
 
-				result.push(span);
-				cursor = next.end;
+				if (!indexMode) {
+					const span = <raw:span>{rendered}</raw:span>;
+					result.push(span);
+				} else {
+					const displayId = UUID().toHex();
+					const span = makeSpan(rendered, {
+						'data-display-id': displayId,
+						'data-atomic': String(atomic),
+						'data-kind': atomic === false ? 'fragment' : 'atomic',
+					});
+					result.push(span);
 
-				// treat element as if each character is it's own element.
-				if (atomic === false) { // add element to displayMap for each character the cursor is expected to move between.
-					const index = next.start;
-
-					let count = 0;
-					next.match.split('').forEach(char => {
+					if (atomic === false) {
+						// Always fragment per character for non-atomic
+						for (let k = 0; k < next.match.length; k++) {
+							const start = next.start + k;
+							displayMap.push({
+								kind: 'fragment',
+								start,
+								end: start + 1,
+								displayId,
+								atomic: false,
+								char: next.match[k],
+								...props,
+							});
+						}
+					} else {
+						// True atomic – single segment
 						displayMap.push({
-							// TODO: I think we could get away with only having index and getting rid of atomicIndex. 
-							index,
-							atomicIndex: index + count,
-							node: span.elem_ ? span.elem_ : span,
-							match: next.match,
-							char,
+							kind: 'atomic',
+							start: next.start,
+							end: next.end,
 							displayId,
-							atomic,
 							...props,
 						});
-						count++
-					});
-				} else {
-					displayMap.push({
-						index: next.start,
-						length: next.end - next.start,
-						node: span.elem_ ? span.elem_ : span,
-						displayId,
-						...props,
-					});
+					}
 				}
-			} else { // if next is undefined, we have reached the end of the label.
-				cursor = label.length;
+				cursor = next.end;
 			}
 		}
-
+		// console.log(displayMap);
 		return result;
 	};
 
@@ -165,16 +184,17 @@ export const Typography = ThemeContext.use(h => {
 	return TextModifiers.use(modifiers => Theme.use(themer => ({
 		type = 'h1',
 		label = '',
-		displayMap = [],
+		displayMap = false,
 		children,
 		theme,
 		...props
 	}) => {
 		let display;
+
 		if (children.length > 0) {
 			display = children;
-		} else if (modifiers.length > 0) {
-			display = label.map(l => applyModifiers(l, modifiers, displayMap));
+		} else if (displayMap || modifiers.length > 0) {
+			display = label.map(l => applyModifiers(l, modifiers, displayMap || null));
 		} else {
 			display = label;
 		}
