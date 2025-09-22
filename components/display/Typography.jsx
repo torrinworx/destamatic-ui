@@ -43,7 +43,7 @@ export const Typography = ThemeContext.use(h => {
 		let cursor = 0;
 		let matches = [];
 
-		// 1) collect matches
+		// collect matches
 		modifiers.forEach((mod, order) => {
 			const pattern = typeof mod.check === 'string'
 				? new RegExp(mod.check.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
@@ -54,7 +54,7 @@ export const Typography = ThemeContext.use(h => {
 			}
 		});
 
-		// 2) sort and de-overlap
+		// sort and de-overlap
 		matches.sort((a, b) => a.start - b.start || a.order - b.order);
 		const filtered = [];
 		let lastEnd = 0;
@@ -62,7 +62,7 @@ export const Typography = ThemeContext.use(h => {
 			if (m.start >= lastEnd) { filtered.push(m); lastEnd = m.end; }
 		}
 
-		// helper: create a span with optional data-* only in index mode
+		// create a span with optional data-* only in index mode
 		const makeSpan = (children, attrs) => {
 			if (indexMode) {
 				return <raw:span {...attrs}>{children}</raw:span>;
@@ -76,7 +76,7 @@ export const Typography = ThemeContext.use(h => {
 			const next = filtered[i];
 			const end = next ? next.start : label.length;
 
-			// 3a) gap text (plain text between matches)
+			// gap text (plain text between matches)
 			if (end > cursor) {
 				const text = label.slice(cursor, end);
 
@@ -109,7 +109,7 @@ export const Typography = ThemeContext.use(h => {
 				cursor = end;
 			}
 
-			// 3b) matched range
+			// matched range
 			if (next) {
 				const { return: renderFn, check: _ignored, atomic, ...props } = next.mod;
 				const rendered = renderFn?.(next.match);
@@ -154,7 +154,6 @@ export const Typography = ThemeContext.use(h => {
 				cursor = next.end;
 			}
 		}
-		// console.log(displayMap);
 		return result;
 	};
 
