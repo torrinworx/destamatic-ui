@@ -21,7 +21,7 @@ Theme.define({
 		position: 'absolute',
 		top: 0,
 		width: 4,
-		background: 'red',
+		background: '$color_top',
 		pointerEvents: 'none',
 	},
 });
