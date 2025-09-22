@@ -11,8 +11,7 @@ Theme.define({
 		cursor: 'text',
 		position: 'relative',
 		outline: 'none',
-		overflow: 'auto', // scroll
-		minHeight: '200px',
+		overflow: 'auto',
 	},
 	richtext_typography: {
 		extends: 'row',
@@ -20,24 +19,28 @@ Theme.define({
 	},
 	cursor: {
 		position: 'absolute',
-		top: 0,         // can be overridden by style.top in JS
+		top: 0,
 		width: 4,
 		background: 'red',
 		pointerEvents: 'none',
 	},
 });
 
-// Text: a rich text input using Typography + TextEngine
+/*
+TODO:
+- Support cursor being moved while content is scrolling. If the user is scrolling to view text overflowing to the right, the text is moving left, the crusor should also move left in it's relative position to the characters. Right now it sticks to the wrapper.
+- ctrl+delete support with word/string groupings similar to vscode, words, things separated by spaces, other parametrs
+*/
+
 export default ThemeContext.use(h => {
 	const Text = ({
-		value,              // Observer<string> or string
+		value,
 		tabIndex = 0,
 		autoFocus = false,
-		onEnter,            // optional callback
+		onEnter,
+		type = 'h1',
 		...props
 	}, cleanup, mounted) => {
-
-		// Ensure value is an Observer<string>
 		if (!(value instanceof Observer)) value = Observer.mutable(String(value ?? ''));
 
 		const displayMap = OArray([]);
@@ -54,7 +57,6 @@ export default ThemeContext.use(h => {
 		const engineRef = Observer.mutable(null);
 
 		// Handlers
-
 		const onMouseUp = (e) => {
 			const eng = engineRef.get();
 			if (!eng) return;
@@ -103,13 +105,11 @@ export default ThemeContext.use(h => {
 					eng.ensureCaretVisible();
 					return;
 				case 'Escape':
-					// Collapse selection to caret; keep caret visible
 					e.preventDefault();
 					const { focus } = eng.getSelection();
 					eng.setCaret(focus, eng.lastDirection.get());
 					return;
 				case 'a': case 'A':
-					// Ctrl/Cmd + A: select all
 					if (ctrlOrMeta) {
 						e.preventDefault();
 						const len = (value.get() || '').length;
@@ -142,14 +142,14 @@ export default ThemeContext.use(h => {
 
 		const onFocus = () => {
 			focused.set(true);
-			lastMoved.set(Date.now()); // show caret immediately
+			lastMoved.set(Date.now());
 		};
 
 		const onBlur = () => focused.set(false);
 		const onScroll = () => {
 			const eng = engineRef.get();
 			if (!eng) return;
-			eng.updateCursor?.(); // uses public updateCursor if you added it
+			eng.updateCursor();
 		};
 
 		// Lifecycle
@@ -195,10 +195,11 @@ export default ThemeContext.use(h => {
 			role="textbox"
 			tabIndex={tabIndex}
 			{...props}
-			theme='richtext'
+			theme={['richtext', type]}
 		>
 			<Typography
-				theme='richtext'
+				theme={['richtext']}
+				type={type}
 				displayMap={displayMap}
 				label={value}
 			/>
