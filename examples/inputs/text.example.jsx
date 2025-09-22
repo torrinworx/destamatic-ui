@@ -57,6 +57,7 @@ const value2 = Observer.mutable('const modifiers = makePrismModifiers(language.g
 const check = Observer.mutable(false);
 
 mount(document.body, <PopupContext>
+    <Typography label="Fun modifiers:" type='h1' />
     <TextModifiers value={[
         {
             check: '!',
@@ -122,7 +123,7 @@ mount(document.body, <PopupContext>
     ]} >
         <Text style={{ background: 'black', color: 'white' }} value={value} />
     </TextModifiers>
-    <Typography label="Javascript syntax highlighting:" type='h3' />
+    <Typography label="Javascript syntax highlighting:" type='h1' />
     <TextModifiers value={modifiers} >
         <Text style={{ background: 'black', color: 'white' }} value={value2} />
     </TextModifiers>
