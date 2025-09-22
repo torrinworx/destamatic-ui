@@ -125,6 +125,6 @@ mount(document.body, <PopupContext>
     </TextModifiers>
     <Typography label="Javascript syntax highlighting:" type='h1' />
     <TextModifiers value={modifiers} >
-        <Text style={{ background: 'black', color: 'white' }} value={value2} />
+        <Text value={value2} />
     </TextModifiers>
 </PopupContext>);
