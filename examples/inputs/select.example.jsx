@@ -7,13 +7,13 @@ const options = {
 	'option 1': () => {
 		window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_self');
 	},
-	'option 1': () => {
+	'option 2': () => {
 		window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_self');
 	},
-	'option 1': () => {
+	'option 3': () => {
 		window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_self');
 	},
-	'option 1': () => {
+	'option 4': () => {
 		window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_self');
 	},
 };
