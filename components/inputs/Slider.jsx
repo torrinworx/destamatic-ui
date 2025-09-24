@@ -93,7 +93,6 @@ Theme.define({
 	slider_thumb_hovered: {
 		background: '$color_hover',
 	},
-
 });
 
 export default ThemeContext.use(h => {
