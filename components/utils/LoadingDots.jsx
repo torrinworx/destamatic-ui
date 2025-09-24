@@ -3,9 +3,7 @@ import ThemeContext from './ThemeContext';
 
 Theme.define({
 	loadingDots: {
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
+		extends: 'row_tight'
 	},
 
 	loadingDots_dot: {
@@ -16,8 +14,8 @@ Theme.define({
 
 		background: '$color',
 		display: 'inline-block',
-		width: '8px',
-		height: '8px',
+		width: 'clamp(0.75rem, 0.75vw + 0.375rem, 1.25rem)',
+		height: 'clamp(0.75rem, 0.75vw + 0.375rem, 1.25rem)',
 		borderRadius: '50%',
 		animationName: '$animationName',
 		animationDuration: '1s',
@@ -28,13 +26,8 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	/**
-	 * LoadingDots component - a loading indicator with three animated dots.
-	 *
-	 * @returns {JSX.Element} The rendered loading dots component.
-	 */
-	const LoadingDots = ({style}) => {
-		return <div ref theme='loadingDots' style={style}>
+	const LoadingDots = () => {
+		return <div ref theme='loadingDots'>
 			<span theme='loadingDots_dot' style={{ animationDelay: '0s' }}></span>
 			<span theme='loadingDots_dot' style={{ animationDelay: '.2s' }}></span>
 			<span theme='loadingDots_dot' style={{ animationDelay: '.4s' }}></span>
