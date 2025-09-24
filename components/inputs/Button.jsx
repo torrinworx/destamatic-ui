@@ -11,7 +11,6 @@ import ThemeContext from '../utils/ThemeContext';
 Theme.define({
 	button: {
 		extends: 'center_radius',
-
 		padding: 10,
 		userSelect: 'none',
 		border: 'none',
@@ -22,7 +21,6 @@ Theme.define({
 		color: '$color_top',
 		boxShadow: 'none',
 		background: 'none',
-
 		_cssProp_focus: {
 			outline: 'none',
 		},
