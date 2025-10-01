@@ -176,6 +176,7 @@ export default {
 
 	tight: {
 		padding: 0,
+		gap: 0,
 	},
 
 	shadow: {
