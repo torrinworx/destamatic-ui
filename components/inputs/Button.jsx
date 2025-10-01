@@ -135,7 +135,7 @@ export default ThemeContext.use(h => {
 					// if the return value is a promise, replace the button with a loading animation.
 					if (ret && ret.then && !loading.isImmutable()) {
 						loading.set(true);
-						ret.catch(() => { }).then(() => loading.set(false));
+						ret.catch(console.error).then(() => loading.set(false));
 					}
 				}
 			}}
