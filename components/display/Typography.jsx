@@ -158,17 +158,6 @@ export const Typography = ThemeContext.use(h => {
 		return result;
 	};
 
-	const rawTags = {
-		span: <raw:span />,
-		h1: <raw:h1 />,
-		h2: <raw:h2 />,
-		h3: <raw:h3 />,
-		h4: <raw:h4 />,
-		h5: <raw:h5 />,
-		h6: <raw:h6 />,
-		p: <raw:p />,
-		input: <raw:input />,
-	};
 
 	const resolveTag = (type) => {
 		if (!type) return 'span';
@@ -199,19 +188,18 @@ export const Typography = ThemeContext.use(h => {
 			display = label;
 		}
 
-		const tagName = resolveTag(type);
-		const Tag = rawTags[tagName];
+		const TagName = resolveTag(type);
 
 		if (!(display instanceof Observer)) display = Observer.immutable(display);
 
 		if (display.isImmutable()) {
-			return <Tag
+			return <TagName
 				ref
 				{...props}
 				theme={['typography', type]}
 			>
 				{display}
-			</Tag>;
+			</TagName>;
 		} else {
 			const editing = Observer.mutable(false);
 			const width = Observer.mutable(0);
@@ -219,7 +207,7 @@ export const Typography = ThemeContext.use(h => {
 			const _class = themer(theme, 'typography', type, 'base');
 
 			const Input = (_, __, mounted) => {
-				const Ref = rawTags.input;
+				const Ref = <raw:input />;
 				mounted(() => {
 					Ref.focus();
 					Ref.select();
@@ -246,7 +234,7 @@ export const Typography = ThemeContext.use(h => {
 			};
 
 			const ref = Observer.mutable();
-			return <Tag
+			return <TagName
 				class={_class}
 				ref={ref}
 				{...props}
@@ -256,7 +244,7 @@ export const Typography = ThemeContext.use(h => {
 				}}
 			>
 				{editing.bool(<Input />, display).unwrap()}
-			</Tag>;
+			</TagName>;
 		}
 	}))
 });
