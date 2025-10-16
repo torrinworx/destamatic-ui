@@ -27,5 +27,9 @@ mount(document.body, <PopupContext>
 			options={country.map(c => c[2].map(r => r[0]))} // we set region to the string, but r contains region name and code: ['Ontario', 'ON']
 		/>
 	</Shown>
+	<div style={{ height: 1000 }} />
+	<Country value={value} type='contained' country={country} placeholder='Select a Country' />
+	<div style={{ height: 1000 }} />
+	<Country value={value} type='contained' country={country} placeholder='Select a Country' />
 	<Popup />
 </PopupContext>);
