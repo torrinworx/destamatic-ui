@@ -2,8 +2,27 @@
   "name": "destamatic-ui",
   "version": "1.0.0",
   "description": "",
-  "main": "./index.js",
   "type": "module",
+  "main": "index.js",
+  "module": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.js"
+    },
+    "./icons/SimpleIcons": "./components/icons/SimpleIcons.jsx",
+    "./icons/FeatherIcons": "./components/icons/FeatherIcons.jsx",
+    "./icons/MaterialIcons": "./components/icons/MaterialIcons.jsx",
+    "./icons/IconifyIcons": "./components/icons/IconifyIcons.jsx",
+    "./util/color": "./util/color.js"
+  },
+  "files": [
+    "index.js",
+    "components",
+    "util",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "build": "bash ./build.sh",
     "dev": "vite",
