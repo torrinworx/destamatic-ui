@@ -1,11 +1,11 @@
 import Observer from 'destam/Observer';
-import Popup from './Popup';
-import Shown from './Shown';
-import ThemeContext from './ThemeContext';
+import Popup from './Popup.jsx';
+import Shown from './Shown.jsx';
+import ThemeContext from './ThemeContext.jsx';
 
 import { mount } from 'destam-dom';
-import trackedMount from '../../util/trackedMount';
-import categories from '../../util/categories';
+import trackedMount from '../../util/trackedMount.js';
+import categories from '../../util/categories.js';
 
 const clamp = (x, l, h) => Math.max(l, Math.min(h, x));
 

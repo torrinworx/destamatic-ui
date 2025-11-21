@@ -1,4 +1,4 @@
-import { mark } from '../components/utils/h';
+import { mark } from '../components/utils/h.jsx';
 
 export default (children, categories, def) => {
 	const out = [];

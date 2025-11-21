@@ -1,5 +1,5 @@
-import Theme from './Theme';
-import ThemeContext from './ThemeContext';
+import Theme from './Theme.jsx';
+import ThemeContext from './ThemeContext.jsx';
 
 Theme.define({
 	loadingDots: {

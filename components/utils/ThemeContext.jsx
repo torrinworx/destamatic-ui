@@ -1,5 +1,5 @@
-import createContext from './Context';
-import { h } from './h';
+import createContext from './Context.jsx';
+import { h } from './h.jsx';
 import { assert } from 'destam/util';
 import Observer from 'destam/Observer';
 

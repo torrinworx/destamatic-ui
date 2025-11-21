@@ -1,8 +1,8 @@
-import { h } from '../utils/h';
+import { h } from '../utils/h.jsx';
 import { Observer } from 'destam-dom';
 
-import { Icon } from '../display/Icon';
-import Shown from '../utils/Shown';
+import { Icon } from '../display/Icon.jsx';
+import Shown from '../utils/Shown.jsx';
 
 /**
  * DropDown component that toggles the visibility of its children when clicked.

@@ -1,7 +1,7 @@
 import { Observer } from 'destam-dom';
-import Theme from '../utils/Theme';
-import ThemeContext from '../utils/ThemeContext';
-import useAbort from '../../util/abort';
+import Theme from '../utils/Theme.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
+import useAbort from '../../util/abort.js';
 
 Theme.define({
 	slider: {

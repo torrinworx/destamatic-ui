@@ -1,11 +1,11 @@
-import { mark } from '../utils/h';
-import ThemeContext from '../utils/ThemeContext';
-import Theme from '../utils/Theme';
-import useAbort from '../../util/abort';
+import { mark } from '../utils/h.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
+import Theme from '../utils/Theme.jsx';
+import useAbort from '../../util/abort.js';
 import Observer from 'destam/Observer';
-import Detached from '../utils/Detached';
+import Detached from '../utils/Detached.jsx';
 
-import categories from '../../util/categories';
+import categories from '../../util/categories.js';
 
 export default ThemeContext.use(h => {
 	const Attached = ({children, focused, Anchor, anchorTheme, type, theme}) => {

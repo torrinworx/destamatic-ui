@@ -1,11 +1,11 @@
 import { Observer } from 'destam-dom';
 
-import Theme from './Theme';
-import Shown from './Shown';
-import Icon from '../display/Icon';
-import createContext from './Context';
-import { Typography } from '../display/Typography';
-import ThemeContext from '../utils/ThemeContext';
+import Theme from './Theme.jsx';
+import Shown from './Shown.jsx';
+import Icon from '../display/Icon.jsx';
+import createContext from './Context.jsx';
+import { Typography } from '../display/Typography.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
 
 Theme.define({
 	validate: {

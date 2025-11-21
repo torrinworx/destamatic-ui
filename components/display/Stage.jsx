@@ -1,13 +1,13 @@
 import { OObject, Observer } from 'destam';
 
-import Icon from './Icon';
-import Popup from '../utils/Popup';
-import Theme from '../utils/Theme';
-import Paper from './Paper';
-import Button from '../inputs/Button';
-import { Typography } from './Typography';
-import createContext from '../utils/Context';
-import ThemeContext from '../utils/ThemeContext';
+import Icon from './Icon.jsx';
+import Popup from '../utils/Popup.jsx';
+import Theme from '../utils/Theme.jsx';
+import Paper from './Paper.jsx';
+import Button from '../inputs/Button.jsx';
+import { Typography } from './Typography.jsx';
+import createContext from '../utils/Context.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
 
 Theme.define({
 	stageOverlay: {

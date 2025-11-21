@@ -2,7 +2,7 @@ import { h, mount, Observer, OObject, OArray } from "destam-dom";
 import { atomic } from 'destam/Network';
 import { Insert, Delete } from 'destam/Events';
 
-import createContext from './Context';
+import createContext from './Context.jsx';
 import { sizeProperties } from '../../util/index.js';
 import defaultTheme from '../../util/defaultTheme.js';
 

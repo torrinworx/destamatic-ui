@@ -1,4 +1,4 @@
-import ThemeContext from '../utils/ThemeContext';
+import ThemeContext from '../utils/ThemeContext.jsx';
 import Observer from 'destam/Observer';
 
 export default ThemeContext.use(h => {

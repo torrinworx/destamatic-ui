@@ -1,4 +1,4 @@
-import { h } from './h';
+import { h } from './h.jsx';
 import Observer from 'destam/Observer';
 
 /**

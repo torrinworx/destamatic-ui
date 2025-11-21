@@ -1,7 +1,7 @@
 import { Observer, OArray } from 'destam';
 
-import createContext from '../utils/Context';
-import ThemeContext from '../utils/ThemeContext';
+import createContext from '../utils/Context.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
 
 const parser = new DOMParser();
 

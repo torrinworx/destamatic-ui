@@ -1,8 +1,8 @@
 import { Observer, OArray } from 'destam';
 import { allCountries } from 'country-region-data';
 
-import Select from './Select';
-import ThemeContext from '../utils/ThemeContext';
+import Select from './Select.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
 
 // a component designed to systemically retreive country information from a user
 // using iso standard regions for purposes of addressing.

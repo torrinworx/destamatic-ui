@@ -1,7 +1,7 @@
-import { mark } from './h';
+import { mark } from './h.jsx';
 import Observer from 'destam/Observer';
 
-import categories from '../../util/categories';
+import categories from '../../util/categories.js';
 
 /**
  * Conditionally shows elements depending on the value.
