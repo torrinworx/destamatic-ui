@@ -49,3 +49,5 @@ export * from './components/utils/Validate.jsx';
 
 // util scripts
 export { default as useAbort } from './util/abort.js';
+
+export {default as renderToString} from './ssg/ssg.jsx';
