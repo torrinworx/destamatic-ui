@@ -77,8 +77,20 @@ const DefaultTemplate = ThemeContext.use(h => ({ s, closeSignal, children }, cle
 	</Popup>;
 });
 
+export const __STAGE_CONTECT_REGISTRY = [];
+
+/**
+ * stages - A dictionary of all possible stages, keys are the names of stages, and values are their component functions.
+ * onOpen - function to run on the opening of the Stage
+ * template - Sets a custom template default for every stage. Default template is DefaulteTemplate.
+ * initial - The string value of a stage to initially set when the stage is opened.
+ * ssg - If the stage is to be included in the destamatic-ui ssg build. deafult is false
+ * route - The route to render the ssg pages for this stage in. E.g. the folder, /, /blogs/, etc.
+ * ...globalProps - custom global props that will get passed into the stage context of any given stage along with any props returned from onOpen.
+ */
+
 export const StageContext = createContext(() => null, (value) => {
-	const { stages, onOpen, template: defaultTemplate = DefaultTemplate, ...globalProps } = value;
+	const { stages, onOpen, template: defaultTemplate = DefaultTemplate, initial, ssg = false, route, ...globalProps } = value;
 
 	const Stage = OObject({
 		stages,
@@ -106,10 +118,15 @@ export const StageContext = createContext(() => null, (value) => {
 		cleanup: () => {
 			Stage.template = defaultTemplate;
 		},
-		current: null,
+		current: initial ? initial : null,
 		currentDelay: 150,
 		onOpen,
+		route,
 	});
+
+	if (typeof process !== 'undefined' && ssg) {
+		__STAGE_CONTECT_REGISTRY.push(Stage);
+	}
 
 	return Stage;
 });
