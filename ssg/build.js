@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const OUT_DIR = path.resolve(__dirname, '../../build/dist');
 
-async function build() {
+const build = async () => {
 	const prevDocument = globalThis.document;
 	const prevNode = globalThis.Node;
 	const prevDOMParser = globalThis.DOMParser;
@@ -16,8 +16,6 @@ async function build() {
 	try {
 		const { renderAppToString } = await import('../../build/server/ssg-entry.js');
 		const appHtml = renderAppToString();
-		console.log("THIS IS APPHTML: ", appHtml);
-		console.log(appHtml.length);
 
 		// not sure how to handle nested stage contexts? 
 		for (const stageHtml of appHtml) {

@@ -122,6 +122,7 @@ export const StageContext = createContext(() => null, (value) => {
 		currentDelay: 150,
 		onOpen,
 		route,
+		initial
 	});
 
 	if (typeof process !== 'undefined' && ssg) {
