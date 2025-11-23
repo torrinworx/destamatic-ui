@@ -45,7 +45,7 @@ const renderToString = (Root) => {
 	const root = document.createElement('div');
 	root.setAttribute('id', 'app');
 
-	mount(root, <Root />);
+	mount(root, Root());
 
 	for (const stageContext of __STAGE_CONTECT_REGISTRY) {
 		for (const [name, value] of Object.entries(stageContext.stages)) {
