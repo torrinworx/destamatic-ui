@@ -1,58 +1,67 @@
-// destamatic-ui/ssg.js
 import { mount } from 'destam-dom';
 
-/**
- * Basic HTML escapers for server-side serialization.
- */
+import { __STAGE_CONTECT_REGISTRY } from '../components/display/Stage';
+
 const escapeText = (text) =>
-  String(text ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+	String(text ?? '')
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;');
 
 const escapeAttr = (value) =>
-  String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;');
+	String(value ?? '')
+		.replace(/&/g, '&amp;')
+		.replace(/"/g, '&quot;');
 
-/**
- * Serialize a Node from the Node-based DOM shim used in tests/SSR.
- * Expects your global.document / global.Node shim to be in place.
- */
-function renderNode(node) {
-  // Text node case: name === '' in your shim
-  if (node.name === '') {
-    return escapeText(node.textContent ?? node.textContent_ ?? '');
-  }
+const renderNode = (node) => {
 
-  const tag = node.name;
-  let attrs = '';
+	if (node.name === '') {
+		return escapeText(node.textContent ?? node.textContent_ ?? '');
+	}
 
-  for (const [name, value] of Object.entries(node.attributes || {})) {
-    if (value === '') attrs += ` ${name}`;
-    else attrs += ` ${name}="${escapeAttr(value)}"`;
-  }
+	const tag = node.name;
+	let attrs = '';
 
-  const styleEntries = Object.entries(node.style || {});
-  if (styleEntries.length) {
-    const styleStr = styleEntries
-      .map(([k, v]) => `${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}:${v}`)
-      .join(';');
-    attrs += ` style="${escapeAttr(styleStr)}"`;
-  }
+	for (const [name, value] of Object.entries(node.attributes || {})) {
+		if (value === '') attrs += ` ${name}`;
+		else attrs += ` ${name}="${escapeAttr(value)}"`;
+	}
 
-  const childrenHtml = (node.childNodes || []).map(renderNode).join('');
-  return `<${tag}${attrs}>${childrenHtml}</${tag}>`;
+	const styleEntries = Object.entries(node.style || {});
+	if (styleEntries.length) {
+		const styleStr = styleEntries
+			.map(([k, v]) => `${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}:${v}`)
+			.join(';');
+		attrs += ` style="${escapeAttr(styleStr)}"`;
+	}
+
+	const childrenHtml = (node.childNodes || []).map(renderNode).join('');
+	return `<${tag}${attrs}>${childrenHtml}</${tag}>`;
 }
 
-function renderToString(Root) {
-  const root = document.createElement('div');
-  root.setAttribute('id', 'app');
+const renderToString = (Root) => {
+	const pages = [];
 
-  // Mount the JSX value, not the function itself
-  mount(root, <Root />);
+	const root = document.createElement('div');
+	root.setAttribute('id', 'app');
 
-  return renderNode(root);
+	mount(root, <Root />);
+
+	for (const stageContext of __STAGE_CONTECT_REGISTRY) {
+		for (const [name, value] of Object.entries(stageContext.stages)) {
+			console.log("STAGE: ", name, value);
+			stageContext.open({ name });
+			pages.push({
+				name,
+				route: stageContext.route,
+				html: renderNode(root)
+			})
+		}
+	}
+
+	console.log("THIS IS STAGE REGISTRY: ", __STAGE_CONTECT_REGISTRY);
+
+	return pages;
 }
 
 export default renderToString;
