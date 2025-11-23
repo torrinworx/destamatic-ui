@@ -18,6 +18,8 @@ async function build() {
 		const appHtml = renderAppToString();
 		console.log("THIS IS APPHTML: ", appHtml);
 		console.log(appHtml.length);
+
+		// not sure how to handle nested stage contexts? 
 		for (const stageHtml of appHtml) {
 			const html = `<!doctype html>
 			<html lang="en" class="no-js">
