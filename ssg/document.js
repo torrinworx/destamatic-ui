@@ -219,4 +219,11 @@ global.document.dummy = {
     insertBefore(newNode, before) { },
 };
 
+// Give document a minimal browser-like shape
+global.document.documentElement = new Node('html');
 global.document.head = new Node('head');
+global.document.body = new Node('body');
+
+// Wire them into a simple tree if you care, but it's not strictly needed
+global.document.documentElement.append(global.document.head);
+global.document.documentElement.append(global.document.body);
