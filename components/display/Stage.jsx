@@ -88,7 +88,6 @@ export const __STAGE_CONTECT_REGISTRY = [];
  * route - The route to render the ssg pages for this stage in. E.g. the folder, /, /blogs/, etc.
  * ...globalProps - custom global props that will get passed into the stage context of any given stage along with any props returned from onOpen.
  */
-
 export const StageContext = createContext(() => null, (value) => {
 	const { stages, onOpen, template: defaultTemplate = DefaultTemplate, initial, ssg = false, route, ...globalProps } = value;
 
