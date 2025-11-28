@@ -9,47 +9,23 @@ const __dirname = path.dirname(__filename);
 const OUT_DIR = path.resolve(__dirname, '../../build/dist');
 
 const build = async () => {
-	const prevDocument = globalThis.document;
-	const prevNode = globalThis.Node;
-	const prevDOMParser = globalThis.DOMParser;
+	const { renderAppToString } = await import('../../build/server/ssg-entry.js');
+	const pages = renderAppToString();
 
-	try {
-		const { renderAppToString } = await import('../../build/server/ssg-entry.js');
-		const appHtml = renderAppToString();
+	for (const page of pages) {
+		const { route, name, html } = page; // TODO: minifi html before? 
 
-		// not sure how to handle nested stage contexts? 
-		for (const stageHtml of appHtml) {
-			const html = `<!doctype html>
-			<html lang="en" class="no-js">
-				<head>
-					<meta charset="UTF-8" />
-					<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-					<link rel="icon" href="./favicon.svg" sizes="any" type="image/svg+xml">
-					<title>Destamatic SSG Test</title>
-				</head>
-				<body>
-					${stageHtml.html}
-					<script type="module" src="./index.jsx"></script>
-				</body>
-			</html>`;
+		await fs.mkdir(path.join(OUT_DIR, route), { recursive: true });
 
-			await fs.mkdir(path.join(OUT_DIR, stageHtml.route), { recursive: true });
+		console.log("WRITING:", route, name + '.html');
 
-			console.log("WRITING: ", stageHtml.route, stageHtml.name + '.html');
+		await fs.writeFile(
+			path.join(OUT_DIR, route, name + '.html'),
+			html,
+			'utf8'
+		);
 
-			await fs.writeFile(
-				path.join(OUT_DIR, stageHtml.route, stageHtml.name + '.html'),
-				html,
-				'utf8'
-			);
-
-			console.log('SSG: wrote', path.join(OUT_DIR, stageHtml.route, stageHtml.name + '.html'));
-		}
-
-	} finally {
-		globalThis.document = prevDocument;
-		globalThis.Node = prevNode;
-		globalThis.DOMParser = prevDOMParser;
+		console.log('SSG: wrote', path.join(OUT_DIR, route, name + '.html'));
 	}
 }
 
