@@ -191,6 +191,60 @@ const normalizeRouteToFolder = (route) => {
 	return '/' + trimmed + '/';
 };
 
+const makeStageKey = (stageCtx) => {
+	const names = Object.keys(stageCtx.stages || {}).sort();
+	return names.join(',');
+};
+
+const snapshotAndDedupeContexts = () => {
+	const seen = new Map(); // key: `${route}|${stagesKey}`, value: ctxInfo
+
+	for (const s of __STAGE_CONTECT_REGISTRY) {
+		if (!s.ssg) continue;
+
+		const route = s.route || '/';
+		const stagesKey = makeStageKey(s);
+		const key = `${route}|${stagesKey}`;
+
+		if (!seen.has(key)) {
+			seen.set(key, {
+				id: s.id,
+				parentId: s.parentId,
+				route,
+				initial: s.initial || null,
+				ssg: !!s.ssg,
+			});
+		} else {
+			// Duplicate for SSG purposes; you can log if you want:
+			// console.log('SSG: deduping duplicate StageContext', s.id, 'for key', key);
+		}
+	}
+
+	return Array.from(seen.values());
+};
+
+const hasChildContextForStage = (contexts, parentCtx, stageName) => {
+	// For now, use a simple heuristic:
+	// - child.parentId === parentCtx.id
+	// - child.route is a non-root (e.g. 'blogs')
+	// - and stageName case-insensitively matches that route segment
+	const parentId = parentCtx.id;
+	for (const child of contexts) {
+		if (child.parentId !== parentId) continue;
+
+		const childFolder = normalizeRouteToFolder(child.route || '/'); // e.g. '/blogs/'
+		if (childFolder === '/') continue;
+
+		const seg = childFolder.split('/').filter(Boolean).pop(); // 'blogs'
+		if (!seg) continue;
+
+		if (seg.toLowerCase() === String(stageName).toLowerCase()) {
+			return true;
+		}
+	}
+	return false;
+};
+
 const render = (Root) => {
 	const pages = [];
 
@@ -224,13 +278,7 @@ const render = (Root) => {
 	});
 
 	// Freeze registry
-	const contexts = __STAGE_CONTECT_REGISTRY.map((s) => ({
-		id: s.id,
-		parentId: s.parentId,
-		route: s.route || '/',
-		initial: s.initial || null,
-		ssg: !!s.ssg,
-	}));
+	const contexts = snapshotAndDedupeContexts();
 
 	// Disable further registration to avoid noise
 	__STAGE_SSG_DISCOVERY_ENABLED__.value = false;
@@ -246,24 +294,28 @@ const render = (Root) => {
 		}))
 	);
 
-	// Now build the final pages array from our captured HTML
 	for (const ctxInfo of contexts) {
 		if (!ctxInfo.ssg) continue;
 
 		const routeFolder = normalizeRouteToFolder(ctxInfo.route);
-
-		// We need to know stage names; easiest is to find the original Stage by id
 		const stageCtx = __STAGE_CONTECT_REGISTRY.find((s) => s.id === ctxInfo.id);
 		if (!stageCtx) continue;
 
 		const stageNames = Object.keys(stageCtx.stages || {});
 
 		for (const stageName of stageNames) {
+			// Skip wrapper-only stages whose content is "owned" by a child context
+			if (hasChildContextForStage(contexts, ctxInfo, stageName)) {
+				// e.g. root Blogs stage when there's a /blogs child StageContext
+				continue;
+			}
+
 			const key = `${ctxInfo.id}:${stageName}`;
 			const fullHtml = pageHtmlByContextAndStage.get(key);
-			if (!fullHtml) continue; // should not happen, but guard anyway
+			if (!fullHtml) continue;
 
-			const isInitial = ctxInfo.initial && ctxInfo.initial === stageName;
+			const isInitial =
+				ctxInfo.initial && ctxInfo.initial === stageName;
 			const fileName = isInitial ? 'index' : stageName;
 
 			pages.push({
