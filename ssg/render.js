@@ -1,5 +1,5 @@
 import { mount } from 'destam-dom';
-import { __STAGE_CONTECT_REGISTRY } from '../components/display/Stage';
+import { __STAGE_CONTECT_REGISTRY, __STAGE_SSG_DISCOVERY_ENABLED__ } from '../components/display/Stage';
 
 const escapeText = (text) =>
 	String(text ?? '')
@@ -143,60 +143,132 @@ const ensureBootScript = () => {
 	}
 };
 
+const openAllStagesOnce = (stageCtx) => {
+	const stageNames = Object.keys(stageCtx.stages || {});
+	console.log('openAllStagesOnce for ctx', stageCtx.id, '=>', stageNames);
+	for (const name of stageNames) {
+		stageCtx.open({ name });
+	}
+};
+
 /**
- * Renders a destamatic-ui/destam-dom webapp (Root) as html
- * 
- * contains logic to render all appropriate ssg pages, returns them to build.js to
- * write them to output build/dist folder.
- * 
- * TODO:
- * - handle nested StageContexts? Explicite nesting? or just based on the 'route' param the user defines
- * - handle index files. For each StageContext, how do we tell this render() to set the initial
- * 		page as the "index" of the folder?
- * - hide or show the /index.html, /Landing.html? how do we handle that? 
- * - allow for custom html templates? Should that just be something handled by another component in App.jsx
- * 		for writing to other headers like jsonld? 
- * - how do we ensure tha the js is loaded no matter the html page you end up on? Proper routing? See destam-web-core?
- * 
- * 
- * Maybe for stages in stages we just need to know the tree of parent stages to activate that stage?]
- * 
- * parent <- root StageContext
- *  - landing	
- * 	- blogs <- stage of parent, but also new StageContext itself.
- *  	- blog-1
- * 		- blog-2
- * 		- blog-3
- * parent-2 <- second root StageContext in the same app?
- *  - landing-2	
- * 	- blogs-2
- *  	- blog-1
- * 		- blog-2
- * 		- blog-3
- * 
- * @param {*} Root 
- * @returns 
+ * Discovery pass:
+ *  - For each StageContext we haven't explored yet,
+ *    open all its stages once.
+ *  - If that causes new StageContexts to register,
+ *    they will be picked up in the next iteration.
+ *  - After we open all stages of a context, we can run `onExplored(stageCtx)`.
  */
+const discoverAllStageContexts = (onExplored) => {
+	const exploredIds = new Set();
+	let discoveredSomething = true;
+
+	while (discoveredSomething) {
+		discoveredSomething = false;
+
+		const snapshot = __STAGE_CONTECT_REGISTRY.slice();
+
+		for (const stageCtx of snapshot) {
+			if (!exploredIds.has(stageCtx.id)) {
+				exploredIds.add(stageCtx.id);
+				discoveredSomething = true;
+
+				// Open all its stages; this will mount nested providers
+				openAllStagesOnce(stageCtx);
+
+				// Allow caller to do something (e.g., snapshot HTML per stage)
+				if (typeof onExplored === 'function') {
+					onExplored(stageCtx);
+				}
+			}
+		}
+	}
+};
+
+const normalizeRouteToFolder = (route) => {
+	if (!route || route === '/') return '/';
+	const trimmed = String(route).replace(/^\/|\/$/g, '');
+	return '/' + trimmed + '/';
+};
+
 const render = (Root) => {
 	const pages = [];
 
 	const { bodyEl } = ensureDocumentSkeleton();
 
-	// Mount app directly into <body>
+	// Enable discovery
+	__STAGE_SSG_DISCOVERY_ENABLED__.value = true;
+
+	// Initial mount
 	mount(bodyEl, Root());
 
-	for (const stageContext of __STAGE_CONTECT_REGISTRY) {
-		for (const name of Object.keys(stageContext.stages)) {
-			stageContext.open({ name });
+	// Capture at discovery time
+	const pageHtmlByContextAndStage = new Map();
 
-			// App may have mutated head/body/html here
+	// Discovery, but for *each* context we open all its stages and snapshot HTML
+	discoverAllStageContexts((stageCtx) => {
+		if (!stageCtx.ssg) return;
+
+		const stageNames = Object.keys(stageCtx.stages || {});
+
+		for (const stageName of stageNames) {
+			// At this point, stageCtx.current has been set to each stage during openAllStagesOnce.
+			// But we might want to explicitly open this stage again to ensure it's the active one.
+			stageCtx.open({ name: stageName });
 
 			ensureBootScript();
 			const fullHtml = renderDocument();
 
+			pageHtmlByContextAndStage.set(`${stageCtx.id}:${stageName}`, fullHtml);
+		}
+	});
+
+	// Freeze registry
+	const contexts = __STAGE_CONTECT_REGISTRY.map((s) => ({
+		id: s.id,
+		parentId: s.parentId,
+		route: s.route || '/',
+		initial: s.initial || null,
+		ssg: !!s.ssg,
+	}));
+
+	// Disable further registration to avoid noise
+	__STAGE_SSG_DISCOVERY_ENABLED__.value = false;
+
+	console.log(
+		'SSG registry snapshot:',
+		contexts.map((s) => ({
+			id: s.id,
+			parentId: s.parentId,
+			route: s.route,
+			initial: s.initial,
+			ssg: s.ssg,
+		}))
+	);
+
+	// Now build the final pages array from our captured HTML
+	for (const ctxInfo of contexts) {
+		if (!ctxInfo.ssg) continue;
+
+		const routeFolder = normalizeRouteToFolder(ctxInfo.route);
+
+		// We need to know stage names; easiest is to find the original Stage by id
+		const stageCtx = __STAGE_CONTECT_REGISTRY.find((s) => s.id === ctxInfo.id);
+		if (!stageCtx) continue;
+
+		const stageNames = Object.keys(stageCtx.stages || {});
+
+		for (const stageName of stageNames) {
+			const key = `${ctxInfo.id}:${stageName}`;
+			const fullHtml = pageHtmlByContextAndStage.get(key);
+			if (!fullHtml) continue; // should not happen, but guard anyway
+
+			const isInitial = ctxInfo.initial && ctxInfo.initial === stageName;
+			const fileName = isInitial ? 'index' : stageName;
+
 			pages.push({
-				name,
-				route: stageContext.route,
+				route: routeFolder,
+				name: fileName,
 				html: fullHtml,
 			});
 		}
