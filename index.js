@@ -30,7 +30,8 @@ export { default as Scroll } from './components/navigation/Scroll.jsx';
 export { default as Tabs } from './components/navigation/Tabs.jsx';
 
 // ./components/stage_templates
-export {default as Default } from './components/stage_templates/Default.jsx';
+export { default as Default } from './components/stage_templates/Default.jsx';
+export { deafult as Modal } from './components/stage_templates/Modal.jsx';
 
 // ./components/utils
 export { default as createContext } from './components/utils/Context.jsx';
