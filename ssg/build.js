@@ -1,13 +1,18 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import './document.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const OUT_DIR = path.resolve(__dirname, '../../build/dist'); // TODO: .env
-const BUILD_FILE = path.resolve(__dirname, '../../build/ssg.js');  // TODO: .env
+const BUILD_DIR_ARG = process.argv[2];
+
+if (!BUILD_DIR_ARG) {
+	console.error('Usage: node ./destamatic-ui/ssg/build.js <BUILD_DIR>');
+	process.exit(1);
+}
+
+const BUILD_DIR = path.resolve(process.cwd(), BUILD_DIR_ARG);
+const OUT_DIR = path.join(BUILD_DIR, 'dist');
+const BUILD_FILE = path.join(BUILD_DIR, 'ssg.js');
 
 const build = async () => {
 	const { renderAppToString } = await import(BUILD_FILE);
@@ -27,13 +32,13 @@ const build = async () => {
 		console.log('SSG: wrote', filePath);
 	}
 
-	// cleanup, remove temp ssg.js build file.
-	fs.unlink(BUILD_FILE, (err) => {
-		if (err) {
-			console.error('Error deleting file:', err);
-			return;
-		}
-	});
+	// cleanup, remove temp ssg.js build file
+	try {
+		await fs.unlink(BUILD_FILE);
+		console.log('SSG: removed', BUILD_FILE);
+	} catch (err) {
+		console.error('Error deleting file:', err);
+	}
 };
 
 build().catch((err) => {
