@@ -1,13 +1,10 @@
 import { OObject, Observer } from 'destam';
 
-import Icon from './Icon';
-import Popup from '../utils/Popup';
 import Theme from '../utils/Theme';
-import Paper from './Paper';
-import Button from '../inputs/Button';
-import { Typography } from './Typography';
 import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
+
+import Default from '../stage_templates/Default';
 
 Theme.define({
 	stageOverlay: {
@@ -23,113 +20,86 @@ Theme.define({
 	}
 });
 
-const DefaultTemplate = ThemeContext.use(h => ({ s, closeSignal, children }, cleanup, mounted) => {
-	const shown = Observer.mutable(false);
-
-	const handleEscape = (e) => {
-		if (e.which === 27) {
-			e.preventDefault();
-			s.current = false;
-		}
-	};
-
-	mounted(() => {
-		queueMicrotask(() => {
-			setTimeout(() => shown.set(true), 10);
-		});
-		if (!s.props.noEsc) {
-			window.addEventListener('keydown', handleEscape);
-			cleanup(() => {
-				window.removeEventListener('keydown', handleEscape);
-			});
-		}
-	});
-
-	cleanup(closeSignal.watch(() => {
-		shown.set(!closeSignal.get());
-	}));
-
-	return <Popup style={{
-		inset: 0,
-		transition: `opacity ${s.currentDelay}ms ease-in-out`,
-		opacity: shown.map(shown => shown ? 1 : 0),
-		pointerEvents: shown.map(shown => shown ? null : 'none'),
-	}}>
-		<div theme='stageOverlay'
-			onClick={() => !s.props.noClickEsc ? s.close() : null} />
-		<div theme='stageWrapper'>
-			<Paper>
-				<div theme='row_spread'>
-					<Typography
-						type='h2'
-						label={s.observer.path(['props', 'label'])
-							.map(l => l ? l : '')}
-					/>
-					<Button
-						type='icon'
-						icon={<Icon name='x' size={30} />}
-						onClick={() => s.close()}
-					/>
-				</div>
-				{children}
-			</Paper>
-		</div>
-	</Popup>;
-});
-
 export const __STAGE_CONTECT_REGISTRY = [];
+export const __STAGE_SSG_DISCOVERY_ENABLED__ = { value: true };
 
-/**
- * stages - A dictionary of all possible stages, keys are the names of stages, and values are their component functions.
- * onOpen - function to run on the opening of the Stage
- * template - Sets a custom template default for every stage. Default template is DefaulteTemplate.
- * initial - The string value of a stage to initially set when the stage is opened.
- * ssg - If the stage is to be included in the destamatic-ui ssg build. deafult is false
- * route - The route to render the ssg pages for this stage in. E.g. the folder, /, /blogs/, etc.
- * ...globalProps - custom global props that will get passed into the stage context of any given stage along with any props returned from onOpen.
- */
-export const StageContext = createContext(() => null, (value) => {
-	const { stages, onOpen, template: defaultTemplate = DefaultTemplate, initial, ssg = false, route, ...globalProps } = value;
+// createContext passes transform(raw, parentValue) as "value" to consumers.
+// We name the args to make that explicit.
+export const StageContext = createContext(
+	() => null,
+	(raw, parentStage) => {
+		const {
+			stages,
+			onOpen,
+			template = Default,
+			initial,
+			ssg = false,
+			route,
+			// we'll capture and ignore any extra fields for now
+			...globalProps
+		} = raw || {};
 
-	const Stage = OObject({
-		stages,
-		template: defaultTemplate,
-		open: ({ name, template = Stage.template, onClose, ...props }) => {
-			if (Stage.onOpen) {
-				const result = Stage.onOpen({ name, template, props });
+		// We'll add metadata here
+		const Stage = OObject({
+			stages,
+			template,
+			open: ({ name, template = Stage.template, onClose, ...props }) => {
+				if (Stage.onOpen) {
+					const result = Stage.onOpen({ name, template, props });
 
-				name = result?.name || name;
-				template = result?.template || template;
-				props = result?.props || props;
+					name = result?.name || name;
+					template = result?.template || template;
+					props = result?.props || props;
+				}
+
+				Stage.props = { ...globalProps, ...props };
+				Stage.template = template;
+				Stage.current = name;
+
+				if (onClose) {
+					Stage.observer
+						.path('current')
+						.defined(val => val !== name)
+						.then(onClose);
+				}
+			},
+			close: () => {
+				Stage.current = null;
+			},
+			cleanup: () => {
+				Stage.template = template;
+			},
+			current: initial ? initial : null,
+			currentDelay: 150,
+			onOpen,
+			route,
+			initial,
+		});
+
+		if (typeof StageContext.__nextId === 'undefined') {
+			StageContext.__nextId = 1;
+		}
+		Stage.id = StageContext.__nextId++;
+
+		// but use a simple parentId for SSG / tree building
+		Stage.parentId =
+			parentStage && typeof parentStage.id === 'number'
+				? parentStage.id
+				: null;
+
+		Stage.ssg = !!ssg;
+		Stage.globalProps = globalProps;
+
+		if (typeof process !== 'undefined' && Stage.ssg && __STAGE_SSG_DISCOVERY_ENABLED__.value) {
+			if (!__STAGE_CONTECT_REGISTRY.includes(Stage)) {
+				console.log('STAGE REGISTERED', Stage.id);
+				__STAGE_CONTECT_REGISTRY.push(Stage);
 			}
+		}
 
-			Stage.props = { ...globalProps, ...props };
-			Stage.template = template;
-			Stage.current = name;
-
-			if (onClose) {
-				Stage.observer.path('current').defined(val => val !== name).then(onClose);
-			}
-		},
-		close: () => {
-			Stage.current = null;
-		},
-		cleanup: () => {
-			Stage.template = defaultTemplate;
-		},
-		current: initial ? initial : null,
-		currentDelay: 150,
-		onOpen,
-		route,
-		initial
-	});
-
-	if (typeof process !== 'undefined' && ssg) {
-		__STAGE_CONTECT_REGISTRY.push(Stage);
+		return Stage;
 	}
-
-	return Stage;
-});
+);
 
 export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) => {
 	const aniCurrent = Observer.mutable(null);
