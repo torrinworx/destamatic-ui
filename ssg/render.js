@@ -116,33 +116,6 @@ const ensureDocumentSkeleton = () => {
 	return { htmlEl, headEl, bodyEl };
 };
 
-/**
- * Ensure client boot script exists in <body> (optional).
- */
-const ensureBootScript = () => {
-	const bodyEl = document.body;
-	if (!bodyEl) return;
-
-	let hasBootScript = false;
-	for (const child of Array.from(bodyEl.childNodes || [])) {
-		if (
-			child.name === 'script' &&
-			child.attributes?.type === 'module' &&
-			child.attributes?.src === './index.jsx'
-		) {
-			hasBootScript = true;
-			break;
-		}
-	}
-
-	if (!hasBootScript) {
-		const bootScript = document.createElement('script');
-		bootScript.setAttribute('type', 'module');
-		bootScript.setAttribute('src', './index.jsx');
-		bodyEl.append(bootScript);
-	}
-};
-
 const openAllStagesOnce = (stageCtx) => {
 	const stageNames = Object.keys(stageCtx.stages || {});
 	console.log('openAllStagesOnce for ctx', stageCtx.id, '=>', stageNames);
@@ -270,7 +243,6 @@ const render = (Root) => {
 			// But we might want to explicitly open this stage again to ensure it's the active one.
 			stageCtx.open({ name: stageName });
 
-			ensureBootScript();
 			const fullHtml = renderDocument();
 
 			pageHtmlByContextAndStage.set(`${stageCtx.id}:${stageName}`, fullHtml);
