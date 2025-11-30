@@ -12,7 +12,7 @@ if (!BUILD_DIR_ARG) {
 
 const BUILD_DIR = path.resolve(process.cwd(), BUILD_DIR_ARG);
 const OUT_DIR = path.join(BUILD_DIR, 'dist');
-const BUILD_FILE = path.join(BUILD_DIR, 'index.ssg.js');
+const BUILD_FILE = path.join(BUILD_DIR, 'dist', 'index.ssg.js');
 
 const build = async () => {
 	const { renderAppToString } = await import(BUILD_FILE);
