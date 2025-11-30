@@ -51,6 +51,10 @@ export { default as Theme } from './components/utils/Theme.jsx';
 export { default as ThemeContext } from './components/utils/ThemeContext.jsx';
 export * from './components/utils/Validate.jsx';
 
+// ./ssg
+// export { default as build } from './ssg/build.js' (TODO)
+export { default as render } from './ssg/render.js';
+export { default as wipe} from './ssg/wipe.js';
+
 // ./util
 export { default as useAbort } from './util/abort.js';
-export { default as render } from './ssg/render.js';
