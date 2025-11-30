@@ -159,3 +159,5 @@ export const Head = ({ value, children }, cleanup, mounted) => {
         );
     };
 };
+
+// TODO: Somehow handle tags already in the dom if any are present before mount?
