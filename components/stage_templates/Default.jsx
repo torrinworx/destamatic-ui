@@ -1,4 +1,4 @@
 
 const Default = ({children}) => children; 
 
-export default Default
+export default Default;
