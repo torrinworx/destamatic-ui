@@ -9,6 +9,14 @@ export * from './components/display/Stage.jsx';
 export { default as Tooltip } from './components/display/Tooltip.jsx';
 export * from './components/display/Typography.jsx';
 
+// ./components/head
+export * from './components/head/Head.jsx';
+export { default as Link } from './components/head/Link.jsx';
+export { default as Meta } from './components/head/Meta.jsx';
+export { default as Script } from './components/head/Script.jsx';
+export { default as Style } from './components/head/Style.jsx';
+export { default as Title } from './components/head/Title.jsx';
+
 // ./components/inputs
 export { default as Button } from './components/inputs/Button.jsx';
 export { default as Checkbox } from './components/inputs/Checkbox.jsx';
@@ -31,7 +39,7 @@ export { default as Tabs } from './components/navigation/Tabs.jsx';
 
 // ./components/stage_templates
 export { default as Default } from './components/stage_templates/Default.jsx';
-export { default as Modal} from './components/stage_templates/Modal.jsx';
+export { default as Modal } from './components/stage_templates/Modal.jsx';
 
 // ./components/utils
 export { default as createContext } from './components/utils/Context.jsx';
@@ -54,7 +62,7 @@ export * from './components/utils/Validate.jsx';
 // ./ssg
 // export { default as build } from './ssg/build.js' (TODO)
 export { default as render } from './ssg/render.js';
-export { default as wipe} from './ssg/wipe.js';
+export { default as wipe } from './ssg/wipe.js';
 
 // ./util
 export { default as useAbort } from './util/abort.js';
