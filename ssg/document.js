@@ -26,16 +26,28 @@ global.Node = class Node {
     }
 
     set textContent(content) {
-        if (this.name === '') {
-            this.textContent_ = String(content);
-        } else if (content === '') {
-            for (const child of this.childNodes) {
-                child.parentElement = null;
-            }
+        const str = String(content ?? '');
 
-            this.childNodes.splice(0, this.childNodes.length);
-        } else {
-            throw new Error("not supported");
+        if (this.name === '') {
+            // This is a text node
+            this.textContent_ = str;
+            return;
+        }
+
+        // For element nodes: clear children, then insert a single text node
+        // if the content is not empty.
+        // This matches browser semantics well enough for SSG.
+        // Remove all existing children:
+        for (const child of this.childNodes) {
+            child.parentElement = null;
+        }
+        this.childNodes.splice(0, this.childNodes.length);
+
+        if (str !== '') {
+            const textNode = new Node('');
+            textNode.textContent_ = str;
+            textNode.parentElement = this;
+            this.childNodes.push(textNode);
         }
     }
 
@@ -48,7 +60,12 @@ global.Node = class Node {
             return this.textContent_;
         }
 
-        throw new Error("not supported");
+        // Minimal: concatenate text children recursively
+        let out = '';
+        for (const child of this.childNodes) {
+            out += child.textContent ?? '';
+        }
+        return out;
     }
 
     get firstChild() {
