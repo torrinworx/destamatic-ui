@@ -44,6 +44,7 @@ export const StageContext = createContext(
 			stages,
 			template,
 			open: ({ name, template = Stage.template, onClose, ...props }) => {
+
 				if (Stage.onOpen) {
 					const result = Stage.onOpen({ name, template, props });
 
@@ -90,9 +91,8 @@ export const StageContext = createContext(
 		Stage.ssg = !!ssg;
 		Stage.globalProps = globalProps;
 
-		if (typeof process !== 'undefined' && Stage.ssg && __STAGE_SSG_DISCOVERY_ENABLED__.value) {
+		if (typeof process !== 'undefined' && Stage.ssg) {
 			if (!__STAGE_CONTECT_REGISTRY.includes(Stage)) {
-				console.log('STAGE REGISTERED', Stage.id);
 				__STAGE_CONTECT_REGISTRY.push(Stage);
 			}
 		}
@@ -102,6 +102,33 @@ export const StageContext = createContext(
 );
 
 export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) => {
+	const isNode = typeof process !== 'undefined' && process.versions?.node;
+	if (isNode) {
+
+		return s.observer.path('current').map((c) => {
+			if (!c) return null;
+
+			let StageComp = null;
+			if (s && s.stages && typeof c === 'string' && c in s.stages) {
+				StageComp = s.stages[c];
+			} else {
+				console.error(
+					`Stage component with '${c}' does not exist in stages list.`,
+					'available=',
+					Object.keys(s.stages || {})
+				);
+				return null;
+			}
+
+			const Template = s.template;
+			const closeSignal = s.observer.path('current').map((current) => current !== c);
+
+			return <Template closeSignal={closeSignal} s={s} m={s}>
+				<StageComp stage={s} modal={s} {...s.props} />
+			</Template>;
+		});
+	}
+
 	const aniCurrent = Observer.mutable(null);
 	cleanup(s.observer.path('current').effect(current => {
 		if (current) aniCurrent.set(current);
