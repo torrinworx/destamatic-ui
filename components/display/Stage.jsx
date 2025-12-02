@@ -107,7 +107,6 @@ export const StageContext = createContext(
 					_STAGE_REGISTRY.splice(idx, 1);
 				}
 			},
-			// todo: tree/discover method to discover all children stages? 
 			current: initial ? initial : null,
 			currentDelay: 150,
 			onOpen,
