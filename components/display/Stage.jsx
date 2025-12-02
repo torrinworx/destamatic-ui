@@ -1,4 +1,4 @@
-import { OObject, Observer } from 'destam';
+import { OObject, OArray, Observer } from 'destam';
 
 import Theme from '../utils/Theme';
 import createContext from '../utils/Context';
@@ -20,11 +20,8 @@ Theme.define({
 	}
 });
 
-export const __STAGE_CONTECT_REGISTRY = [];
-export const __STAGE_SSG_DISCOVERY_ENABLED__ = { value: true };
+export const _STAGE_CONTEXT_REGISTRY = OArray([]);
 
-// createContext passes transform(raw, parentValue) as "value" to consumers.
-// We name the args to make that explicit.
 export const StageContext = createContext(
 	() => null,
 	(raw, parentStage) => {
@@ -35,19 +32,19 @@ export const StageContext = createContext(
 			initial,
 			ssg = false,
 			route,
-			// we'll capture and ignore any extra fields for now
 			...globalProps
 		} = raw || {};
 
-		// We'll add metadata here
 		const Stage = OObject({
 			stages,
 			template,
-			open: ({ name, template = Stage.template, onClose, ...props }) => {
+			open: ({ name, template = Stage.template, onClose, ...props }) => { // todo: name accepts array of strings
+				if (typeof name === 'string') {
+					name = name.includes("/") ? name.split("/").filter(Boolean) : [name];
+				}
 
 				if (Stage.onOpen) {
 					const result = Stage.onOpen({ name, template, props });
-
 					name = result?.name || name;
 					template = result?.template || template;
 					props = result?.props || props;
@@ -55,7 +52,22 @@ export const StageContext = createContext(
 
 				Stage.props = { ...globalProps, ...props };
 				Stage.template = template;
-				Stage.current = name;
+				Stage.current = name.shift(); // open here, remove opened stage from name/route.
+
+				if (name.length > 0) {
+					const children = _STAGE_CONTEXT_REGISTRY.filter(entry => {
+						return entry.parentId === Stage.id
+					});
+
+					if (children.length > 1) {
+						console.warn(
+							`Expected only 1 child stage for route ${name[0]}, found ${children.length}.\n`,
+							children
+						);
+					}
+
+					children[0].open({ name: name }); // Forward props? Prop handling? idk? 
+				}
 
 				if (onClose) {
 					Stage.observer
@@ -69,7 +81,33 @@ export const StageContext = createContext(
 			},
 			cleanup: () => {
 				Stage.template = template;
+
 			},
+			register: () => {
+				if (typeof StageContext.__nextId === 'undefined') {
+					StageContext.__nextId = 1;
+				}
+				Stage.id = StageContext.__nextId++;
+
+				Stage.parentId =
+					parentStage && typeof parentStage.id === 'number'
+						? parentStage.id
+						: null;
+
+				if (!_STAGE_CONTEXT_REGISTRY.includes(Stage)) {
+					_STAGE_CONTEXT_REGISTRY.push(Stage);
+				}
+			},
+			unregister: () => {
+				const idx = _STAGE_CONTEXT_REGISTRY.findIndex(
+					entry => entry && entry.id === Stage.id
+				);
+				console.log("cleanup: ", idx, _STAGE_CONTEXT_REGISTRY[idx].current);
+				if (idx !== -1) {
+					_STAGE_CONTEXT_REGISTRY.splice(idx, 1);
+				}
+			},
+			// todo: tree/discover method to discover all children stages? 
 			current: initial ? initial : null,
 			currentDelay: 150,
 			onOpen,
@@ -77,25 +115,9 @@ export const StageContext = createContext(
 			initial,
 		});
 
-		if (typeof StageContext.__nextId === 'undefined') {
-			StageContext.__nextId = 1;
-		}
-		Stage.id = StageContext.__nextId++;
-
-		// but use a simple parentId for SSG / tree building
-		Stage.parentId =
-			parentStage && typeof parentStage.id === 'number'
-				? parentStage.id
-				: null;
-
-		Stage.ssg = !!ssg;
+		Stage.ssg = !!ssg; // TODO: Hook this flag up with the render() function to filter out non ssg stages? 
 		Stage.globalProps = globalProps;
-
-		if (typeof process !== 'undefined' && Stage.ssg) {
-			if (!__STAGE_CONTECT_REGISTRY.includes(Stage)) {
-				__STAGE_CONTECT_REGISTRY.push(Stage);
-			}
-		}
+		Stage.register();
 
 		return Stage;
 	}
@@ -134,6 +156,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 		if (current) aniCurrent.set(current);
 		else {
 			const timeout = setTimeout(() => {
+				console.log("THIS HAPPENS");
 				s.cleanup();
 				aniCurrent.set(null);
 			}, s.currentDelay);
@@ -141,6 +164,8 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 			return () => clearTimeout(timeout);
 		}
 	}));
+
+	cleanup(() => s.unregister());
 
 	return Observer.all([s.observer.path('template').unwrap(), aniCurrent])
 		.map(([Template, c]) => {
