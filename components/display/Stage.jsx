@@ -20,7 +20,7 @@ Theme.define({
 	}
 });
 
-export const _STAGE_CONTEXT_REGISTRY = OArray([]);
+export const _STAGE_REGISTRY = OArray([]);
 
 export const StageContext = createContext(
 	() => null,
@@ -32,6 +32,7 @@ export const StageContext = createContext(
 			initial,
 			ssg = false,
 			route,
+			register = true,
 			...globalProps
 		} = raw || {};
 
@@ -55,7 +56,7 @@ export const StageContext = createContext(
 				Stage.current = name.shift(); // open here, remove opened stage from name/route.
 
 				if (name.length > 0) {
-					const children = _STAGE_CONTEXT_REGISTRY.filter(entry => {
+					const children = _STAGE_REGISTRY.filter(entry => {
 						return entry.parentId === Stage.id
 					});
 
@@ -94,17 +95,16 @@ export const StageContext = createContext(
 						? parentStage.id
 						: null;
 
-				if (!_STAGE_CONTEXT_REGISTRY.includes(Stage)) {
-					_STAGE_CONTEXT_REGISTRY.push(Stage);
+				if (!_STAGE_REGISTRY.includes(Stage)) {
+					_STAGE_REGISTRY.push(Stage);
 				}
 			},
 			unregister: () => {
-				const idx = _STAGE_CONTEXT_REGISTRY.findIndex(
+				const idx = _STAGE_REGISTRY.findIndex(
 					entry => entry && entry.id === Stage.id
 				);
-				console.log("cleanup: ", idx, _STAGE_CONTEXT_REGISTRY[idx].current);
 				if (idx !== -1) {
-					_STAGE_CONTEXT_REGISTRY.splice(idx, 1);
+					_STAGE_REGISTRY.splice(idx, 1);
 				}
 			},
 			// todo: tree/discover method to discover all children stages? 
@@ -117,7 +117,10 @@ export const StageContext = createContext(
 
 		Stage.ssg = !!ssg; // TODO: Hook this flag up with the render() function to filter out non ssg stages? 
 		Stage.globalProps = globalProps;
-		Stage.register();
+
+		if (register) {
+			Stage.register();
+		}
 
 		return Stage;
 	}
