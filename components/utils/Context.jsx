@@ -1,4 +1,4 @@
-import { mount } from 'destam-dom';
+import { OArray, mount } from 'destam-dom';
 
 const createContext = (def, transform = x => x) => {
 	const getter = Symbol();
@@ -11,7 +11,11 @@ const createContext = (def, transform = x => x) => {
 
 			if (!state.hasValue) {
 				state.hasValue = true;
-				state.value = transform(state.raw, calc(state.parent));
+				state.value = transform(
+					state.raw,
+					calc(state.parent),
+					state.children
+				);
 			}
 
 			return state.value;
@@ -20,16 +24,25 @@ const createContext = (def, transform = x => x) => {
 		return calc(context?.[getter]);
 	};
 
-	const Context = ({ value, children }, cleanup, mounted) => {
+	const Context = ({ value, children }) => {
 		return (elem, _, before, context) => {
+			const parentState = context?.[getter];
+
+			const state = {
+				parent: parentState,
+				raw: value,
+				hasValue: false,
+				value: null,
+				children: OArray([]),
+			};
+
+			if (parentState) {
+				parentState.children.push(state);
+			}
+
 			context = {
 				...context,
-				[getter]: {
-					parent: context?.[getter],
-					raw: value,
-					hasValue: false,
-					value: null,
-				},
+				[getter]: state,
 			};
 
 			return mount(elem, children, before, context);
@@ -44,7 +57,7 @@ const createContext = (def, transform = x => x) => {
 				before,
 				context,
 			);
-		}
+		};
 	};
 
 	Context.def = def;
