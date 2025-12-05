@@ -1,13 +1,12 @@
-import { OArray, mount } from 'destam-dom';
+import { mount } from 'destam-dom';
+import { OArray, OObject, UUID } from 'destam';
 
 const createContext = (def, transform = x => x) => {
 	const getter = Symbol();
 
-	const getValue = context => {
+	const getValue = (context) => {
 		const calc = state => {
-			if (!state) {
-				return def;
-			}
+			if (!state) return def;
 
 			if (!state.hasValue) {
 				state.hasValue = true;
@@ -24,21 +23,27 @@ const createContext = (def, transform = x => x) => {
 		return calc(context?.[getter]);
 	};
 
-	const Context = ({ value, children }) => {
+	const Context = ({ value, children }, cleanup) => {
 		return (elem, _, before, context) => {
-			const parentState = context?.[getter];
+			const parent = context?.[getter];
 
-			const state = {
-				parent: parentState,
+			const id = UUID();
+			const state = OObject({
+				id,
+				parent,
 				raw: value,
 				hasValue: false,
 				value: null,
 				children: OArray([]),
-			};
+			});
 
-			if (parentState) {
-				parentState.children.push(state);
-			}
+			if (parent) {
+				parent?.children.push(state)
+				cleanup(() => {
+					const index = parent?.children.findIndex(child => child.id === id);
+					parent?.children.splice(index, 1);
+				})
+			};
 
 			context = {
 				...context,
