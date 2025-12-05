@@ -1,4 +1,4 @@
-import { OArray, OObject, Observer, UUID, Insert, Delete, Modify, Synthetic } from 'destam';
+import { OArray, OObject, Observer } from 'destam';
 
 import Theme from '../utils/Theme';
 import createContext from '../utils/Context';
@@ -76,7 +76,6 @@ export const StageContext = createContext(
 			},
 			cleanup: () => {
 				Stage.template = template;
-
 			},
 			register: () => {
 				if (!stageRegistry.includes(Stage)) {
