@@ -23,7 +23,7 @@ export const stageRegistry = OArray([]);
 
 export const StageContext = createContext(
 	() => null,
-	(raw, parent, children) => {
+	(raw, _, children) => {
 		const {
 			acts,
 			onOpen,
@@ -61,7 +61,7 @@ export const StageContext = createContext(
 							children
 						);
 					}
-					children[0]?.value?.open({ name: name, ...globalProps }); // Forward props? Prop handling? idk? Maybe special props param, endRouteProps? props only intended to be used as regular porps if the name.length === 0?
+					children[0].value.open({ name: name, ...globalProps }); // Forward props? Prop handling? idk? Maybe special props param, endRouteProps? props only intended to be used as regular porps if the name.length === 0?
 				}
 
 				if (onClose) {
