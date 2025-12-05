@@ -1,9 +1,8 @@
-import { OObject, OArray, Observer } from 'destam';
+import { OArray, OObject, Observer, UUID, Insert, Delete, Modify, Synthetic } from 'destam';
 
 import Theme from '../utils/Theme';
 import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
-
 import Default from '../stage_templates/Default';
 
 Theme.define({
@@ -20,13 +19,13 @@ Theme.define({
 	}
 });
 
-export const _STAGE_REGISTRY = OArray([]);
+export const stageRegistry = OArray([]);
 
 export const StageContext = createContext(
 	() => null,
-	(raw, parentStage) => {
+	(raw, parent, children) => {
 		const {
-			stages,
+			acts,
 			onOpen,
 			template = Default,
 			initial,
@@ -37,9 +36,9 @@ export const StageContext = createContext(
 		} = raw || {};
 
 		const Stage = OObject({
-			stages,
+			acts,
 			template,
-			open: ({ name, template = Stage.template, onClose, ...props }) => { // todo: name accepts array of strings
+			open: ({ name, template = Stage.template, onClose, ...props }) => {
 				if (typeof name === 'string') {
 					name = name.includes("/") ? name.split("/").filter(Boolean) : [name];
 				}
@@ -56,18 +55,13 @@ export const StageContext = createContext(
 				Stage.current = name.shift(); // open here, remove opened stage from name/route.
 
 				if (name.length > 0) {
-					const children = _STAGE_REGISTRY.filter(entry => {
-						return entry.parentId === Stage.id
-					});
-
 					if (children.length > 1) {
 						console.warn(
 							`Expected only 1 child stage for route ${name[0]}, found ${children.length}.\n`,
 							children
 						);
 					}
-
-					children[0].open({ name: name }); // Forward props? Prop handling? idk? 
+					children[0]?.value?.open({ name: name, ...globalProps }); // Forward props? Prop handling? idk? Maybe special props param, endRouteProps? props only intended to be used as regular porps if the name.length === 0?
 				}
 
 				if (onClose) {
@@ -85,26 +79,16 @@ export const StageContext = createContext(
 
 			},
 			register: () => {
-				if (typeof StageContext.__nextId === 'undefined') {
-					StageContext.__nextId = 1;
-				}
-				Stage.id = StageContext.__nextId++;
-
-				Stage.parentId =
-					parentStage && typeof parentStage.id === 'number'
-						? parentStage.id
-						: null;
-
-				if (!_STAGE_REGISTRY.includes(Stage)) {
-					_STAGE_REGISTRY.push(Stage);
+				if (!stageRegistry.includes(Stage)) {
+					stageRegistry.push(Stage);
 				}
 			},
 			unregister: () => {
-				const idx = _STAGE_REGISTRY.findIndex(
+				const idx = stageRegistry.findIndex(
 					entry => entry && entry.id === Stage.id
 				);
 				if (idx !== -1) {
-					_STAGE_REGISTRY.splice(idx, 1);
+					stageRegistry.splice(idx, 1);
 				}
 			},
 			current: initial ? initial : null,
@@ -112,14 +96,11 @@ export const StageContext = createContext(
 			onOpen,
 			route,
 			initial,
+			ssg: !!ssg, // TODO: Hook this flag up with the render() function to filter out non ssg acts? 
+			globalProps,
 		});
 
-		Stage.ssg = !!ssg; // TODO: Hook this flag up with the render() function to filter out non ssg stages? 
-		Stage.globalProps = globalProps;
-
-		if (register) {
-			Stage.register();
-		}
+		if (register) Stage.register();
 
 		return Stage;
 	}
@@ -127,19 +108,18 @@ export const StageContext = createContext(
 
 export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) => {
 	const isNode = typeof process !== 'undefined' && process.versions?.node;
-	if (isNode) {
-
+	if (isNode || s.props?.skipSignal) {
 		return s.observer.path('current').map((c) => {
 			if (!c) return null;
 
 			let StageComp = null;
-			if (s && s.stages && typeof c === 'string' && c in s.stages) {
-				StageComp = s.stages[c];
+			if (s && s.acts && typeof c === 'string' && c in s.acts) {
+				StageComp = s.acts[c];
 			} else {
 				console.error(
-					`Stage component with '${c}' does not exist in stages list.`,
+					`Stage component with '${c}' does not exist in acts list.`,
 					'available=',
-					Object.keys(s.stages || {})
+					Object.keys(s.acts || {})
 				);
 				return null;
 			}
@@ -158,7 +138,6 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 		if (current) aniCurrent.set(current);
 		else {
 			const timeout = setTimeout(() => {
-				console.log("THIS HAPPENS");
 				s.cleanup();
 				aniCurrent.set(null);
 			}, s.currentDelay);
@@ -179,10 +158,10 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 			});
 
 			let Stage = null;
-			if (s && s.stages && typeof c === 'string' && c in s.stages) {
-				Stage = s.stages[c];
+			if (s && s.acts && typeof c === 'string' && c in s.acts) {
+				Stage = s.acts[c];
 			} else {
-				console.error(`Stage component with '${c}' does not exist in stages list.`);
+				console.error(`Stage component with '${c}' does not exist in acts list.`);
 			}
 
 			return <Template closeSignal={closeSignal} s={s} m={s}>
