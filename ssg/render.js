@@ -169,6 +169,8 @@ const render = (Root) => {
     // Initial mount
     mount(bodyEl, Root());
 
+    console.log('SSG: ===== START RENDER PASS =====');
+
     // Run discovery; we snapshot the entire document each time
     const { contexts, pageHtmlByContextAndStage } = discoverStages(() => {
         return renderDocument();
@@ -188,20 +190,43 @@ const render = (Root) => {
         const routeSegments = segmentsByKey.get(ctxInfo.ctxKey) || [];
         const routeFolder = normalizeRouteToFolder(routeSegments);
 
+        console.log(
+            'SSG: render ctx',
+            ctxInfo.ctxKey,
+            'routeSegments=',
+            routeSegments,
+            'acts=',
+            allActs,
+        );
+
         for (const actName of allActs) {
             // Skip acts that are "parent routes" for child contexts
             if (hasChildContextForStage(contexts, ctxInfo, actName)) {
+                console.log(
+                    `  - skip act "${actName}" on ctx ${ctxInfo.ctxKey} because it has child context`,
+                );
                 continue;
             }
 
             const byAct = pageHtmlByContextAndStage.get(stageCtx);
-            if (!byAct) continue;
+            if (!byAct) {
+                console.log('  - no HTML map for this stageCtx');
+                continue;
+            }
 
             const fullHtml = byAct.get(actName);
-            if (!fullHtml) continue;
+            if (!fullHtml) {
+                console.log(`  - no HTML for act "${actName}"`);
+                continue;
+            }
 
             const isInitial = ctxInfo.initial && ctxInfo.initial === actName;
             const fileName = isInitial ? 'index' : actName;
+
+            console.log(
+                `  -> page route="${routeFolder}", file="${fileName}.html" from act="${actName}", html[0..200]=`,
+                fullHtml.slice(0, 200).replace(/\n/g, '\\n'),
+            );
 
             pages.push({
                 route: routeFolder,
@@ -210,6 +235,8 @@ const render = (Root) => {
             });
         }
     }
+
+    console.log('SSG: ===== END RENDER PASS =====');
 
     return pages;
 };

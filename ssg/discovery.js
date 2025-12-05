@@ -1,23 +1,33 @@
 import { stageRegistry } from '../components/display/Stage';
 
+let _stageCounter = 0;
+const stageIds = new WeakMap();
+const getStageId = (stageCtx) => {
+    if (!stageIds.has(stageCtx)) {
+        stageIds.set(stageCtx, `stage_${_stageCounter++}`);
+    }
+    return stageIds.get(stageCtx);
+};
+
 /**
  * Open all acts of a stage context at least once
  * to force children to mount.
  */
 const openAllActsOnce = (stageCtx) => {
+    const id = getStageId(stageCtx);
     const stageNames = Object.keys(stageCtx.acts || {});
+    console.log(`SSG: openAllActsOnce(${id}) acts=`, stageNames);
+
     for (const name of stageNames) {
+        console.log(`  -> ${id}.open("${name}") (discovery)`);
         stageCtx.open({ name });
     }
 };
 
 /**
- * Core discovery loop: keep pulling new stage contexts
- * from stageRegistry until we've explored all of them.
- *
- * We key by the Stage object reference itself.
+ * Core discovery loop: structural only.
  */
-const discoverAllStageContexts = (onExplored) => {
+const discoverAllStageContexts = () => {
     const explored = new Set(); // of Stage objects
     let discoveredSomething = true;
 
@@ -25,20 +35,25 @@ const discoverAllStageContexts = (onExplored) => {
         discoveredSomething = false;
 
         const snapshot = Array.from(stageRegistry);
+        console.log('SSG: discoverAllStageContexts snapshot size =', snapshot.length);
 
         for (const stageCtx of snapshot) {
-            if (!stageCtx || explored.has(stageCtx)) continue;
+            if (!stageCtx) continue;
+            if (explored.has(stageCtx)) continue;
+
+            const id = getStageId(stageCtx);
+            console.log(
+                `SSG: discovering ${id} (parentRoute=${stageCtx.parentRoute}, initial=${stageCtx.initial})`,
+            );
 
             explored.add(stageCtx);
             discoveredSomething = true;
 
             openAllActsOnce(stageCtx);
-
-            if (typeof onExplored === 'function') {
-                onExplored(stageCtx);
-            }
         }
     }
+
+    console.log('SSG: discovery complete. stageRegistry size =', stageRegistry.length);
 };
 
 const makeStageKey = (stageCtx) => {
@@ -47,13 +62,11 @@ const makeStageKey = (stageCtx) => {
 };
 
 /**
- * Snapshot all SSG-enabled stage contexts into a stable structure:
- * we generate a synthetic ctxKey instead of relying on stageCtx.id.
+ * Snapshot all SSG-enabled stage contexts.
+ * No dedupe: each Stage instance becomes its own ctx.
  */
 const snapshotContexts = () => {
     const contexts = [];
-    const seen = new Map(); // key: `${parentRoute}|${stagesKey}|${initial}`, value: ctxKey
-    let counter = 0;
 
     for (const stageCtx of stageRegistry) {
         if (!stageCtx?.ssg) continue;
@@ -61,21 +74,21 @@ const snapshotContexts = () => {
         const parentRoute = stageCtx.parentRoute || null;
         const stagesKey = makeStageKey(stageCtx);
         const initial = stageCtx.initial || null;
-        const dedupeKey = `${parentRoute || 'ROOT'}|${stagesKey}|${initial || ''}`;
+        const id = getStageId(stageCtx);
 
-        let ctxKey = seen.get(dedupeKey);
-        if (!ctxKey) {
-            ctxKey = `ctx_${counter++}`;
-            seen.set(dedupeKey, ctxKey);
+        const ctxKey = id; // use stageId as ctxKey to keep mapping 1:1
 
-            contexts.push({
-                ctxKey,
-                stageRef: stageCtx,
-                parentRoute,
-                initial,
-                ssg: !!stageCtx.ssg,
-            });
-        }
+        console.log(
+            `SSG: snapshotContexts -> ctx ${ctxKey}, parentRoute=${parentRoute}, initial=${initial}, acts=${stagesKey}`,
+        );
+
+        contexts.push({
+            ctxKey,
+            stageRef: stageCtx,
+            parentRoute,
+            initial,
+            ssg: !!stageCtx.ssg,
+        });
     }
 
     return contexts;
@@ -90,8 +103,7 @@ const snapshotContexts = () => {
  * - If multiple parents match, we just pick the first (it’s ambiguous otherwise).
  */
 const buildParentLinks = (contexts) => {
-    // map from actName -> array of parent contexts that have that act
-    const parentsByActName = new Map();
+    const parentsByActName = new Map(); // actName -> [ctx]
 
     for (const ctx of contexts) {
         const acts = Object.keys(ctx.stageRef.acts || {});
@@ -109,7 +121,6 @@ const buildParentLinks = (contexts) => {
         }
 
         const parents = parentsByActName.get(route) || [];
-        // If there are multiple, just choose the first consistently.
         const parent = parents[0] || null;
 
         ctx.parentCtxKey = parent ? parent.ctxKey : null;
@@ -152,18 +163,43 @@ const hasChildContextForStage = (contexts, parentCtx, stageName) => {
  * }}
  */
 export const discoverStages = (snapshotHtml) => {
-    // (Stage -> Map<actName, html>)
     const pageHtmlByContextAndStage = new Map();
 
-    // 1) Explore all contexts and snapshot HTML per (stageRef, act)
-    discoverAllStageContexts((stageCtx) => {
-        if (!stageCtx.ssg) return;
+    console.log('SSG: ===== START DISCOVERY PASS =====');
+    // 1) Structural discovery: mount all nested StageContexts
+    discoverAllStageContexts();
+
+    // 2) Snapshot HTML per SSG context/act
+    for (const stageCtx of stageRegistry) {
+        const id = getStageId(stageCtx);
+
+        if (!stageCtx?.ssg) {
+            console.log(`SSG: skip non-ssg stage ${id}`);
+            continue;
+        }
 
         const stageNames = Object.keys(stageCtx.acts || {});
+        console.log(
+            `SSG: snapshotting stage ${id} (parentRoute=${stageCtx.parentRoute}, initial=${stageCtx.initial}) acts=`,
+            stageNames,
+        );
+
         for (const stageName of stageNames) {
+            console.log(`  -> ${id}.open("${stageName}") (snapshot)`);
             stageCtx.open({ name: stageName });
 
+            console.log(
+                `     ${id}.current after open("${stageName}") =`,
+                stageCtx.current,
+            );
+
             const fullHtml = snapshotHtml(stageCtx, stageName);
+
+            console.log(
+                `     ${id} snapshot "${stageName}" html[0..200]=`,
+                fullHtml.slice(0, 200).replace(/\n/g, '\\n'),
+            );
+
             let byAct = pageHtmlByContextAndStage.get(stageCtx);
             if (!byAct) {
                 byAct = new Map();
@@ -171,9 +207,9 @@ export const discoverStages = (snapshotHtml) => {
             }
             byAct.set(stageName, fullHtml);
         }
-    });
+    }
 
-    // 2) Snapshot contexts and build parent links
+    // 3) Snapshot contexts and build parent links for routing
     const rawContexts = snapshotContexts();
     const contexts = buildParentLinks(rawContexts);
 
@@ -188,6 +224,7 @@ export const discoverStages = (snapshotHtml) => {
             acts: Object.keys(s.stageRef.acts || {}),
         })),
     );
+    console.log('SSG: ===== END DISCOVERY PASS =====');
 
     return { contexts, pageHtmlByContextAndStage };
 };
