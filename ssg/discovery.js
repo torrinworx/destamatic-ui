@@ -1,4 +1,3 @@
-// discovery.js
 import { stageRegistry } from '../components/display/Stage';
 
 /**

@@ -1,4 +1,3 @@
-// render.js
 import { mount } from 'destam-dom';
 import {
     discoverStages,
