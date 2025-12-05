@@ -23,14 +23,14 @@ export const stageRegistry = OArray([]);
 
 export const StageContext = createContext(
 	() => null,
-	(raw, _, children) => {
+	(raw, parent, children) => {
+
 		const {
 			acts,
 			onOpen,
 			template = Default,
 			initial,
 			ssg = false,
-			route,
 			register = true,
 			...globalProps
 		} = raw || {};
@@ -90,10 +90,10 @@ export const StageContext = createContext(
 					stageRegistry.splice(idx, 1);
 				}
 			},
+			parentRoute: parent ? parent?.current : null,
 			current: initial ? initial : null,
 			currentDelay: 150,
 			onOpen,
-			route,
 			initial,
 			ssg: !!ssg, // TODO: Hook this flag up with the render() function to filter out non ssg acts? 
 			globalProps,
