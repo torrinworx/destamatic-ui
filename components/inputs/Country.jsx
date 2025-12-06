@@ -1,4 +1,4 @@
-import { Observer, OArray } from 'destam';
+import { Observer } from 'destam';
 import { allCountries } from 'country-region-data';
 
 import Select from './Select';
