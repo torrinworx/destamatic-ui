@@ -19,8 +19,91 @@ Theme.define({
 	}
 });
 
+/**
+ * stageRegistry
+ *
+ * Global, observable registry of all active Stage instances.
+ * Every Stage created via `StageContext` can register itself here,
+ * and unregister on cleanup/unmount.
+ *
+ * This is mainly for debugging all open stages, building global controls
+ * (close all, inspect state, etc.), external tools that need to observe
+ * or react to stage lifecycle.
+ * 
+ * Consumers should treat this as read-only from the outside. To close a
+ * stage, call `stage.close()` or manipulate its own StageContext API.
+ * In general avoid mutating `stageRegistry` directly (push/splice).
+ * 
+ * Usage:
+ * ```js
+ * import { stageRegistry } from 'destamatic-ui';
+ *
+ * // Log all active stages
+ * stageRegistry.observer.watch(event => {
+ *     if (event instanceof Insert) {
+ *         console.log('Stage Opened', event.value, 'at ref', event.ref);
+ *     } else if (event instancof Delete) {
+ *         console.log('Stage Closed', event.value, 'at ref', event.ref);
+ *     } else {
+ *         console.log(event.constructor.name, 'prev=', event.prev, 'value=', event.value);
+ *     }
+ * });
+ *
+ * // Close all open stages
+ * stageRegistry.forEach(stage => stage.close());
+ * ```
+ */
 export const stageRegistry = OArray([]);
 
+/**
+ * StageContext
+ * 
+ * A specialized context that manages a hierarchical "stage" system
+ * (think modal / wizard / pages / route-like flows).
+ *
+ * Each `<StageContext>` node creates a `Stage` object for its subtree. Stages
+ * can:
+ * - Define available "acts" (named stage components)
+ * - Control which act is currently open via `Stage.open` / `Stage.close`
+ * - Optionally register themselves into the global `stageRegistry`
+ * - Compose nested stages (children) for route-like navigation
+ *
+ * All properties on the `Stage` object are ephemeral and bound to the current
+ * mount cycle.
+
+ * Shape of `raw` (value passed into `<StageContext>`):
+ * ```ts
+ * {
+ *   acts?: { [name: string]: ReactLikeComponent },
+ *   onOpen?: ({ name, template, props }) => { name?, template?, props? },
+ *   template?: ReactLikeComponent, // wrapper used when rendering acts
+ *   initial?: string | null,       // initial act to open
+ *   ssg?: boolean,                 // static-site-generation hint
+ *   register?: boolean,            // auto-register in stageRegistry (default: true)
+ *   ...globalProps: any            // props forwarded to acts on open
+ * }
+ * ```
+ * Usage example:
+ * ```jsx
+ * export const StageContext = createContext(
+ *   () => null,
+ *   (raw, parent, children) => { ... }
+ * );
+ *
+ * // Provide a stage:
+ * <StageContext value={{
+ *   acts: { ModalA, ModalB },
+ *   initial: 'ModalA',
+ *   onOpen: ({ name, template, props }) => ({
+ *     name,
+ *     template,
+ *     props: { ...props, injected: true }
+ *   })
+ * }}>
+ *   <Stage/> // will render the active act wrapped in the current template.
+ * </StageContext>
+ * ```
+ */
 export const StageContext = createContext(
 	() => null,
 	(raw, parent, children) => {
@@ -38,6 +121,58 @@ export const StageContext = createContext(
 		const Stage = OObject({
 			acts,
 			template,
+			/**
+			 * Open a stage "act" (and optionally a nested route of child stages).
+			 *
+			 * Resolves the target act, applies the `onOpen` hook (if defined),
+			 * updates `Stage.current`, `Stage.template`, `Stage.props`, and
+			 * optionally forwards the remaining route to the first child stage.
+			 *
+			 * @param {Object} options
+			 * @param {string|string[]} options.name
+			 *   Act name or route to open.
+			 *   - `"ActA"` opens the `ActA` act on this Stage.
+			 *   - `"Parent/Child"` or `["Parent", "Child"]` will open `Parent`
+			 *     on this Stage and forward `"Child"` to the first child Stage.
+			 * @param {Function} [options.template=Stage.template]
+			 *   Optional template component to wrap the act. If provided, it
+			 *   replaces the current `Stage.template` for this open.
+			 * @param {Function} [options.onClose]
+			 *   Optional callback fired when this act is no longer current.
+			 *   It is wired to `Stage.observer.path('current')` and runs once
+			 *   `current` changes away from the opened act.
+			 * @param {Object} [options.props]
+			 *   Extra props merged into `Stage.props` for this open:
+			 *   `{ ...globalProps, ...props }`.
+			 *
+			 * Behavior:
+			 * - Normalizes `name` into a string array route.
+			 * - Runs `Stage.onOpen({ name, template, props })` if defined,
+			 *   allowing it to override `name`, `template`, and `props`.
+			 * - Sets:
+			 *   - `Stage.props`
+			 *   - `Stage.template`
+			 *   - `Stage.current` to the first segment of the route.
+			 * - If there are remaining route segments and children exist,
+			 *   calls `children[0].value.open({ name: remaining, ...globalProps })`.
+			 * - If `onClose` is passed, wires it to run when `current` moves
+			 *   off this act.
+			 *
+			 * @example
+			 * // Open an act:
+			 * Stage.open({ name: 'LoginModal' });
+			 *
+			 * // Open nested route "Root/StepOne/StepTwo":
+			 * Stage.open({ name: 'Root/StepOne/StepTwo' });
+			 *
+			 * // Override template and handle close:
+			 * Stage.open({
+			 *   name: 'Settings',
+			 *   template: CustomTemplate,
+			 *   onClose: () => console.log('Settings closed'),
+			 *   props: { userId: 123 }
+			 * });
+			 */
 			open: ({ name, template = Stage.template, onClose, ...props }) => {
 				if (typeof name === 'string') {
 					name = name.includes("/") ? name.split("/").filter(Boolean) : [name];
@@ -71,17 +206,41 @@ export const StageContext = createContext(
 						.then(onClose);
 				}
 			},
+			/**
+			 * Close the currently active act on this Stage.
+			 */
 			close: () => {
 				Stage.current = null;
 			},
+
+			/**
+			 * Reset transient Stage state after an act finishes.
+			 *
+			 * Currently restores `Stage.template` back to the original
+			 * `template` captured when this Stage was created.
+			 */
 			cleanup: () => {
 				Stage.template = template;
 			},
+
+			/**
+			 * Register this Stage in the global `stageRegistry`.
+			 *
+			 * Adds the Stage once (by identity) so external tooling can
+			 * inspect or control all active stages.
+			 */
 			register: () => {
 				if (!stageRegistry.includes(Stage)) {
 					stageRegistry.push(Stage);
 				}
 			},
+
+			/**
+			 * Unregister this Stage from the global `stageRegistry`.
+			 *
+			 * Removes the Stage by matching its `id`. Typically called
+			 * during cleanup/unmount.
+			 */
 			unregister: () => {
 				const idx = stageRegistry.findIndex(
 					entry => entry && entry.id === Stage.id
@@ -105,6 +264,38 @@ export const StageContext = createContext(
 	}
 );
 
+/**
+ * Stage
+ *
+ * Render component for a `StageContext` instance.
+ *
+ * It subscribes to the underlying `Stage`'s reactive state and:
+ * - Watches `Stage.current` to decide which act to render.
+ * - Wraps the active act in the current `Stage.template`.
+ * - Handles Node/SSR mode (`process.versions.node`) differently from
+ *   browser mode (with animation / delayed cleanup via `currentDelay`).
+ * - Wires a `closeSignal` observable into the template so it can react
+ *   when the act is closing or has closed.
+ *
+ * Usage:
+ * ```jsx
+ * // Inside a <StageContext> provider with configured acts:
+ * <Stage />
+ *
+ * // Example StageContext value:
+ * <StageContext value={{
+ *   acts: { Login, Register },
+ *   initial: 'Login'
+ * }}>
+ *   <Stage />
+ * </StageContext>
+ *
+ * // Somewhere else you can open acts via the Stage object:
+ * StageContext.use(stage => {
+ *     stage.open({ name: 'Register' });
+ * }):
+ * ```
+ */
 export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) => {
 	const isNode = typeof process !== 'undefined' && process.versions?.node;
 	if (isNode || s.props?.skipSignal) {
