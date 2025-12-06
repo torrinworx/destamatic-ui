@@ -256,6 +256,8 @@ export const StageContext = createContext(
 			initial,
 			ssg: !!ssg, // TODO: Hook this flag up with the render() function to filter out non ssg acts? 
 			globalProps,
+			children,
+			parent,
 		});
 
 		if (register) Stage.register();
