@@ -1,15 +1,30 @@
 /* node:coverage disable */
 
-// global.DOMParser = window.DOMParser;
-global.DOMParser = class DOMParserStub {
+class DOMParserStub {
     parseFromString(str, type) {
-        return {
-            body: {
-                innerHTML: str,
-            },
+        // Very minimal fake "document" that matches what Icon.jsx expects
+        // Icon.jsx uses: parser.parseFromString(...).children[0]
+        const doc = {
+            // children[0] should be an <svg>‑like node
+            children: [],
         };
+
+        // Build a fake Node that looks like an <svg> with one text child.
+        // We only need enough to not break Icon.jsx: attributes, firstElementChild, etc.
+        const svgNode = new global.Node('svg'); // uses your Node stub
+
+        // You can optionally parse out attributes from `str` if you want,
+        // but for SSG it's usually enough to just stuff the raw string in as a text node.
+        const textNode = new global.Node('');
+        textNode.textContent = str;
+        svgNode.append(textNode);
+
+        doc.children.push(svgNode);
+        return doc;
     }
-};
+}
+
+global.DOMParser = DOMParserStub;
 
 global.Node = class Node {
     constructor(name) {
@@ -236,11 +251,112 @@ global.document.dummy = {
     insertBefore(newNode, before) { },
 };
 
-// Give document a minimal browser-like shape
 global.document.documentElement = new Node('html');
 global.document.head = new Node('head');
 global.document.body = new Node('body');
 
-// Wire them into a simple tree if you care, but it's not strictly needed
 global.document.documentElement.append(global.document.head);
 global.document.documentElement.append(global.document.body);
+
+// --- window stub (new) ---
+
+if (typeof global.window === 'undefined') {
+    global.window = {
+        document: global.document,
+        DOMParser: global.DOMParser,
+        Node: global.Node,
+    };
+}
+
+// minimal location so routing code doesn't explode
+if (!global.window.location) {
+    global.window.location = {
+        href: 'http://localhost/',
+        protocol: 'http:',
+        host: 'localhost',
+        hostname: 'localhost',
+        port: '',
+        pathname: '/',
+        search: '',
+        hash: '',
+    };
+}
+
+// minimal event handling so `window.addEventListener` works
+if (typeof global.window.addEventListener !== 'function') {
+    const listeners = {};
+
+    global.window.addEventListener = (type, handler) => {
+        if (!listeners[type]) listeners[type] = [];
+        listeners[type].push(handler);
+    };
+
+    global.window.removeEventListener = (type, handler) => {
+        const arr = listeners[type];
+        if (!arr) return;
+        const i = arr.indexOf(handler);
+        if (i !== -1) arr.splice(i, 1);
+    };
+
+    // optional: a way to fire events if you ever need it in tests
+    global.window.dispatchEvent = (event) => {
+        const arr = listeners[event.type] || [];
+        arr.forEach(fn => fn.call(global.window, event));
+    };
+}
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.window = global.window;
+}
+
+if (typeof global.fetch === 'function') {
+    // Keep a reference to Node/Undici's fetch
+    const realFetch = global.fetch;
+
+    // Lazy require of fs & path to avoid issues if this file is ever used in browser
+    const fs = await import('fs/promises').then(m => m.default || m);
+    const path = await import('path').then(m => m.default || m);
+
+    const projectRoot = process.cwd(); // your repo root when running SSG
+    console.log(projectRoot)
+
+    global.fetch = async (input, init) => {
+        // Normalize to string
+        const url = typeof input === 'string' ? input : input?.url;
+
+        // Handle only absolute-path URLs like "/blog/..."
+        if (typeof url === 'string' && url.startsWith('/blog/')) {
+            // Map "/blog/..." -> "<projectRoot>/frontend/public/blog/..."
+            const rel = url.replace(/^\/blog\//, '');
+            const filePath = path.join(projectRoot, 'build', 'dist', 'blog', rel);
+
+            try {
+                const data = await fs.readFile(filePath);
+
+                // Basic Response-like object
+                return {
+                    ok: true,
+                    status: 200,
+                    url,
+                    // minimal headers mock
+                    headers: new Map([['content-type', 'application/json']]),
+                    // .text() and .json()
+                    text: async () => data.toString('utf8'),
+                    json: async () => JSON.parse(data.toString('utf8')),
+                };
+            } catch (err) {
+                return {
+                    ok: false,
+                    status: 404,
+                    url,
+                    headers: new Map(),
+                    text: async () => '',
+                    json: async () => { throw new Error(`404 for ${url}`); },
+                };
+            }
+        }
+
+        // For anything else, fall back to real fetch (must be absolute URL in Node)
+        return realFetch(input, init);
+    };
+}
