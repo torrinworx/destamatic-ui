@@ -4,6 +4,7 @@
  * over SSG‑rendered HTML.
  */
 const wipe = () => {
+    document.documentElement.classList.remove('preload');
     const body = document.body;
     if (!body) return;
 
