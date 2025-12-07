@@ -16,7 +16,7 @@ const BUILD_FILE = path.join(BUILD_DIR, 'dist', 'index.ssg.js');
 
 const build = async () => {
 	const { renderAppToString } = await import(BUILD_FILE);
-	const pages = renderAppToString();
+	const pages = await renderAppToString();
 
 	for (const page of pages) {
 		const { route, name, html } = page; // route: folder, name: file base
