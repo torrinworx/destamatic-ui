@@ -63,6 +63,7 @@ export * from './components/utils/Validate.jsx';
 // export { default as build } from './ssg/build.js' (TODO)
 export { default as render } from './ssg/render.js';
 export { default as wipe } from './ssg/wipe.js';
+export { default as is_node } from './ssg/is_node.js';
 
 // ./util
 export { default as useAbort } from './util/abort.js';

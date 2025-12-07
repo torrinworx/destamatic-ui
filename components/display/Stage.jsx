@@ -1,6 +1,7 @@
 import { OArray, OObject, Observer } from 'destam';
 
 import Theme from '../utils/Theme';
+import is_node from '../../ssg/is_node';
 import createContext from '../utils/Context';
 import ThemeContext from '../utils/ThemeContext';
 import Default from '../stage_templates/Default';
@@ -299,8 +300,7 @@ export const StageContext = createContext(
  * ```
  */
 export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) => {
-	const isNode = typeof process !== 'undefined' && process.versions?.node;
-	if (isNode || s.props?.skipSignal) {
+	if (is_node() || s.props?.skipSignal) {
 		return s.observer.path('current').map((c) => {
 			if (!c) return null;
 
