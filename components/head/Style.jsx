@@ -1,4 +1,3 @@
-// components/head/Style.jsx
 import { Observer } from 'destam-dom';
 import { HeadContext } from './Head';
 
