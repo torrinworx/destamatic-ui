@@ -91,7 +91,7 @@ const ensureDocumentSkeleton = () => {
         htmlEl.setAttribute('lang', 'en');
     }
     if (!htmlEl.attributes?.class) {
-        htmlEl.setAttribute('class', 'no-js');
+        htmlEl.setAttribute('class', 'no-js preload');
     }
 
     // <head>
