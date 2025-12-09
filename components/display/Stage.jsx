@@ -56,55 +56,6 @@ Theme.define({
  */
 export const stageRegistry = OArray([]);
 
-/**
- * StageContext
- * 
- * A specialized context that manages a hierarchical "stage" system
- * (think modal / wizard / pages / route-like flows).
- *
- * Each `<StageContext>` node creates a `Stage` object for its subtree. Stages
- * can:
- * - Define available "acts" (named stage components)
- * - Control which act is currently open via `Stage.open` / `Stage.close`
- * - Optionally register themselves into the global `stageRegistry`
- * - Compose nested stages (children) for route-like navigation
- *
- * All properties on the `Stage` object are ephemeral and bound to the current
- * mount cycle.
-
- * Shape of `raw` (value passed into `<StageContext>`):
- * ```ts
- * {
- *   acts?: { [name: string]: ReactLikeComponent },
- *   onOpen?: ({ name, template, props }) => { name?, template?, props? },
- *   template?: ReactLikeComponent, // wrapper used when rendering acts
- *   initial?: string | null,       // initial act to open
- *   ssg?: boolean,                 // static-site-generation hint
- *   register?: boolean,            // auto-register in stageRegistry (default: true)
- *   ...globalProps: any            // props forwarded to acts on open
- * }
- * ```
- * Usage example:
- * ```jsx
- * export const StageContext = createContext(
- *   () => null,
- *   (raw, parent, children) => { ... }
- * );
- *
- * // Provide a stage:
- * <StageContext value={{
- *   acts: { ModalA, ModalB },
- *   initial: 'ModalA',
- *   onOpen: ({ name, template, props }) => ({
- *     name,
- *     template,
- *     props: { ...props, injected: true }
- *   })
- * }}>
- *   <Stage/> // will render the active act wrapped in the current template.
- * </StageContext>
- * ```
- */
 export const StageContext = createContext(
 	() => null,
 	(raw, parent, children) => {
@@ -116,77 +67,49 @@ export const StageContext = createContext(
 			initial,
 			ssg = false,
 			register = true,
+			urlRouting = false,
 			...globalProps
 		} = raw || {};
+
+		let current;
+
+		if (parent.pending) {
+			current = parent.pending;
+		} else if (initial) {
+			current = initial
+		}
 
 		const Stage = OObject({
 			acts,
 			template,
-			/**
-			 * Open a stage "act" (and optionally a nested route of child stages).
-			 *
-			 * Resolves the target act, applies the `onOpen` hook (if defined),
-			 * updates `Stage.current`, `Stage.template`, `Stage.props`, and
-			 * optionally forwards the remaining route to the first child stage.
-			 *
-			 * @param {Object} options
-			 * @param {string|string[]} options.name
-			 *   Act name or route to open.
-			 *   - `"ActA"` opens the `ActA` act on this Stage.
-			 *   - `"Parent/Child"` or `["Parent", "Child"]` will open `Parent`
-			 *     on this Stage and forward `"Child"` to the first child Stage.
-			 * @param {Function} [options.template=Stage.template]
-			 *   Optional template component to wrap the act. If provided, it
-			 *   replaces the current `Stage.template` for this open.
-			 * @param {Function} [options.onClose]
-			 *   Optional callback fired when this act is no longer current.
-			 *   It is wired to `Stage.observer.path('current')` and runs once
-			 *   `current` changes away from the opened act.
-			 * @param {Object} [options.props]
-			 *   Extra props merged into `Stage.props` for this open:
-			 *   `{ ...globalProps, ...props }`.
-			 *
-			 * Behavior:
-			 * - Normalizes `name` into a string array route.
-			 * - Runs `Stage.onOpen({ name, template, props })` if defined,
-			 *   allowing it to override `name`, `template`, and `props`.
-			 * - Sets:
-			 *   - `Stage.props`
-			 *   - `Stage.template`
-			 *   - `Stage.current` to the first segment of the route.
-			 * - If there are remaining route segments and children exist,
-			 *   calls `children[0].value.open({ name: remaining, ...globalProps })`.
-			 * - If `onClose` is passed, wires it to run when `current` moves
-			 *   off this act.
-			 *
-			 * @example
-			 * // Open an act:
-			 * Stage.open({ name: 'LoginModal' });
-			 *
-			 * // Open nested route "Root/StepOne/StepTwo":
-			 * Stage.open({ name: 'Root/StepOne/StepTwo' });
-			 *
-			 * // Override template and handle close:
-			 * Stage.open({
-			 *   name: 'Settings',
-			 *   template: CustomTemplate,
-			 *   onClose: () => console.log('Settings closed'),
-			 *   props: { userId: 123 }
-			 * });
-			 */
+			props: globalProps,
 			open: ({ name, template = Stage.template, onClose, ...props }) => {
 				if (typeof name === 'string') {
-					name = name.includes("/") ? name.split("/").filter(Boolean) : [name];
+					name = name.includes("/")
+						? name.split("/").filter(Boolean)
+						: [name];
+				} else if (!Array.isArray(name)) {
+					throw new Error(`Stage.open: "name" must be string or array, got ${typeof name}`);
 				}
 
+				// Allow onOpen hook to adjust route/template/props
 				if (Stage.onOpen) {
 					const result = Stage.onOpen({ name, template, props });
-					name = result?.name || name;
-					template = result?.template || template;
-					props = result?.props || props;
+					if (result) {
+						if (result.name) name = result.name;
+						if (result.template) template = result.template;
+						if (result.props) props = result.props;
+					}
 				}
 
-				Stage.props = { ...globalProps, ...props };
+				// Ensure name is still an array after onOpen
+				if (typeof name === 'string') {
+					name = name.includes("/")
+						? name.split("/").filter(Boolean)
+						: [name];
+				}
+
+				Object.assign(Stage.props, props)
 				Stage.template = template;
 				Stage.current = name.shift(); // open here, remove opened stage from name/route.
 
@@ -197,7 +120,7 @@ export const StageContext = createContext(
 							children
 						);
 					}
-					children[0].value.open({ name: name, ...globalProps }); // Forward props? Prop handling? idk? Maybe special props param, endRouteProps? props only intended to be used as regular porps if the name.length === 0?
+					Stage.pending = name; // set current stage pending, if child stage mounts, it will read pending and self open the correct act.
 				}
 
 				if (onClose) {
@@ -251,14 +174,16 @@ export const StageContext = createContext(
 				}
 			},
 			parentRoute: parent ? parent?.current : null,
-			current: initial ? initial : null,
+			current,
 			currentDelay: 150,
 			onOpen,
 			initial,
-			ssg: !!ssg, // TODO: Hook this flag up with the render() function to filter out non ssg acts? 
-			globalProps,
+			ssg: !!ssg,
 			children,
 			parent,
+			urlRouting: !!urlRouting,
+			pending: null,
+
 		});
 
 		if (register) Stage.register();
@@ -267,39 +192,7 @@ export const StageContext = createContext(
 	}
 );
 
-/**
- * Stage
- *
- * Render component for a `StageContext` instance.
- *
- * It subscribes to the underlying `Stage`'s reactive state and:
- * - Watches `Stage.current` to decide which act to render.
- * - Wraps the active act in the current `Stage.template`.
- * - Handles Node/SSR mode (`process.versions.node`) differently from
- *   browser mode (with animation / delayed cleanup via `currentDelay`).
- * - Wires a `closeSignal` observable into the template so it can react
- *   when the act is closing or has closed.
- *
- * Usage:
- * ```jsx
- * // Inside a <StageContext> provider with configured acts:
- * <Stage />
- *
- * // Example StageContext value:
- * <StageContext value={{
- *   acts: { Login, Register },
- *   initial: 'Login'
- * }}>
- *   <Stage />
- * </StageContext>
- *
- * // Somewhere else you can open acts via the Stage object:
- * StageContext.use(stage => {
- *     stage.open({ name: 'Register' });
- * }):
- * ```
- */
-export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) => {
+export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mounted) => {
 	if (is_node() || s.props?.skipSignal) {
 		return s.observer.path('current').map((c) => {
 			if (!c) return null;
@@ -338,6 +231,105 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 		}
 	}));
 
+
+	// Get the current url path.
+	const getUrlPath = () => {
+		const raw = window.location.pathname || '/';
+		const trimmed = raw.endsWith('/') && raw.length > 1
+			? raw.slice(0, -1)
+			: raw;
+		if (trimmed === '/') return [];
+		return trimmed
+			.slice(1)
+			.split('/')
+			.map(x => x.trim())
+			.filter(Boolean);
+	};
+
+	mounted(() => {
+		if (s.urlRouting && typeof s.parent !== 'object') { // This code only runs in the 'root' stage of a given stage tree.
+			let isPopState = false;
+
+			// on change in the url (direct navigation to a url, forward/backward, etc), update current of all stages and navigate to it.
+			const syncStage = () => {
+				isPopState = true;
+
+				const segments = getUrlPath();
+				console.log(segments);
+
+				let stage = s
+				const name = []
+				let count = 0;
+
+				// How the fuck do I do this? There is no possible way to know which stage route I need given a url,
+				// especially if I want 'inital' stages to act as roots of a given route???
+				while (stage) {
+					console.log(stage.initial, stage.current, stage.children);
+
+					console.log(segments[count] in stage.acts);
+
+					if (segments[count] in stage.acts) {
+						name.push(segments[count]);
+					} else {
+						name.push(stage.initial);
+					}
+					stage = null;
+				};
+
+				console.log("NAME: ", name);
+
+				// Create a valid stage route from the url, account for 'initial' stage values being roots of a given slug.
+				// const name = stageFromUrl(s, segments);
+
+				// s.open({ name })
+
+				queueMicrotask(() => {
+					isPopState = false;
+				});
+			};
+
+			// on change in any stages current value, update the url.
+			const syncUrl = () => {
+				if (isPopState) return;
+
+				// Create a valid url from stages, account for 'initial' stage values as being roots of a given slug.
+				// const path = urlFromStage(s);
+				console.log(path);
+
+				if (window.location.pathname !== path) {
+					history.pushState({ route: segs }, document.title || path, path);
+				}
+			};
+
+			// Initial URL -> Stage
+			syncStage();
+
+			// Stage (Any) Change -> URL Change
+			cleanup(
+				/*
+				Stage contexts are infinitely nestable, so this watches for changes on 
+				each stages child array and runs syncUrl.
+
+				The expectation that syncUrl will construct a valid url from the root stage,
+				recursing through root.children and building a valid url based on a combination
+				of current act, and inital act.
+				*/
+				s.observer
+					.tree('children')
+					.path('value')
+					.path('current')
+					.effect(() => {
+						syncUrl();
+					})
+			);
+
+			// URL Change -> Stage Change
+			const onPop = () => syncStage();
+			window.addEventListener('popstate', onPop);
+			cleanup(() => window.removeEventListener('popstate', onPop));
+		}
+	});
+
 	cleanup(() => s.unregister());
 
 	return Observer.all([s.observer.path('template').unwrap(), aniCurrent])
@@ -361,3 +353,95 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup) =>
 			</Template>;
 		});
 }));
+
+
+/*
+Stage Tree definition:
+
+
+StageContext's can be nested, the intention for this is to create a hierarchical tree structure and build pagination systems
+from this.
+
+Stage itself, detects if it's a root by checking if it has any parent stages. If it does not have parent stages, it assumes it's
+a root singlton. We still need to implement a warning/check to restrict this root behaviour to a single stage context. But that's
+a trivial task for the future.
+
+`acts` are the individual 'pages' that a stage is able to show. `current` is the observer that propegates what act is currently
+being shown in a given Stage/StageContext. `initial` is the act that the Stage is expected to show on mount.
+
+Example:
+```javascript
+
+const Landing () => <>Landing Page</>;
+
+const Blog = () => {
+	const blogConfig = {
+		acts: {
+			home: '...',
+			'post-1': '...',
+			'post-2': '...'
+		},
+		template: ({ children }) => children,
+		initial: 'home',
+	};
+
+	return <StageContext value={blogConfig}>
+		<Stage />
+	</StageContext>
+};
+
+const App = StageContext.use(rootStage, () => {
+	return <>
+			<Button
+				label="Blog"
+				onClick={() => {
+					rootStage.open({ name: 'Blog' });
+				}}
+			/>
+			<Button
+				label="Landing"
+				onClick={() => {
+					rootStage.open({ name: 'Landing' });
+				}}
+			/>
+		<Stage />
+	</>;
+});
+
+const rootConfig = {
+	acts: {
+		Landing,
+		Blog,
+	},
+	template: ({ children }) => children,
+	initial: 'Landing',
+};
+
+export default () => <StageContext value={rootConfig}>
+	<App />
+</StageContext>;
+```
+
+This is a working stub example of a stage tree. The root stage in App get's mounted and immediately displays the initial 'Landing' component.
+act.
+
+When the user clicks a button in the App, rootStage.open() is triggered and the button determins the act the rootStage should open.
+
+When the clicks the 'Blog' button, here is the logical flow of what happens stage by stage:
+1. rootStage.open({name: 'Blog'}); is called and we open the 'Blog' act, mounting the Blog component.
+2. Blog component mounts to the dom. And immediately opens it's `initial` child act 'home'.
+
+.open also supports something called act routing:
+```javascript
+<Button
+	label="Blog"
+	onClick={() => {
+		rootStage.open({ name: 'Blog/post-1' });
+	}}
+/>
+```
+
+Meaning we can 
+
+*/
+
