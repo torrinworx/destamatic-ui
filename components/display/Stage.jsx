@@ -71,19 +71,16 @@ export const StageContext = createContext(
 			...globalProps
 		} = raw || {};
 
-		let current;
-
-		if (parent.pending) {
-			current = parent.pending;
-		} else if (initial) {
-			current = initial
-		}
-
 		const Stage = OObject({
 			acts,
 			template,
 			props: globalProps,
+
+			/*
+			name: Can be either a / separated list of 'act' names, or an array of 'act' names. aka keys in the act lists of various stages in a stage tree.
+			*/
 			open: ({ name, template = Stage.template, onClose, ...props }) => {
+				console.log(name);
 				if (typeof name === 'string') {
 					name = name.includes("/")
 						? name.split("/").filter(Boolean)
@@ -116,12 +113,12 @@ export const StageContext = createContext(
 				if (name.length > 0) {
 					if (children.length > 1) {
 						console.warn(
-							`Expected only 1 child stage for route ${name[0]}, found ${children.length}.\n`,
+							`Expected only 1 child stage for route ${name[0]}, found ${children.length}. Stage trees assume a single child StageContext per act.\n`,
 							children
 						);
 					}
-					Stage.pending = name; // set current stage pending, if child stage mounts, it will read pending and self open the correct act.
-				}
+					children[0].value.open({ name, ...globalProps });
+				};
 
 				if (onClose) {
 					Stage.observer
@@ -174,7 +171,7 @@ export const StageContext = createContext(
 				}
 			},
 			parentRoute: parent ? parent?.current : null,
-			current,
+			current: initial ? initial : null,
 			currentDelay: 150,
 			onOpen,
 			initial,
@@ -182,8 +179,6 @@ export const StageContext = createContext(
 			children,
 			parent,
 			urlRouting: !!urlRouting,
-			pending: null,
-
 		});
 
 		if (register) Stage.register();
