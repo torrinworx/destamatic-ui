@@ -65,6 +65,7 @@ export const StageContext = createContext(
 			onOpen,
 			template = Default,
 			initial,
+			fallback,
 			ssg = false,
 			register = true,
 			urlRouting = false,
@@ -80,7 +81,6 @@ export const StageContext = createContext(
 			name: Can be either a / separated list of 'act' names, or an array of 'act' names. aka keys in the act lists of various stages in a stage tree.
 			*/
 			open: ({ name, template = Stage.template, onClose, ...props }) => {
-				console.log(name);
 				if (typeof name === 'string') {
 					name = name.includes("/")
 						? name.split("/").filter(Boolean)
@@ -120,9 +120,13 @@ export const StageContext = createContext(
 					}
 					// child context isn't garunteed to be mounted yet because current is fed into a signaled delay with anti current in Stage:
 					queueMicrotask(() => {
-						children[0]?.value.open({ name, ...globalProps });
+						children[0].value.open({ name, ...globalProps });
 					});
-				};
+				} else {
+					queueMicrotask(() => {
+						children[0]?.value.observer.path('current').set(children[0].value.initial ? children[0].value.initial : null);
+					});
+				}
 
 				if (onClose) {
 					Stage.observer
@@ -179,6 +183,8 @@ export const StageContext = createContext(
 			currentDelay: 150,
 			onOpen,
 			initial,
+			fallback,
+			fallbackAct: null,
 			ssg: !!ssg,
 			children,
 			parent,
@@ -186,6 +192,25 @@ export const StageContext = createContext(
 		});
 
 		if (register) Stage.register();
+
+		Stage.fallbackAct = Stage.observer.path('fallback').map(f => {
+			if (f && Stage.acts && f in Stage.acts) return Stage.acts[f];
+
+			// If this stage has a local fallback string, and it's in this stage's acts, use it
+			// Otherwise, walk up the parents
+			let current = parent;
+			while (current) {
+				if (current.fallback && current.acts && current.fallback in current.acts) {
+					return current.acts[current.fallback];
+				}
+				current = current.parent;
+			}
+
+			// No fallback found anywhere
+			return null;
+		});
+
+		console.log(Stage.fallbackAct.get());
 
 		return Stage;
 	}
@@ -245,6 +270,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 				// If there are no segments left:
 				// - if stage has an initial, use that
 				// - otherwise, clear current
+				console.log("HERE: ", stage.initial, segments, stage);
 				if (!segments.length) {
 					if (stage.initial) {
 						stage.open({ name: [stage.initial] });
@@ -317,7 +343,6 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 				if (isPopState) return;
 
 				const path = buildPathFromStage(s) || '/';
-				console.log('THIS IS PATH: ', path);
 
 				if (window.location.pathname !== path) {
 					history.pushState({ route: path }, document.title || path, path);
@@ -368,11 +393,12 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 			if (s && s.acts && typeof c === 'string' && c in s.acts) {
 				Stage = s.acts[c];
 			} else {
+				Stage = s.fallbackAct.get();
 				console.error(`Stage component with '${c}' does not exist in acts list.`);
 			}
 
 			return <Template closeSignal={closeSignal} s={s} m={s}>
-				<Stage stage={s} modal={s} {...s.props} />
+				<Stage stage={s} {...s.props} />
 			</Template>;
 		});
 }));
