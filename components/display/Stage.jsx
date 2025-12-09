@@ -108,7 +108,8 @@ export const StageContext = createContext(
 
 				Object.assign(Stage.props, props)
 				Stage.template = template;
-				Stage.current = name.shift(); // open here, remove opened stage from name/route.
+				const opened = name.shift();
+				Stage.current = opened;
 
 				if (name.length > 0) {
 					if (children.length > 1) {
@@ -117,13 +118,16 @@ export const StageContext = createContext(
 							children
 						);
 					}
-					children[0].value.open({ name, ...globalProps });
+					// child context isn't garunteed to be mounted yet because current is fed into a signaled delay with anti current in Stage:
+					queueMicrotask(() => {
+						children[0]?.value.open({ name, ...globalProps });
+					});
 				};
 
 				if (onClose) {
 					Stage.observer
 						.path('current')
-						.defined(val => val !== name)
+						.defined(val => val !== opened)
 						.then(onClose);
 				}
 			},
@@ -226,92 +230,116 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 		}
 	}));
 
-
-	// Get the current url path.
-	const getUrlPath = () => {
-		const raw = window.location.pathname || '/';
-		const trimmed = raw.endsWith('/') && raw.length > 1
-			? raw.slice(0, -1)
-			: raw;
-		if (trimmed === '/') return [];
-		return trimmed
-			.slice(1)
-			.split('/')
-			.map(x => x.trim())
-			.filter(Boolean);
-	};
-
 	mounted(() => {
-		if (s.urlRouting && typeof s.parent !== 'object') { // This code only runs in the 'root' stage of a given stage tree.
+		// Only the root Stage of a tree should manage URL routing
+		if (s.urlRouting && typeof s.parent !== 'object') {
 			let isPopState = false;
 
-			// on change in the url (direct navigation to a url, forward/backward, etc), update current of all stages and navigate to it.
+			// '/blog/post-1/' -> ['blog', 'post-1']
+			const urlToSegments = (pathname) =>
+				pathname.split('/').filter(Boolean);
+
+			// Walk a stage chain and set .current along the way
+			// segments: remaining route parts for this and child stages
+			const applySegmentsToStageChain = (stage, segments) => {
+				// If there are no segments left:
+				// - if stage has an initial, use that
+				// - otherwise, clear current
+				if (!segments.length) {
+					if (stage.initial) {
+						stage.open({ name: [stage.initial] });
+					} else {
+						stage.close();
+					}
+					return;
+				}
+
+				// We do NOT want to accidentally treat an initial as explicit route
+				// initial is implicit: if a segment equals stage.initial but we still
+				// have more segments, it's ambiguous / probably invalid.
+				// For now: treat segments[0] as the explicit target act.
+				const [head, ...tail] = segments;
+
+				// Open this stage at `head`
+				stage.open({ name: [head, ...tail] });
+				// `Stage.open` implementation will forward remaining tail
+				// into the child stage for us.
+			};
+
+			// URL → Stage tree (root)
 			const syncStage = () => {
 				isPopState = true;
 
-				const segments = getUrlPath();
-				console.log(segments);
+				const segments = urlToSegments(window.location.pathname);
 
-				let stage = s
-				const name = []
-				let count = 0;
-
-				// How the fuck do I do this? There is no possible way to know which stage route I need given a url,
-				// especially if I want 'inital' stages to act as roots of a given route???
-				while (stage) {
-					console.log(stage.initial, stage.current, stage.children);
-
-					console.log(segments[count] in stage.acts);
-
-					if (segments[count] in stage.acts) {
-						name.push(segments[count]);
+				if (segments.length === 0) {
+					// No path segments: go to root initial chain
+					if (s.initial) {
+						s.open({ name: [s.initial] });
 					} else {
-						name.push(stage.initial);
+						s.close();
 					}
-					stage = null;
-				};
-
-				console.log("NAME: ", name);
-
-				// Create a valid stage route from the url, account for 'initial' stage values being roots of a given slug.
-				// const name = stageFromUrl(s, segments);
-
-				// s.open({ name })
+				} else {
+					applySegmentsToStageChain(s, segments);
+				}
 
 				queueMicrotask(() => {
 					isPopState = false;
 				});
 			};
 
-			// on change in any stages current value, update the url.
+			// Stage tree → URL
+			const buildPathFromStage = (stage) => {
+				const segs = [];
+
+				const walk = (stg) => {
+					const cur = stg.current;
+					if (!cur) return;
+
+					// Skip adding segment if it's equal to initial
+					// initial acts are implicit
+					if (!stg.initial || cur !== stg.initial) {
+						segs.push(cur);
+					}
+
+					// Expect max 1 child stage in this "routing chain"
+					if (stg.children && stg.children.length > 0) {
+						const child = stg.children[0]?.value;
+						if (child) walk(child);
+					}
+				};
+
+				walk(stage);
+				return '/' + segs.join('/');
+			};
+
 			const syncUrl = () => {
 				if (isPopState) return;
 
-				// Create a valid url from stages, account for 'initial' stage values as being roots of a given slug.
-				// const path = urlFromStage(s);
-				console.log(path);
+				const path = buildPathFromStage(s) || '/';
+				console.log('THIS IS PATH: ', path);
 
 				if (window.location.pathname !== path) {
-					history.pushState({ route: segs }, document.title || path, path);
+					history.pushState({ route: path }, document.title || path, path);
 				}
 			};
 
 			// Initial URL -> Stage
 			syncStage();
 
-			// Stage (Any) Change -> URL Change
+			// Any nested stage, including root, .current Change -> Change URL
 			cleanup(
-				/*
-				Stage contexts are infinitely nestable, so this watches for changes on 
-				each stages child array and runs syncUrl.
-
-				The expectation that syncUrl will construct a valid url from the root stage,
-				recursing through root.children and building a valid url based on a combination
-				of current act, and inital act.
-				*/
 				s.observer
 					.tree('children')
 					.path('value')
+					.path('current')
+					.effect(() => {
+						syncUrl();
+					})
+			);
+
+			cleanup(
+				s.observer
 					.path('current')
 					.effect(() => {
 						syncUrl();
@@ -351,8 +379,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 
 
 /*
-Stage Tree definition:
-
+# Stage Tree definition:
 
 StageContext's can be nested, the intention for this is to create a hierarchical tree structure and build pagination systems
 from this.
@@ -436,7 +463,114 @@ When the clicks the 'Blog' button, here is the logical flow of what happens stag
 />
 ```
 
-Meaning we can 
+If the buttons onClick is ran, here is the logical flow of what would happen given the example so far:
+1. rootStage would open the 'Blog' act.
+2. Blog component mounts, triggering blogStage context to startup and mount.
+3. rootStage sends the remaining entries in `name` through blogStage.open({name: name}).
+4. blogStage opens 'post-1' act, the remaining segment in the `name`.
+
+
+# Stage url routing, and it's troubles.
+
+Right now in the above url routing code in the mounted(() => {...}) block is a bunch of bullshit, half implemented. Ignore it. The goal of the 
+documentation below is to outline the expected resuling usage and behaviour of a routing system. And at the end specify the actual url -> name
+algorithm and name -> url algorithm. We can then feed these into the url watcher
+
+The stage system is designed to be an all in one expansible content display handler. Because of this, it would be immensly useful to have a url
+router system installed that automatically resolves url changes to changes in the stage tree and vice versa.
+
+Right now there is a question I must answer before we continue: How do we map urls to stage tree routes? 
+
+To answer that we need to establish the behaviour expected of the url -> name and name -> url converters.
+
+I'll be refering to stage routes as 'name' and urls as 'urls' for clarity. Here are the considerations, and the url/name relationship:
+
+Considerations:
+- Stages themselves don't have names, we will only be using the act names in url routes
+- Context.jsx provides a children OArray, we can watch each stage contexts 'current' value recursively to construct some kind
+	of route from in theory, if we establish how name-route works.
+- Ideally, `initial` acts on each stage will be treated as 'roots' of their stage, eg no slug will be added to the url itself.
+	This in particular complicates the url -> name logic. maybe we can assume that if an initial act is shown in a child stage,
+	there will be no sub acts. Therefore in the url, if there are multiple nested segments: '/blog/page-1', we assume
+	stageRoot.current = 'blog' and blogStage.current = 'page-1', then with '/blog' we assume stageRoot.current = 'blog', and 
+	stageBlog.current = stageBlog.initial?
+- All logic should be recursive, no matter the depth of the stage tree. All functionality should be applicable to all stage tree
+	depths.
+- Url -> stage and stage -> url resolution/syncing logic should only run on a single designated root stage that doesn't have siblings
+	and monitors url changes, applies them to the stage tree, and watches stage tree .current changes, and applies them to the url.
+- What I'm having difficulty with is defining this url -> name logic, especially around the complications introduced by requiering 
+	`initial` acts to act as roots of a given stages url slug.
+
+# Url format:
+/{act}/{act}/{act}/...
+
+Each segment is a stage: `/{act}`
+
+Therefore `/blog` is:
+1. assert(rootStage.current = 'blog');
+
+and also, because Blog component is mounted, it has a child StageContext, so there is another step here:
+2. assert(blogStage.current = blogStage.initial);
+
+Example:
+
+url: '/blog/post-1' -> name: 'blog/post-1'
+
+This get's resolved to:
+```javascript
+assert(rootStage.current = 'blog');
+```
+
+and
+```javascript
+assert(blogStage.current === 'post-1');
+```
+
+# url and name resolution
+We want this sytsem to sync the browser url, including url actions like browser back/forward functionality, with the stage tree's
+currently open path of acts. To illustrate this, let's continue with the example:
+
+Now that we have 'blog/post-1' open and mounted, say the user activates a button on the Blog component that does this:
+```javascript
+blogStage.open({name: blogStage.initial});
+```
+
+blogStage.initial is set to 'home', so it's expected that the stage will open 'home' and, the url get's resolved to '/blog, since
+initial pages are resolved as the 'root' of their StageContexts. The url is '/blog' but the logic in the stage system is now:
+```javascript
+assert(rootStage.current === 'blog');
+assert(blogStage.current === 'post-1');
+// url is '/blog/post-1'
+
+// User clicks button:
+blogStage.open({name: blogStage.initial});
+
+assert(rootStage.current === 'blog');
+assert(blogStage.current === blogStage.initial === 'home'); // since initial, url resolution doesn't append 'home' to url slug
+// url is '/blog'
+```
+
+Now say the user clicks the back button in their browser controls, the url is now '/blog/post-1' again. The url resolution system should parse the change in the url, convert
+it to a name, and pass it onto the rootStage. Logic flow:
+1. Url change detected by rootStage eventListener.
+2. url '/blog/post-1' is converted into name: 'blog/post-1'
+3. rootStage.open({name: 'blog/post-1'});
+4. blog act opens, Blog component mounts, blogStage starts
+5. rootStage runs blogStage.open({name: 'post-1'});
+6. act 'post-1' is mounted and displayed.
+
+How does this work if url changes to a route where it's expected an 'initial' act will be loaded in a child stage? Here is what should happen when the user clicks the forward browser
+button, and the url is now '/blog' again. Logic flow:
+1. Url change detected by rootStage eventListener.
+2. url '/blog' is converted into name: 'blog'
+3. rootStage.open({name: 'blog'});
+4. blog act opens, Blog component mounts, blogStage starts, blogStage.current === blogStage.initial === 'home'
+5. There are no remaining segments in `name` for the blogStage to pass onto children, so the route stops here.
+
+Problem: if we construct a name_to_url() function, how does it convert initial acts to routes? Simple:
+We don't have to worry about that because initial pages don't need to be included in any name anyway, they are initial, they appear first.
+
+so if you wanted to go to '/blog/home', you woulnd't, you would just go to url: '/blog', and the name: 'blog', would navigate to Blog and the initial page would automatically appear.
 
 */
 
