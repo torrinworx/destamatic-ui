@@ -378,6 +378,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 }));
 
 
+// TODO: Convert these ramblings into coherent documentation, or just discard them idk. 
 /*
 # Stage Tree definition:
 
