@@ -210,8 +210,6 @@ export const StageContext = createContext(
 			return null;
 		});
 
-		console.log(Stage.fallbackAct.get());
-
 		return Stage;
 	}
 );
@@ -270,7 +268,6 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 				// If there are no segments left:
 				// - if stage has an initial, use that
 				// - otherwise, clear current
-				console.log("HERE: ", stage.initial, segments, stage);
 				if (!segments.length) {
 					if (stage.initial) {
 						stage.open({ name: [stage.initial] });
