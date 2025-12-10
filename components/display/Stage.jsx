@@ -191,8 +191,6 @@ export const StageContext = createContext(
 			urlRouting: !!urlRouting,
 		});
 
-		if (register) Stage.register();
-
 		Stage.fallbackAct = Stage.observer.path('fallback').map(f => {
 			if (f && Stage.acts && f in Stage.acts) return Stage.acts[f];
 
@@ -209,6 +207,8 @@ export const StageContext = createContext(
 			// No fallback found anywhere
 			return null;
 		});
+
+		if (register) Stage.register();
 
 		return Stage;
 	}
