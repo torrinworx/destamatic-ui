@@ -195,25 +195,81 @@ const buildNameChainForContextAct = (contexts, ctxInfo, actName) => {
     return segments;
 };
 
-// Wait until a given stage's `current` matches actName, or timeout.
-const waitForStageAct = async (stage, actName, timeoutMs = 5000) => {
-    const start = Date.now();
 
-    while (true) {
-        await waitForAllSuspendsToSettle();
+const stageTreeMatchesChain = (rootStage, chain) => {
+    let stage = rootStage;
 
-        if (stage.current === actName) return;
-
-        if (Date.now() - start > timeoutMs) {
-            console.warn(
-                `SSG: timeout waiting for stage to reach act "${actName}", current=`,
-                stage.current,
-            );
-            return;
+    for (let i = 0; i < chain.length; i++) {
+        const expectedAct = chain[i];
+        if (!stage || stage.current !== expectedAct) {
+            return false;
         }
 
-        await new Promise((r) => setTimeout(r, 0));
+        if (i < chain.length - 1) {
+            // Move to the first child Stage for the next segment
+            const child = stage.children && stage.children[0] && stage.children[0].value;
+            stage = child || null;
+        }
     }
+
+    // OPTIONAL strictness: ensure no deeper acts are open beyond the chain
+    // Uncomment if you want to enforce "exact path" vs "prefix path":
+    /*
+    let child = stage && stage.children && stage.children[0] && stage.children[0].value;
+    if (child && child.current != null) {
+        return false;
+    }
+    */
+
+    return true;
+};
+
+const waitForRouteChain = (rootStage, chain) => {
+    return new Promise((resolve) => {
+        const { observer } = rootStage;
+
+        let done = false;
+
+        const check = () => {
+            if (done) return;
+            if (stageTreeMatchesChain(rootStage, chain)) {
+                done = true;
+                cleanupAll();
+                resolve();
+            }
+        };
+
+        // We want to re-check whenever *any* current in the chain changes.
+        const cleanups = [];
+
+        const cleanupAll = () => {
+            for (const c of cleanups) c();
+        };
+
+        // 1) Watch root.current
+        cleanups.push(
+            observer
+                .path('current')
+                .effect(() => {
+                    check();
+                })
+        );
+
+        // 2) Watch all nested stage.current values:
+        //    root.observer.tree('children').path('value').path('current')
+        cleanups.push(
+            observer
+                .tree('children')
+                .path('value')
+                .path('current')
+                .effect(() => {
+                    check();
+                })
+        );
+
+        // Do an initial check in case we're already at the correct state
+        check();
+    });
 };
 
 // --- main render function ---
@@ -292,12 +348,14 @@ const render = async (Root) => {
             'file=', fileName,
         );
 
-        // Drive routing using the actual root Stage
-        rootStage.open({ name: [...chain] });
+        // Drive routing
+        rootStage.open({ name: [...chain], skipSignal: true });
 
-        // Wait until this context's stage has actually entered `actName`,
-        // and all suspends have settled.
-        await waitForStageAct(ctxInfo.stageRef, actName);
+        // 1) Wait until the stage tree configuration matches this chain
+        await waitForRouteChain(rootStage, chain);
+
+        // 2) Then wait until all active suspends have settled
+        await waitForAllSuspendsToSettle();
 
         const fullHtml = renderDocument();
 
