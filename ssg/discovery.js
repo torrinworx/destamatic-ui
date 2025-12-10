@@ -1,4 +1,15 @@
 import { stageRegistry } from '../components/display/Stage';
+import { suspendRegistry } from '../components/utils/Suspend';
+
+// Wait until all current suspends have settled.
+// Loop because resolving one suspend might start new ones.
+const waitForAllSuspendsToSettle = async () => {
+    while (true) {
+        const pending = [...suspendRegistry];
+        if (!pending.length) break;
+        await Promise.allSettled(pending);
+    }
+};
 
 let _stageCounter = 0;
 const stageIds = new WeakMap();
@@ -26,13 +37,18 @@ const openAllActsOnce = (stageCtx) => {
 
 /**
  * Core discovery loop: structural only.
+ *
+ * This is now async:
+ * - we repeatedly scan stageRegistry
+ * - for any un-explored stage, we open all of its acts
+ * - then we wait for all suspends that might have been triggered by those opens
+ * - repeat until no new stages appear
  */
-const discoverAllStageContexts = () => {
+const discoverAllStageContexts = async () => {
     const explored = new Set(); // of Stage objects
-    let discoveredSomething = true;
 
-    while (discoveredSomething) {
-        discoveredSomething = false;
+    while (true) {
+        let discoveredSomething = false;
 
         const snapshot = Array.from(stageRegistry);
         console.log('SSG: discoverAllStageContexts snapshot size =', snapshot.length);
@@ -51,6 +67,13 @@ const discoverAllStageContexts = () => {
 
             openAllActsOnce(stageCtx);
         }
+
+        // If we didn't discover any new stage in this pass, we're done.
+        if (!discoveredSomething) break;
+
+        // Otherwise, wait for any suspends kicked off by the newly opened acts
+        // to settle, so that any child stages behind async can register.
+        await waitForAllSuspendsToSettle();
     }
 
     console.log('SSG: discovery complete. stageRegistry size =', stageRegistry.length);
@@ -146,7 +169,10 @@ const hasChildContextForStage = (contexts, parentCtx, stageName) => {
         if (child.parentCtxKey !== parentKey) continue;
         if (!child.parentRoute) continue;
 
-        if (String(child.parentRoute).toLowerCase() === String(stageName).toLowerCase()) {
+        if (
+            String(child.parentRoute).toLowerCase() ===
+            String(stageName).toLowerCase()
+        ) {
             return true;
         }
     }
@@ -157,19 +183,25 @@ const hasChildContextForStage = (contexts, parentCtx, stageName) => {
  * Main discovery API.
  *
  * @param {Function} snapshotHtml - fn(stageCtx, stageName) => HTML string
- * @returns {{
+ * @returns {Promise<{
  *   contexts: Array<{ ctxKey, stageRef, parentCtxKey, parentRoute, initial, ssg }>,
  *   pageHtmlByContextAndStage: Map<Stage, Map<string, string>>,
- * }}
+ * }>}
  */
-export const discoverStages = (snapshotHtml) => {
+export const discoverStages = async (snapshotHtml) => {
     const pageHtmlByContextAndStage = new Map();
 
     console.log('SSG: ===== START DISCOVERY PASS =====');
-    // 1) Structural discovery: mount all nested StageContexts
-    discoverAllStageContexts();
 
-    // 2) Snapshot HTML per SSG context/act
+    // 1) Structural discovery: recursively mount/open all nested StageContexts,
+    //    waiting for any suspends that gate them.
+    await discoverAllStageContexts();
+
+    // 2) Snapshot HTML per SSG context/act.
+    //    Opening acts here can also trigger suspends (e.g. act-level loaders),
+    //    but we're primarily interested in HTML here, not further stage discovery.
+    //    If you *do* want to handle new async here, you can add another
+    //    waitForAllSuspendsToSettle() around this loop.
     for (const stageCtx of stageRegistry) {
         const id = getStageId(stageCtx);
 

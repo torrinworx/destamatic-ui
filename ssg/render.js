@@ -161,7 +161,7 @@ const buildRoutes = (contexts) => {
 
 // --- main render function ---
 
-const render = (Root) => {
+const render = async (Root) => {
     const pages = [];
 
     const { bodyEl } = ensureDocumentSkeleton();
@@ -172,7 +172,7 @@ const render = (Root) => {
     console.log('SSG: ===== START RENDER PASS =====');
 
     // Run discovery; we snapshot the entire document each time
-    const { contexts, pageHtmlByContextAndStage } = discoverStages(() => {
+    const { contexts, pageHtmlByContextAndStage } = await discoverStages(() => {
         return renderDocument();
     });
 
