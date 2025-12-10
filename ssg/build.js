@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import './document.js';
+import { generateSitemap } from './sitemap.js';
 
 const BUILD_DIR_ARG = process.argv[2];
 
@@ -13,6 +14,9 @@ if (!BUILD_DIR_ARG) {
 const BUILD_DIR = path.resolve(process.cwd(), BUILD_DIR_ARG);
 const OUT_DIR = path.join(BUILD_DIR, 'dist');
 const BUILD_FILE = path.join(BUILD_DIR, 'dist', 'index.ssg.js');
+
+
+const SITE_BASE_URL = process.argv[4] || 'https://example.com';
 
 const build = async () => {
 	const { renderAppToString } = await import(BUILD_FILE);
@@ -31,6 +35,11 @@ const build = async () => {
 
 		console.log('SSG: wrote', filePath);
 	}
+
+	await generateSitemap({
+		outDir: OUT_DIR,
+		baseUrl: SITE_BASE_URL,
+	});
 
 	try {
 		await fs.unlink(BUILD_FILE);
