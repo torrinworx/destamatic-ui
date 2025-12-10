@@ -4,6 +4,17 @@ import {
     normalizeRouteToFolder,
     hasChildContextForStage,
 } from './discovery';
+import { suspendRegistry } from '../components/utils/Suspend';
+
+// --- async helpers ---
+
+const waitForAllSuspendsToSettle = async () => {
+    while (true) {
+        const pending = [...suspendRegistry];
+        if (!pending.length) break;
+        await Promise.allSettled(pending);
+    }
+};
 
 // --- HTML / DOM helpers ---
 
@@ -120,7 +131,7 @@ const ensureDocumentSkeleton = () => {
 };
 
 /**
- * Build route segments for each context from ctxKey/parentCtxKey chain.
+ * Build route segments for each context from ctxKey / parentCtxKey chain.
  *
  * - Root contexts (parentCtxKey == null) -> []
  * - Child contexts -> parent segments + [parentRoute]
@@ -159,24 +170,78 @@ const buildRoutes = (contexts) => {
     return { segmentsByKey, byKey };
 };
 
+const findRootContext = (contexts) =>
+    contexts.find((c) => c.parentCtxKey == null) || null;
+
+/**
+ * Build full Stage.open name-chain for a given context+act:
+ * climb parents via parentCtxKey, collecting parentRoute (act on parent),
+ * reverse to get root->ctx, then append actName (act on this ctx).
+ */
+const buildNameChainForContextAct = (contexts, ctxInfo, actName) => {
+    const segments = [];
+    let current = ctxInfo;
+
+    while (current && current.parentCtxKey != null) {
+        if (current.parentRoute) {
+            segments.push(current.parentRoute);
+        }
+        current = contexts.find((c) => c.ctxKey === current.parentCtxKey) || null;
+    }
+
+    segments.reverse(); // root -> this ctx
+    segments.push(actName);
+
+    return segments;
+};
+
+// Wait until a given stage's `current` matches actName, or timeout.
+const waitForStageAct = async (stage, actName, timeoutMs = 5000) => {
+    const start = Date.now();
+
+    while (true) {
+        await waitForAllSuspendsToSettle();
+
+        if (stage.current === actName) return;
+
+        if (Date.now() - start > timeoutMs) {
+            console.warn(
+                `SSG: timeout waiting for stage to reach act "${actName}", current=`,
+                stage.current,
+            );
+            return;
+        }
+
+        await new Promise((r) => setTimeout(r, 0));
+    }
+};
+
 // --- main render function ---
 
 const render = async (Root) => {
     const pages = [];
+    const emitted = new Set(); // dedupe route+file
 
     const { bodyEl } = ensureDocumentSkeleton();
 
-    // Initial mount
+    // Mount app once
     mount(bodyEl, Root());
 
     console.log('SSG: ===== START RENDER PASS =====');
 
-    // Run discovery; we snapshot the entire document each time
-    const { contexts, pageHtmlByContextAndStage } = await discoverStages(() => {
-        return renderDocument();
-    });
-
+    // 1) Discover structure on this single app instance
+    const { contexts } = await discoverStages();
     const { segmentsByKey } = buildRoutes(contexts);
+
+    const rootCtx = findRootContext(contexts);
+    if (!rootCtx || !rootCtx.stageRef) {
+        console.warn('SSG: no root context; aborting');
+        return pages;
+    }
+    const rootStage = rootCtx.stageRef;
+
+    // 2) Build page definitions from structure
+    const pageDefs = [];
 
     for (const ctxInfo of contexts) {
         if (!ctxInfo.ssg) continue;
@@ -190,50 +255,62 @@ const render = async (Root) => {
         const routeSegments = segmentsByKey.get(ctxInfo.ctxKey) || [];
         const routeFolder = normalizeRouteToFolder(routeSegments);
 
-        console.log(
-            'SSG: render ctx',
-            ctxInfo.ctxKey,
-            'routeSegments=',
-            routeSegments,
-            'acts=',
-            allActs,
-        );
-
         for (const actName of allActs) {
             // Skip acts that are "parent routes" for child contexts
             if (hasChildContextForStage(contexts, ctxInfo, actName)) {
-                console.log(
-                    `  - skip act "${actName}" on ctx ${ctxInfo.ctxKey} because it has child context`,
-                );
-                continue;
-            }
-
-            const byAct = pageHtmlByContextAndStage.get(stageCtx);
-            if (!byAct) {
-                console.log('  - no HTML map for this stageCtx');
-                continue;
-            }
-
-            const fullHtml = byAct.get(actName);
-            if (!fullHtml) {
-                console.log(`  - no HTML for act "${actName}"`);
                 continue;
             }
 
             const isInitial = ctxInfo.initial && ctxInfo.initial === actName;
             const fileName = isInitial ? 'index' : actName;
 
-            console.log(
-                `  -> page route="${routeFolder}", file="${fileName}.html" from act="${actName}", html[0..200]=`,
-                fullHtml.slice(0, 200).replace(/\n/g, '\\n'),
-            );
+            const key = `${routeFolder}::${fileName}`;
+            if (emitted.has(key)) continue;
+            emitted.add(key);
 
-            pages.push({
-                route: routeFolder,
-                name: fileName,
-                html: fullHtml,
+            pageDefs.push({
+                ctxInfo,
+                actName,
+                routeFolder,
+                fileName,
             });
         }
+    }
+
+    // 3) For each page, drive routing via rootStage, wait, then snapshot
+    for (const def of pageDefs) {
+        const { ctxInfo, actName, routeFolder, fileName } = def;
+
+        const chain = buildNameChainForContextAct(contexts, ctxInfo, actName);
+
+        console.log(
+            'SSG: render page',
+            'ctx=', ctxInfo.ctxKey,
+            'act=', actName,
+            'chain=', chain,
+            'routeFolder=', routeFolder,
+            'file=', fileName,
+        );
+
+        // Drive routing using the actual root Stage
+        rootStage.open({ name: [...chain] });
+
+        // Wait until this context's stage has actually entered `actName`,
+        // and all suspends have settled.
+        await waitForStageAct(ctxInfo.stageRef, actName);
+
+        const fullHtml = renderDocument();
+
+        console.log(
+            `  -> snapshot route="${routeFolder}", file="${fileName}.html" html[0..200]=`,
+            fullHtml.slice(0, 200).replace(/\n/g, '\\n'),
+        );
+
+        pages.push({
+            route: routeFolder,
+            name: fileName,
+            html: fullHtml,
+        });
     }
 
     console.log('SSG: ===== END RENDER PASS =====');

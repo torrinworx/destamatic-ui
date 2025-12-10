@@ -38,7 +38,7 @@ const openAllActsOnce = (stageCtx) => {
 /**
  * Core discovery loop: structural only.
  *
- * This is now async:
+ * This is async:
  * - we repeatedly scan stageRegistry
  * - for any un-explored stage, we open all of its acts
  * - then we wait for all suspends that might have been triggered by those opens
@@ -68,11 +68,9 @@ const discoverAllStageContexts = async () => {
             openAllActsOnce(stageCtx);
         }
 
-        // If we didn't discover any new stage in this pass, we're done.
         if (!discoveredSomething) break;
 
-        // Otherwise, wait for any suspends kicked off by the newly opened acts
-        // to settle, so that any child stages behind async can register.
+        // Wait for any async work triggered by newly opened stages
         await waitForAllSuspendsToSettle();
     }
 
@@ -182,66 +180,17 @@ const hasChildContextForStage = (contexts, parentCtx, stageName) => {
 /**
  * Main discovery API.
  *
- * @param {Function} snapshotHtml - fn(stageCtx, stageName) => HTML string
+ * NOTE: This now returns only structure: no HTML.
+ *
  * @returns {Promise<{
  *   contexts: Array<{ ctxKey, stageRef, parentCtxKey, parentRoute, initial, ssg }>,
- *   pageHtmlByContextAndStage: Map<Stage, Map<string, string>>,
  * }>}
  */
-export const discoverStages = async (snapshotHtml) => {
-    const pageHtmlByContextAndStage = new Map();
-
+export const discoverStages = async () => {
     console.log('SSG: ===== START DISCOVERY PASS =====');
 
-    // 1) Structural discovery: recursively mount/open all nested StageContexts,
-    //    waiting for any suspends that gate them.
     await discoverAllStageContexts();
 
-    // 2) Snapshot HTML per SSG context/act.
-    //    Opening acts here can also trigger suspends (e.g. act-level loaders),
-    //    but we're primarily interested in HTML here, not further stage discovery.
-    //    If you *do* want to handle new async here, you can add another
-    //    waitForAllSuspendsToSettle() around this loop.
-    for (const stageCtx of stageRegistry) {
-        const id = getStageId(stageCtx);
-
-        if (!stageCtx?.ssg) {
-            console.log(`SSG: skip non-ssg stage ${id}`);
-            continue;
-        }
-
-        const stageNames = Object.keys(stageCtx.acts || {});
-        console.log(
-            `SSG: snapshotting stage ${id} (parentRoute=${stageCtx.parentRoute}, initial=${stageCtx.initial}) acts=`,
-            stageNames,
-        );
-
-        for (const stageName of stageNames) {
-            console.log(`  -> ${id}.open("${stageName}") (snapshot)`);
-            stageCtx.open({ name: stageName });
-
-            console.log(
-                `     ${id}.current after open("${stageName}") =`,
-                stageCtx.current,
-            );
-
-            const fullHtml = snapshotHtml(stageCtx, stageName);
-
-            console.log(
-                `     ${id} snapshot "${stageName}" html[0..200]=`,
-                fullHtml.slice(0, 200).replace(/\n/g, '\\n'),
-            );
-
-            let byAct = pageHtmlByContextAndStage.get(stageCtx);
-            if (!byAct) {
-                byAct = new Map();
-                pageHtmlByContextAndStage.set(stageCtx, byAct);
-            }
-            byAct.set(stageName, fullHtml);
-        }
-    }
-
-    // 3) Snapshot contexts and build parent links for routing
     const rawContexts = snapshotContexts();
     const contexts = buildParentLinks(rawContexts);
 
@@ -258,7 +207,7 @@ export const discoverStages = async (snapshotHtml) => {
     );
     console.log('SSG: ===== END DISCOVERY PASS =====');
 
-    return { contexts, pageHtmlByContextAndStage };
+    return { contexts };
 };
 
 export { normalizeRouteToFolder, hasChildContextForStage };
