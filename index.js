@@ -54,7 +54,7 @@ export { default as Ripple } from './components/utils/Ripple.jsx';
 export { default as useRipples } from './components/utils/Ripple.jsx';
 export { default as Shown } from './components/utils/Shown.jsx'
 export { default as Switch } from './components/utils/Switch.jsx'
-export { default as suspend } from './components/utils/Suspend.jsx';
+export * from './components/utils/Suspend.jsx';
 export { default as Theme } from './components/utils/Theme.jsx';
 export { default as ThemeContext } from './components/utils/ThemeContext.jsx';
 export * from './components/utils/Validate.jsx';
