@@ -13,10 +13,10 @@
       "import": "./index.js",
       "require": "./index.js"
     },
-    "./icons/SimpleIcons": "./components/icons/SimpleIcons.jsx",
-    "./icons/FeatherIcons": "./components/icons/FeatherIcons.jsx",
-    "./icons/MaterialIcons": "./components/icons/MaterialIcons.jsx",
-    "./icons/IconifyIcons": "./components/icons/IconifyIcons.jsx",
+    "./components/icons/SimpleIcons": "./components/icons/SimpleIcons.jsx",
+    "./components/icons/FeatherIcons": "./components/icons/FeatherIcons.jsx",
+    "./components/icons/MaterialIcons": "./components/icons/MaterialIcons.jsx",
+    "./components/icons/IconifyIcons": "./components/icons/IconifyIcons.jsx",
     "./util/color": "./util/color.js"
   },
   "files": [
