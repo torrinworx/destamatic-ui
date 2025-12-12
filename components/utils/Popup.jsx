@@ -1,8 +1,8 @@
 import { OArray, Observer } from 'destam-dom';
-import useAbort from '../../util/abort';
-import createContext from './Context';
-import ThemeContext from './ThemeContext';
-import { h } from './h';
+import useAbort from '../../util/abort.js';
+import createContext from './Context.jsx';
+import ThemeContext from './ThemeContext.jsx';
+import { h } from './h.jsx';
 
 const RawContext = createContext();
 

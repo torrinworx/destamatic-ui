@@ -1,7 +1,7 @@
 import { Observer } from 'destam-dom';
-import useRipples from '../utils/Ripple';
-import Theme from '../utils/Theme';
-import ThemeContext from '../utils/ThemeContext';
+import useRipples from '../utils/Ripple.jsx';
+import Theme from '../utils/Theme.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
 
 Theme.define({
 	toggle: {

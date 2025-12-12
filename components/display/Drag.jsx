@@ -1,12 +1,12 @@
-import { h } from '../utils/h';
-import Theme from '../utils/Theme';
+import { h } from '../utils/h.jsx';
+import Theme from '../utils/Theme.jsx';
 import { OArray, Observer } from 'destam-dom';
 import { assert } from 'destam/util';
 import { OArray as DestamOArray } from 'destam';
 import { atomic } from 'destam/Network';
 import { Insert, Delete } from 'destam';
-import useAbort from '../../util/abort';
-import ThemeContext from '../utils/ThemeContext';
+import useAbort from '../../util/abort.js';
+import ThemeContext from '../utils/ThemeContext.jsx';
 
 const clamp = (x, min, max) => Math.min(Math.max(x, min), max);
 

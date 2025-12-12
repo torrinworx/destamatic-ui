@@ -2,7 +2,7 @@ import { h, mount, Observer, OObject, OArray } from "destam-dom";
 import { atomic } from 'destam/Network';
 import { Insert, Delete } from 'destam/Events';
 
-import createContext from './Context';
+import createContext from './Context.jsx';
 import { sizeProperties } from '../../util/index.js';
 import defaultTheme from '../../util/defaultTheme.js';
 
@@ -513,7 +513,15 @@ const Theme = createContext(createTheme(theme), (nextTheme, { theme: prevTheme }
 
 Theme.define = obj => atomic(() => {
 	for (const o in obj) {
-		if (o in theme) throw new Error("Theme.define: theme definition already exists: " + o);
+		if (o in theme) {
+			if (import.meta.hot) {
+				// Dev/HMR: ignore duplicates instead of throwing
+				console.warn("Theme.define duplicate in dev (ignored):", o);
+				continue;
+			}
+			// Production: still hard fail on mistakes
+			throw new Error("Theme.define: theme definition already exists: " + o);
+		}
 		theme[o] = obj[o];
 	}
 });

@@ -1,4 +1,4 @@
-import { mark } from './h';
+import { mark } from './h.jsx';
 import Observer from 'destam/Observer';
 import { assert } from 'destam/util';
 

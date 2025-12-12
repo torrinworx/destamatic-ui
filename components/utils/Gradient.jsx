@@ -1,9 +1,9 @@
 // import { atomic } from 'destam/Network';
 import { OArray, Observer } from 'destam-dom';
 
-import { h } from '../utils/h';
-import Theme from '../utils/Theme';
-import ThemeContext from '../utils/ThemeContext';
+import { h } from '../utils/h.jsx';
+import Theme from '../utils/Theme.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
 
 Theme.define({
 	gradient: {

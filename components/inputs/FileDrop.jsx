@@ -1,13 +1,13 @@
-import Theme from '../utils/Theme';
-import ThemeContext from '../utils/ThemeContext';
-import Shown from '../utils/Shown';
-import Paper from '../display/Paper';
-import Button from '../inputs/Button';
-import Icon from '../display/Icon';
-import { Typography } from '../display/Typography';
-import LoadingDots from '../utils/LoadingDots';
-import Context from '../utils/Context';
-import { h } from '../utils/h';
+import Theme from '../utils/Theme.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
+import Shown from '../utils/Shown.jsx';
+import Paper from '../display/Paper.jsx';
+import Button from '../inputs/Button.jsx';
+import Icon from '../display/Icon.jsx';
+import { Typography } from '../display/Typography.jsx';
+import LoadingDots from '../utils/LoadingDots.jsx';
+import Context from '../utils/Context.jsx';
+import { h } from '../utils/h.jsx';
 
 import { OArray, OObject, Observer } from 'destam-dom';
 

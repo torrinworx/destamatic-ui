@@ -1,8 +1,8 @@
 import Theme from '../utils/Theme.jsx';
 import ThemeContext from '../utils/ThemeContext.jsx';
-import Shown from '../utils/Shown';
+import Shown from '../utils/Shown.jsx';
 import Observer from 'destam/Observer';
-import useAbort from '../../util/abort';
+import useAbort from '../../util/abort.js';
 
 Theme.define({
 	scroll_body: {

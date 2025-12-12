@@ -1,8 +1,8 @@
 import { Observer } from 'destam-dom';
-import { mark } from '../utils/h';
-import Theme from '../utils/Theme';
-import ThemeContext from '../utils/ThemeContext';
-import Button from '../inputs/Button';
+import { mark } from '../utils/h.jsx';
+import Theme from '../utils/Theme.jsx';
+import ThemeContext from '../utils/ThemeContext.jsx';
+import Button from '../inputs/Button.jsx';
 
 Theme.define({
 	button_tab: {

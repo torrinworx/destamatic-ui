@@ -1,7 +1,7 @@
 import { h as destam_h, mount, getFirst } from 'destam-dom';
 import Observer, { observerGetter, shallowListener } from 'destam/Observer';
 import { sizeProperties } from '../../util/index.js';
-import Theme from './Theme';
+import Theme from './Theme.jsx';
 import useAbort from '../../util/abort.js';
 import { assert } from 'destam/util.js';
 
