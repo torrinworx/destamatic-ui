@@ -26,14 +26,6 @@ Theme.define({
 	},
 });
 
-/*
-TODO:
-- Support cursor being moved while content is scrolling. If the user is scrolling to view text overflowing to the right, the text is moving left, the crusor should also move left in it's relative position to the characters. Right now it sticks to the wrapper.
-- ctrl+delete support with word/string groupings similar to vscode, words, things separated by spaces, other parametrs
-- on initial click to trigger focus, the cursor is rendered in it's hidden state, not fully visible. Needs to be changed to feel more tactile.
-- scale cursor width and hieght to match size of typography element. 
-*/
-
 export default ThemeContext.use(h => {
 	const Text = ({
 		value,
