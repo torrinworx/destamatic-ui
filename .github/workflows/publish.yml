@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "23"
+          node-version: "25"
           registry-url: "https://registry.npmjs.org"
 
       - name: Extract Version from Tag
@@ -36,14 +36,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build
-        run: |
-          chmod +x ./build.sh
-          ./build.sh
-
       - name: Publish to NPM
-        run: |
-          cd ./dist
-          npm publish
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
