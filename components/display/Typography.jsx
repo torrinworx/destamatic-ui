@@ -66,10 +66,10 @@ export const Typography = ThemeContext.use(h => {
 		// create a span with optional data-* only in index mode
 		const makeSpan = (children, attrs) => {
 			if (indexMode) {
-				return <raw:span {...attrs}>{children}</raw:span>;
+				return <span {...attrs}>{children}</span>;
 			} else {
 				// If attrs are only for indexing, omit them for perf
-				return <raw:span>{children}</raw:span>;
+				return <span>{children}</span>;
 			}
 		};
 

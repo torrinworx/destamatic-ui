@@ -4,9 +4,9 @@ import 'prismjs/themes/prism.css'
 
 import { Observer } from 'destam';
 import { mount } from 'destam-dom';
-import { Button, TextModifiers, Typography, PopupContext, Text, Checkbox } from 'destamatic-ui';
+import { Button, TextModifiers, Typography, PopupContext, Text } from 'destamatic-ui';
 
-const value = Observer.mutable('hello world there!?!?!?!?!?! :frog: atomic non-atomic checkbox');
+const value = Observer.mutable('hello world there!?!?!?!?!?! :frog: atomic non-atomic');
 
 const emojis = {
     frog: '🐸',
@@ -46,7 +46,7 @@ const makePrismModifiers = (lang) => {
         return {
             check: new RegExp(regex.source, regex.flags + (regex.flags.includes('g') ? '' : 'g')),
             atomic: false,
-            return: match => <span class={`token ${tokenClass}`}>{match}</span>
+            return: match => <span class={`token ${tokenClass}`} style={{ display: 'inline-block' }}>{match}</span>
         }
     });
 };
@@ -54,14 +54,12 @@ const makePrismModifiers = (lang) => {
 const modifiers = makePrismModifiers('javascript');
 const value2 = Observer.mutable('const modifiers = makePrismModifiers(language.get()); ');
 
-const check = Observer.mutable(false);
-
 mount(document.body, <PopupContext>
     <Typography label="Fun modifiers:" type='h1' />
     <TextModifiers value={[
         {
             check: '!',
-            return: (match) => <span style={{ color: 'red' }}>{match}</span>,
+            return: (match) => <span style={{ color: 'red', display: 'inline-block' }}>{match}</span>,
         },
         {
             check: '?',
@@ -69,13 +67,13 @@ mount(document.body, <PopupContext>
                 const hover = Observer.mutable(false);
                 return <span
                     isHovered={hover}
-                    style={{ cursor: 'pointer', color: hover.bool('purple', 'pink') }}
+                    style={{ cursor: 'pointer', color: hover.bool('purple', 'pink'), display: 'inline-block' }}
                 >{match}</span>
             },
         },
         {
             check: /hello/gi,
-            return: (match) => <div><div style={{ background: 'blue' }}>{match}</div></div>,
+            return: (match) => <div style={{ display: 'inline-block' }}><div style={{ background: 'blue' }}>{match}</div></div>,
             atomic: true,
         },
         { // vscode style inline button.
@@ -93,35 +91,30 @@ mount(document.body, <PopupContext>
 
                 const specialButton = Observer.all([hover, CtrlKey]).map(([h, c]) => h && c);
 
-                return <div isHovered={hover} style={{ cursor: specialButton.bool('pointer', 'inherit'), background: specialButton.bool('blue', 'red') }}>{match}</div>
+                return <div isHovered={hover} style={{ cursor: specialButton.bool('pointer', 'inherit'), background: specialButton.bool('blue', 'red'), display: 'inline-block' }}>{match}</div>
             },
             atomic: false,
         },
         {
             check: /atomic/gi,
-            return: (match) => <Button type='contained'>{match}</Button>,
+            return: (match) => <Button type='contained' style={{ display: 'inline-block' }}>{match}</Button>,
             atomic: true,
         },
         {
             check: /non-atomic/gi,
-            return: (match) => <Button type='contained'>{match}</Button>,
+            return: (match) => <Button type='contained' style={{ display: 'inline-block' }}>{match}</Button>,
             atomic: false,
-        },
-        {
-            check: /checkbox/gi,
-            return: (match) => <Checkbox value={check} />,
-            atomic: true,
         },
         {
             check: /:([a-zA-Z0-9_]+):/g,
             return: (match) => {
                 const key = match.slice(1, -1); // remove surrounding colons
                 const emoji = emojis[key];
-                return emoji ? <span>{emoji}</span> : match;
+                return emoji ? <span style={{ display: 'inline-block' }}>{emoji}</span> : match;
             }
         }
     ]} >
-        <Text style={{ background: 'black', color: 'white' }} value={value} />
+        <Text value={value} />
     </TextModifiers>
     <Typography label="Javascript syntax highlighting:" type='h1' />
     <TextModifiers value={modifiers} >

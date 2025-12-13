@@ -353,6 +353,7 @@ export default class TextEngine {
 
             // Y/height: measure from actual Typography node (theme-driven)
             const measureEl = this.measureElem.get();
+
             let topContent = 0;
             let height = 16;
 

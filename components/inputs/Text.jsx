@@ -17,9 +17,8 @@ Theme.define({
 	richtext_typography: {
 		extends: 'row',
 		whiteSpace: 'pre',
-		// overflow: 'none'
-		display: 'inline-block',
-
+		display: 'inline-block' // somehow I want inline-block so that scrolling works properly but without the new line characters it's injecting into the text making the atomic/non-atomic elements appear on new lines.
+		// if we don't have this display inline-block, the caret scrolling doesn't work, and content get's cut off when you scroll to it and isn't visible.
 	},
 
 	cursor: {
