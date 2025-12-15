@@ -114,10 +114,10 @@ mount(document.body, <PopupContext>
             }
         }
     ]} >
-        <Text value={value} />
+        <Text value={value} type='h1' />
     </TextModifiers>
     <Typography label="Javascript syntax highlighting:" type='h1' />
     <TextModifiers value={modifiers} >
-        <Text value={value2} />
+        <Text value={value2} type='h1' />
     </TextModifiers>
 </PopupContext>);
