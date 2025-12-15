@@ -2,7 +2,7 @@ import { Observer, OArray } from 'destam';
 
 import Theme from '../utils/Theme.jsx';
 import Shown from '../utils/Shown.jsx';
-import TextEngine from '../utils/TextEngine.js';
+import RichEngine from '../utils/RichEngine.js';
 import ThemeContext from '../utils/ThemeContext.jsx';
 import { Typography } from '../display/Typography.jsx';
 
@@ -223,7 +223,7 @@ export default ThemeContext.use(h => {
 		});
 
 		mounted(() => {
-			const engine = new TextEngine({
+			const engine = new RichEngine({
 				valueObs: value,
 				displayMapObs: displayMap,
 				wrapperObs: wrapper,

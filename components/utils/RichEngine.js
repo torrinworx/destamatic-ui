@@ -2,7 +2,7 @@ import { Observer } from 'destam';
 
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
 
-export default class TextEngine {
+export default class RichEngine {
     constructor({ valueObs, displayMapObs, wrapperObs, cursorElemObs, measureElemObs, lastMovedObs }) {
         this.value = valueObs;
         this.displayMap = displayMapObs;
