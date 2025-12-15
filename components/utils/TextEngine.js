@@ -93,6 +93,92 @@ export default class TextEngine {
         extend ? this.setSelection(anchor, f, 'right') : this.setCaret(f, 'right');
     }
 
+    _rangeFromPoint(x, y) {
+        if (document.caretRangeFromPoint) return document.caretRangeFromPoint(x, y);
+        const pos = document.caretPositionFromPoint?.(x, y);
+        if (!pos) return null;
+        const r = document.createRange();
+        r.setStart(pos.offsetNode, pos.offset);
+        r.collapse(true);
+        return r;
+    }
+
+    _caretClientPoint() {
+        const { side, rect } = this.indexToEdge(this.selection.get().focus, this.lastDirection.get());
+        if (!rect) return null;
+        const x = side === 'left' ? rect.left : rect.right;
+        const y = rect.top + rect.height / 2;
+        return { x, y, rect };
+    }
+
+    moveUp(extend = false) {
+        this._moveVertical(-1, extend);
+    }
+
+    moveDown(extend = false) {
+        this._moveVertical(1, extend);
+    }
+
+    _moveVertical(dir, extend) {
+        const base = this._caretClientPoint();
+        if (!base) return;
+
+        const step = Math.max(8, base.rect.height || 16);
+        const x = base.x;
+        const y = base.y + dir * step;
+
+        const r = this._rangeFromPoint(x, y);
+        if (!r) return;
+
+        const idx = this._indexFromDom(r.startContainer, r.startOffset, x);
+        if (idx == null) return;
+
+        const cur = this.selection.get();
+        const newDir = idx >= cur.focus ? 'right' : 'left';
+
+        if (extend) this.setSelection(cur.anchor, idx, newDir);
+        else this.setCaret(idx, newDir);
+    }
+
+    _lineStartIndex(i) {
+        const val = this.value.get() || '';
+        i = clamp(i, 0, val.length);
+        const j = val.lastIndexOf('\n', i - 1);
+        return j === -1 ? 0 : (j + 1);
+    }
+
+    _lineEndIndex(i) {
+        const val = this.value.get() || '';
+        i = clamp(i, 0, val.length);
+        const j = val.indexOf('\n', i);
+        return j === -1 ? val.length : j;
+    }
+
+    moveLineStart(extend = false) {
+        const cur = this.selection.get();
+        const idx = this._lineStartIndex(cur.focus);
+        const dir = idx >= cur.focus ? 'right' : 'left';
+        extend ? this.setSelection(cur.anchor, idx, dir) : this.setCaret(idx, dir);
+    }
+
+    moveLineEnd(extend = false) {
+        const cur = this.selection.get();
+        const idx = this._lineEndIndex(cur.focus);
+        const dir = idx >= cur.focus ? 'right' : 'left';
+        extend ? this.setSelection(cur.anchor, idx, dir) : this.setCaret(idx, dir);
+    }
+
+    moveDocStart(extend = false) {
+        const cur = this.selection.get();
+        extend ? this.setSelection(cur.anchor, 0, 'left') : this.setCaret(0, 'left');
+    }
+
+    moveDocEnd(extend = false) {
+        const end = this._getLength();
+        const cur = this.selection.get();
+        extend ? this.setSelection(cur.anchor, end, 'right') : this.setCaret(end, 'right');
+    }
+
     // ----- word nav (VSCode-ish) -----
     _isWhitespace(ch) { return ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r'; }
     _isWordChar(ch) { return !!ch && /[A-Za-z0-9_]/.test(ch); }
@@ -459,66 +545,45 @@ export default class TextEngine {
             const originX = wRect.left + wrapperEl.clientLeft;
             const originY = wRect.top + wrapperEl.clientTop;
 
-            // X: use character rect but convert to CONTENT coords
+            // X in content coords
             const visualX = (side === 'left' ? rect.left : rect.right) - originX;
             const contentX = visualX + (wrapperEl.scrollLeft || 0);
 
+            // Height: prefer computed line-height, but trust rect.height when reasonable
             const measureEl = this.measureElem.get();
-
-            // Defaults if we somehow don't have measureEl or style
             let fontSizePx = 16;
             let lineHeightPx = 16;
 
             if (measureEl) {
                 const cs = getComputedStyle(measureEl);
 
-                // font-size
                 const fs = parseFloat(cs.fontSize);
-                if (!Number.isNaN(fs) && fs > 0) {
-                    fontSizePx = fs;
-                }
+                if (!Number.isNaN(fs) && fs > 0) fontSizePx = fs;
 
-                // line-height can be "normal", a number, or a px value.
                 const lhRaw = cs.lineHeight;
                 if (lhRaw && lhRaw !== 'normal') {
                     const lhNum = parseFloat(lhRaw);
                     if (!Number.isNaN(lhNum) && lhNum > 0) {
-                        // If it's unitless (e.g. "1.5") multiply by fontSize
-                        if (!lhRaw.endsWith('px')) {
-                            lineHeightPx = lhNum * fontSizePx;
-                        } else {
-                            lineHeightPx = lhNum;
-                        }
+                        lineHeightPx = lhRaw.endsWith('px') ? lhNum : (lhNum * fontSizePx);
                     }
                 } else {
-                    // approximate "normal" as 1.2 * fontSize
                     lineHeightPx = fontSizePx * 1.2;
                 }
             }
 
-            // Vertical position: align caret with Typography's top + scrollTop
-            let topContent = 0;
-            if (measureEl) {
-                const mRect = measureEl.getBoundingClientRect();
-                const visualTop = mRect.top - originY;
-                const contentTop = visualTop + (wrapperEl.scrollTop || 0);
+            // Y MUST come from rect, otherwise multiline caret sticks to the top line
+            const visualTop = rect.top - originY;
+            const topContent = visualTop + (wrapperEl.scrollTop || 0);
 
-                // Center caret within the line box
-                const caretTop = contentTop + (lineHeightPx - lineHeightPx) / 2; // simplifies to contentTop
-                topContent = caretTop;
-            } else {
-                // Fallback to character rect if measureEl is missing
-                const visualTop = rect.top - originY;
-                topContent = visualTop + (wrapperEl.scrollTop || 0);
-                lineHeightPx = rect.height || lineHeightPx;
-            }
+            // If rect.height looks sane, use it (better with inline nodes)
+            const rectH = rect.height || 0;
+            const height = (rectH > 2 && rectH < 200) ? rectH : lineHeightPx;
 
-            // caret width scaled from font size
             const caretWidth = clamp(Math.round((fontSizePx / 16) * 2), 1, 4);
 
             cursorEl.style.left = `${contentX}px`;
             cursorEl.style.top = `${topContent}px`;
-            cursorEl.style.height = `${lineHeightPx}px`;
+            cursorEl.style.height = `${height}px`;
             cursorEl.style.width = `${caretWidth}px`;
         });
     }
