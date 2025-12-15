@@ -343,7 +343,7 @@ export default ThemeContext.use(h => {
 				return Math.floor((delta - timeToFirstBlink) / blinkInterval) % 2 === 0 ? 1 : 0;
 			});
 
-		const showPlaceholder = value.map(v => (String(v ?? '')).length === 0);
+		const showPlaceholder = value.map(v => (String(v ?? '')).length === 0 && placeholder);
 
 		return <div
 			ref={wrapper}
