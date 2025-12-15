@@ -132,10 +132,10 @@ mount(document.body, <PopupContext>
 			}
 		}
 	]} >
-		<RichArea value={value} type='h1' />
+		<RichArea value={value} type='h1' maxHeight={1000} />
 	</TextModifiers>
 	<Typography label="Javascript syntax highlighting:" type='h1' />
 	<TextModifiers value={modifiers} >
-		<RichArea value={value2} type='h1' />
+		<RichArea value={value2} type='h1' maxHeight={1000} />
 	</TextModifiers>
 </PopupContext>);
