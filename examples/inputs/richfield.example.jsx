@@ -4,7 +4,7 @@ import 'prismjs/themes/prism.css'
 
 import { Observer } from 'destam';
 import { mount } from 'destam-dom';
-import { Button, TextModifiers, Typography, PopupContext, Text } from 'destamatic-ui';
+import { Button, TextModifiers, Typography, PopupContext, RichField } from 'destamatic-ui';
 
 const value = Observer.mutable('hello world there!?!?!?!?!?! :frog: atomic non-atomic');
 
@@ -114,10 +114,10 @@ mount(document.body, <PopupContext>
             }
         }
     ]} >
-        <Text value={value} type='h1' />
+        <RichField value={value} type='h1' />
     </TextModifiers>
     <Typography label="Javascript syntax highlighting:" type='h1' />
     <TextModifiers value={modifiers} >
-        <Text value={value2} type='h1' />
+        <RichField value={value2} type='h1' />
     </TextModifiers>
 </PopupContext>);

@@ -37,7 +37,7 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Text = ({
+	const RichField = ({
 		value,
 		tabIndex = 0,
 		autoFocus = false,
@@ -263,5 +263,5 @@ export default ThemeContext.use(h => {
 		</div>;
 	};
 
-	return Text;
+	return RichField;
 });
