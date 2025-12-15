@@ -13,6 +13,8 @@ Theme.define({
 		outline: 'none',
 		overflow: 'auto',
 		minHeight: '1.2em',
+		userSelect: 'text',
+
 	},
 
 	richtext_typography: {
@@ -20,6 +22,8 @@ Theme.define({
 		whiteSpace: 'pre',
 		display: 'inline-block',
 		minHeight: '1.2em',
+		userSelect: 'text',
+
 	},
 
 	cursor: {
@@ -38,7 +42,7 @@ export default ThemeContext.use(h => {
 		tabIndex = 0,
 		autoFocus = false,
 		onEnter,
-		type = 'h1',
+		type = 'p1',
 		...props
 	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.mutable(String(value ?? ''));

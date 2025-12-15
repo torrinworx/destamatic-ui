@@ -39,7 +39,12 @@ export default class TextEngine {
         else if (this.displayMap?.effect) this.displayMap.effect(schedule);
         this.value.effect(schedule);
 
-        this.selection.effect(sel => this._updateCursor(sel));
+        this._settingNativeSelection = false;
+
+        this.selection.effect(sel => {
+            this._updateCursor(sel);
+            this._syncNativeSelection();
+        });
         this._ensureScrollRaf = null;
     }
 
@@ -263,6 +268,115 @@ export default class TextEngine {
     reindex() {
         this._rebuildIndex();
         this.updateCursor();
+        this._syncNativeSelection();
+    }
+
+    _domPointForIndex(i, bias = 'right') {
+        const wrapperEl = this.wrapper.get();
+        if (!wrapperEl) return null;
+
+        i = this._boundToLength(i, this._getLength());
+
+        // Prefer a segment on the side we are moving towards
+        const segLeft = this.leftSegmentAt[i];
+        const segRight = this.rightSegmentAt[i];
+
+        let seg = null;
+        if (bias === 'left') seg = segLeft || segRight;
+        else seg = segRight || segLeft;
+
+        // Fallback: if we can't find any segment, place caret at start of measureEl/wrapper
+        const measureEl = this.measureElem.get();
+        if (!seg) {
+            const host = measureEl || wrapperEl;
+            return { kind: 'container', node: host, offset: 0 };
+        }
+
+        const node = this._ensureNode(seg);
+        if (!node) {
+            const host = measureEl || wrapperEl;
+            return { kind: 'container', node: host, offset: 0 };
+        }
+
+        // Atomic: position before/after the element node
+        if (seg.kind === 'atomic') {
+            const parent = node.parentNode;
+            if (!parent) return { kind: 'container', node: node, offset: 0 };
+
+            const idx = Array.prototype.indexOf.call(parent.childNodes, node);
+            const off = idx + (bias === 'right' ? 1 : 0);
+            return { kind: 'container', node: parent, offset: Math.max(0, off) };
+        }
+
+        // Non-atomic: find text position inside node from global index
+        const info = this._getRegionInfo(seg, node);
+        const regionStart = info.regionStart;
+        const textLen = (node.textContent || '').length;
+
+        const local = clamp(i - regionStart, 0, textLen);
+        const pt = this._textNodeAtOffset(node, local);
+
+        return { kind: 'text', node: pt.node, offset: pt.offset };
+    }
+
+    _textNodeAtOffset(ancestor, offset) {
+        // Walk text nodes and find which one contains the boundary
+        const walker = document.createTreeWalker(ancestor, NodeFilter.SHOW_TEXT);
+        let n = walker.nextNode();
+
+        // If there's no text nodes at all, fallback to ancestor
+        if (!n) return { node: ancestor, offset: 0 };
+
+        while (n) {
+            const len = (n.nodeValue || '').length;
+            if (offset <= len) return { node: n, offset };
+            offset -= len;
+            n = walker.nextNode();
+        }
+
+        // If offset is past end, clamp to end of last text node
+        // (walker is exhausted; we need to re-walk to find last)
+        const walker2 = document.createTreeWalker(ancestor, NodeFilter.SHOW_TEXT);
+        let last = walker2.nextNode();
+        let cur = last;
+        while (cur) { last = cur; cur = walker2.nextNode(); }
+
+        return { node: last || ancestor, offset: (last?.nodeValue || '').length };
+    }
+
+    _syncNativeSelection() {
+        // guard against recursion / selectionchange noise
+        if (this._settingNativeSelection) return;
+
+        const wrapperEl = this.wrapper.get();
+        if (!wrapperEl) return;
+
+        // Only show native selection when focused (optional but usually nicer)
+        if (document.activeElement !== wrapperEl) return;
+
+        const sel = window.getSelection();
+        if (!sel) return;
+
+        const { anchor, focus } = this.selection.get();
+        const start = Math.min(anchor, focus);
+        const end = Math.max(anchor, focus);
+
+        const startPt = this._domPointForIndex(start, 'left');
+        const endPt = this._domPointForIndex(end, 'right');
+        if (!startPt || !endPt) return;
+
+        const range = document.createRange();
+
+        try {
+            range.setStart(startPt.node, startPt.offset);
+            range.setEnd(endPt.node, endPt.offset);
+
+            this._settingNativeSelection = true;
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } finally {
+            this._settingNativeSelection = false;
+        }
     }
 
     setSelectionFromNativeSelection(windowSelection, clickX) {
