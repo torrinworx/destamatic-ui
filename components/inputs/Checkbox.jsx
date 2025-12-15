@@ -22,7 +22,7 @@ Theme.define({
 	},
 	checkboxwrapper: {
 		display: 'flex',
-		flexWrap: 'wrap'
+		flexWrap: 'wrap',
 	},
 	checkboxspan: {
 		padding: "8px",

@@ -2,7 +2,7 @@ import { Observer, OArray } from 'destam';
 
 import Theme from '../utils/Theme.jsx';
 import Shown from '../utils/Shown.jsx';
-import TextEngine from '../utils/TextEngine.js';
+import RichEngine from '../utils/RichEngine.js';
 import ThemeContext from '../utils/ThemeContext.jsx';
 import { Typography } from '../display/Typography.jsx';
 
@@ -12,27 +12,37 @@ Theme.define({
 		position: 'relative',
 		outline: 'none',
 		overflow: 'auto',
+		minHeight: '1.2em',
+		userSelect: 'text',
+
 	},
+
 	richtext_typography: {
 		extends: 'row',
 		whiteSpace: 'pre',
+		display: 'inline-block',
+		minHeight: '1.2em',
+		userSelect: 'text',
+
 	},
+
 	cursor: {
 		position: 'absolute',
 		top: 0,
-		width: 4,
+		left: 0,
 		background: '$color_top',
 		pointerEvents: 'none',
+		transform: 'translateY(0.15em)',
 	},
 });
 
 export default ThemeContext.use(h => {
-	const Text = ({
+	const RichField = ({
 		value,
 		tabIndex = 0,
 		autoFocus = false,
 		onEnter,
-		type = 'h1',
+		type = 'p1',
 		...props
 	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.mutable(String(value ?? ''));
@@ -40,24 +50,20 @@ export default ThemeContext.use(h => {
 		const displayMap = OArray([]);
 		const wrapper = Observer.mutable(null);
 		const cursor = Observer.mutable(null);
+		const measure = Observer.mutable(null);
 		const lastMoved = Observer.mutable(Date.now());
 		const focused = Observer.mutable(false);
 
-		// Blink config
-		const blinkInterval = 400;
-		const timeToFirstBlink = 250;
-
-		// Engine
 		const engineRef = Observer.mutable(null);
 
-		// Handlers
 		const onMouseUp = (e) => {
 			const eng = engineRef.get();
 			if (!eng) return;
 			wrapper.get()?.focus?.();
 			const sel = window.getSelection();
 			eng.setSelectionFromNativeSelection(sel, e.clientX);
-			eng.ensureCaretVisible();
+			eng.ensureCaretVisibleSoon();
+			eng.updateCursor();
 		};
 
 		const onKeyDown = (e) => {
@@ -68,58 +74,72 @@ export default ThemeContext.use(h => {
 			const ctrlOrMeta = e.ctrlKey || e.metaKey;
 			const key = e.key;
 
+			// undo / redo
+			if (ctrlOrMeta && (key === 'z' || key === 'Z')) {
+				e.preventDefault();
+				if (shift) eng.redo();
+				else eng.undo();
+				eng.ensureCaretVisibleSoon();
+				return;
+			}
+			if (ctrlOrMeta && (key === 'y' || key === 'Y')) {
+				e.preventDefault();
+				eng.redo();
+				eng.ensureCaretVisibleSoon();
+				return;
+			}
+
 			switch (key) {
 				case 'ArrowLeft':
 					e.preventDefault();
-					eng.moveLeft(shift);
-					eng.ensureCaretVisible();
+					ctrlOrMeta ? eng.moveWordLeft(shift) : eng.moveLeft(shift);
+					eng.ensureCaretVisibleSoon();
 					return;
+
 				case 'ArrowRight':
 					e.preventDefault();
-					eng.moveRight(shift);
-					eng.ensureCaretVisible();
+					ctrlOrMeta ? eng.moveWordRight(shift) : eng.moveRight(shift);
+					eng.ensureCaretVisibleSoon();
 					return;
+
 				case 'Backspace':
 					e.preventDefault();
-					eng.deleteBackward();
-					eng.ensureCaretVisible();
+					ctrlOrMeta ? eng.deleteWordBackward() : eng.deleteBackward();
+					eng.ensureCaretVisibleSoon();
 					return;
+
 				case 'Delete':
 					e.preventDefault();
-					eng.deleteForward();
-					eng.ensureCaretVisible();
+					ctrlOrMeta ? eng.deleteWordForward() : eng.deleteForward();
+					eng.ensureCaretVisibleSoon();
 					return;
+
 				case 'Enter':
 					e.preventDefault();
 					if (typeof onEnter === 'function') {
-						onEnter(eng.getSelection(), value.get());
-					} else {
-						eng.insertText('\n');
+						onEnter(value.get(), eng.getSelection());
 					}
-					eng.ensureCaretVisible();
 					return;
-				case 'Escape':
-					e.preventDefault();
-					const { focus } = eng.getSelection();
-					eng.setCaret(focus, eng.lastDirection.get());
-					return;
-				case 'a': case 'A':
+
+				case 'a':
+				case 'A':
 					if (ctrlOrMeta) {
 						e.preventDefault();
-						const len = (value.get() || '').length;
-						eng.setSelection(0, len, 'right');
+						eng.selectAll();
+						eng.ensureCaretVisibleSoon();
 						return;
 					}
 					break;
+
 				default:
-					break;
+					eng.ensureCaretVisibleSoon();
 			}
 
-			// Printable characters
+			// printable chars
 			if (key.length === 1 && !ctrlOrMeta) {
 				e.preventDefault();
 				eng.insertText(key);
-				eng.ensureCaretVisible();
+				eng.ensureCaretVisibleSoon();
 			}
 		};
 
@@ -130,60 +150,94 @@ export default ThemeContext.use(h => {
 			const text = e.clipboardData?.getData('text/plain') ?? '';
 			if (text) {
 				eng.insertText(text);
-				eng.ensureCaretVisible();
+				eng.ensureCaretVisibleSoon();
 			}
+		};
+
+		const onCopy = (e) => {
+			const eng = engineRef.get();
+			if (!eng) return;
+			const text = eng.getSelectedText();
+			if (text == null) return;
+			e.preventDefault();
+			e.clipboardData?.setData('text/plain', text);
+		};
+
+		const onCut = (e) => {
+			const eng = engineRef.get();
+			if (!eng) return;
+			const text = eng.getSelectedText();
+			if (text == null) return;
+			e.preventDefault();
+			e.clipboardData?.setData('text/plain', text);
+			eng.deleteSelection();
+			eng.ensureCaretVisibleSoon();
 		};
 
 		const onFocus = () => {
 			focused.set(true);
 			lastMoved.set(Date.now());
+			const eng = engineRef.get();
+			eng?.updateCursor();
 		};
 
 		const onBlur = () => focused.set(false);
+
 		const onScroll = () => {
 			const eng = engineRef.get();
-			if (!eng) return;
-			eng.updateCursor();
+			eng?.wakeCaret();
 		};
 
-		// Lifecycle
 		cleanup(() => {
 			const el = wrapper.get();
 			if (!el) return;
 			el.removeEventListener('mouseup', onMouseUp);
 			el.removeEventListener('keydown', onKeyDown);
 			el.removeEventListener('paste', onPaste);
+			el.removeEventListener('copy', onCopy);
+			el.removeEventListener('cut', onCut);
 			el.removeEventListener('focus', onFocus, true);
 			el.removeEventListener('blur', onBlur, true);
 			el.removeEventListener('scroll', onScroll);
 		});
 
 		mounted(() => {
-			// Build engine
-			const engine = new TextEngine({
+			const engine = new RichEngine({
 				valueObs: value,
 				displayMapObs: displayMap,
 				wrapperObs: wrapper,
 				cursorElemObs: cursor,
+				measureElemObs: measure,
 				lastMovedObs: lastMoved,
 			});
 			engineRef.set(engine);
 
-			// Wire DOM events
 			const el = wrapper.get();
 			el.addEventListener('mouseup', onMouseUp);
 			el.addEventListener('keydown', onKeyDown);
 			el.addEventListener('paste', onPaste);
+			el.addEventListener('copy', onCopy);
+			el.addEventListener('cut', onCut);
 			el.addEventListener('focus', onFocus, true);
 			el.addEventListener('blur', onBlur, true);
 			el.addEventListener('scroll', onScroll);
 
 			if (autoFocus) queueMicrotask(() => el?.focus?.());
-			// Force initial index build after first paint
 			queueMicrotask(() => engine.reindex());
 		});
 
-		// Render
+		// blink
+		const blinkInterval = 400;
+		const timeToFirstBlink = 250;
+
+		const blinkOpacity = Observer
+			.all([Observer.timer(blinkInterval), lastMoved])
+			.map(() => {
+				const delta = Date.now() - lastMoved.get();
+				if (delta < timeToFirstBlink) return 1;
+				return Math.floor((delta - timeToFirstBlink) / blinkInterval) % 2 === 0 ? 1 : 0;
+			});
+
 		return <div
 			ref={wrapper}
 			role="textbox"
@@ -192,6 +246,7 @@ export default ThemeContext.use(h => {
 			theme={['richtext', type]}
 		>
 			<Typography
+				ref={measure}
 				theme={['richtext']}
 				type={type}
 				displayMap={displayMap}
@@ -202,17 +257,11 @@ export default ThemeContext.use(h => {
 				<div
 					ref={cursor}
 					theme='cursor'
-					style={{
-						opacity: Observer.timer(blinkInterval).map(() => {
-							const delta = Date.now() - lastMoved.get();
-							if (delta < timeToFirstBlink) return 1;
-							return Math.floor((delta - timeToFirstBlink) / blinkInterval) % 2 === 0 ? 1 : 0;
-						})
-					}}
+					style={{ opacity: blinkOpacity }}
 				/>
 			</Shown>
 		</div>;
 	};
 
-	return Text;
+	return RichField;
 });
