@@ -12,12 +12,14 @@ Theme.define({
 		position: 'relative',
 		outline: 'none',
 		overflow: 'auto',
+		minHeight: '1.2em',
 	},
 
 	richtext_typography: {
 		extends: 'row',
 		whiteSpace: 'pre',
 		display: 'inline-block',
+		minHeight: '1.2em',
 	},
 
 	cursor: {
