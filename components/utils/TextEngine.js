@@ -28,7 +28,6 @@ export default class TextEngine {
 
         this.undoStack = [];
         this.redoStack = [];
-        this.maxHistory = 200;
 
         this._rebuildScheduled = false;
         this._raf = null;
@@ -144,7 +143,6 @@ export default class TextEngine {
     }
     _pushUndoSnapshot() {
         this.undoStack.push(this._makeSnapshot());
-        if (this.undoStack.length > this.maxHistory) this.undoStack.shift();
     }
 
     undo() {
