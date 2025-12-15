@@ -63,6 +63,8 @@ export default ThemeContext.use(h => {
 		placeholder = '',
 		onKeyDown,
 		onEnter,
+		blinkInterval = 400,
+		timeToFirstBlink = 250,
 		...props
 	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.mutable(String(value ?? ''));
@@ -332,10 +334,6 @@ export default ThemeContext.use(h => {
 			cleanup(value.effect(scheduleHeight));
 		});
 
-		// blink
-		const blinkInterval = 400;
-		const timeToFirstBlink = 250;
-
 		const blinkOpacity = Observer
 			.all([Observer.timer(blinkInterval), lastMoved])
 			.map(() => {
@@ -384,5 +382,5 @@ export default ThemeContext.use(h => {
 		</div>;
 	});
 
-	return RichArea;
+return RichArea;
 });
