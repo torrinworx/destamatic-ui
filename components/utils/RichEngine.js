@@ -814,4 +814,4 @@ export default class RichEngine {
 
         return { regionStart, textLength: Math.max(1, textLength | 0) };
     }
-}
+};
