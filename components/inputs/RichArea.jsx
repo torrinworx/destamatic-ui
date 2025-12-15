@@ -11,18 +11,22 @@ Theme.define({
 		cursor: 'text',
 		position: 'relative',
 		outline: 'none',
-		overflow: 'auto',
+		overflowX: 'auto',
+		overflowY: 'auto',
 		minHeight: '6em',
 		userSelect: 'text',
-		whiteSpace: 'pre-wrap',
+		whiteSpace: 'pre',
+		overflowWrap: 'normal',
+		wordBreak: 'normal',
 	},
 
-	// Typography wrapper used as the render/measure surface
 	richarea_typography: {
-		whiteSpace: 'pre-wrap',
-		display: 'block',
+		whiteSpace: 'pre',
+		display: 'inline-block',
 		minHeight: '1.2em',
 		userSelect: 'text',
+		overflowWrap: 'normal',
+		wordBreak: 'normal',
 	},
 
 	cursor: {
@@ -41,7 +45,7 @@ export default ThemeContext.use(h => {
 		tabIndex = 0,
 		autoFocus = false,
 		type = 'p1',
-		onEnter,      // optional: fires after inserting newline (textarea-like still inserts)
+		onEnter, 
 		...props
 	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.mutable(String(value ?? ''));
