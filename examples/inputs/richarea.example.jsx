@@ -59,8 +59,7 @@ const makePrismModifiers = (lang) => {
 };
 
 const modifiers = makePrismModifiers('javascript');
-const value2 = Observer.mutable(`
-const makePrismModifiers = (lang) => {
+const value2 = Observer.mutable(`const makePrismModifiers = (lang) => {
 	const grammar = Prism.languages[lang]
 	if (!grammar) return []
 	const patterns = extractPatterns(grammar)
@@ -71,9 +70,7 @@ const makePrismModifiers = (lang) => {
 			return: match => <span class={'token'} style={{ display: 'inline-block' }}>{match}</span>
 		}
 	});
-};	
-	
-`);
+};`);
 
 mount(document.body, <PopupContext>
 	<Typography label="Fun modifiers:" type='h1' />
