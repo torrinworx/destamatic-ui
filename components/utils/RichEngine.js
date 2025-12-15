@@ -537,19 +537,22 @@ export default class RichEngine {
         cursorEl.style.opacity = '1';
 
         if (this._raf) cancelAnimationFrame(this._raf);
+
         this._raf = requestAnimationFrame(() => {
             const { side, rect } = this.indexToEdge(caret, this.lastDirection.get());
-            if (!rect) return;
+
+            if (!rect) {
+                requestAnimationFrame(() => this._updateCursor(this.selection.get()));
+                return;
+            }
 
             const wRect = wrapperEl.getBoundingClientRect();
             const originX = wRect.left + wrapperEl.clientLeft;
             const originY = wRect.top + wrapperEl.clientTop;
 
-            // X in content coords
             const visualX = (side === 'left' ? rect.left : rect.right) - originX;
             const contentX = visualX + (wrapperEl.scrollLeft || 0);
 
-            // Height: prefer computed line-height, but trust rect.height when reasonable
             const measureEl = this.measureElem.get();
             let fontSizePx = 16;
             let lineHeightPx = 16;
@@ -571,11 +574,9 @@ export default class RichEngine {
                 }
             }
 
-            // Y MUST come from rect, otherwise multiline caret sticks to the top line
             const visualTop = rect.top - originY;
             const topContent = visualTop + (wrapperEl.scrollTop || 0);
 
-            // If rect.height looks sane, use it (better with inline nodes)
             const rectH = rect.height || 0;
             const height = (rectH > 2 && rectH < 200) ? rectH : lineHeightPx;
 
@@ -594,10 +595,12 @@ export default class RichEngine {
     _scheduleRebuild() {
         if (this._rebuildScheduled) return;
         this._rebuildScheduled = true;
-        queueMicrotask(() => {
+
+        requestAnimationFrame(() => {
             this._rebuildScheduled = false;
             this._rebuildIndex();
             this.updateCursor();
+            this._syncNativeSelection();
         });
     }
 
@@ -673,8 +676,8 @@ export default class RichEngine {
     indexToEdge(i, preferredSide = this.lastDirection.get()) {
         i = this._boundToLength(i, this._getLength());
 
-        const segLeft = this.leftSegmentAt[i];
-        const segRight = this.rightSegmentAt[i];
+        const segLeft = this.leftSegmentAt[i];   // NOTE: this is the segment that STARTS at i
+        const segRight = this.rightSegmentAt[i]; // NOTE: this is the segment that ENDS at i
 
         let seg = null;
         let side = 'left';
@@ -707,8 +710,55 @@ export default class RichEngine {
         let charIndex = side === 'left' ? (i - regionStart) : (i - regionStart - 1);
         charIndex = clamp(charIndex, 0, textLen - 1);
 
-        const rect = this._charRect(node, charIndex) || this._nodeRect(node);
+        let rect = this._charRect(node, charIndex) || this._nodeRect(node);
+
+        const val = this.value.get() || '';
+        if (i > 0 && val[i - 1] === '\n') {
+            // Prefer measuring the first glyph AFTER the newline (segment that starts at i)
+            const afterSeg = this.leftSegmentAt[i];
+            if (afterSeg) {
+                const afterNode = this._ensureNode(afterSeg);
+                if (afterNode) {
+                    if (afterSeg.kind === 'atomic') {
+                        return { node: afterNode, side: 'left', rect: this._nodeRect(afterNode) };
+                    } else {
+                        const afterInfo = this._getRegionInfo(afterSeg, afterNode);
+                        const afterCharIndex = clamp(i - afterInfo.regionStart, 0, afterInfo.textLength - 1);
+                        const afterRect = this._charRect(afterNode, afterCharIndex) || this._nodeRect(afterNode);
+                        return { node: afterNode, side: 'left', rect: afterRect };
+                    }
+                }
+            }
+
+            // Trailing newline (nothing after it): synth a rect at start of the next line
+            if (rect) {
+                const host = this.measureElem.get() || this.wrapper.get();
+                const hostRect = host?.getBoundingClientRect?.();
+                if (hostRect) {
+                    const top = rect.top + rect.height;
+                    const h = rect.height || 16;
+                    const synth = {
+                        left: hostRect.left,
+                        right: hostRect.left,
+                        top,
+                        bottom: top + h,
+                        width: 0,
+                        height: h,
+                    };
+                    return { node, side: 'left', rect: synth };
+                }
+            }
+        }
+
         return { node, side, rect };
+    }
+    setCaretFromPoint(x, y) {
+        const r = this._rangeFromPoint(x, y);
+        if (!r) return false;
+        const idx = this._indexFromDom(r.startContainer, r.startOffset, x);
+        if (idx == null) return false;
+        this.setCaret(idx, 'right');
+        return true;
     }
 
     _indexFromDom(node, nodeOffset, clickX) {

@@ -32,8 +32,6 @@ Theme.define({
 
 	richarea_placeholder: {
 		position: 'absolute',
-		left: 10,
-		top: 10,
 		pointerEvents: 'none',
 		opacity: 0.5,
 		whiteSpace: 'pre',
@@ -134,9 +132,12 @@ export default ThemeContext.use(h => {
 		const onMouseUp = (e) => {
 			const eng = engineRef.get();
 			if (!eng) return;
-			wrapper.get()?.focus?.();
+
+			wrapper.get().focus();
+
 			const sel = window.getSelection();
 			eng.setSelectionFromNativeSelection(sel, e.clientX);
+			eng.setCaretFromPoint(e.clientX, e.clientY);
 			eng.ensureCaretVisibleSoon();
 			eng.updateCursor();
 		};
@@ -382,5 +383,5 @@ export default ThemeContext.use(h => {
 		</div>;
 	});
 
-return RichArea;
+	return RichArea;
 });
