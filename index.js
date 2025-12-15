@@ -24,6 +24,7 @@ export { default as ColorPicker } from './components/inputs/ColorPicker.jsx';
 export { default as Country } from './components/inputs/Country.jsx';
 export { default as Date } from './components/inputs/Date.jsx';
 export { default as Radio } from './components/inputs/Radio.jsx';
+export { default as RichArea } from './components/inputs/RichArea.jsx';
 export { default as RichField } from './components/inputs/RichField.jsx';
 export { default as Select } from './components/inputs/Select.jsx';
 export { default as Slider } from './components/inputs/Slider.jsx';
