@@ -351,34 +351,62 @@ export default class TextEngine {
             const visualX = (side === 'left' ? rect.left : rect.right) - originX;
             const contentX = visualX + (wrapperEl.scrollLeft || 0);
 
-            // Y/height: measure from actual Typography node (theme-driven)
             const measureEl = this.measureElem.get();
 
-            let topContent = 0;
-            let height = 16;
+            // Defaults if we somehow don't have measureEl or style
+            let fontSizePx = 16;
+            let lineHeightPx = 16;
 
+            if (measureEl) {
+                const cs = getComputedStyle(measureEl);
+
+                // font-size
+                const fs = parseFloat(cs.fontSize);
+                if (!Number.isNaN(fs) && fs > 0) {
+                    fontSizePx = fs;
+                }
+
+                // line-height can be "normal", a number, or a px value.
+                const lhRaw = cs.lineHeight;
+                if (lhRaw && lhRaw !== 'normal') {
+                    const lhNum = parseFloat(lhRaw);
+                    if (!Number.isNaN(lhNum) && lhNum > 0) {
+                        // If it's unitless (e.g. "1.5") multiply by fontSize
+                        if (!lhRaw.endsWith('px')) {
+                            lineHeightPx = lhNum * fontSizePx;
+                        } else {
+                            lineHeightPx = lhNum;
+                        }
+                    }
+                } else {
+                    // approximate "normal" as 1.2 * fontSize
+                    lineHeightPx = fontSizePx * 1.2;
+                }
+            }
+
+            // Vertical position: align caret with Typography's top + scrollTop
+            let topContent = 0;
             if (measureEl) {
                 const mRect = measureEl.getBoundingClientRect();
                 const visualTop = mRect.top - originY;
-                topContent = visualTop + (wrapperEl.scrollTop || 0);
-                height = mRect.height || height;
+                const contentTop = visualTop + (wrapperEl.scrollTop || 0);
+
+                // Center caret within the line box
+                const caretTop = contentTop + (lineHeightPx - lineHeightPx) / 2; // simplifies to contentTop
+                topContent = caretTop;
             } else {
+                // Fallback to character rect if measureEl is missing
                 const visualTop = rect.top - originY;
                 topContent = visualTop + (wrapperEl.scrollTop || 0);
-                height = rect.height || height;
+                lineHeightPx = rect.height || lineHeightPx;
             }
 
-            // caret width scaled lightly with font size from typography
-            let fontSize = 16;
-            if (measureEl) {
-                const cs = getComputedStyle(measureEl);
-                fontSize = parseFloat(cs.fontSize) || 16;
-            }
-            const caretWidth = clamp(Math.round((fontSize / 16) * 2), 1, 4);
+            // caret width scaled from font size
+            const caretWidth = clamp(Math.round((fontSizePx / 16) * 2), 1, 4);
 
             cursorEl.style.left = `${contentX}px`;
             cursorEl.style.top = `${topContent}px`;
-            cursorEl.style.height = `${height}px`;
+            cursorEl.style.height = `${lineHeightPx}px`;
             cursorEl.style.width = `${caretWidth}px`;
         });
     }
