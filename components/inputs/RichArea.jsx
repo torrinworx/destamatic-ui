@@ -36,15 +36,6 @@ Theme.define({
 		opacity: 0.5,
 		whiteSpace: 'pre',
 	},
-
-	cursor: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		background: '$color_top',
-		pointerEvents: 'none',
-		transform: 'translateY(0.15em)',
-	},
 });
 
 export default ThemeContext.use(h => {
