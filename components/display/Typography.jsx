@@ -8,7 +8,6 @@ Theme.define({
 	typography: {
 		whiteSpace: 'pre-wrap',
 		margin: 0,
-		fontWeight: 400,
 	},
 	typography_h1: { fontSize: 62 },
 	typography_h2: { fontSize: 56 },
