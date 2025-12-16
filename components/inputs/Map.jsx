@@ -106,7 +106,7 @@ export default ThemeContext.use(h => {
 			});
 		});
 
-		return <div them='mapWrapper' style={style}>
+		return <div style={style}>
 			<Ref theme='map' />
 			<Zoom map={map} />
 		</div>;
