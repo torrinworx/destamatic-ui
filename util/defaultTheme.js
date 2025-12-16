@@ -199,4 +199,13 @@ export default {
 		background: '$color_text',
 		margin: '10px 0px 10px 0px',
 	},
+
+	cursor: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		background: '$color_top',
+		pointerEvents: 'none',
+		transform: 'translateY(0.15em)',
+	},
 };
