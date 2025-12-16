@@ -27,6 +27,8 @@ Theme.define({
 	},
 });
 
+// TODO: match TextField api as done with RichArea
+
 export default ThemeContext.use(h => {
 	const RichField = ({
 		value,
