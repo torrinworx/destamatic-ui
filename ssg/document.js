@@ -111,6 +111,30 @@ global.Node = class Node {
         this.childNodes.push(node);
     }
 
+    appendChild(node) {
+        this.append(node);
+        return node;
+    }
+
+    removeChild(child) {
+        const i = this.childNodes.indexOf(child);
+        if (i === -1) throw new Error("node not found");
+        child.parentElement = null;
+        this.childNodes.splice(i, 1);
+        return child;
+    }
+
+    replaceChild(node, before) {
+        const i = this.childNodes.indexOf(before);
+        if (i === -1) throw new Error("node not found");
+
+        node.remove();
+        node.parentElement = this;
+        before.parentElement = null;
+        this.childNodes[i] = node;
+        return before;
+    }
+
     prepend(node) {
         node.remove();
         node.parentElement = this;
@@ -183,6 +207,12 @@ global.Node = class Node {
         document.activeElement = this;
     }
 
+    blur() {
+        if (document.activeElement === this) {
+            document.activeElement = null;
+        }
+    }
+
     tree() {
         if (this.name === '') {
             return this.textContent_;
@@ -228,6 +258,31 @@ global.Node = class Node {
         if (listeners) {
             listeners.forEach(listener => listener.call(this, event));
         }
+    }
+
+    getBoundingClientRect() {
+        return {
+            x: 0,
+            y: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: 0,
+            height: 0,
+            toJSON() {
+                return {
+                    x: this.x,
+                    y: this.y,
+                    top: this.top,
+                    left: this.left,
+                    right: this.right,
+                    bottom: this.bottom,
+                    width: this.width,
+                    height: this.height,
+                };
+            },
+        };
     }
 };
 
