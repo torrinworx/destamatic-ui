@@ -13,6 +13,7 @@
       "import": "./index.js",
       "require": "./index.js"
     },
+    "./components/inputs/Map": "./components/inputs/Map.jsx",
     "./components/icons/SimpleIcons": "./components/icons/SimpleIcons.jsx",
     "./components/icons/FeatherIcons": "./components/icons/FeatherIcons.jsx",
     "./components/icons/MaterialIcons": "./components/icons/MaterialIcons.jsx",
