@@ -1,5 +1,5 @@
-import Theme from '../utils/Theme.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
+import Theme from '../../utils/Theme.jsx';
+import ThemeContext from '../../utils/ThemeContext.jsx';
 
 Theme.define({
 	paper: {

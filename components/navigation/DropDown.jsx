@@ -1,7 +1,7 @@
 import { h } from '../utils/h.jsx';
 import { Observer } from 'destam-dom';
 
-import { Icon } from '../display/Icon.jsx';
+import { Icon } from '../display/Icon/Icon.jsx';
 import Shown from '../utils/Shown.jsx';
 
 /**

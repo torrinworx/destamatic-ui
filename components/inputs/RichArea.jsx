@@ -4,7 +4,7 @@ import Theme from '../utils/Theme.jsx';
 import Shown from '../utils/Shown.jsx';
 import RichEngine from '../utils/RichEngine.js';
 import ThemeContext from '../utils/ThemeContext.jsx';
-import { Typography } from '../display/Typography.jsx';
+import { Typography } from '../display/Typography/Typography.jsx';
 
 Theme.define({
 	richarea: {

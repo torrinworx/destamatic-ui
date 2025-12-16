@@ -1,10 +1,10 @@
 import Theme from '../utils/Theme.jsx';
 import ThemeContext from '../utils/ThemeContext.jsx';
 import Shown from '../utils/Shown.jsx';
-import Paper from '../display/Paper.jsx';
+import Paper from '../display/Paper/Paper.jsx';
 import Button from '../inputs/Button.jsx';
-import Icon from '../display/Icon.jsx';
-import { Typography } from '../display/Typography.jsx';
+import Icon from '../display/Icon/Icon.jsx';
+import { Typography } from '../display/Typography/Typography.jsx';
 import LoadingDots from '../utils/LoadingDots.jsx';
 import Context from '../utils/Context.jsx';
 import { h } from '../utils/h.jsx';

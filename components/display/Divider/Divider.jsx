@@ -1,8 +1,8 @@
 import { Observer } from 'destam-dom';
-import Theme from '../utils/Theme.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
-import { mark } from '../utils/h.jsx';
-import useAbort from '../../util/abort.js';
+import Theme from '../../utils/Theme.jsx';
+import ThemeContext from '../../utils/ThemeContext.jsx';
+import { mark } from '../../utils/h.jsx';
+import useAbort from '../../../util/abort.js';
 
 Theme.define({
 	divider_base: {

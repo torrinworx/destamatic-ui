@@ -1,13 +1,13 @@
 import { Observer, Insert, Modify, Delete } from 'destam-dom';
 
-import {mark} from '../utils/h.jsx';
-import Detached from '../utils/Detached.jsx';
-import Theme from '../utils/Theme.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
-import Paper from '../display/Paper.jsx';
-import '../display/Typography.jsx';
-import trackedMount from '../../util/trackedMount.js';
-import categories from '../../util/categories.js';
+import {mark} from '../../utils/h.jsx';
+import Detached from '../../utils/Detached.jsx';
+import Theme from '../../utils/Theme.jsx';
+import ThemeContext from '../../utils/ThemeContext.jsx';
+import Paper from '../Paper/Paper.jsx';
+import '../Typography/Typography.jsx';
+import trackedMount from '../../../util/trackedMount.js';
+import categories from '../../../util/categories.js';
 
 Theme.define({
 	tooltip_paper: {

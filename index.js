@@ -1,13 +1,13 @@
 // ./components/display
-export { default as Column } from './components/display/Column.jsx';
-export { default as Drag } from './components/display/Drag.jsx';
-export { default as Divider } from './components/display/Divider.jsx';
-export * from './components/display/Icon.jsx';
-export { default as Paper } from './components/display/Paper.jsx';
-export { default as Row } from './components/display/Row.jsx';
-export * from './components/display/Stage.jsx';
-export { default as Tooltip } from './components/display/Tooltip.jsx';
-export * from './components/display/Typography.jsx';
+export { default as Column } from './components/display/Column/Column.jsx';
+export { default as Divider } from './components/display/Divider/Divider.jsx';
+export { default as Drag } from './components/display/Drag/Drag.jsx';
+export * from './components/display/Icon/Icon.jsx';
+export { default as Paper } from './components/display/Paper/Paper.jsx';
+export { default as Row } from './components/display/Row/Row.jsx';
+export * from './components/display/Stage/Stage.jsx';
+export { default as Tooltip } from './components/display/Tooltip/Tooltip.jsx';
+export * from './components/display/Typography/Typography.jsx';
 
 // ./components/head
 export * from './components/head/Head.jsx';

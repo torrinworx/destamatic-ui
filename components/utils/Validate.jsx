@@ -2,9 +2,9 @@ import { Observer } from 'destam-dom';
 
 import Theme from './Theme.jsx';
 import Shown from './Shown.jsx';
-import Icon from '../display/Icon.jsx';
+import Icon from '../display/Icon/Icon.jsx';
 import createContext from './Context.jsx';
-import { Typography } from '../display/Typography.jsx';
+import { Typography } from '../display/Typography/Typography.jsx';
 import ThemeContext from '../utils/ThemeContext.jsx';
 
 Theme.define({

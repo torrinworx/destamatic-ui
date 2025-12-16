@@ -1,7 +1,7 @@
 import { mark } from '../utils/h.jsx';
 import Observer from 'destam/Observer';
-import { Typography } from '../display/Typography.jsx';
-import { Icon } from '../display/Icon.jsx';
+import { Typography } from '../display/Typography/Typography.jsx';
+import { Icon } from '../display/Icon/Icon.jsx';
 import ThemeContext from '../utils/ThemeContext.jsx';
 import Button from '../inputs/Button.jsx';
 import useAbort from '../../util/abort.js';

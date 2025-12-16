@@ -2,7 +2,7 @@ import Observer from 'destam/Observer';
 
 import Theme from '../utils/Theme.jsx';
 import useRipples from '../utils/Ripple.jsx';
-import { Typography } from '../display/Typography.jsx';
+import { Typography } from '../display/Typography/Typography.jsx';
 import ThemeContext from '../utils/ThemeContext.jsx';
 
 Theme.define({

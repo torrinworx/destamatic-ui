@@ -1,5 +1,5 @@
-import { stageRegistry } from '../components/display/Stage';
-import { suspendRegistry } from '../components/utils/Suspend';
+import { stageRegistry } from '../components/display/Stage/Stage.jsx';
+import { suspendRegistry } from '../components/utils/Suspend.jsx';
 
 // Wait until all current suspends have settled.
 // Loop because resolving one suspend might start new ones.

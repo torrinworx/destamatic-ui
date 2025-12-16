@@ -1,10 +1,10 @@
 import { OArray, OObject, Observer } from 'destam';
 
-import Theme from '../utils/Theme';
-import is_node from '../../ssg/is_node';
-import createContext from '../utils/Context';
-import ThemeContext from '../utils/ThemeContext';
-import Default from '../stage_templates/Default';
+import Theme from '../../utils/Theme';
+import is_node from '../../../ssg/is_node';
+import createContext from '../../utils/Context';
+import ThemeContext from '../../utils/ThemeContext';
+import Default from '../../stage_templates/Default';
 
 Theme.define({
 	stageOverlay: {
