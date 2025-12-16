@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { Observer } from 'destam-dom';
 
 import Button from './Button.jsx';
-import Icon from '../display/Icon.jsx';
+import Icon from '../display/Icon/Icon.jsx';
 import Theme from '../utils/Theme.jsx';
 import Paper from '../display/Paper/Paper.jsx';
 import ThemeContext from '../utils/ThemeContext.jsx';
