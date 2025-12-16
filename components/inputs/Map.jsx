@@ -49,6 +49,8 @@ const Zoom = ({ map }) => {
 	</Paper>;
 };
 
+
+// FIX: if location changes, map isn't updated.
 export default ThemeContext.use(h => {
 	const Map = ({ location = Observer.mutable({ lat: 0, lng: 0 }), askForLocation = false, style, }, cleanup, mounted) => {
 		const Ref = <raw:div theme="map" />;
