@@ -12,7 +12,7 @@ import ThemeContext from '../utils/ThemeContext.jsx';
 Theme.define({
 	map: {
 		extends: 'radius',
-		height: '100vh',
+		height: '100%',
 		width: '100%',
 		position: 'relative',
 	},
@@ -35,7 +35,7 @@ const Zoom = ({ map }) => {
 		}
 	};
 
-	return <Paper theme="zoom">
+	return <Paper theme="zoom" style={{ padding: 10, gap: 10, }}>
 		<Button
 			type="icon"
 			icon={<Icon name="plus" size={20} />}
@@ -50,12 +50,12 @@ const Zoom = ({ map }) => {
 };
 
 export default ThemeContext.use(h => {
-	const Map = ({ location = Observer.mutable({ lat: 0, lng: 0 }) }, cleanup, mounted) => {
+	const Map = ({ location = Observer.mutable({ lat: 0, lng: 0 }), askForLocation = false, style, }, cleanup, mounted) => {
 		const Ref = <raw:div theme="map" />;
 		const map = Observer.mutable(null);
 
 		mounted(() => {
-			let initialLocation = [0, 0];
+			let initialLocation = location.get();
 
 			const renderMap = () => {
 				const leafletMap = L.map(Ref, {
@@ -77,7 +77,7 @@ export default ThemeContext.use(h => {
 				});
 			};
 
-			if (navigator.geolocation) {
+			if (navigator.geolocation && askForLocation) {
 				navigator.geolocation.getCurrentPosition(
 					(position) => {
 						initialLocation = [position.coords.latitude, position.coords.longitude];
@@ -104,9 +104,9 @@ export default ThemeContext.use(h => {
 			});
 		});
 
-		return <div>
-				<Ref theme='map' />
-				<Zoom map={map} />
+		return <div them='mapWrapper' style={style}>
+			<Ref theme='map' />
+			<Zoom map={map} />
 		</div>;
 	};
 
