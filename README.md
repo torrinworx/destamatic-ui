@@ -68,11 +68,11 @@ The playground includes live examples for:
 `destamatic-ui` is published on npm and designed for Vite.
 
 ```bash
-npm install destamatic-ui destam destam-dom
+npm install destamatic-ui
 # or
-yarn add destamatic-ui destam destam-dom
+yarn add destamatic-ui
 # or
-pnpm add destamatic-ui destam destam-dom
+pnpm add destamatic-ui
 ```
 
 Basic usage (JSX):
