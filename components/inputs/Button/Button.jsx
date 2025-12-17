@@ -95,7 +95,7 @@ export default ThemeContext.use(h => {
 	const Button = ({
 		label = '',
 		type = 'text',
-		onClick,
+		onClick = () => { },
 		inline,
 		onMouseDown,
 		onMouseUp,
