@@ -23,7 +23,9 @@ const Example = ({ }, cleanup) => {
 			type='outlined'
 			iconPosition='right'
 			label={doneCheck.map(c => c ? 'Done!' : 'Promise')}
-			onClick={async () => new Promise(ok => setTimeout(() => { doneCheck.set(true); ok(); }, 1000))}
+			onClick={async () => new Promise(ok => setTimeout(() => {
+				doneCheck.set(true); ok();
+			}, 1000))}
 		/>
 		<Button type='contained' label='Disabled' disabled />
 	</div>;
