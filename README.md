@@ -1,63 +1,132 @@
+# destamatic‑ui
 
-# Destamatic UI
+> A batteries‑included frontend framework built on fine‑grained Observers.  
+> No React, no VDOM. Components, routing, SSG/SEO, theming, icons, and rich text in one stack.
 
-*A lightweight component library powered by `destam` and `destam-dom`.*
+[![Build Status](https://img.shields.io/github/actions/workflow/status/torrinworx/destamatic-ui/build.yml?branch=main)](https://github.com/torrinworx/destamatic-ui/actions)
+[![npm version](https://img.shields.io/npm/v/destamatic-ui)](https://www.npmjs.com/package/destamatic-ui)
 
----
-![Build Status](https://img.shields.io/github/actions/workflow/status/torrinworx/destamatic-ui/build.yml?branch=main)
-![npm version](https://img.shields.io/npm/v/destamatic-ui)
+- 🌐 **Site & docs:** https://torrin.me/destamatic-ui  
+- 🧪 **Playground & examples:** https://torrin.me/destamatic-ui/playground  
+- 📦 **Template starter:** https://github.com/torrinworx/destamatic-template  
 
-Destamatic UI is a UI library built on the delta state management library [destam](https://github.com/equator-studios/destam) and the DOM manipulation library [destam-dom](https://github.com/Nefsen402/destam-dom). The base set of components take inspiration from MUI and standard HTML tags, with additional ease-of-use features integrated.
+## What is destamatic‑ui?
 
-## To get started, checkout the destamatic-template repository, clone it and set it up like an other js project!
-[destamatic-template](https://github.com/torrinworx/destamatic-template)
+destamatic‑ui is the top layer of the **destam stack**:
 
-## Features Overview
+- **destam** – fine‑grained Observer based state management (`Observer`, `OObject`, `OArray`, etc.).
+- **destam-dom** – DOM manipulation with direct Observer based updates (**no virtual DOM**).
+- **destamatic‑ui** – batteries‑included framework built on top:
+  - component library
+  - routing & stages
+  - static site generation / SEO helpers
+  - theming system
+  - rich text
+  - icons and other utilities
 
-Destamatic UI offers a range of components designed for responsive and interactive web interfaces. Key features include:
+Most apps can import almost everything they need from `destamatic-ui` and ignore the other packages until they want lower‑level control.
 
-- **State Management Integration:** Built on `destam`, enabling effortless state management across components.
-- **Built-in Reactivity:** Utilizes `destam-dom` for efficient DOM manipulations and updates without the need for a virtual DOM.
-- **Theming:** Customizable and reactive theming for consistent, application-wide styles and appearances.
-- **Universal Icons:** Seamless icon support for all your favorite icon libraries or custom icon sources.
-- **Component Library:** Includes navigational, input, and display components inspired by Material Design principles.
+## Who is this for?
 
-For a detailed overview of the components and their functionalities, refer to the [documentation](./docs/index.md).
+- **Indie devs / solo SaaS / small teams**  
+  Tired of stitching React + Next + Zustand + MUI + Redux + 5 other libs. You want a single stack that just works.
 
-## Demo
+- **Performance / architecture nerds**  
+  You like Solid/Svelte/signals and care about fine‑grained reactivity and benchmarkable performance.
 
-You can install and run the demo by following these steps:
+- **JS devs bored with React overhead**  
+  Comfortable with JSX, want a smaller mental model, less boilerplate, and a live playground to try things before committing.
 
-1. **Clone the repository:**
+## Key features
 
-    ```bash
-    git clone https://github.com/torrinworx/destamatic-ui.git
-    ```
+- 🧩 **Built‑in component library** – buttons, inputs, layout, navigation, utilities.
+- 🎨 **“Hell and back” theming** – deeply composable, context‑based theming with inheritance and helpers.
+- 🧭 **Routing & stages** – simple page routing and stage management.
+- 📄 **Static site / SEO tooling** – `<Head>`, `<Title>`, `<Meta>`, `<Link>`, JSON‑LD helpers; works with SSG.
+- ✏️ **Rich text engine** – `RichArea`, `RichField`, `RichEngine`, `TextModifiers` for custom inline rendering.
+- 🖼️ **Icons** – built‑in support for multiple icon sets & custom icons.
+- 🧬 **Observer‑based state** – fine‑grained updates, watchers, delta mutations, network‑sync patterns.
+- ⚡ **No VDOM** – `destam-dom` updates real DOM directly, tuned for large lists and high‑frequency updates.
+- 🏭 **Production‑proven** – destam stack has been used in production for 5+ years (Equator Studios + personal projects like torrin.me, OpenGig.org, MangoSync).
 
-2. **Navigate to the project directory:**
+## Try it online
 
-    ```bash
-    cd destamatic-ui
-    ```
+You can play with the stack in the browser before installing anything:
 
-3. **Install dependencies:**
+- **Landing & overview:** https://torrin.me/destamatic-ui  
+- **Interactive Playground:** https://torrin.me/destamatic-ui/playground  
+- **Comprehensive Documentation**: https://torrin.me/destamatic-ui/docs
 
-    ```bash
-    npm install
-    ```
+The playground includes live examples for:
 
-4. **Run the demo:**
+- destam (Observers),
+- destam‑dom (DOM bindings),
+- destamatic‑ui (components, theming, utils).
 
-    ```bash
-    npm run dev
-    ```
+## Installation
 
-    This will start the Vite demo server on [http://localhost:5173/](http://localhost:5173/). You can view example components based on their directory paths in the `examples` folder. Here's how you can access them:
+`destamatic-ui` is published on npm and designed for Vite.
 
-    - **Button Example:**
-      [http://localhost:5173/inputs/button.html](http://localhost:5173/inputs/button.html)
+```bash
+npm install destamatic-ui destam destam-dom
+# or
+yarn add destamatic-ui destam destam-dom
+# or
+pnpm add destamatic-ui destam destam-dom
+```
 
-    - **Theme Utility Example:**
-      [http://localhost:5173/utils/theme.html](http://localhost:5173/utils/theme.html)
+Basic usage (JSX):
 
-    Replace the path with the corresponding directory and file name to explore the other examples.
+```jsx
+import { Observer } from 'destam';
+import { mount } from 'destam-dom';
+import { h, Paper, Button, Typography } from 'destamatic-ui';
+
+const count = Observer.mutable(0);
+
+const App = () => <Paper theme="column_fill_center" style={{ gap: 12, padding: 24 }}>
+    <Typography type="h3" label="Counter" />
+    <Typography type="p1" label={count.map((c) => `Value: ${c}`)} />
+    <Button
+      type="contained"
+      label="Increment"
+      onClick={() => count.set(count.get() + 1)}
+    />
+</Paper>;
+
+mount(document.getElementById('root'), <App />);
+```
+
+For Vite setup and JSX transform configuration, see:  
+👉 https://torrin.me/destamatic-ui#getting-started
+
+Or start from the template:  
+👉 https://github.com/torrinworx/destamatic-ui-template
+
+
+## Project status
+
+- ✅ Used in production for multiple apps.
+- ✅ Stable core APIs for most components.
+- 🚧 Docs, examples, and centralized site are being expanded.
+- 🚧 Public roadmap and community (Discord, good first issues) in progress.
+
+If you hit gaps in the docs or rough edges, please open an issue and describe what you were trying to build.
+
+## Contributing
+
+Issues and pull requests are welcome:
+
+- 🐛 Issues: https://github.com/torrinworx/destamatic-ui/issues  
+- 📥 PRs: open against `main`  
+
+Planned:
+
+- Public roadmap
+- Discord / chat
+- Labeled “good first issue” tasks
+
+
+## License
+
+MIT
