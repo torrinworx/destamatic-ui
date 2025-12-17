@@ -75,7 +75,7 @@ yarn add destamatic-ui
 pnpm add destamatic-ui
 ```
 
-Basic usage (JSX):
+Basic usage:
 
 ```jsx
 import { Observer } from 'destam';
@@ -98,10 +98,10 @@ mount(document.getElementById('root'), <App />);
 ```
 
 For Vite setup and JSX transform configuration, see:  
-👉 https://torrin.me/destamatic-ui#getting-started
+👉 https://torrin.me/destamatic-ui/docs
 
 Or start from the template:  
-👉 https://github.com/torrinworx/destamatic-ui-template
+👉 https://github.com/torrinworx/destamatic-template (repo needs an update)
 
 
 ## Project status
