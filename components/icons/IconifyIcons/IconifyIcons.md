@@ -1,0 +1,3 @@
+# IconifyIcons
+
+- Component: `IconifyIcons.jsx`

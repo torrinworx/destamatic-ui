@@ -1,0 +1,3 @@
+# Validate
+
+- Component: `Validate.jsx`

@@ -1,0 +1,3 @@
+# Script
+
+- Component: `Script.jsx`

@@ -1,0 +1,3 @@
+# Modal
+
+- Component: `Modal.jsx`

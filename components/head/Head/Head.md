@@ -1,0 +1,3 @@
+# Head
+
+- Component: `Head.jsx`

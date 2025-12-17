@@ -1,0 +1,3 @@
+# Slider
+
+- Component: `Slider.jsx`

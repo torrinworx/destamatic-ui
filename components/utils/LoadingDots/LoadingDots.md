@@ -1,0 +1,3 @@
+# LoadingDots
+
+- Component: `LoadingDots.jsx`

@@ -1,0 +1,3 @@
+# FileDrop
+
+- Component: `FileDrop.jsx`

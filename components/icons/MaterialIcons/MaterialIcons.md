@@ -1,0 +1,3 @@
+# MaterialIcons
+
+- Component: `MaterialIcons.jsx`

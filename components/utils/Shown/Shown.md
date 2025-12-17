@@ -1,0 +1,3 @@
+# Shown
+
+- Component: `Shown.jsx`

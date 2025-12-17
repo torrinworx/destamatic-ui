@@ -1,0 +1,3 @@
+# Theme
+
+- Component: `Theme.jsx`

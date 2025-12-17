@@ -1,0 +1,3 @@
+# RichArea
+
+- Component: `RichArea.jsx`

@@ -1,0 +1,3 @@
+# Tabs
+
+- Component: `Tabs.jsx`

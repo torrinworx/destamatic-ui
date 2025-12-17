@@ -1,0 +1,3 @@
+# SimpleIcons
+
+- Component: `SimpleIcons.jsx`

@@ -1,0 +1,3 @@
+# Detached
+
+- Component: `Detached.jsx`

@@ -1,0 +1,3 @@
+# Default
+
+- Component: `Default.jsx`

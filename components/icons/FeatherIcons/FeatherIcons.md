@@ -1,0 +1,3 @@
+# FeatherIcons
+
+- Component: `FeatherIcons.jsx`

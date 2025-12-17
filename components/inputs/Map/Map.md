@@ -1,0 +1,3 @@
+# Map
+
+- Component: `Map.jsx`
