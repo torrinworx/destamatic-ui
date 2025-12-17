@@ -67,3 +67,13 @@ export { default as is_node } from './ssg/is_node.js';
 
 // ./util
 export { default as useAbort } from './util/abort.js';
+
+// destam
+export * from 'destam/Events.js';
+export { default as Observer } from 'destam/Observer.js';
+export { default as OObject } from 'destam/Object.js';
+export { default as OArray } from 'destam/Array.js';
+
+// destam-dom
+export { mount } from 'destam-dom/dom.js';
+export { atomic } from 'destam/Network';
