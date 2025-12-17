@@ -13,18 +13,14 @@
       "import": "./index.js",
       "require": "./index.js"
     },
-    "./components/inputs/Map": "./components/inputs/Map.jsx",
-    "./components/icons/SimpleIcons": "./components/icons/SimpleIcons.jsx",
-    "./components/icons/FeatherIcons": "./components/icons/FeatherIcons.jsx",
-    "./components/icons/MaterialIcons": "./components/icons/MaterialIcons.jsx",
-    "./components/icons/IconifyIcons": "./components/icons/IconifyIcons.jsx",
-    "./util/color": "./util/color.js"
+    "./*": "./*",
+    "./components/*": "./components/*",
+    "./util/*": "./util/*"
   },
   "files": [
     "index.js",
     "components",
     "util",
-    "ssg",
     "LICENSE",
     "README.md"
   ],
