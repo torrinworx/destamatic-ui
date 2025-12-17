@@ -1,17 +1,28 @@
-import { Observer } from 'destam';
 import { mount } from 'destam-dom';
-import { Checkbox } from 'destamatic-ui';
+import { Theme, Button } from 'destamatic-ui';
 
 const Example = () => {
-	const checked = Observer.mutable(false);
+	const custom = {
+		candyPrimary: {
+			$color: '#ff4da6',
+			$color_alt: '#ffd54f',
+		},
 
-	return <div theme='column_center'>
-		{checked.map(c => `Checked: ${c}`)}
+		button_contained: {
+			extends: 'button_candyPrimary',
+			background: 'linear-gradient(135deg, $color, $color_alt)',
+		},
 
-		<div theme='row'>
-			<Checkbox value={checked} />
-		</div>
-	</div>
+		button_contained_hovered: {
+			extends: 'button_contained_candyPrimary',
+			background:
+				'linear-gradient(135deg, $shiftBrightness($color, .1), $shiftBrightness($color_alt, .1))'
+		},
+	}
+
+	return <Theme value={custom}>
+		<Button type='contained' label='Click Me' />
+	</Theme>
 };
 
 mount(root, <Example />);
