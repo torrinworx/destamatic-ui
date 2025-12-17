@@ -1,5 +1,6 @@
-import ThemeContext from '../utils/ThemeContext.jsx';
 import Observer from 'destam/Observer';
+
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 export default ThemeContext.use(h => {
 	const TextField = ({

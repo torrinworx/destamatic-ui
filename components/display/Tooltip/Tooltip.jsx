@@ -1,9 +1,9 @@
 import { Observer, Insert, Modify, Delete } from 'destam-dom';
 
-import {mark} from '../../utils/h.jsx';
-import Detached from '../../utils/Detached.jsx';
-import Theme from '../../utils/Theme.jsx';
-import ThemeContext from '../../utils/ThemeContext.jsx';
+import {mark} from '../../utils/h/h.jsx';
+import Detached from '../../utils/Detached/Detached.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import Paper from '../Paper/Paper.jsx';
 import '../Typography/Typography.jsx';
 import trackedMount from '../../../util/trackedMount.js';

@@ -1,6 +1,7 @@
-import { mark } from './h.jsx';
 import Observer from 'destam/Observer';
 import { assert } from 'destam/util';
+
+import { mark } from '../h/h.jsx';
 
 /**
  * Conditionally renders components based on a value and multiple cases.

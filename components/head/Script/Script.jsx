@@ -1,5 +1,5 @@
 import { Observer } from 'destam-dom';
-import { HeadContext } from './Head';
+import { HeadContext } from '../Head/Head.jsx';
 
 /**
  * <Script> – wraps <script> in <head>.

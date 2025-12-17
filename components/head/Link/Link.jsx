@@ -1,4 +1,4 @@
-import { HeadContext } from './Head';
+import { HeadContext } from '../Head/Head.jsx';
 
 /**
  * <Link> – wraps <link> head tag.

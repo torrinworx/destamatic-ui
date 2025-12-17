@@ -1,10 +1,10 @@
 import { Observer, OArray } from 'destam';
 
-import Theme from '../utils/Theme.jsx';
-import Shown from '../utils/Shown.jsx';
-import RichEngine from '../utils/RichEngine.js';
-import ThemeContext from '../utils/ThemeContext.jsx';
-import { Typography } from '../display/Typography/Typography.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import Shown from '../../utils/Shown/Shown.jsx';
+import RichEngine from '../../utils/RichEngine/RichEngine.js';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+import { Typography } from '../../display/Typography/Typography.jsx';
 
 Theme.define({
 	richtext: {

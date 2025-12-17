@@ -1,5 +1,5 @@
 import { Observer } from 'destam-dom';
-import { HeadContext } from './Head';
+import { HeadContext } from '../Head/Head.jsx';
 
 const Title = HeadContext.use(api => {
     return ({ children, text, group = 'title' }, cleanup) => {

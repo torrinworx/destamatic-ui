@@ -1,6 +1,6 @@
 import { UUID } from 'destam';
 import { mount, OArray, Observer } from 'destam-dom';
-import createContext from '../utils/Context';
+import createContext from '../../utils/Context/Context.jsx';
 
 // All entries: { id, group?, node }
 const headEntries = OArray();

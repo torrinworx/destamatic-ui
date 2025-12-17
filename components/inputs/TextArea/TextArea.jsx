@@ -1,7 +1,7 @@
 import { Observer } from 'destam-dom';
 
-import Theme from '../utils/Theme.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	field_area: {

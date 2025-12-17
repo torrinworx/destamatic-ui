@@ -1,9 +1,9 @@
 import Observer from 'destam/Observer';
 
-import Theme from '../utils/Theme.jsx';
-import useRipples from '../utils/Ripple.jsx';
-import { Typography } from '../display/Typography/Typography.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import useRipples from '../../utils/Ripple/Ripple.jsx';
+import { Typography } from '../../display/Typography/Typography.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	radio_label: {

@@ -1,15 +1,16 @@
-import Theme from '../utils/Theme.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
-import Shown from '../utils/Shown.jsx';
-import Paper from '../display/Paper/Paper.jsx';
-import Button from '../inputs/Button.jsx';
-import Icon from '../display/Icon/Icon.jsx';
-import { Typography } from '../display/Typography/Typography.jsx';
-import LoadingDots from '../utils/LoadingDots.jsx';
-import Context from '../utils/Context.jsx';
-import { h } from '../utils/h.jsx';
-
 import { OArray, OObject, Observer } from 'destam-dom';
+
+import { h } from '../../utils/h/h.jsx';
+import Icon from '../../display/Icon/Icon.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import Shown from '../../utils/Shown/Shown.jsx';
+import Paper from '../../display/Paper/Paper.jsx';
+import Button from '../../inputs/Button/Button.jsx';
+import Context from '../../utils/Context/Context.jsx';
+import LoadingDots from '../../utils/LoadingDots/LoadingDots.jsx';
+import { Typography } from '../../display/Typography/Typography.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+
 
 // File selection dialogue.
 const selectFile = (extensions, multiple = true) => new Promise((ok) => {

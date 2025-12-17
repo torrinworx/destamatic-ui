@@ -3,8 +3,8 @@ import {
     discoverStages,
     normalizeRouteToFolder,
     hasChildContextForStage,
-} from './discovery';
-import { suspendRegistry } from '../components/utils/Suspend';
+} from './discovery.js';
+import { suspendRegistry } from '../components/utils/Suspend/Suspend.jsx';
 
 // --- async helpers ---
 

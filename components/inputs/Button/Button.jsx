@@ -1,12 +1,12 @@
 import { Observer } from 'destam-dom';
 
-import { mark } from '../utils/h.jsx';
+import { mark } from '../../utils/h/h.jsx';
 
-import Theme from '../utils/Theme.jsx';
-import Shown from '../utils/Shown.jsx';
-import LoadingDots from '../utils/LoadingDots.jsx';
-import useRipples from '../utils/Ripple.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import Shown from '../../utils/Shown/Shown.jsx';
+import LoadingDots from '../../utils/LoadingDots/LoadingDots.jsx';
+import useRipples from '../../utils/Ripple/Ripple.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	button: {

@@ -1,9 +1,11 @@
-import color from '../../util/color.js';
-import Theme from '../utils/Theme.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
-import Slider from './Slider.jsx';
 import Observer from 'destam/Observer';
-import useAbort from '../../util/abort.js';
+
+import color from '../../../util/color.js';
+import useAbort from '../../../util/abort.js';
+
+import Slider from '../Slider/Slider.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	colorPicker: {

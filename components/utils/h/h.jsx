@@ -1,9 +1,10 @@
+import { assert } from 'destam/util.js';
 import { h as destam_h, mount, getFirst } from 'destam-dom';
 import Observer, { observerGetter, shallowListener } from 'destam/Observer';
-import { sizeProperties } from '../../util/index.js';
-import Theme from './Theme.jsx';
-import useAbort from '../../util/abort.js';
-import { assert } from 'destam/util.js';
+
+import Theme from '../Theme/Theme.jsx';
+import useAbort from '../../../util/abort.js';
+import { sizeProperties } from '../../../util/index.js';
 
 // This h element overrides the default behavoior that destam-dom gives for
 // overriding styles. destam-dom will never try to be more fancy than the browser

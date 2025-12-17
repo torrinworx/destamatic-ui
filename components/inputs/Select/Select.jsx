@@ -1,14 +1,15 @@
-import { mark } from '../utils/h.jsx';
 import Observer from 'destam/Observer';
-import { Typography } from '../display/Typography/Typography.jsx';
-import { Icon } from '../display/Icon/Icon.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
-import Button from '../inputs/Button.jsx';
-import useAbort from '../../util/abort.js';
-import Attached from '../utils/Attached.jsx';
-import Theme from '../utils/Theme.jsx';
 
-import categories from '../../util/categories.js';
+import Button from '../Button/Button.jsx';
+import { mark } from '../../utils/h/h.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import { Icon } from '../../display/Icon/Icon.jsx';
+import Attached from '../../utils/Attached/Attached.jsx';
+import { Typography } from '../../display/Typography/Typography.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+
+import useAbort from '../../../util/abort.js';
+import categories from '../../../util/categories.js';
 
 Theme.define({
 	select_popup: {

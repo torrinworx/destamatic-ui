@@ -1,6 +1,6 @@
-import { h } from './h.jsx';
-import Observer from 'destam/Observer';
-import { OArray } from 'destam';
+import { Observer, OArray } from 'destam';
+
+import { h } from '../h/h.jsx';
 
 export const suspendRegistry = OArray([]);
 

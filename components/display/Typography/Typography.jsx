@@ -1,8 +1,8 @@
 import { UUID, Observer } from 'destam';
 
-import Theme from '../../utils/Theme.jsx';
-import createContext from '../../utils/Context.jsx';
-import ThemeContext from '../../utils/ThemeContext.jsx';
+import Theme from '../../utils/Theme/Theme.jsx';
+import createContext from '../../utils/Context/Context.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	typography: {

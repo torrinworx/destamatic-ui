@@ -1,7 +1,8 @@
-import { h } from './h.jsx';
-
 import { OArray, Observer } from 'destam-dom';
-import Theme from './Theme.jsx';
+
+import { h } from '../h/h.jsx';
+import Theme from '../Theme/Theme.jsx';
+
 
 Theme.define({
     ripple: {

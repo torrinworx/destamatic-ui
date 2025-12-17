@@ -1,11 +1,11 @@
 import { Observer } from 'destam-dom';
 
-import Icon from '../display/Icon/Icon.jsx';
-import Popup from '../utils/Popup.jsx';
-import Paper from '../display/Paper/Paper.jsx';
-import Button from '../inputs/Button.jsx';
-import ThemeContext from '../utils/ThemeContext.jsx';
-import { Typography } from '../display/Typography/Typography.jsx';
+import Icon from '../../display/Icon/Icon.jsx';
+import Popup from '../../utils/Popup/Popup.jsx';
+import Paper from '../../display/Paper/Paper.jsx';
+import Button from '../../inputs/Button/Button.jsx';
+import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+import { Typography } from '../../display/Typography/Typography.jsx';
 
 const Modal = ThemeContext.use(h => ({ s, closeSignal, children }, cleanup, mounted) => {
 	const shown = Observer.mutable(false);

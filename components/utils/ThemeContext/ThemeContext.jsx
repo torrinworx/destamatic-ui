@@ -1,7 +1,8 @@
-import createContext from './Context.jsx';
-import { h } from './h.jsx';
 import { assert } from 'destam/util';
 import Observer from 'destam/Observer';
+
+import { h } from '../h/h.jsx';
+import createContext from '../Context/Context.jsx';
 
 const ThemeContext = createContext('primary');
 
