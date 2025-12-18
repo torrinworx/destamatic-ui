@@ -82,7 +82,9 @@ export default ThemeContext.use(h => {
 			}}
 		>
 			<Anchor
-				focused={preFocus}
+				focused={preFocus.setter(val => {
+					if (val) preFocus.set(true);
+				})}
 				{...anchor.props}
 				ref={ref}
 				style={{
