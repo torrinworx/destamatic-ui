@@ -10,17 +10,17 @@ export default ThemeContext.use(h => {
 		expand,
 		onEnter,
 		error,
-		focus = false,
+		focused = false,
 		...props
 	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
 		if (!(expand instanceof Observer)) expand = Observer.immutable(expand);
-		if (!(focus instanceof Observer)) focus = Observer.mutable(focus);
+		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 
 		const ref = Observer.mutable(null);
 
-		mounted(() => cleanup(focus.effect(e => {
+		mounted(() => cleanup(focused.effect(e => {
 			if (e) ref.get().focus();
 			else ref.get().blur();
 		})));
@@ -35,7 +35,7 @@ export default ThemeContext.use(h => {
 				value.set(e.target.value);
 			}}
 			type={type}
-			isFocused={focus}
+			isFocused={focused}
 			onKeyDown={e => {
 				if (value.isImmutable()) {
 					e.preventDefault();
@@ -52,7 +52,7 @@ export default ThemeContext.use(h => {
 			theme={[
 				'field',
 				'line',
-				focus.map(e => e ? 'focused' : null),
+				focused.map(e => e ? 'focused' : null),
 				error.map(e => e ? 'error' : null),
 				expand.map(e => e ? 'expand' : null),
 			]}

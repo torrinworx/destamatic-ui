@@ -39,7 +39,7 @@ export default ThemeContext.use(h => {
 			error,
 			theme,
 			type,
-			focus = false,
+			focused = false,
 			...props
 		},
 		cleanup,
@@ -47,7 +47,7 @@ export default ThemeContext.use(h => {
 	) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
-		if (!(focus instanceof Observer)) focus = Observer.mutable(focus);
+		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 
 		const isMounted = Observer.mutable(false);
 		const ref = Observer.mutable(null);
@@ -56,7 +56,7 @@ export default ThemeContext.use(h => {
 		// the text area won't have the right initial size.
 		mounted(() => queueMicrotask(() => isMounted.set(true)));
 
-		mounted(() => cleanup(focus.effect(e => {
+		mounted(() => cleanup(focused.effect(e => {
 			if (e) ref.get().focus();
 			else ref.get().blur();
 		})));
@@ -66,7 +66,7 @@ export default ThemeContext.use(h => {
 			'field',
 			'area',
 			type,
-			focus.map(e => e ? 'focused' : null),
+			focused.map(e => e ? 'focused' : null),
 			error.map(e => e ? 'error' : null));
 
 		return <textarea ref={ref}
@@ -88,7 +88,7 @@ export default ThemeContext.use(h => {
 
 				value.set(e.target.value);
 			}}
-			isFocused={focus}
+			isFocused={focused}
 			style={{
 				height: isMounted.map(mounted => {
 					if (!mounted) return 'auto';
