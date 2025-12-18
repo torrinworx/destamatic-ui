@@ -514,11 +514,13 @@ const Theme = createContext(createTheme(theme), (nextTheme, { theme: prevTheme }
 Theme.define = obj => atomic(() => {
 	for (const o in obj) {
 		if (o in theme) {
+			/* Disable for now as not all build systems support import.meta yet
 			if (import.meta.hot) {
 				// Dev/HMR: ignore duplicates instead of throwing
 				console.warn("Theme.define duplicate in dev (ignored):", o);
 				continue;
 			}
+			*/
 			// Production: still hard fail on mistakes
 			throw new Error("Theme.define: theme definition already exists: " + o);
 		}
