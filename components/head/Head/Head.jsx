@@ -1,155 +1,142 @@
 import { UUID } from 'destam';
-import { mount, OArray, Observer } from 'destam-dom';
+import { mount, OArray } from 'destam-dom';
 import createContext from '../../utils/Context/Context.jsx';
 import {h} from '../../utils/h/h.jsx';
 
-// All entries: { id, group?, node }
-const headEntries = OArray();
+const rendered = OArray([]);
+const groups = new Map();
+let groupOrderSeq = 0;
+let writeSeq = 0;
 
-// Derived view: only top entry per group
-const visibleEntries = Observer.mutable([]);
+let headMounted = false;
 
-// Recompute visible entries whenever headEntries changes
-const recomputeVisible = () => {
-    const byGroup = new Map();   // group -> entry
-    const ungrouped = [];        // entries with no group
+const ensureHeadMounted = () => {
+    if (headMounted) return;
+    headMounted = true;
 
-    for (const entry of headEntries) {
-        if (entry.group) {
-            // last one wins for that group
-            byGroup.set(entry.group, entry);
-        } else {
-            // ungrouped entries just all show
-            ungrouped.push(entry);
+    if (typeof document === 'undefined' || !document.head) return;
+
+    const HeadRender = ({ each }) => each.node;
+    mount(document.head, <HeadRender each={rendered} />);
+};
+
+const getGroupState = (group) => {
+    let st = groups.get(group);
+    if (!st) {
+        st = { entries: new Map(), order: ++groupOrderSeq };
+        groups.set(group, st);
+    }
+    return st;
+};
+
+const pickWinner = (st) => {
+    let best = null;
+
+    for (const entry of st.entries.values()) {
+        if (!best) {
+            best = entry;
+            continue;
         }
+
+        if (entry.depth > best.depth) best = entry;
+        else if (entry.depth === best.depth && entry.seq > best.seq) best = entry;
     }
 
-    const result = [...ungrouped, ...byGroup.values()];
-    visibleEntries.set(result);
+    return best;
 };
 
-// Watch changes to headEntries reactively
-headEntries.observer.watch(() => {
-    recomputeVisible();
-});
+const setRenderedWinner = (group, winner) => {
+    const idx = rendered.findIndex(e => e.group === group);
 
-// Low-level helpers
-const pushEntry = (entry) => {
-    headEntries.push(entry);
+    if (!winner) {
+        if (idx >= 0) rendered.splice(idx, 1);
+        return;
+    }
+
+    const next = { group, id: winner.id, node: winner.node };
+
+    if (idx >= 0) rendered.splice(idx, 1, next);
+    else rendered.push(next);
+};
+
+const recomputeGroup = (group) => {
+    const st = groups.get(group);
+    if (!st) return;
+
+    const winner = pickWinner(st);
+    setRenderedWinner(group, winner);
+
+    if (st.entries.size === 0) {
+        groups.delete(group);
+    }
+};
+
+const register = ({ group, node, depth }) => {
+    ensureHeadMounted();
+
+    if (!node) {
+        throw new Error(`Head.register: "node" is required (group="${group}")`);
+    }
+
+    const id = UUID().toHex();
+    const st = getGroupState(group);
+
+    const entry = {
+        id,
+        group,
+        node,
+        depth,
+        seq: ++writeSeq,
+    };
+
+    st.entries.set(id, entry);
+    recomputeGroup(group);
+
     return () => {
-        const idx = headEntries.findIndex(e => e.id === entry.id);
-        if (idx >= 0) headEntries.splice(idx, 1);
+        const st2 = groups.get(group);
+        if (!st2) return;
+
+        st2.entries.delete(id);
+        recomputeGroup(group);
     };
 };
 
-const clearAll = () => {
-    headEntries.splice(0, headEntries.length);
-};
-
-// Base API (similar to what you already had, but adjust addUnique)
-const createBaseApi = () => {
-    const api = {
+const createApi = (depth) => {
+    return {
+        depth,
         add(node, opts = {}) {
-            const { group } = opts;
-            const id = UUID().toHex();
-            return pushEntry({ id, group, node });
+            const group = opts.group ?? `__anon:${UUID().toHex()}`;
+            return register({ group, node, depth });
         },
-
-        // Now addUnique is "ensure exactly one entry in this group from THIS call":
-        // We do NOT clear others permanently; instead, we push and rely on stacking.
         addUnique(group, node) {
-            const id = UUID().toHex();
-            return pushEntry({ id, group, node });
-        },
-
-        push(node) {
-            return api.add(node);
-        },
-
-        get(index) {
-            return headEntries[index];
-        },
-
-        get length() {
-            return headEntries.length;
-        },
-
-        get entries() {
-            return headEntries;
-        },
-
-        // If you still want these raw operations, keep them:
-        splice(start, deleteCount, ...items) {
-            return headEntries.splice(start, deleteCount, ...items);
-        },
-        pop() { return headEntries.pop(); },
-        shift() { return headEntries.shift(); },
-        unshift(...items) { return headEntries.unshift(...items); },
-
-        remove(id) {
-            const idx = headEntries.findIndex(e => e.id === id);
-            if (idx >= 0) headEntries.splice(idx, 1);
-        },
-
-        clear() {
-            clearAll();
-        },
-
-        // Observe the raw list if needed:
-        watch(listener, governor) {
-            return headEntries.observer.watch(listener, governor);
-        },
-        effect(fn) {
-            return headEntries.effect(fn);
-        },
-        map(fn) {
-            return headEntries.map(fn);
+            if (!group) throw new Error('Head.addUnique(group, node) requires a group');
+            return register({ group, node, depth });
         },
     };
-
-    return api;
 };
 
-const baseApi = createBaseApi();
+const baseApi = createApi(-1);
 
-// HeadContext with same transform as you have now
 export const HeadContext = createContext(
     baseApi,
-    (next, prev) => {
-        if (!next) return prev;
+    (raw, parentApi) => {
+        const parentDepth = parentApi?.depth ?? -1;
+        const api = createApi(parentDepth + 1);
 
-        if (typeof next === 'function') {
-            return next(prev);
+        if (typeof raw === 'function') {
+            return raw(api, parentApi) || api;
         }
 
-        if (next && typeof next.add === 'function') {
-            return {
-                ...prev,
-                ...next,
-                add(node, opts) {
-                    return next.add ? next.add(node, opts) : prev.add(node, opts);
-                },
-                addUnique(group, node) {
-                    return next.addUnique
-                        ? next.addUnique(group, node)
-                        : prev.addUnique(group, node);
-                },
-            };
+        if (raw && typeof raw === 'object') {
+            return { ...api, ...raw };
         }
 
-        return prev;
+        return api;
     }
 );
 
-// We now render from visibleEntries, not headEntries
-const HeadRender = ({ each }) => each.node
-
-// Provider
 export const Head = ({ value, children }, cleanup, mounted) => {
-    if (!Head._mounted) {
-        Head._mounted = true;
-        mount(document.head, <HeadRender each={visibleEntries} />);
-    }
+    ensureHeadMounted();
 
     return (elem, _, before, context) => {
         return HeadContext({ value, children }, cleanup, mounted)(
@@ -160,5 +147,3 @@ export const Head = ({ value, children }, cleanup, mounted) => {
         );
     };
 };
-
-// TODO: Somehow handle tags already in the dom if any are present before mount?

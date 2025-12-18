@@ -3,18 +3,14 @@ import { HeadContext } from '../Head/Head.jsx';
 
 const Title = HeadContext.use(api => {
     return ({ children, text, group = 'title' }, cleanup) => {
-        let content;
-        if (children && children.length > 0) {
-            content = children;
-        } else {
-            content = text || '';
-        }
+        const content =
+            (children && children.length > 0) ? children : (text || '');
 
-        if (!(content instanceof Observer)) {
-            content = Observer.immutable(content);
-        }
+        const obs = (content instanceof Observer)
+            ? content
+            : Observer.immutable(content);
 
-        const node = <raw:title $textContent={content} />;
+        const node = <raw:title $textContent={obs} />;
 
         const remove = api.addUnique(group, node);
         cleanup(remove);
