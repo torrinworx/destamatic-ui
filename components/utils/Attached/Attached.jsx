@@ -9,9 +9,13 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import categories from '../../../util/categories.js';
 
 export default ThemeContext.use(h => {
-	const Attached = ({children, focused, Anchor, anchorTheme, type, theme}) => {
+	const Attached = ({children, focused, collapsed, Anchor, anchorTheme, type, theme}) => {
 		const [popup, anchor] = categories(children, ['popup', 'anchor'], 'anchor');
 		const [preFocus, postFocus] = focused.memo(2);
+		const expanded = Observer.all([
+			postFocus,
+			Observer.immutable(collapsed)
+		]).map(([foc, col]) => foc && !col ? foc : false).setter(val => postFocus.set(val)).memo();
 
 		const ref = anchor.props.ref ?? Observer.mutable(null);
 		const Paper = popup.props.ref ?? <raw:div />;
@@ -42,7 +46,7 @@ export default ThemeContext.use(h => {
 					flex: '1 1 auto',
 					width: style.map(style => style.width),
 					overflow: 'auto',
-					borderRadius: Observer.all([postFocus, radius]).map(([f, r]) => {
+					borderRadius: Observer.all([expanded, radius]).map(([f, r]) => {
 						if (f === Detached.TOP_LEFT_RIGHT) {
 							return `${r} ${r} 0px 0px`;
 						} else if (f === Detached.BOTTOM_LEFT_RIGHT) {
@@ -51,7 +55,7 @@ export default ThemeContext.use(h => {
 							return null;
 						}
 					}),
-					clipPath: Observer.all([postFocus, radius]).map(([f, r]) => {
+					clipPath: Observer.all([expanded, radius]).map(([f, r]) => {
 						if (f === Detached.TOP_LEFT_RIGHT) {
 							return `inset(-${r} -${r} 0px -${r})`;
 						} else if (f === Detached.BOTTOM_LEFT_RIGHT) {
@@ -68,7 +72,7 @@ export default ThemeContext.use(h => {
 		});
 
 		return <Detached
-			enabled={postFocus}
+			enabled={expanded}
 			locations={[
 				Detached.BOTTOM_LEFT_RIGHT,
 				Detached.TOP_LEFT_RIGHT,
@@ -88,10 +92,10 @@ export default ThemeContext.use(h => {
 				{...anchor.props}
 				ref={ref}
 				style={{
-					borderTopLeftRadius: postFocus.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
-					borderTopRightRadius: postFocus.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
-					borderBottomLeftRadius: postFocus.map(f => f === Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
-					borderBottomRightRadius: postFocus.map(f => f === Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
+					borderTopLeftRadius: expanded.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
+					borderTopRightRadius: expanded.map(f => f === Detached.TOP_LEFT_RIGHT ? 0 : null),
+					borderBottomLeftRadius: expanded.map(f => f === Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
+					borderBottomRightRadius: expanded.map(f => f === Detached.BOTTOM_LEFT_RIGHT ? 0 : null),
 					...anchor.props.style,
 				}}
 			>
