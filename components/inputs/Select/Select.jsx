@@ -179,8 +179,8 @@ export default ThemeContext.use(h => {
 					'select_selectable',
 					selector(option)
 				]}
-				onMouseDown={e => e.preventDefault()}
-				onMouseUp={() => {
+				onMouseDown={e => {
+					e.preventDefault()
 					if (!value.isImmutable()) value.set(option);
 					focused.set(false);
 				}}
@@ -199,6 +199,7 @@ export default ThemeContext.use(h => {
 				type={['select', 'base', type]}
 				onMouseDown={e => {
 					e.preventDefault();
+					console.log("MOUSE DOWN!");
 					focused.set(!focused.get());
 				}}
 				style={style}
