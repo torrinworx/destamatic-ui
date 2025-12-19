@@ -199,7 +199,6 @@ export default ThemeContext.use(h => {
 				type={['select', 'base', type]}
 				onMouseDown={e => {
 					e.preventDefault();
-					console.log("MOUSE DOWN!");
 					focused.set(!focused.get());
 				}}
 				style={style}
