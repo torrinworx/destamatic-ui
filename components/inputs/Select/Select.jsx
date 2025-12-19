@@ -62,7 +62,6 @@ Theme.define({
 
 export default ThemeContext.use(h => {
 	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None', theme }) => {
-		console.log("THIS IS VALUE AT SELECT MOUNT: ", value);
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(options instanceof Observer)) options = Observer.immutable(options);
 
