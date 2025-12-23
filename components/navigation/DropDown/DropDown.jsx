@@ -23,6 +23,8 @@ const DropDown = ({
     arrow = 'right',
     style,
     open = Observer.mutable(false),
+    iconOpen = <Icon size='20' name='chevron-down' />,
+    iconClose = <Icon size='20' name='chevron-down' />,
 }) => {
     if (!(open instanceof Observer)) open = Observer.mutable(open);
 
@@ -42,9 +44,9 @@ const DropDown = ({
             <div style={{ display: 'flex', alignItems: 'center', userSelect: 'none' }}>
                 <i class='chevron-icon' style={{ cursor: 'pointer' }}>
                     {open.map((show) => show ? (
-                        <Icon size='20' name='chevron-down' />
+                        iconOpen
                     ) : (
-                        <Icon size='20' name='chevron-right' />
+                        iconClose
                     ))}
                 </i>
             </div>
