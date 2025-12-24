@@ -51,10 +51,11 @@
     "destam-dom": "^0.14.0"
   },
   "optionalDependencies": {
-    "@iconify-json/tabler": "^1.2.22",
     "@iconify-json/feather": "^1.2.1",
     "@iconify-json/lineicons": "^1.2.6",
     "@iconify-json/simple-icons": "^1.2.1",
+    "@iconify-json/tabler": "^1.2.22",
+    "@iconify-json/svg-spinners": "^1.2.4",
     "@material-design-icons/svg": "^0.14.15",
     "country-region-data": "^3.1.0",
     "feather-icons": "^4.29.2",

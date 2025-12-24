@@ -2,12 +2,14 @@ import { icons as lineicons } from '@iconify-json/lineicons';
 import { icons as feather } from '@iconify-json/feather';
 import { icons as simpleIcons } from '@iconify-json/simple-icons';
 import { icons as tabler } from '@iconify-json/tabler';
+import { icons as svgSpinner } from '@iconify-json/svg-spinners';
 
 const libraries = {
     lineicons,
     feather,
     tabler,
     simpleIcons,
+    svgSpinner,
 };
 
 const IconifyDriver = (name) => {
