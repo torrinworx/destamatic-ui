@@ -13,7 +13,7 @@ destamatic-ui has many features to simplilfy the developer experience of creatin
 - component library with various pools of components: display, head, icons, inputs, navigation, utils.
 - context management, similar to react context, but simplier in implementation.
 - cascading themeing system built on contexts. you're able to theme and update using observers/destam-dom any css property reactivly
-- 
+- content display system through the Stage component, allows for Stage trees, url routing/resolution, and static page generation.
 
 # Syntax:
 - JSX tags are returned directly and not in parenthasis:
@@ -23,6 +23,23 @@ return <div>
 </div>
 ```
 - If a function or variable isn't used more than once, prefer to inline it.
+- Theme Object items are defined with a line space between each theme definition for readability:
+```javascript:
+Theme.define({
+	button_contained: {
+		extends: 'typography_p1_bold',
+		background: '$color',
+		color: '$contrast_text($color_top)',
+	},
+
+   button_outlined: {
+		extends: 'typography_p1_bold',
+		borderWidth: 2,
+		borderStyle: 'solid',
+		color: '$color',
+	},
+})
+```
 
 # Tips:
 
