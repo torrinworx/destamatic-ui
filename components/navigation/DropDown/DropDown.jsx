@@ -10,7 +10,7 @@ import { Icon } from '../../display/Icon/Icon.jsx';
 
 Theme.define({
 	dropdown: {
-		extends: 'text_fill_spread',
+		extends: 'fill_spread',
 		maxWidth: 'none',
 	}
 });
@@ -22,7 +22,7 @@ export default ThemeContext.use(h => {
 		iconOpen = <Icon size="20" name="chevron-down" />,
 		iconClose = <Icon size="20" name="chevron-down" />,
 		label = '',
-		type = 'dropdown',
+		type = 'text_fill_spread',
 		onClick,
 		inline,
 		onMouseDown,
@@ -44,7 +44,7 @@ export default ThemeContext.use(h => {
 
 		return <div style={style}>
 			<Button
-				type={type}
+				type={[type, 'dropdown']}
 				iconPosition={arrow === 'right' ? 'right' : 'left'}
 				label={label}
 				icon={open.map(show => (show ? iconOpen : iconClose))}
