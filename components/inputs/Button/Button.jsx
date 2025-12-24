@@ -124,6 +124,9 @@ export default ThemeContext.use(h => {
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
 
+		// Don't show ripples if link.
+		const is_link = (Array.isArray(type) ? type : type.split('_')).includes('link') ? true : false;
+
 		return <button ref
 			onClick={(event) => {
 				if (disabled.get()) return;
@@ -194,7 +197,7 @@ export default ThemeContext.use(h => {
 					{label}
 					{children}
 					{iconPosition === 'right' ? icon : null}
-					{ripples}
+					{is_link ? null : ripples}
 				</mark:else>
 			</Shown>
 			<Shown value={href}>
