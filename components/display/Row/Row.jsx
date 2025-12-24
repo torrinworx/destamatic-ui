@@ -11,6 +11,11 @@ Theme.define({
 	row_inline: {
 		display: 'inline-flex',
 	},
+
+	row_wrap: {
+		flexWrap: 'wrap',
+		gap: 10,
+	},
 });
 
 export default ThemeContext.use(h => {
