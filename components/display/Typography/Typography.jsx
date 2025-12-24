@@ -6,6 +6,13 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	typography: {
+		// line heights
+		$lh_body: '1.65',
+		$lh_head: '1.15',
+
+		// standard readable line length limit
+		$measure: '80ch',
+
 		color: '$color_text',
 		whiteSpace: 'pre-wrap',
 		margin: 0,
