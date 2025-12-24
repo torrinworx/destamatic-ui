@@ -143,6 +143,15 @@ export default ThemeContext.use(h => {
 		// Don't show ripples if link.
 		const is_link = (Array.isArray(type) ? type : type.split('_')).includes('link') ? true : false;
 
+
+		const handleLoading = (value) => {
+			// if the value is a promise, replace the button with a loading animation.
+			if (value && value.then && !loading.isImmutable()) {
+				loading.set(true);
+				value.catch(console.error).then(() => loading.set(false));
+			}
+		};
+
 		return <button ref
 			onClick={(event) => {
 				if (disabled.get()) return;
@@ -150,13 +159,7 @@ export default ThemeContext.use(h => {
 
 				if (onClick) {
 					createRipple(event);
-					const ret = onClick(event);
-
-					// if the return value is a promise, replace the button with a loading animation.
-					if (ret && ret.then && !loading.isImmutable()) {
-						loading.set(true);
-						ret.catch(console.error).then(() => loading.set(false));
-					}
+					handleLoading(onClick(event));
 				}
 			}}
 			onMouseDown={(event) => {
@@ -183,8 +186,8 @@ export default ThemeContext.use(h => {
 					focused.set(true);
 					createRipple(event);
 
-					if (onClick) onClick(event);
-					if (onMouseDown) onMouseDown(event);
+					if (onClick) handleLoading(onClick(event));
+					if (onMouseDown) handleLoading(onMouseDown(event))
 				}
 			}}
 			onMouseLeave={() => focused.set(false)}
