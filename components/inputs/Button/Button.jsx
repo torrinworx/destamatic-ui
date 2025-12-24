@@ -26,10 +26,6 @@ Theme.define({
 		},
 	},
 
-	button_text_hovered: {
-		background: 'rgb(0, 0, 0, 0.1)',
-	},
-
 	button_contained: {
 		extends: 'typography_p1_bold',
 		background: '$color',
@@ -42,7 +38,6 @@ Theme.define({
 
 	button_outlined: {
 		extends: 'typography_p1_bold',
-
 		borderWidth: 2,
 		borderStyle: 'solid',
 		borderColor: '$color',
@@ -66,18 +61,17 @@ Theme.define({
 		color: '$contrast_text($bg)',
 	},
 
-	text: {
+	button_text: {
 		extends: 'typography_p1_regular',
 	},
 
-	button_icon: {
-		color: '$color_top',
-		fill: '$color_top',
+	button_text_hovered: {
+		background: 'rgb(0, 0, 0, 0.1)',
 	},
 
-	button_icon_hovered: {
-		color: '$color_hover',
-		fill: '$color_hover',
+	button_round: {
+		extends: 'typography_p1_regular',
+		borderRadius: '50%',
 	},
 
 	button_link: {
@@ -142,6 +136,7 @@ export default ThemeContext.use(h => {
 			onMouseDown={(event) => {
 				if (disabled.get()) return;
 
+				focused.set(true);
 				if (onMouseDown) {
 					createRipple(event);
 					onMouseDown(event);
@@ -158,11 +153,15 @@ export default ThemeContext.use(h => {
 			onKeyDown={(event) => {
 				if (!disabled.get() && (event.key === "Enter" || event.key === " ")) {
 					event.preventDefault();
+					focused.set(true);
 					createRipple(event);
+
 					if (onClick) onClick(event);
 					if (onMouseDown) onMouseDown(event);
 				}
 			}}
+			onMouseLeave={() => focused.set(false)}
+			isFocused={focused}
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
 				...style
