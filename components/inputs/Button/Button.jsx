@@ -18,7 +18,7 @@ Theme.define({
 		textDecoration: 'none',
 		position: 'relative',
 		overflow: 'clip',
-		color: '$color_top',
+		color: '$color',
 		boxShadow: 'none',
 		background: 'none',
 		_cssProp_focus: {
@@ -36,29 +36,25 @@ Theme.define({
 		background: '$color_hover',
 	},
 
+	button_contained_disabled: {
+		$bg: '$saturate($color, -1)',
+		background: '$bg',
+		color: '$contrast_text($bg)',
+	},
+
 	button_outlined: {
 		extends: 'typography_p1_bold',
 		borderWidth: 2,
 		borderStyle: 'solid',
-		borderColor: '$color',
 		color: '$color',
 	},
 
 	button_outlined_hovered: {
 		color: '$color_hover',
-		borderColor: '$color_hover',
 	},
 
 	button_outlined_disabled: {
-		borderColor: '$saturate($color, -1)',
 		color: '$saturate($color, -1)',
-	},
-
-	button_contained_disabled: {
-		// temp var
-		$bg: '$saturate($color, -1)',
-		background: '$bg',
-		color: '$contrast_text($bg)',
 	},
 
 	button_text: {
@@ -69,25 +65,45 @@ Theme.define({
 		background: 'rgb(0, 0, 0, 0.1)',
 	},
 
-	button_round: {
-		extends: 'typography_p1_regular',
-		borderRadius: '50%',
+	button_text_disabled: {
+		color: '$saturate($color, -1)',
 	},
 
 	button_link: {
-		padding: 0,
+		extends: 'typography_p1_regular',
+		borderRadius: 'none',
+		padding: 1,
+		overflow: 'visible',
 		color: 'blue',
 		textDecoration: 'underline',
+	},
+
+	button_link_focused: {
+		boxShadow: 'none',
+	},
+
+	button_link_hovered: {
+		textDecorationThickness: '3px'
+	},
+
+	button_link_disabled: {
+		color: '$saturate($color, -1)',
 	},
 
 	button_link_clicked: {
 		color: 'purple',
 	},
 
-	button_link_focused: {
-		boxShadow: 'none',
-	}
+	button_round: {
+		extends: 'typography_p1_regular',
+		borderRadius: '50%',
+	},
 });
+
+/*
+TODO: Make LoadingDots style consistent with typography so that it doesn't adjust the size of the button
+when appearing during a promise.
+*/
 
 export default ThemeContext.use(h => {
 	const Button = ({
@@ -185,7 +201,7 @@ export default ThemeContext.use(h => {
 				hover.bool('hovered', null),
 				disabled.bool('disabled', null),
 				focused.bool('focused', null),
-				clicked.bool('clicked', null),
+				Observer.all([disabled, clicked]).map(([d, c]) => c && !d ? 'clicked' : null),
 			]}
 		>
 			<Shown value={loading}>
