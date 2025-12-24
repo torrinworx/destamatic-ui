@@ -90,6 +90,8 @@ Theme.define({
 		color: '$saturate($color, -1)',
 	},
 
+	// TODO: Somehow disable transition for just clicked? it feels weird on mobile when clicking a link and it takes a second to transition to the clicked state
+
 	button_link_clicked: {
 		color: 'purple',
 	},
