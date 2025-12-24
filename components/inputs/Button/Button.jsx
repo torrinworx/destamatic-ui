@@ -145,7 +145,6 @@ export default ThemeContext.use(h => {
 		// Don't show ripples if link.
 		const is_link = (Array.isArray(type) ? type : type.split('_')).includes('link') ? true : false;
 
-
 		const handleLoading = (value) => {
 			// if the value is a promise, replace the button with a loading animation.
 			if (value && value.then && !loading.isImmutable()) {
