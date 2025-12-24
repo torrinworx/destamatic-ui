@@ -141,14 +141,6 @@ export default {
 		pointerEvents: 'none',
 	},
 
-	field: {
-		extends: 'radius_typography_p1_regular',
-		outline: 0,
-		padding: 10,
-		background: '$invert($color_top)',
-		color: '$color_top',
-	},
-
 	focused: {
 		boxShadow: '$color 0 0 0 0.2rem',
 	},
