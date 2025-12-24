@@ -11,15 +11,12 @@ Theme.define({
 		cursor: 'pointer',
 		overflow: 'clip',
 		position: 'relative',
+		color: '$color',
 		width: '60px',
 		height: '30px',
 		background: '$color',
 		borderRadius: '37.5px',
 		userSelect: 'none',
-	},
-
-	toggle_hovered: {
-		background: '$color_hover'
 	},
 
 	toggleknob: {
@@ -28,20 +25,77 @@ Theme.define({
 		transform: 'translateX(4px) translateY(-50%) scale(1)',
 		width: '23px',
 		height: '23px',
-		background: '$color_top',
+		background: '$contrast_text($color_top)',
 		borderRadius: '50%',
-		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
+
+		// TODO: Fix: this transform messes with the border styles of the outlined type, need to narrow the scope of this somehow:
+		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1)',
 	},
 
 	toggleknob_checked: {
-		// Slide the knob to the right. 
-		// 28px or 32px depends on your design—adjust if needed
+		// Slide the knob to the right.
 		transform: 'translateX(32px) translateY(-50%) scale(1)',
 	},
 
 	toggleknob_unchecked: {
 		// Slide it back to the “left”
 		transform: 'translateX(5px) translateY(-50%) scale(1)',
+	},
+
+	toggle_contained: {
+		background: '$color',
+	},
+
+	toggle_contained_hovered: {
+		background: '$color_hover',
+	},
+
+	toggle_contained_disabled: {
+		$bg: '$saturate($color, -1)',
+		background: '$bg',
+	},
+
+	toggleknob_contained: {
+		background: '$contrast_text($color_top)',
+	},
+
+	toggleknob_contained_disabled: {
+		$bg: '$saturate($contrast_text($color_top), -1)',
+		background: '$bg',
+	},
+
+	toggle_outlined: {
+		background: 'transparent',
+		borderWidth: 2,
+		borderStyle: 'solid',
+	},
+
+	toggle_outlined_hovered: {
+		background: 'rgb(0, 0, 0, 0.1)',
+	},
+
+	toggle_outlined_disabled: {
+		borderColor: '$saturate($color, -1)',
+	},
+
+	toggleknob_outlined: {
+		background: '$color',
+	},
+
+	toggleknob_outlined_disabled: {
+		background: '$saturate($color, -1)',
+	},
+
+	toggleknob_outlined_checked: {
+		transform: 'translateX(30px) translateY(-50%) scale(1)',
+	},
+
+	toggleknob_outlined_unchecked: {
+		transform: 'translateX(3px) translateY(-50%) scale(1)',
+	},
+
+	toggle_hovered: {
+		background: '$color_hover',
 	},
 });
 
@@ -52,23 +106,17 @@ export default ThemeContext.use(h => {
 	/**
 	 * toggle component.
 	 *
-	 * This component acts like a toggle toggle, utilizing an observable boolean value for its state.
-	 * It supports custom styling, event handling, and a disabled state.
-	 *
-	 * @param {Object} props - The properties object.
-	 * @param {Observer<boolean>|boolean} [props.value] - Observable representing the toggled state or a static boolean value.
-	 * @param {function} [props.onChange] - Function to be executed when the toggled state changes.
-	 * @param {Observer<boolean>|boolean} [props.disabled] - Observable representing the disabled state or a static boolean value.
-	 * @param {Object} [props.style] - Custom styles to apply directly to the toggle container.
-	 * @param {Object} [props.rest] - Additional props to be propagated to the toggle container.
-	 *
-	 * @returns {JSX.Element} The rendered toggle component.
+	 * @param {Object} props
+	 * @param {Observer<boolean>|boolean} [props.value]
+	 * @param {function} [props.onChange]
+	 * @param {Observer<boolean>|boolean} [props.disabled]
+	 * @param {'contained'|'outlined'|string} [props.type]
 	 */
 	const Toggle = ({
 		value,
 		onChange,
 		disabled,
-		type,
+		type = 'contained', // default variant
 		...props
 	}) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
@@ -76,7 +124,7 @@ export default ThemeContext.use(h => {
 
 		const hover = Observer.mutable(false);
 		const [ripples, createRipple] = useRipples();
-		const Span = <raw:span />
+		const Span = <raw:span />;
 
 		return <Span
 			isHovered={hover}
@@ -85,20 +133,16 @@ export default ThemeContext.use(h => {
 					return;
 				}
 
-				try {
-					createRipple(e);
-					const newValue = !value.get();
-					value.set(newValue);
-					if (onChange) {
-						onChange(newValue);
-					}
-				} catch (e) {
-					throw e;
+				createRipple(e);
+				const newValue = !value.get();
+				value.set(newValue);
+				if (onChange) {
+					onChange(newValue);
 				}
 			}}
 			{...props}
 			theme={[
-				"toggle",
+				'toggle',
 				type,
 				disabled.map(d => d ? 'disabled' : null),
 				hover.map(h => h ? 'hovered' : null),
@@ -107,6 +151,7 @@ export default ThemeContext.use(h => {
 			<span
 				theme={[
 					'toggleknob',
+					type,
 					value.map(v => v ? 'checked' : 'unchecked'),
 					disabled.map(d => d ? 'disabled' : null),
 				]}
