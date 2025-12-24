@@ -30,6 +30,13 @@ export default {
 		boxSizing: 'border-box',
 		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out, color 250ms ease-in-out, fill 250ms ease-in-out',
 
+		// line heights
+		$lh_body: '1.65',
+		$lh_head: '1.15',
+
+		// standard readable line length limit
+		$measure: '80ch',
+
 		/*
 		Adjusts the brightness of the input colour by shifting its value in the HSV colour space. Accepts colours
 		in hexadecimal, RGB, or HSV.
