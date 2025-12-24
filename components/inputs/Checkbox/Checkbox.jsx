@@ -6,7 +6,6 @@ import useRipples from '../../utils/Ripple/Ripple.jsx';
 
 Theme.define({
 	checkbox: {
-		extends: 'focusable',
 		accentColor: '$color',
 		height: '20px',
 		width: '20px'

@@ -141,16 +141,9 @@ export default {
 		pointerEvents: 'none',
 	},
 
-	focusable: {
-		borderStyle: 'solid',
-		borderWidth: .5,
-		borderColor: '$color',
-		transitionDuration: '0.3s',
-		transitionProperty: 'border-color, background-color, box-shadow',
-	},
 
 	field: {
-		extends: 'radius_typography_p1_regular_focusable',
+		extends: 'radius_typography_p1_regular',
 		outline: 0,
 		padding: 10,
 		background: '$invert($color_top)',
