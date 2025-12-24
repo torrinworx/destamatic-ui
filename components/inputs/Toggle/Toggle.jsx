@@ -46,6 +46,7 @@ Theme.define({
 });
 
 // TODO: Accessiblity: toggle not tabbable for some reason? We aren't using standard <input>, so we have to handle this ourselves properly.
+// TODO: Add focusable outline like buttons to toggle.
 
 export default ThemeContext.use(h => {
 	/**
