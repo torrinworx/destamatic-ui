@@ -15,6 +15,7 @@ Theme.define({
 		height: '30px',
 		background: '$color',
 		borderRadius: '37.5px',
+		userSelect: 'none',
 	},
 
 	toggle_hovered: {
