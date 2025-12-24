@@ -132,7 +132,7 @@ export default {
 	},
 
 	radius: {
-		$radius: '6px',
+		$radius: '12px',
 		borderRadius: '$radius',
 	},
 
@@ -140,7 +140,6 @@ export default {
 		cursor: 'default',
 		pointerEvents: 'none',
 	},
-
 
 	field: {
 		extends: 'radius_typography_p1_regular',
