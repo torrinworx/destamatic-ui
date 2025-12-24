@@ -46,11 +46,10 @@ Theme.define({
 		extends: 'typography_p1_bold',
 		borderWidth: 2,
 		borderStyle: 'solid',
-		color: '$color',
 	},
 
 	button_outlined_hovered: {
-		color: '$color_hover',
+		background: 'rgb(0, 0, 0, 0.1)',
 	},
 
 	button_outlined_disabled: {
