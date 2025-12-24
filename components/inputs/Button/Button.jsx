@@ -80,6 +80,10 @@ Theme.define({
 		textDecoration: 'underline',
 	},
 
+	button_link_clicked: {
+		color: 'purple',
+	},
+
 	button_link_focused: {
 		boxShadow: 'none',
 	}
@@ -102,8 +106,10 @@ export default ThemeContext.use(h => {
 		iconPosition = 'left',
 		loading = true,
 		href,
+		clicked = false,
 		...props
 	}) => {
+		if (!(clicked instanceof Observer)) clicked = Observer.mutable(clicked);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
@@ -121,6 +127,7 @@ export default ThemeContext.use(h => {
 		return <button ref
 			onClick={(event) => {
 				if (disabled.get()) return;
+				if (!clicked.get()) clicked.set(true);
 
 				if (onClick) {
 					createRipple(event);
@@ -135,6 +142,7 @@ export default ThemeContext.use(h => {
 			}}
 			onMouseDown={(event) => {
 				if (disabled.get()) return;
+				if (!clicked.get()) clicked.set(true);
 
 				focused.set(true);
 				if (onMouseDown) {
@@ -174,6 +182,7 @@ export default ThemeContext.use(h => {
 				hover.bool('hovered', null),
 				disabled.bool('disabled', null),
 				focused.bool('focused', null),
+				clicked.bool('clicked', null),
 			]}
 		>
 			<Shown value={loading}>
