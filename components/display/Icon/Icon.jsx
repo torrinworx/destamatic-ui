@@ -1,7 +1,15 @@
 import { Observer, OArray } from 'destam';
 
+import Theme from '../../utils/Theme/Theme.jsx';
 import createContext from '../../utils/Context/Context.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+
+Theme.define({
+	icon: {
+		color: '$color_text',
+	}
+});
+
 
 const parser = new DOMParser();
 
