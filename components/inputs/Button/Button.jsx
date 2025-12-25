@@ -124,6 +124,7 @@ export default ThemeContext.use(h => {
 		loading = true,
 		href,
 		clicked = false,
+		theme,
 		...props
 	}) => {
 		if (!(clicked instanceof Observer)) clicked = Observer.mutable(clicked);
@@ -199,6 +200,7 @@ export default ThemeContext.use(h => {
 			disabled={disabled}
 			{...props}
 			theme={[
+				theme,
 				'button',
 				type,
 				hover.bool('hovered', null),

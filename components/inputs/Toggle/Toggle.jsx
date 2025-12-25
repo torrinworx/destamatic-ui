@@ -6,28 +6,39 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import Button from '../Button/Button.jsx';
 
 Theme.define({
+	toggle: {
+		position: 'relative',
+		alignItems: 'center',
+		justifyContent: 'center',
+
+		width: 60,
+		minWidth: 60,
+		height: 30,
+		borderRadius: 37.5,
+		padding: 0,
+		boxSizing: 'border-box',
+
+		flexShrink: 0,
+		flexGrow: 0,
+	},
+
 	toggleknob: {
 		position: 'absolute',
 		top: '50%',
-		left: 0, // anchor to the left edge of the button
+		left: 0,
 		width: 23,
 		height: 23,
 		background: '$contrast_text($color_top)',
 		borderRadius: '50%',
-
-		// Only vertical centering here; no X shift in the base
 		transform: 'translateY(-50%) scale(1)',
 		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1)',
 		pointerEvents: 'none',
 	},
 
-	// CONTAINED positions
-	// Unchecked = left
 	toggleknob_unchecked: {
 		transform: 'translateX(5px) translateY(-50%) scale(1)',
 	},
 
-	// Checked = right
 	toggleknob_checked: {
 		transform: 'translateX(32px) translateY(-50%) scale(1)',
 	},
@@ -41,7 +52,6 @@ Theme.define({
 		background: '$bg',
 	},
 
-	// OUTLINED variant (slightly different offsets to account for border)
 	toggleknob_outlined: {
 		background: '$color',
 	},
@@ -60,29 +70,18 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	/**
-	 * Toggle built on top of Button.
-	 *
-	 * Extra API over Button:
-	 *   - value: boolean | Observer<boolean>
-	 *   - onChange: (newValue: boolean, event) => void
-	 */
 	const Toggle = ({
 		value,
 		onChange,
 		disabled,
 		hover,
 		focused,
-		type = 'contained',        // 'contained' | 'outlined' | etc, same as Button
-		label = '',                 // optional, usually empty for a pure switch
-		iconPosition = 'left',      // not super important, knob is absolute
-		inline,
+		type = 'contained',
 		style,
-		onClick,                    // optional, called after onChange
-		loading = false,            // toggles usually don't want LoadingDots
-		ref,                        // allow passing an Observer ref like TextField
-		...props                    // pass through rest of Button props (aria-*, tabIndex, etc)
-	}, cleanup, mounted) => {
+		onClick,
+		ref,
+		...props
+	}) => {
 		if (!(value instanceof Observer)) value = Observer.mutable(!!value);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(!!disabled);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
@@ -107,38 +106,21 @@ export default ThemeContext.use(h => {
 			]}
 		/>;
 
+		// Ensure Button's theme sees both "toggle" and the variant ("contained"/"outlined"/...)
+		const buttonType = Array.isArray(type) ? ['toggle', ...type] : ['toggle', type];
+
 		return <Button
 			ref={ref}
-			type={type}
-			label={label}
+			type={buttonType}
 			icon={knob}
-			iconPosition={iconPosition}
-			inline={inline}
 			disabled={disabled}
 			hover={hover}
 			focused={focused}
-			loading={loading}
 			onClick={handleClick}
 			role="switch"
 			aria-checked={value}
 			aria-disabled={disabled}
-
-			style={{
-				position: 'relative',
-				display: inline ? 'inline-flex' : 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				width: 60,
-				minWidth: 60,
-				height: 30,
-				borderRadius: 37.5,
-				padding: 0,
-				boxSizing: 'border-box',
-				flexShrink: 0,
-				flexGrow: 0,
-				...style,
-			}}
-
+			style={style}
 			{...props}
 		/>;
 	};
