@@ -1,58 +1,35 @@
+// Toggle.jsx
 import { Observer } from 'destam-dom';
 
 import Theme from '../../utils/Theme/Theme.jsx';
-import useRipples from '../../utils/Ripple/Ripple.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+import Button from '../Button/Button.jsx';
 
 Theme.define({
-	toggle: {
-		display: 'flex',
-		alignItems: 'center',
-		cursor: 'pointer',
-		overflow: 'clip',
-		position: 'relative',
-		color: '$color',
-		width: '60px',
-		height: '30px',
-		background: '$color',
-		borderRadius: '37.5px',
-		userSelect: 'none',
-	},
-
 	toggleknob: {
 		position: 'absolute',
 		top: '50%',
-		transform: 'translateX(4px) translateY(-50%) scale(1)',
-		width: '23px',
-		height: '23px',
+		left: 0, // anchor to the left edge of the button
+		width: 23,
+		height: 23,
 		background: '$contrast_text($color_top)',
 		borderRadius: '50%',
 
-		// TODO: Fix: this transform messes with the border styles of the outlined type, need to narrow the scope of this somehow:
+		// Only vertical centering here; no X shift in the base
+		transform: 'translateY(-50%) scale(1)',
 		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+		pointerEvents: 'none',
 	},
 
-	toggleknob_checked: {
-		// Slide the knob to the right.
-		transform: 'translateX(32px) translateY(-50%) scale(1)',
-	},
-
+	// CONTAINED positions
+	// Unchecked = left
 	toggleknob_unchecked: {
-		// Slide it back to the “left”
 		transform: 'translateX(5px) translateY(-50%) scale(1)',
 	},
 
-	toggle_contained: {
-		background: '$color',
-	},
-
-	toggle_contained_hovered: {
-		background: '$color_hover',
-	},
-
-	toggle_contained_disabled: {
-		$bg: '$saturate($color, -1)',
-		background: '$bg',
+	// Checked = right
+	toggleknob_checked: {
+		transform: 'translateX(32px) translateY(-50%) scale(1)',
 	},
 
 	toggleknob_contained: {
@@ -64,20 +41,7 @@ Theme.define({
 		background: '$bg',
 	},
 
-	toggle_outlined: {
-		background: 'transparent',
-		borderWidth: 2,
-		borderStyle: 'solid',
-	},
-
-	toggle_outlined_hovered: {
-		background: 'rgb(0, 0, 0, 0.1)',
-	},
-
-	toggle_outlined_disabled: {
-		borderColor: '$saturate($color, -1)',
-	},
-
+	// OUTLINED variant (slightly different offsets to account for border)
 	toggleknob_outlined: {
 		background: '$color',
 	},
@@ -86,79 +50,97 @@ Theme.define({
 		background: '$saturate($color, -1)',
 	},
 
-	toggleknob_outlined_checked: {
-		transform: 'translateX(30px) translateY(-50%) scale(1)',
-	},
-
 	toggleknob_outlined_unchecked: {
 		transform: 'translateX(3px) translateY(-50%) scale(1)',
 	},
 
-	toggle_hovered: {
-		background: '$color_hover',
+	toggleknob_outlined_checked: {
+		transform: 'translateX(30px) translateY(-50%) scale(1)',
 	},
 });
 
-// TODO: Accessiblity: toggle not tabbable for some reason? We aren't using standard <input>, so we have to handle this ourselves properly.
-// TODO: Add focusable outline like buttons to toggle.
-
 export default ThemeContext.use(h => {
 	/**
-	 * toggle component.
+	 * Toggle built on top of Button.
 	 *
-	 * @param {Object} props
-	 * @param {Observer<boolean>|boolean} [props.value]
-	 * @param {function} [props.onChange]
-	 * @param {Observer<boolean>|boolean} [props.disabled]
-	 * @param {'contained'|'outlined'|string} [props.type]
+	 * Extra API over Button:
+	 *   - value: boolean | Observer<boolean>
+	 *   - onChange: (newValue: boolean, event) => void
 	 */
 	const Toggle = ({
 		value,
 		onChange,
 		disabled,
-		type = 'contained', // default variant
-		...props
-	}) => {
-		if (!(value instanceof Observer)) value = Observer.immutable(value);
-		if (!(disabled instanceof Observer)) disabled = Observer.immutable(disabled);
+		hover,
+		focused,
+		type = 'contained',        // 'contained' | 'outlined' | etc, same as Button
+		label = '',                 // optional, usually empty for a pure switch
+		iconPosition = 'left',      // not super important, knob is absolute
+		inline,
+		style,
+		onClick,                    // optional, called after onChange
+		loading = false,            // toggles usually don't want LoadingDots
+		ref,                        // allow passing an Observer ref like TextField
+		...props                    // pass through rest of Button props (aria-*, tabIndex, etc)
+	}, cleanup, mounted) => {
+		if (!(value instanceof Observer)) value = Observer.mutable(!!value);
+		if (!(disabled instanceof Observer)) disabled = Observer.mutable(!!disabled);
+		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
+		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 
-		const hover = Observer.mutable(false);
-		const [ripples, createRipple] = useRipples();
-		const Span = <raw:span />;
+		const handleClick = (event) => {
+			if (disabled.get()) return;
 
-		return <Span
-			isHovered={hover}
-			onMouseDown={e => {
-				if (disabled.get()) {
-					return;
-				}
+			const newValue = !value.get();
+			value.set(newValue);
 
-				createRipple(e);
-				const newValue = !value.get();
-				value.set(newValue);
-				if (onChange) {
-					onChange(newValue);
-				}
-			}}
-			{...props}
+			if (onChange) onChange(newValue, event);
+			if (onClick) onClick(event);
+		};
+
+		const knob = <span
 			theme={[
-				'toggle',
+				'toggleknob',
 				type,
+				value.map(v => v ? 'checked' : 'unchecked'),
 				disabled.map(d => d ? 'disabled' : null),
-				hover.map(h => h ? 'hovered' : null),
 			]}
-		>
-			<span
-				theme={[
-					'toggleknob',
-					type,
-					value.map(v => v ? 'checked' : 'unchecked'),
-					disabled.map(d => d ? 'disabled' : null),
-				]}
-			/>
-			<span draggable="false" theme={[disabled.map(d => d ? 'checkboxOverlay' : null)]} />
-			{ripples}
-		</Span>;
+		/>;
+
+		return <Button
+			ref={ref}
+			type={type}
+			label={label}
+			icon={knob}
+			iconPosition={iconPosition}
+			inline={inline}
+			disabled={disabled}
+			hover={hover}
+			focused={focused}
+			loading={loading}
+			onClick={handleClick}
+			role="switch"
+			aria-checked={value}
+			aria-disabled={disabled}
+
+			style={{
+				position: 'relative',
+				display: inline ? 'inline-flex' : 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				width: 60,
+				minWidth: 60,
+				height: 30,
+				borderRadius: 37.5,
+				padding: 0,
+				boxSizing: 'border-box',
+				flexShrink: 0,
+				flexGrow: 0,
+				...style,
+			}}
+
+			{...props}
+		/>;
 	};
 
 	return Toggle;
