@@ -189,12 +189,12 @@ export default ThemeContext.use(h => {
 		if (!(cover instanceof Observer)) cover = Observer.immutable(cover !== false);
 		if (!(disabled instanceof Observer)) disabled = Observer.immutable(!!disabled);
 
-		const isVertical = type.map(([t, v]) => {
-				if (t === 'vertical') return true;
-				if (t === 'horizontal') return false;
-				if (v === null || v === undefined) return false;
-				return !!v;
-			});
+		const isVertical = type.map(t => {
+			if (t === 'vertical') return true;
+			if (t === 'horizontal') return false;
+		});
+
+		console.log(isVertical.get());
 
 		const rootRef = (ref instanceof Observer) ? ref : Observer.mutable(null);
 		const railRef = Observer.mutable(null);
