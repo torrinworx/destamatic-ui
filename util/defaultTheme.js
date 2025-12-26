@@ -182,7 +182,7 @@ export default {
 		width: '100%',
 		height: '2px',
 		background: '$color_top',
-		margin: '10px 0px 10px 0px',
+		margin: '40px 0px',
 	},
 
 	cursor: {
