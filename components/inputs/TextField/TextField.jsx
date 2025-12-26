@@ -76,7 +76,6 @@ export default ThemeContext.use(h => {
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 
-
 		const ref = Observer.mutable(null);
 
 		mounted(() => cleanup(focused.effect(e => {
@@ -114,7 +113,6 @@ export default ThemeContext.use(h => {
 				}
 			}}
 			isFocused={focused}
-
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
 				...style
