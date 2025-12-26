@@ -1,9 +1,12 @@
-import { Observer } from 'destam-dom';
+// src/components/inputs/TextArea/TextArea.jsx
+
+import Observer from 'destam/Observer';
 
 import Theme from '../../utils/Theme/Theme.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
+	// Extra tweaks on top of TextField's `field` theme
 	field_area: {
 		resize: 'none',
 		overflowY: 'auto',
@@ -11,107 +14,132 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	/**
-	 * Textarea component that provides a flexible and controllable text input area.
-	 * Automatically resizes based on the content up to a maximum height.
-	 *
-	 * @param {Object} props - The properties object.
-	 * @param {JSX.Element | string} [props.children] - Children elements to be included inside the textarea.
-	 * @param {Observer<string>} [props.value] - Observable value for the textarea content.
-	 * @param {Object} [props.style] - Custom styles to apply to the textarea.
-	 * @param {number} [props.maxHeight=200] - Maximum height of the textarea before it starts to scroll.
-	 * @param {Function} [props.onKeyDown] - Function to call when a key is pressed down inside the textarea.
-	 * @param {string} [props.placeholder] - Placeholder text for the textarea.
-	 * @param {...Object} [props] - Additional properties to spread onto the textarea element.
-	 * @param {boolean} isMounted - Observer to track if the component is mounted.
-	 * @param {boolean} isFocused - Observer to track if the textarea is focused.
-	 *
-	 * @returns {JSX.Element} The rendered textarea element.
-	 */
-	const Textarea = Theme.use(themer => (
-		{
-			children,
-			value,
-			style,
-			maxHeight = 200,
-			onKeyDown,
-			placeholder = '',
-			error,
-			theme,
-			type,
-			focused = false,
-			...props
-		},
-		cleanup,
-		mounted
-	) => {
+	const TextArea = ({
+		value,
+		type = 'text',      // 'contained' | 'outlined' | 'text'
+		style,
+		inline,
+		expand,
+		onEnter,
+		error,
+		focused,
+		disabled,
+		hover,
+		maxHeight = 200,    // matches the old textarea default
+		onKeyDown,
+		...props
+	}, cleanup, mounted) => {
+		// Normalize props to Observers (same pattern as TextField)
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
+		if (!(expand instanceof Observer)) expand = Observer.immutable(expand);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
+		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
+		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
+		if (!(maxHeight instanceof Observer)) maxHeight = Observer.immutable(maxHeight);
 
-		const isMounted = Observer.mutable(false);
 		const ref = Observer.mutable(null);
+		const isMounted = Observer.mutable(false);
 
-		// TODO: Figure out why the microtask is needed. Sometimes without it,
-		// the text area won't have the right initial size.
+		// microtask so layout / fonts settle before first measure
 		mounted(() => queueMicrotask(() => isMounted.set(true)));
 
+		// Focus binding
 		mounted(() => cleanup(focused.effect(e => {
-			if (e) ref.get().focus();
-			else ref.get().blur();
+			const el = ref.get();
+			if (!el) return;
+			if (e) el.focus();
+			else el.blur();
 		})));
 
-		const _class = themer(
-			theme,
-			'field',
-			'area',
-			type,
-			focused.map(e => e ? 'focused' : null),
-			error.map(e => e ? 'error' : null));
+		// Hook into h’s helpers
+		if (!focused.isImmutable()) props.isFocused = focused;
+		if (!hover.isImmutable()) props.isHovered = hover;
 
-		return <textarea ref={ref}
-			class={_class}
-			placeholder={placeholder}
-			$value={value}
-			onKeyDown={(e) => {
-				if (value.isImmutable()) {
-					e.preventDefault();
-				}
-
-				if (onKeyDown) onKeyDown(e);
-			}}
+		return <textarea
+			ref={ref}
+			rows={1}
+			$value={value.def('')}
 			onInput={e => {
+				if (disabled.get()) return;
+
 				if (value.isImmutable()) {
-					ref.get().value = value.get() || '';
+					const el = ref.get();
+					const v = value.get() || '';
+					if (el && el.value !== v) el.value = v;
 					return;
 				}
 
 				value.set(e.target.value);
 			}}
+			onKeyDown={e => {
+				if (disabled.get()) return;
+
+				if (value.isImmutable()) {
+					e.preventDefault();
+				}
+
+				if (onKeyDown) onKeyDown(e);
+
+				if (e.key === 'Enter' && onEnter) {
+					// don’t kill newline by default; let handler decide
+					onEnter(e);
+				}
+			}}
 			isFocused={focused}
 			style={{
-				height: isMounted.map(mounted => {
+				// this is the important bit: same style as old Textarea,
+				// just using the real element + maxHeight Observer
+				height: Observer.all([maxHeight, isMounted]).map(([_, mounted]) => {
 					if (!mounted) return 'auto';
 
 					return value.map(val => {
-						const elem = <raw:textarea class={_class.get()} rows={1} $value={val} $style={{
-							width: ref.get().clientWidth + 'px',
-						}} />;
+						const el = ref.get();
+						if (!el) return 'auto';
 
-						document.body.appendChild(elem);
-						let calculatedHeight = elem.scrollHeight + 1;
-						document.body.removeChild(elem);
+						// clone real textarea so we inherit all CSS/theme
+						const clone = el.cloneNode(true);
+						clone.value = val || '';
 
-						if (calculatedHeight > maxHeight) calculatedHeight = maxHeight;
+						clone.style.height = 'auto';
+						clone.style.position = 'absolute';
+						clone.style.visibility = 'hidden';
+						clone.style.pointerEvents = 'none';
+						clone.style.top = '0';
+						clone.style.left = '-9999px';
+						clone.rows = 1;
 
-						return calculatedHeight + 'px';
+						document.body.appendChild(clone);
+						let h = clone.scrollHeight + 1;
+						document.body.removeChild(clone);
+
+						const maxNum = Number.isFinite(+maxHeight.get())
+							? +maxHeight.get()
+							: null;
+
+						if (maxNum != null && h > maxNum) h = maxNum;
+
+						return h + 'px';
 					}).memo();
 				}).unwrap(),
-				...style
-			}}
-			{...props}
-		/>;
-	});
 
-	return Textarea;
+				display: inline ? 'inline-flex' : 'flex',
+				...style,
+			}}
+			disabled={disabled}
+			{...props}
+			theme={[
+				'field',
+				'area',
+				type,
+				focused.map(e => e ? 'focused' : null),
+				error.map(e => e ? 'error' : null),
+				expand.map(e => e ? 'expand' : null),
+				hover.bool('hovered', null),
+				disabled.bool('disabled', null),
+			]}
+		/>;
+	};
+
+	return TextArea;
 });
