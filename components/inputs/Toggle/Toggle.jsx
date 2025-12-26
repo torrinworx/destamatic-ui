@@ -1,4 +1,3 @@
-// Toggle.jsx
 import { Observer } from 'destam-dom';
 
 import Theme from '../../utils/Theme/Theme.jsx';
