@@ -1,223 +1,430 @@
 import { Observer } from 'destam-dom';
 
-import useAbort from '../../../util/abort.js';
 import Theme from '../../utils/Theme/Theme.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	slider: {
-		$size: 25,
-		$trackSize: 8,
-
 		position: 'relative',
-	},
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
 
-	slider_horizontal: {
-		$movementAnchor: 'left',
-		$eventAnchor: 'clientX',
-		$sizeAnchor: 'width',
+		padding: 12,
+		boxSizing: 'border-box',
+		userSelect: 'none',
+		touchAction: 'none',
 
-		width: '100%',
-		height: '$size$px',
-	},
-
-	slider_vertical: {
-		$movementAnchor: 'top',
-		$eventAnchor: 'clientY',
-		$sizeAnchor: 'height',
-
-		width: '$size$px',
-		height: '100%',
-	},
-
-	slider_track: {
-		background: '$saturate($shiftBrightness($color, 0.1), -1)',
-
-		position: 'absolute',
-		borderRadius: '$div($trackSize, 2)px',
 		cursor: 'pointer',
+
+		outline: 'none',
+		_cssProp_focus: {
+			outline: 'none',
+		},
 	},
 
-	slider_track_active: {
+	slider_horizontal: { width: 220, height: 44 },
+	slider_vertical: { width: 44, height: 220 },
+
+	sliderrail: {
+		position: 'relative',
+		width: '100%',
+		height: '100%',
+
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+
+	slidertrack: {
+		position: 'relative',
+		width: '100%',
+		height: 6,
+		borderRadius: 999,
+
+		background: '$alpha($color_top, 0.2)',
+		overflow: 'clip',
 		pointerEvents: 'none',
+	},
+
+	slidertrack_vertical: { width: 6, height: '100%' },
+
+	slidertrack_hovered: { background: '$alpha($color_top, 0.28)' },
+	slidertrack_disabled: { background: '$alpha($color_top, 0.12)' },
+
+	slidercover: {
 		position: 'absolute',
-		transition: 'width ease-in-out 100ms, height ease-in-out 100ms',
-		background: '$shiftBrightness($color, 0.1)',
-	},
-
-	slider_vertical_track_active: {
-		top: 0,
-	},
-
-	slider_horizontal_track_active: {
 		left: 0,
-	},
-
-	slider_horizontal_track: {
-		top: '50%',
-		width: '100%',
-		height: '$trackSize$px',
-		transform: 'translateY(-50%)',
-	},
-
-	slider_vertical_track: {
-		left: '50%',
-		width: '$trackSize$px',
+		top: 0,
 		height: '100%',
-		transform: 'translateX(-50%)',
-	},
+		width: '0%',
 
-	slider_track_hovered: {
-		background: '$shiftBrightness($color_hover, 0.1)',
-	},
-
-	slider_thumb: {
-		width: `$size$px`,
-		height: `$size$px`,
 		background: '$color',
+		borderRadius: 999,
+		pointerEvents: 'none',
+	},
 
+	slidercover_vertical: {
+		left: 0,
+		top: 'auto',
+		bottom: 0,
+		width: '100%',
+		height: '0%',
+	},
+
+	slidercover_hovered: { background: '$color_hover' },
+	slidercover_disabled: { background: '$saturate($color, -1)' },
+
+	sliderknob: {
 		position: 'absolute',
-		borderRadius: '50%',
-		cursor: 'pointer',
-	},
-
-	slider_horizontal_thumb: {
+		left: '0%',
 		top: '50%',
-		transform: 'translateY(-50%)'
+
+		width: 20,
+		height: 20,
+		borderRadius: '50%',
+
+		background: '$color',
+		transform: 'translate(-50%, -50%) scale(1)',
+		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
+		boxShadow: '0 2px 8px $alpha($color_top, 0.25)',
 	},
 
-	slider_vertical_thumb: {
+	sliderknob_vertical: {
 		left: '50%',
-		transform: 'translateX(-50%)'
+		top: '0%',
+		transform: 'translate(-50%, -50%) scale(1)',
 	},
 
-	slider_thumb_hovered: {
+	sliderknob_hovered: {
 		background: '$color_hover',
+		transform: 'translate(-50%, -50%) scale(1.1)',
+	},
+
+	sliderknob_vertical_hovered: {
+		transform: 'translate(-50%, -50%) scale(1.1)',
+	},
+
+	sliderknob_disabled: {
+		background: '$saturate($color, -1)',
+		boxShadow: 'none',
+	},
+
+	slider_horizontal_expand: {
+		width: '100%',
+	},
+
+	slider_vertical_expand: {
+		height: '100%',
 	},
 });
 
 export default ThemeContext.use(h => {
-	/**
-	 * Slider component for selecting a value from a range.
-	 *
-	 * @param {Object} props - The properties object.
-	 * @param {Observer<number>} [props.min=Observer.mutable(0)] - Observable minimum value of the slider.
-	 * @param {Observer<number>} [props.max=Observer.mutable(100)] - Observable maximum value of the slider.
-	 * @param {Observer<number>} [props.OValue=Observer.mutable(50)] - Observable value for the slider's position.
-	 * @param {Observer<boolean>} [props.disabled] - Observable boolean to determine if the slider is disabled.
-	 * @param {Object} [props.style] - Custom styles to apply to the slider container.
-	 * @param {Object} [props.trackStyle] - Custom styles to apply to the track element.
-	 * @param {Object} [props.thumbStyle] - Custom styles to apply to the thumb element.
-	 * @param {...Object} props - Additional properties to spread onto the slider container element.
-	 *
-	 * @returns {JSX.Element} The rendered slider element.
-	 */
-	const Slider = Theme.use(themer => ({
-		type="horizontal",
+	const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+	const snapToStep = (v, min, step) => {
+		step = parseFloat(step);
+		if (!Number.isFinite(step) || step <= 0) return v;
+
+		const snapped = min + Math.round((v - min) / step) * step;
+		const decimals = (String(step).split('.')[1] || '').length;
+		return parseFloat(snapped.toFixed(decimals));
+	};
+
+	const normalize = (v, min, max, step) => clamp(snapToStep(v, min, step), min, max);
+
+	const keyFromEvent = (e) => {
+		let k = e?.key || e?.code || '';
+		const code = e?.keyCode ?? e?.which ?? 0;
+
+		if (k === 'Left') k = 'ArrowLeft';
+		if (k === 'Right') k = 'ArrowRight';
+		if (k === 'Up') k = 'ArrowUp';
+		if (k === 'Down') k = 'ArrowDown';
+
+		if (!k && code) {
+			const map = {
+				37: 'ArrowLeft',
+				38: 'ArrowUp',
+				39: 'ArrowRight',
+				40: 'ArrowDown',
+				33: 'PageUp',
+				34: 'PageDown',
+				36: 'Home',
+				35: 'End',
+			};
+			k = map[code] || '';
+		}
+
+		return k;
+	};
+
+	const Slider = ({
+		value,
+		disabled,
 		min,
 		max,
-		value,
+		step,
+		type = 'horizontal',
+		cover = true,
+		expand = false,
 		hover,
-		disabled,
-		styleThumb,
-		styleTrack,
-		children,
+		focused,
+		style,
+		ref,
 		theme,
 		...props
-	}, cleanup, mount) => {
-		if (!(min instanceof Observer)) min = Observer.immutable(min ?? 0);
-		if (!(max instanceof Observer)) max = Observer.immutable(max ?? 1);
-		if (!(value instanceof Observer)) value = Observer.immutable(value ?? 0);
-		if (!(hover instanceof Observer)) hover = Observer.mutable(hover ?? false);
-		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled ?? false);
+	}, cleanup, mounted) => {
+		if (!(value instanceof Observer)) value = Observer.mutable(value);
+		if (!(hover instanceof Observer)) hover = Observer.mutable(false);
+		if (!(focused instanceof Observer)) focused = Observer.mutable(false);
 
-		const TrackRef = <raw:div />;
+		// Slider deafults
+		if (!(min instanceof Observer)) min = Observer.immutable(0);
+		if (!(max instanceof Observer)) max = Observer.immutable(1);
+		if (!(step instanceof Observer)) step = Observer.immutable(0.01);
+
+		if (!(type instanceof Observer)) type = Observer.immutable(type);
+		if (!(expand instanceof Observer)) expand = Observer.immutable(!!expand);
+		if (!(cover instanceof Observer)) cover = Observer.immutable(cover !== false);
+		if (!(disabled instanceof Observer)) disabled = Observer.immutable(!!disabled);
+
+		const vertical = type === 'vertical'
+
+		// derive orientation: type wins, else vertical prop
+		const isVertical = Observer.all([type, (vertical instanceof Observer) ? vertical : Observer.immutable(vertical)])
+			.map(([t, v]) => {
+				if (t === 'vertical') return true;
+				if (t === 'horizontal') return false;
+				if (v === null || v === undefined) return false;
+				return !!v;
+			});
+
+		const rootRef = (ref instanceof Observer) ? ref : Observer.mutable(null);
+		const railRef = Observer.mutable(null);
 		const dragging = Observer.mutable(false);
 
-		const vars = themer(theme, 'slider', type, 'thumb');
-		const size = vars.vars('size');
-		const movementAnchor = vars.vars('movementAnchor').get();
-		const eventAnchor = vars.vars('eventAnchor').get();
-		const sizeAnchor = vars.vars('sizeAnchor').get();
+		const safeMin = min.map(v => parseFloat(v));
+		const safeMax = max.map(v => parseFloat(v));
 
-		cleanup(dragging.effect(event => {
-			if (!event) return;
-			if (disabled.get()) return;
-
-			const rect = TrackRef.getBoundingClientRect();
-			const trackWidth = rect[sizeAnchor] - size.get();
-			const clickX = event[eventAnchor] - rect[movementAnchor] - size.get() / 2;
-			const minVal = min.get();
-			const maxVal = max.get();
-			const newValue = minVal + ((clickX / trackWidth) * (maxVal - minVal));
-			value.set(Math.min(Math.max(newValue, minVal), maxVal));
-		}));
-
-		cleanup(dragging.map(Boolean).effect(useAbort((signal, started) => {
-			if (!started) return;
-
-			const reset = () => dragging.set(false);
-			const move = e => dragging.set(e);
-
-			window.addEventListener('mousemove', move, {signal});
-			window.addEventListener('mouseup', reset, {signal});
-		})));
-
-		const percentage = Observer.all([value, min, max]).map(([value, min, max]) => {
-			const ratio = (value - min) / (max - min);
-			return Math.min(Math.max(ratio, 0), 1);
+		const percent = Observer.all([value, safeMin, safeMax]).map(([v, mn, mx]) => {
+			v = parseFloat(v);
+			if (!Number.isFinite(mn)) mn = 0;
+			if (!Number.isFinite(mx)) mx = 1;
+			if (!Number.isFinite(v)) v = mn;
+			if (mx === mn) return 0;
+			return clamp((v - mn) / (mx - mn), 0, 1);
 		});
 
-		const renderHover = value.isImmutable() ?
-			Observer.immutable(false) :
-			Observer.all([dragging, hover]).map(([a, b]) => a || b);
+		const setFromEvent = (event) => {
+			const el = railRef.get();
+			if (!el) return;
 
-		return <div ref
+			const mn = safeMin.get();
+			const mx = safeMax.get();
+			if (!Number.isFinite(mn) || !Number.isFinite(mx) || mx === mn) return;
+
+			const rect = el.getBoundingClientRect();
+			const vert = !!isVertical.get();
+
+			let p;
+			if (vert) p = (rect.bottom - event.clientY) / rect.height;
+			else p = (event.clientX - rect.left) / rect.width;
+
+			p = clamp(p, 0, 1);
+
+			const raw = mn + p * (mx - mn);
+			const next = normalize(raw, mn, mx, step.get());
+
+			if (!disabled.get() && !value.isImmutable()) value.set(next);
+		};
+
+		const stopWindowDrag = { fn: null };
+		const stopDrag = () => {
+			dragging.set(false);
+
+			if (stopWindowDrag.fn) {
+				stopWindowDrag.fn();
+				stopWindowDrag.fn = null;
+			}
+		};
+
+		mounted(() => cleanup(stopDrag));
+
+		if (!focused.isImmutable()) props.isFocused = focused;
+		if (!hover.isImmutable()) props.isHovered = hover;
+
+		// keep value normalized if bounds/step changes
+		mounted(() => cleanup(Observer.all([value, safeMin, safeMax, step]).effect(([v, mn, mx, st]) => {
+			if (disabled.get() || value.isImmutable()) return;
+
+			v = parseFloat(v);
+			if (!Number.isFinite(v) || !Number.isFinite(mn) || !Number.isFinite(mx)) return;
+
+			const next = normalize(v, mn, mx, st);
+			if (next !== v) value.set(next);
+		})));
+
+		const coverStyle = {
+			display: cover.map(c => c ? null : 'none'),
+			width: Observer.all([isVertical, percent]).map(([v, p]) => v ? '100%' : `${p * 100}%`),
+			height: Observer.all([isVertical, percent]).map(([v, p]) => v ? `${p * 100}%` : '100%'),
+		};
+
+		const knobStyle = {
+			left: Observer.all([isVertical, percent]).map(([v, p]) => v ? null : `${p * 100}%`),
+			top: Observer.all([isVertical, percent]).map(([v, p]) => v ? `${(1 - p) * 100}%` : null),
+		};
+
+		const applyStep = (dir, event) => {
+			if (!dir) return;
+
+			if (disabled.get()) return;
+			if (value.isImmutable()) return;
+
+			const mn = safeMin.get();
+			const mx = safeMax.get();
+			if (!Number.isFinite(mn) || !Number.isFinite(mx) || mx === mn) return;
+
+			let st = parseFloat(step.get() || 1);
+			if (!Number.isFinite(st) || st <= 0) st = 1;
+
+			let v = parseFloat(value.get());
+			if (!Number.isFinite(v)) v = mn;
+
+			event.preventDefault();
+			event.stopPropagation();
+
+			focused.set(true);
+			value.set(normalize(v + dir * st, mn, mx, st));
+		};
+
+		const handleKeyDown = (event) => {
+			const key = keyFromEvent(event);
+
+			// MUI-ish: all arrows always work, regardless of orientation
+			if (key === 'ArrowRight' || key === 'ArrowUp') return applyStep(1, event);
+			if (key === 'ArrowLeft' || key === 'ArrowDown') return applyStep(-1, event);
+
+			if (disabled.get() || value.isImmutable()) return;
+
+			const mn = safeMin.get();
+			const mx = safeMax.get();
+			if (!Number.isFinite(mn) || !Number.isFinite(mx) || mx === mn) return;
+
+			let st = parseFloat(step.get() || 1);
+			if (!Number.isFinite(st) || st <= 0) st = 1;
+
+			let v = parseFloat(value.get());
+			if (!Number.isFinite(v)) v = mn;
+
+			let next = null;
+			if (key === 'PageUp') next = v + st * 10;
+			else if (key === 'PageDown') next = v - st * 10;
+			else if (key === 'Home') next = mn;
+			else if (key === 'End') next = mx;
+			else return;
+
+			event.preventDefault();
+			event.stopPropagation();
+
+			focused.set(true);
+			value.set(normalize(next, mn, mx, st));
+		};
+
+		return <div
+			ref={rootRef}
+			tabIndex={disabled.map(d => d ? -1 : 0)}
+			role="slider"
+			aria-orientation={isVertical.map(v => v ? 'vertical' : 'horizontal')}
+			aria-disabled={disabled}
+			aria-valuemin={safeMin}
+			aria-valuemax={safeMax}
+			aria-valuenow={value}
+
+			onMouseLeave={() => focused.set(false)}
+
+			onPointerDown={(event) => {
+				if (disabled.get()) return;
+				if (value.isImmutable()) return;
+				if (event.button !== undefined && event.button !== 0) return;
+
+				focused.set(true);
+				rootRef.get()?.focus?.();
+
+				dragging.set(true);
+				setFromEvent(event);
+
+				const el = rootRef.get();
+				if (el?.setPointerCapture) {
+					try { el.setPointerCapture(event.pointerId); } catch { }
+					return;
+				}
+
+				const move = (e) => setFromEvent(e);
+				const up = () => stopDrag();
+
+				window.addEventListener('pointermove', move);
+				window.addEventListener('pointerup', up, { once: true });
+				window.addEventListener('pointercancel', up, { once: true });
+
+				stopWindowDrag.fn = () => window.removeEventListener('pointermove', move);
+			}}
+
+			onPointerMove={(event) => {
+				if (!dragging.get()) return;
+				setFromEvent(event);
+			}}
+
+			onPointerUp={() => stopDrag()}
+			onPointerCancel={() => stopDrag()}
+
+			onKeyDown={handleKeyDown}
+
+			style={style}
 			{...props}
-			theme={["slider", type]}
+			theme={[
+				theme,
+				'slider',
+				isVertical.map(v => v ? 'vertical' : 'horizontal'),
+				expand.map(e => e ? 'expand' : null),
+				disabled.bool('disabled', null),
+			]}
 		>
-			<TrackRef
-				theme={[
-					"slider", type, "track",
-					renderHover.bool('hovered', null),
-					disabled.bool('disabled', null),
-				]}
-				style={styleTrack}
-				isHovered={hover}
-				onMouseDown={event => {
-					if (!value.isImmutable()) {
-						event.preventDefault();
-						dragging.set(event);
-					}
-				}}
-				children={children}
-			/>
-			<div
-				theme={[
-					"slider", type, "track", "active",
-					renderHover.bool('hovered', null),
-					disabled.bool('disabled', null),
-				]}
-				style={{[sizeAnchor]: percentage.map(prc => (prc * 100) + '%')}}
-			/>
-			{value.isImmutable() ? null : <div
-				theme={[
-					"slider", type, "thumb",
-					dragging.map(h => h ? 'hovered' : null),
-					disabled.map(d => d ? 'disabled' : null),
-				]}
-				style={{
-					[movementAnchor]: Observer.all([percentage, size]).map(([prc, size]) => `calc(${prc * 100}% - (${size * prc}px))`),
-					...styleThumb,
-				}}
-				isHovered={hover}
-				onMouseDown={event => {
-					event.preventDefault();
-					dragging.set(event);
-				}}
-			/>}
+			<div ref={railRef} theme={['sliderrail']}>
+				<span
+					theme={[
+						'slidertrack',
+						isVertical.map(v => v ? 'vertical' : null),
+						hover.bool('hovered', null),
+						disabled.bool('disabled', null),
+						Observer.all([disabled, focused]).map(([d, f]) => !d && f ? 'focused' : null),
+					]}
+				>
+					<span
+						style={coverStyle}
+						theme={[
+							'slidercover',
+							isVertical.map(v => v ? 'vertical' : null),
+							hover.bool('hovered', null),
+							disabled.bool('disabled', null),
+						]}
+					/>
+				</span>
+
+				<span
+					style={knobStyle}
+					theme={[
+						'sliderknob',
+						isVertical.map(v => v ? 'vertical' : null),
+						hover.bool('hovered', null),
+						disabled.bool('disabled', null),
+						Observer.all([disabled, focused]).map(([d, f]) => !d && f ? 'focused' : null),
+					]}
+				/>
+			</div>
 		</div>;
-	});
+	};
 
 	return Slider;
 });
