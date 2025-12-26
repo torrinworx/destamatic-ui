@@ -189,11 +189,7 @@ export default ThemeContext.use(h => {
 		if (!(cover instanceof Observer)) cover = Observer.immutable(cover !== false);
 		if (!(disabled instanceof Observer)) disabled = Observer.immutable(!!disabled);
 
-		const vertical = type === 'vertical'
-
-		// derive orientation: type wins, else vertical prop
-		const isVertical = Observer.all([type, (vertical instanceof Observer) ? vertical : Observer.immutable(vertical)])
-			.map(([t, v]) => {
+		const isVertical = type.map(([t, v]) => {
 				if (t === 'vertical') return true;
 				if (t === 'horizontal') return false;
 				if (v === null || v === undefined) return false;
@@ -254,7 +250,6 @@ export default ThemeContext.use(h => {
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
 
-		// keep value normalized if bounds/step changes
 		mounted(() => cleanup(Observer.all([value, safeMin, safeMax, step]).effect(([v, mn, mx, st]) => {
 			if (disabled.get() || value.isImmutable()) return;
 
@@ -302,7 +297,6 @@ export default ThemeContext.use(h => {
 		const handleKeyDown = (event) => {
 			const key = keyFromEvent(event);
 
-			// MUI-ish: all arrows always work, regardless of orientation
 			if (key === 'ArrowRight' || key === 'ArrowUp') return applyStep(1, event);
 			if (key === 'ArrowLeft' || key === 'ArrowDown') return applyStep(-1, event);
 
