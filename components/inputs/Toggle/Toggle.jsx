@@ -69,6 +69,8 @@ Theme.define({
 	},
 });
 
+// TODO: Somehow make it clear to the user there is an off/on state with styling? 
+
 export default ThemeContext.use(h => {
 	const Toggle = ({
 		value,
