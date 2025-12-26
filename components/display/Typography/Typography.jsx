@@ -217,8 +217,8 @@ export const Typography = ThemeContext.use(h => {
 		return result;
 	};
 
-
 	const resolveTag = (type) => {
+		type = type.get();
 		if (!type) return 'span';
 
 		const [first] = type.split('_');
@@ -237,6 +237,8 @@ export const Typography = ThemeContext.use(h => {
 		theme,
 		...props
 	}) => {
+		if (!(type instanceof Observer)) type = Observer.immutable(type);
+
 		let display;
 
 		if (children.length > 0) {
