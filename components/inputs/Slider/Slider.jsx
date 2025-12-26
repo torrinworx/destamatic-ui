@@ -111,14 +111,6 @@ Theme.define({
 		background: '$saturate($color, -1)',
 		boxShadow: 'none',
 	},
-
-	slider_horizontal_expand: {
-		width: '100%',
-	},
-
-	slider_vertical_expand: {
-		height: '100%',
-	},
 });
 
 export default ThemeContext.use(h => {
