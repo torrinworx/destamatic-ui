@@ -10,7 +10,7 @@ Theme.define({
 		position: 'relative',
 		alignItems: 'center',
 		justifyContent: 'center',
-
+		userSelect: 'none',
 		width: 60,
 		minWidth: 60,
 		height: 30,
@@ -33,6 +33,7 @@ Theme.define({
 		transform: 'translateY(-50%) scale(1)',
 		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1)',
 		pointerEvents: 'none',
+		userSelect: 'none',
 	},
 
 	toggleknob_unchecked: {
