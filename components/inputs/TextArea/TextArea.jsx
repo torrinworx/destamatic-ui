@@ -1,145 +1,169 @@
-// src/components/inputs/TextArea/TextArea.jsx
-
 import Observer from 'destam/Observer';
 
 import Theme from '../../utils/Theme/Theme.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
-	// Extra tweaks on top of TextField's `field` theme
-	field_area: {
-		resize: 'none',
-		overflowY: 'auto',
-	},
+    field_area: {
+        resize: 'none',
+        overflowY: 'auto',
+    },
 });
 
 export default ThemeContext.use(h => {
-	const TextArea = ({
-		value,
-		type = 'text',      // 'contained' | 'outlined' | 'text'
-		style,
-		inline,
-		expand,
-		onEnter,
-		error,
-		focused,
-		disabled,
-		hover,
-		maxHeight = 200,    // matches the old textarea default
-		onKeyDown,
-		...props
-	}, cleanup, mounted) => {
-		// Normalize props to Observers (same pattern as TextField)
-		if (!(value instanceof Observer)) value = Observer.immutable(value);
-		if (!(error instanceof Observer)) error = Observer.immutable(error);
-		if (!(expand instanceof Observer)) expand = Observer.immutable(expand);
-		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
-		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
-		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
-		if (!(maxHeight instanceof Observer)) maxHeight = Observer.immutable(maxHeight);
+    const TextArea = ({
+        value,
+        type = 'text',
+        style,
+        inline,
+        expand,
+        onEnter,
+        error,
+        focused,
+        disabled,
+        hover,
+        maxHeight = 200,
+        onKeyDown,
+        ...props
+    }, cleanup, mounted) => {
+        if (!(value instanceof Observer)) value = Observer.immutable(value);
+        if (!(error instanceof Observer)) error = Observer.immutable(error);
+        if (!(expand instanceof Observer)) expand = Observer.immutable(expand);
+        if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
+        if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
+        if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
+        if (!(maxHeight instanceof Observer)) maxHeight = Observer.immutable(maxHeight);
 
-		const ref = Observer.mutable(null);
-		const isMounted = Observer.mutable(false);
+        const ref = Observer.mutable(null);
 
-		// microtask so layout / fonts settle before first measure
-		mounted(() => queueMicrotask(() => isMounted.set(true)));
+        const height = Observer.mutable('auto');
+        const overflowY = Observer.mutable('hidden');
 
-		// Focus binding
-		mounted(() => cleanup(focused.effect(e => {
-			const el = ref.get();
-			if (!el) return;
-			if (e) el.focus();
-			else el.blur();
-		})));
+        const measurer = { el: null };
 
-		// Hook into h’s helpers
-		if (!focused.isImmutable()) props.isFocused = focused;
-		if (!hover.isImmutable()) props.isHovered = hover;
+        const parseMax = (v) => {
+            const n = parseFloat(v);
+            return Number.isFinite(n) && n > 0 ? n : null;
+        };
 
-		return <textarea
-			ref={ref}
-			rows={1}
-			$value={value.def('')}
-			onInput={e => {
-				if (disabled.get()) return;
+        const resize = () => {
+            const el = ref.get();
+            const m = measurer.el;
+            if (!el || !m) return;
 
-				if (value.isImmutable()) {
-					const el = ref.get();
-					const v = value.get() || '';
-					if (el && el.value !== v) el.value = v;
-					return;
-				}
+            // Let theme-generated classes do the styling work
+            m.className = el.className;
 
-				value.set(e.target.value);
-			}}
-			onKeyDown={e => {
-				if (disabled.get()) return;
+            const w = el.getBoundingClientRect().width || el.clientWidth || 0;
+            m.style.width = Math.max(1, w) + 'px';
 
-				if (value.isImmutable()) {
-					e.preventDefault();
-				}
+            // Use DOM value best)(, fallback to observer
+            m.value = el.value ?? (value.get() || '');
 
-				if (onKeyDown) onKeyDown(e);
+            m.style.height = 'auto';
+            const natural = (m.scrollHeight || 0) + 1;
 
-				if (e.key === 'Enter' && onEnter) {
-					// don’t kill newline by default; let handler decide
-					onEnter(e);
-				}
-			}}
-			isFocused={focused}
-			style={{
-				// this is the important bit: same style as old Textarea,
-				// just using the real element + maxHeight Observer
-				height: Observer.all([maxHeight, isMounted]).map(([_, mounted]) => {
-					if (!mounted) return 'auto';
+            const maxH = parseMax(maxHeight.get());
+            const clamped = maxH != null ? Math.min(natural, maxH) : natural;
 
-					return value.map(val => {
-						const el = ref.get();
-						if (!el) return 'auto';
+            height.set(clamped + 'px');
+            overflowY.set(maxH != null && natural > maxH ? 'auto' : 'hidden');
+        };
 
-						// clone real textarea so we inherit all CSS/theme
-						const clone = el.cloneNode(true);
-						clone.value = val || '';
+        mounted(() => {
+            // Create a single hidden textarea measurer
+            const m = document.createElement('textarea');
+            m.setAttribute('aria-hidden', 'true');
+            m.tabIndex = -1;
+            m.rows = 1;
 
-						clone.style.height = 'auto';
-						clone.style.position = 'absolute';
-						clone.style.visibility = 'hidden';
-						clone.style.pointerEvents = 'none';
-						clone.style.top = '0';
-						clone.style.left = '-9999px';
-						clone.rows = 1;
+            // Hide it once (not copied every time)
+            m.style.position = 'absolute';
+            m.style.top = '0';
+            m.style.left = '-9999px';
+            m.style.visibility = 'hidden';
+            m.style.pointerEvents = 'none';
+            m.style.height = '0';
+            m.style.overflow = 'hidden';
 
-						document.body.appendChild(clone);
-						let h = clone.scrollHeight + 1;
-						document.body.removeChild(clone);
+            document.body.appendChild(m);
+            measurer.el = m;
 
-						const maxNum = Number.isFinite(+maxHeight.get())
-							? +maxHeight.get()
-							: null;
+            cleanup(() => m.remove());
 
-						if (maxNum != null && h > maxNum) h = maxNum;
+            // initial measure after layout settles
+            queueMicrotask(resize);
 
-						return h + 'px';
-					}).memo();
-				}).unwrap(),
+            // remeasure when value/maxHeight changes programmatically
+            cleanup(value.watch(() => queueMicrotask(resize)));
+            cleanup(maxHeight.watch(() => queueMicrotask(resize)));
 
-				display: inline ? 'inline-flex' : 'flex',
-				...style,
-			}}
-			disabled={disabled}
-			{...props}
-			theme={[
-				'field',
-				'area',
-				type,
-				focused.map(e => e ? 'focused' : null),
-				error.map(e => e ? 'error' : null),
-				expand.map(e => e ? 'expand' : null),
-				hover.bool('hovered', null),
-				disabled.bool('disabled', null),
-			]}
-		/>;
-	};
+            // remeasure on width changes (material-ish behavior)
+            const el = ref.get();
+            if (el && window.ResizeObserver) {
+                const ro = new ResizeObserver(() => resize());
+                ro.observe(el);
+                cleanup(() => ro.disconnect());
+            }
+        });
 
-	return TextArea;
+        mounted(() => cleanup(focused.effect(f => {
+            const el = ref.get();
+            if (!el) return;
+            if (f) el.focus();
+            else el.blur();
+        })));
+
+        if (!focused.isImmutable()) props.isFocused = focused;
+        if (!hover.isImmutable()) props.isHovered = hover;
+
+        return <textarea
+            ref={ref}
+            rows={1}
+            $value={value.def('')}
+            onInput={e => {
+                if (disabled.get()) return;
+
+                if (value.isImmutable()) {
+                    const el = ref.get();
+                    const v = value.get() || '';
+                    if (el && el.value !== v) el.value = v;
+                    resize();
+                    return;
+                }
+
+                value.set(e.target.value);
+                resize();
+            }}
+            onKeyDown={e => {
+                if (disabled.get()) return;
+
+                if (value.isImmutable()) e.preventDefault();
+
+                if (onKeyDown) onKeyDown(e);
+                if (e.key === 'Enter' && onEnter) onEnter(e);
+            }}
+            isFocused={focused}
+            style={{
+                height,
+                overflowY,
+                display: inline ? 'inline-flex' : 'flex',
+                ...style,
+            }}
+            disabled={disabled}
+            {...props}
+            theme={[
+                'field',
+                'area',
+                type,
+                focused.map(v => v ? 'focused' : null),
+                error.map(v => v ? 'error' : null),
+                expand.map(v => v ? 'expand' : null),
+                hover.bool('hovered', null),
+                disabled.bool('disabled', null),
+            ]}
+        />;
+    };
+
+    return TextArea;
 });
