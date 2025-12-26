@@ -9,14 +9,11 @@ Theme.define({
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
-
 		padding: 12,
 		boxSizing: 'border-box',
 		userSelect: 'none',
 		touchAction: 'none',
-
 		cursor: 'pointer',
-
 		outline: 'none',
 		_cssProp_focus: {
 			outline: 'none',
@@ -34,6 +31,8 @@ Theme.define({
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
+		userSelect: 'none',
+
 	},
 
 	slidertrack: {
@@ -45,6 +44,7 @@ Theme.define({
 		background: '$alpha($color_top, 0.2)',
 		overflow: 'clip',
 		pointerEvents: 'none',
+		userSelect: 'none',
 	},
 
 	slidertrack_vertical: { width: 6, height: '100%' },
@@ -62,6 +62,7 @@ Theme.define({
 		background: '$color',
 		borderRadius: 999,
 		pointerEvents: 'none',
+		userSelect: 'none',
 	},
 
 	slidercover_vertical: {
@@ -88,6 +89,7 @@ Theme.define({
 		transform: 'translate(-50%, -50%) scale(1)',
 		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
 		boxShadow: '0 2px 8px $alpha($color_top, 0.25)',
+		userSelect: 'none',
 	},
 
 	sliderknob_vertical: {
@@ -335,9 +337,7 @@ export default ThemeContext.use(h => {
 			aria-valuemin={safeMin}
 			aria-valuemax={safeMax}
 			aria-valuenow={value}
-
 			onMouseLeave={() => focused.set(false)}
-
 			onPointerDown={(event) => {
 				if (disabled.get()) return;
 				if (value.isImmutable()) return;
