@@ -10,6 +10,8 @@ Theme.define({
     },
 });
 
+// TODO: When disabled allow scrolling.
+
 export default ThemeContext.use(h => {
     const TextArea = ({
         value,
