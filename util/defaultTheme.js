@@ -173,6 +173,7 @@ export default {
 	right: { marginLeft: 'auto' },
 
 	spread: {
+		maxWidth: 'none',
 		display: 'flex',
 		justifyContent: 'space-between',
 	},
