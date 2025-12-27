@@ -5,22 +5,6 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import Button from '../Button/Button.jsx';
 
 Theme.define({
-	toggle: {
-		position: 'relative',
-		alignItems: 'center',
-		justifyContent: 'center',
-		userSelect: 'none',
-		width: 60,
-		minWidth: 60,
-		height: 30,
-		borderRadius: 37.5,
-		padding: 0,
-		boxSizing: 'border-box',
-
-		flexShrink: 0,
-		flexGrow: 0,
-	},
-
 	toggleknob: {
 		position: 'absolute',
 		top: '50%',
@@ -70,7 +54,7 @@ Theme.define({
 });
 
 // TODO: Somehow make it clear to the user there is an off/on state with styling? 
-
+// TODO: Type can only be outlined/contained, doesn't make sense to have a "text" theme here.
 export default ThemeContext.use(h => {
 	const Toggle = ({
 		value,
@@ -78,7 +62,7 @@ export default ThemeContext.use(h => {
 		disabled,
 		hover,
 		focused,
-		type = 'contained',
+		type = 'outlined',
 		style,
 		onClick,
 		ref,
@@ -108,12 +92,9 @@ export default ThemeContext.use(h => {
 			]}
 		/>;
 
-		// Ensure Button's theme sees both "toggle" and the variant ("contained"/"outlined"/...)
-		const buttonType = Array.isArray(type) ? ['toggle', ...type] : ['toggle', type];
-
 		return <Button
 			ref={ref}
-			type={buttonType}
+			type={type}
 			icon={knob}
 			disabled={disabled}
 			hover={hover}
@@ -122,7 +103,21 @@ export default ThemeContext.use(h => {
 			role="switch"
 			aria-checked={value}
 			aria-disabled={disabled}
-			style={style}
+			style={{
+				...style,
+				position: 'relative',
+				alignItems: 'center',
+				justifyContent: 'center',
+				userSelect: 'none',
+				width: 60,
+				minWidth: 60,
+				height: 30,
+				borderRadius: 37.5,
+				padding: 0,
+				boxSizing: 'border-box',
+				flexShrink: 0,
+				flexGrow: 0,
+			}}
 			{...props}
 		/>;
 	};

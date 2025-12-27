@@ -114,23 +114,26 @@ export default ThemeContext.use(h => {
 		inline,
 		onMouseDown,
 		onMouseUp,
+		round = false,
 		icon = null,
+		iconPosition = 'left',
 		style,
 		disabled,
 		hover,
 		focused,
 		children,
-		iconPosition = 'left',
 		loading = true,
 		href,
 		clicked = false,
-		theme,
 		...props
 	}) => {
 		if (!(clicked instanceof Observer)) clicked = Observer.mutable(clicked);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
+
+		if (!(type instanceof Observer)) type = Observer.immutable(type);
+		if (!(round instanceof Observer)) round = Observer.immutable(round);
 
 		if (!loading) loading = Observer.immutable(loading)
 		else loading = Observer.mutable(false)
@@ -141,9 +144,6 @@ export default ThemeContext.use(h => {
 
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
-
-		// Don't show ripples if link.
-		const is_link = (Array.isArray(type) ? type : type.split('_')).includes('link') ? true : false;
 
 		const handleLoading = (value) => {
 			// if the value is a promise, replace the button with a loading animation.
@@ -200,9 +200,9 @@ export default ThemeContext.use(h => {
 			disabled={disabled}
 			{...props}
 			theme={[
-				theme,
 				'button',
 				type,
+				round.bool('round', null),
 				hover.bool('hovered', null),
 				disabled.bool('disabled', null),
 				focused.bool('focused', null),
@@ -218,14 +218,14 @@ export default ThemeContext.use(h => {
 					{label}
 					{children}
 					{iconPosition === 'right' ? icon : null}
-					{is_link ? null : ripples}
+					{type.map(t => t === 'link' ? null : ripples)}
 				</mark:else>
 			</Shown>
 			<Shown value={href}>
 				<a
 					href={href}
 					aria-hidden="true"
-					onClick={(e) => e.preventDefault()}
+					onClick={e => e.preventDefault()}
 					style={{
 						all: "unset",
 						pointerEvents: "none",

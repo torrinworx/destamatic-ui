@@ -1,19 +1,11 @@
 import { Observer } from 'destam-dom';
 
 import { h } from '../../utils/h/h.jsx';
-import Theme from '../../utils/Theme/Theme.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 import Button from '../../inputs/Button/Button.jsx';
 import Shown from '../../utils/Shown/Shown.jsx';
 import { Icon } from '../../display/Icon/Icon.jsx';
-
-Theme.define({
-	dropdown: {
-		extends: 'fill_spread',
-		maxWidth: 'none',
-	}
-});
 
 export default ThemeContext.use(h => {
 	const DropDown = ({
@@ -22,7 +14,7 @@ export default ThemeContext.use(h => {
 		iconOpen = <Icon size="20" name="chevron-down" />,
 		iconClose = <Icon size="20" name="chevron-down" />,
 		label = '',
-		type = 'text_fill_spread',
+		type = 'text',
 		onClick,
 		inline,
 		onMouseDown,
@@ -44,7 +36,7 @@ export default ThemeContext.use(h => {
 
 		return <div style={style}>
 			<Button
-				type={[type, 'dropdown']}
+				type={type}
 				iconPosition={arrow === 'right' ? 'right' : 'left'}
 				label={label}
 				icon={open.map(show => (show ? iconOpen : iconClose))}
@@ -61,8 +53,13 @@ export default ThemeContext.use(h => {
 				loading={loading}
 				href={href}
 				{...props}
+				style={{
+					maxWidth: 'none',
+					display: 'flex',
+					justifyContent: 'space-between',
+					width: '100%', height: '100%'
+				}}
 			/>
-
 			<Shown value={open}>
 				{children}
 			</Shown>
