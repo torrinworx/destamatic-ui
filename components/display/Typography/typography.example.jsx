@@ -5,8 +5,7 @@ const Example = () => {
 	const SelectRadio = Radio(type);
 	const italic = Observer.mutable(false);
 	const bold = Observer.mutable(false);
-
-	const value = Observer.mutable('Try typing: TODO, @mention, #tag, *emphasis*, or !!strong!! text.');
+	const value = Observer.mutable('Try typing: TODO, DONE, @mention, #tag, *emphasis*, or !!strong!! text.');
 	const modifiers = [
 		{
 			check: /\b(TODO|DONE)\b/g,
@@ -76,8 +75,7 @@ const Example = () => {
 		},
 	];
 
-	return <>
-		<Typography />
+	return <div style={{ padding: 10 }}>
 		<div theme='row_fill_center_wrap' >
 			<SelectRadio value={'h1'} label='h1' />
 			<SelectRadio value={'h2'} label='h2' />
@@ -129,11 +127,10 @@ const Example = () => {
 				/>
 			</TextModifiers>
 		</div>
-	</>;
+	</div>;
 };
 
 export default {
-	open: true,
 	example: Example,
 	header: 'Typography',
 };
