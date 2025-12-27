@@ -76,7 +76,7 @@ Theme.define({
 	slidercover_hovered: { background: '$color_hover' },
 	slidercover_disabled: { background: '$saturate($color, -1)' },
 
-	sliderknob: {
+	sliderthumb: {
 		position: 'absolute',
 		left: '0%',
 		top: '50%',
@@ -92,22 +92,22 @@ Theme.define({
 		userSelect: 'none',
 	},
 
-	sliderknob_vertical: {
+	sliderthumb_vertical: {
 		left: '50%',
 		top: '0%',
 		transform: 'translate(-50%, -50%) scale(1)',
 	},
 
-	sliderknob_hovered: {
+	sliderthumb_hovered: {
 		background: '$color_hover',
 		transform: 'translate(-50%, -50%) scale(1.1)',
 	},
 
-	sliderknob_vertical_hovered: {
+	sliderthumb_vertical_hovered: {
 		transform: 'translate(-50%, -50%) scale(1.1)',
 	},
 
-	sliderknob_disabled: {
+	sliderthumb_disabled: {
 		background: '$saturate($color, -1)',
 		boxShadow: 'none',
 	},
@@ -166,7 +166,9 @@ export default ThemeContext.use(h => {
 		focused,
 		style,
 		ref,
-		theme,
+		styleThumb,
+		styleTrack,
+		children,
 		...props
 	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.mutable(value);
@@ -187,8 +189,6 @@ export default ThemeContext.use(h => {
 			if (t === 'vertical') return true;
 			if (t === 'horizontal') return false;
 		});
-
-		console.log(isVertical.get());
 
 		const rootRef = (ref instanceof Observer) ? ref : Observer.mutable(null);
 		const railRef = Observer.mutable(null);
@@ -253,17 +253,6 @@ export default ThemeContext.use(h => {
 			const next = normalize(v, mn, mx, st);
 			if (next !== v) value.set(next);
 		})));
-
-		const coverStyle = {
-			display: cover.map(c => c ? null : 'none'),
-			width: Observer.all([isVertical, percent]).map(([v, p]) => v ? '100%' : `${p * 100}%`),
-			height: Observer.all([isVertical, percent]).map(([v, p]) => v ? `${p * 100}%` : '100%'),
-		};
-
-		const knobStyle = {
-			left: Observer.all([isVertical, percent]).map(([v, p]) => v ? null : `${p * 100}%`),
-			top: Observer.all([isVertical, percent]).map(([v, p]) => v ? `${(1 - p) * 100}%` : null),
-		};
 
 		const applyStep = (dir, event) => {
 			if (!dir) return;
@@ -356,21 +345,16 @@ export default ThemeContext.use(h => {
 
 				stopWindowDrag.fn = () => window.removeEventListener('pointermove', move);
 			}}
-
 			onPointerMove={(event) => {
 				if (!dragging.get()) return;
 				setFromEvent(event);
 			}}
-
 			onPointerUp={() => stopDrag()}
 			onPointerCancel={() => stopDrag()}
-
 			onKeyDown={handleKeyDown}
-
 			style={style}
 			{...props}
 			theme={[
-				theme,
 				'slider',
 				isVertical.map(v => v ? 'vertical' : 'horizontal'),
 				expand.map(e => e ? 'expand' : null),
@@ -379,6 +363,7 @@ export default ThemeContext.use(h => {
 		>
 			<div ref={railRef} theme={['sliderrail']}>
 				<span
+					style={styleTrack}
 					theme={[
 						'slidertrack',
 						isVertical.map(v => v ? 'vertical' : null),
@@ -388,7 +373,11 @@ export default ThemeContext.use(h => {
 					]}
 				>
 					<span
-						style={coverStyle}
+						style={{
+							display: cover.map(c => c ? null : 'none'),
+							width: Observer.all([isVertical, percent]).map(([v, p]) => v ? '100%' : `${p * 100}%`),
+							height: Observer.all([isVertical, percent]).map(([v, p]) => v ? `${p * 100}%` : '100%'),
+						}}
 						theme={[
 							'slidercover',
 							isVertical.map(v => v ? 'vertical' : null),
@@ -396,12 +385,17 @@ export default ThemeContext.use(h => {
 							disabled.bool('disabled', null),
 						]}
 					/>
+					{children}
 				</span>
 
 				<span
-					style={knobStyle}
+					style={{
+						...styleThumb,
+						left: Observer.all([isVertical, percent]).map(([v, p]) => v ? null : `${p * 100}%`),
+						top: Observer.all([isVertical, percent]).map(([v, p]) => v ? `${(1 - p) * 100}%` : null),
+					}}
 					theme={[
-						'sliderknob',
+						'sliderthumb',
 						isVertical.map(v => v ? 'vertical' : null),
 						hover.bool('hovered', null),
 						disabled.bool('disabled', null),
