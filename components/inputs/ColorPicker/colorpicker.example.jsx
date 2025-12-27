@@ -1,7 +1,5 @@
 import { Typography, ColorPicker, OObject, Theme, ThemeContext } from 'destamatic-ui';
-
 import color from 'destamatic-ui/util/color';
-
 
 const Example = () => {
 	const specialTheme = OObject({
