@@ -248,7 +248,8 @@ export const Typography = ThemeContext.use(h => {
 		} else {
 			display = label;
 		}
-
+		
+		// TODO: make reactive, currently we only render the first instance of whatever type is as the tag.
 		const TagName = resolveTag(type);
 
 		if (!(display instanceof Observer)) display = Observer.immutable(display);
