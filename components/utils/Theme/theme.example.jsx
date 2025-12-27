@@ -74,7 +74,6 @@ const Example = ({ globalTheme }) => {
 };
 
 export default {
-	open: true,
 	example: Example,
 	header: 'Theme',
 };
