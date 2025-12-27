@@ -1,6 +1,14 @@
-import { mount, DropDown, Typography, Icon, Icons } from 'destamatic-ui';
-
+import { mount, DropDown, Typography, Icon, Icons, OObject, Theme } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
+
+const globalTheme = OObject({
+    primary: OObject({
+        $color: '#02CA9F',
+        $color_hover: '$shiftBrightness($color, 0.1)',
+        $color_error: 'red',
+        $color_top: 'black',
+    }),
+});
 
 const ExampleWrapper = ({ example }) => {
     const { header, example: ExampleComp } = example;
@@ -11,9 +19,10 @@ const ExampleWrapper = ({ example }) => {
         iconOpen={<Icon name="feather:chevron-up" />}
         iconClose={<Icon name="feather:chevron-down" />}
     >
-        <ExampleComp />
+        <ExampleComp globalTheme={globalTheme} />
     </DropDown>;
 };
+
 
 const Examples = () => {
     const example_array = Object.values(
@@ -23,9 +32,17 @@ const Examples = () => {
         )
     ).map(e => e.default);
 
-    return <Icons value={[IconifyIcons]}>
-        <ExampleWrapper each:example={example_array} />
-    </Icons>;
+    return <Theme value={globalTheme}>
+        <Icons value={[IconifyIcons]}>
+            <div theme='primary' style={{
+                background: '$color_background',
+                height: '100%',
+                minHeight: '100vh'
+            }}>
+                <ExampleWrapper each:example={example_array} />
+            </div>
+        </Icons>
+    </Theme>;
 };
 
 mount(document.body, <Examples />);
