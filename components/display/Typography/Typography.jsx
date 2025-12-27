@@ -13,7 +13,6 @@ Theme.define({
 		// standard readable line length limit
 		$measure: '80ch',
 
-		color: '$color_text',
 		whiteSpace: 'pre-wrap',
 		margin: 0,
 		fontWeight: '400',
