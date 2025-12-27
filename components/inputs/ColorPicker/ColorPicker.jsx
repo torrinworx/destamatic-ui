@@ -15,10 +15,9 @@ TODO:
 
 */
 
-
 Theme.define({
 	colorPicker: {
-		extends: 'radius',
+		transition: 'unset',
 		cursor: 'pointer',
 	},
 
