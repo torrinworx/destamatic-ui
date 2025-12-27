@@ -148,6 +148,7 @@ export default {
 	expand: {
 		flexGrow: 1,
 		height: '100%',
+		maxWidth: 'none',
 	},
 
 	start: {
