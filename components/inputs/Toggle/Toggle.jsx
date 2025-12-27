@@ -62,7 +62,7 @@ export default ThemeContext.use(h => {
 		disabled,
 		hover,
 		focused,
-		type = 'outlined',
+		type = 'contained',
 		style,
 		onClick,
 		ref,
