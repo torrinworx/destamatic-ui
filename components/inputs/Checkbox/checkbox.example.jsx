@@ -1,17 +1,41 @@
-import { Observer } from 'destam';
-import { mount } from 'destam-dom';
-import { Checkbox } from 'destamatic-ui';
+import { Checkbox, Typography, Toggle, Observer } from 'destamatic-ui';
 
 const Example = () => {
-	const checked = Observer.mutable(false);
+	const checkboxCount = Observer.mutable(0);
+	const disable_checkboxes = Observer.mutable(false)
 
-	return <div theme='column_center'>
-		{checked.map(c => `Checked: ${c}`)}
-
-		<div theme='row'>
-			<Checkbox value={checked} />
+	return <div style={{ padding: 10 }}>
+		<div theme='row_fill_center_warp'>
+			<Typography type='p1' label='Disable: ' />
+			<Toggle value={disable_checkboxes} />
 		</div>
-	</div>
+
+		<div theme='divider' />
+		<Typography
+			type='p1'
+			label={checkboxCount.map(c => `Boxes checked: ${c}`)}
+		/>
+
+		<div theme='column_center'>
+			{Array.from({ length: 8 }).map(() => <div theme='row'>{Array.from({ length: 8 }).map(() => Observer.mutable(false)).map(box =>
+				<Checkbox
+					disabled={disable_checkboxes}
+					value={box}
+					onChange={val => {
+						if (val) {
+							checkboxCount.set(checkboxCount.get() + 1);
+						} else {
+							checkboxCount.set(checkboxCount.get() - 1);
+						}
+					}}
+				/>
+			)}</div>)}
+		</div>
+	</div>;
 };
 
-mount(root, <Example />);
+export default {
+	open: true,
+	example: Example,
+	header: 'Checkbox',
+};
