@@ -6,7 +6,6 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	icon: {
-		color: '$color_text',
 		width: 'clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem)',
 		height: 'clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem)',
 	},
