@@ -5,7 +5,7 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import Button from '../Button/Button.jsx';
 
 Theme.define({
-	toggleknob: {
+	togglethumb: {
 		position: 'absolute',
 		top: '50%',
 		left: 0,
@@ -19,36 +19,36 @@ Theme.define({
 		userSelect: 'none',
 	},
 
-	toggleknob_unchecked: {
+	togglethumb_unchecked: {
 		transform: 'translateX(5px) translateY(-50%) scale(1)',
 	},
 
-	toggleknob_checked: {
+	togglethumb_checked: {
 		transform: 'translateX(32px) translateY(-50%) scale(1)',
 	},
 
-	toggleknob_contained: {
+	togglethumb_contained: {
 		background: '$contrast_text($color_top)',
 	},
 
-	toggleknob_contained_disabled: {
+	togglethumb_contained_disabled: {
 		$bg: '$saturate($contrast_text($color_top), -1)',
 		background: '$bg',
 	},
 
-	toggleknob_outlined: {
+	togglethumb_outlined: {
 		background: '$color',
 	},
 
-	toggleknob_outlined_disabled: {
+	togglethumb_outlined_disabled: {
 		background: '$saturate($color, -1)',
 	},
 
-	toggleknob_outlined_unchecked: {
+	togglethumb_outlined_unchecked: {
 		transform: 'translateX(3px) translateY(-50%) scale(1)',
 	},
 
-	toggleknob_outlined_checked: {
+	togglethumb_outlined_checked: {
 		transform: 'translateX(30px) translateY(-50%) scale(1)',
 	},
 });
@@ -83,19 +83,17 @@ export default ThemeContext.use(h => {
 			if (onClick) onClick(event);
 		};
 
-		const knob = <span
-			theme={[
-				'toggleknob',
-				type,
-				value.map(v => v ? 'checked' : 'unchecked'),
-				disabled.map(d => d ? 'disabled' : null),
-			]}
-		/>;
-
 		return <Button
 			ref={ref}
 			type={type}
-			icon={knob}
+			icon={<span
+				theme={[
+					'togglethumb',
+					type,
+					value.map(v => v ? 'checked' : 'unchecked'),
+					disabled.map(d => d ? 'disabled' : null),
+				]}
+			/>}
 			disabled={disabled}
 			hover={hover}
 			focused={focused}
