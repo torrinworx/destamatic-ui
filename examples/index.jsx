@@ -23,11 +23,10 @@ const ExampleWrapper = ({ example }) => {
     </DropDown>;
 };
 
-
 const Examples = () => {
     const example_array = Object.values(
         import.meta.glob(
-            '../../destamatic-ui/components/**/**/*.example.jsx',
+            '../components/**/**/*.example.jsx',
             { eager: true }
         )
     ).map(e => e.default);
