@@ -58,7 +58,7 @@ Theme.define({
 export default ThemeContext.use(h => {
 	const TextField = ({
 		value,
-		type = 'text',
+		type = 'contained',
 		style,
 		inline,
 		expand,
