@@ -151,7 +151,7 @@ export default ThemeContext.use(h => {
 				min={0}
 				max={1}
 				cover={false}
-				styleThumb={{ background: fullColor }}
+				styleThumb={{ background: fullColor, transition: 'unset' }}
 				styleTrack={{ background: null }}
 			>
 				<div theme='colorPicker_alpha' style={{
