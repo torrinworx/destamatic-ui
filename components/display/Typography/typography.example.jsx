@@ -5,73 +5,80 @@ const Example = () => {
 	const SelectRadio = Radio(type);
 	const italic = Observer.mutable(false);
 	const bold = Observer.mutable(false);
-	const value = Observer.mutable('Try typing: TODO, DONE, @mention, #tag, *emphasis*, or !!strong!! text.');
+	const value = Observer.mutable('Try typing: TODO, DONE, MAGIC, @mention, #tag, *emphasis*, or !!strong!! text.');
 	const modifiers = [
 		{
 			check: /\b(TODO|DONE)\b/g,
 			atomic: true,
-			return: match => (
-				<span
-					style={{
-						display: 'inline-block',
-						padding: '0 4px',
-						borderRadius: 4,
-						background: match === 'DONE' ? 'green' : 'orange',
-						color: 'white',
-						fontWeight: 600,
-					}}
-				>
-					{match}
-				</span>
-			),
+			return: match => <span
+				style={{
+					display: 'inline-block',
+					padding: '0 4px',
+					borderRadius: 4,
+					background: match === 'DONE' ? 'green' : 'orange',
+					color: 'white',
+					fontWeight: 600,
+				}}
+			>
+				{match}
+			</span>,
+		},
+		{
+			check: /\b(MAGIC)\b/g,
+			atomic: true,
+			return: match => <span
+				theme='primary'
+				style={{
+					display: 'inline-block',
+					padding: '0 4px',
+					borderRadius: 4,
+					background: '$color',
+					color: 'white',
+					fontWeight: 600,
+				}}
+			>
+				{match}
+			</span>,
 		},
 		{
 			check: /@\w+/g,
 			atomic: false,
-			return: match => (
-				<span
-					style={{
-						display: 'inline-block',
-						color: 'blue',
-						fontWeight: 500,
-					}}
-				>
-					{match}
-				</span>
-			),
+			return: match => <span
+				style={{
+					display: 'inline-block',
+					color: 'blue',
+					fontWeight: 500,
+				}}
+			>
+				{match}
+			</span>,
 		},
 		{
 			check: /#\w+/g,
 			atomic: false,
-			return: match => (
-				<span
-					style={{
-						display: 'inline-block',
-						color: 'green',
-						fontWeight: 500,
-					}}
-				>
-					{match}
-				</span>
-			),
+			return: match => <span
+				style={{
+					display: 'inline-block',
+					color: 'green',
+					fontWeight: 500,
+				}}
+			>
+				{match}
+			</span>,
 		},
 		{
 			check: /!!(.+?)!!/g,
 			atomic: false,
-			return: match => (
-				<span style={{ fontWeight: 700, display: 'inline-block' }}>
-					{match.slice(2, -2)}
-				</span>
-			),
+			return: match => <span style={{ fontWeight: 700, display: 'inline-block' }}>
+				{match.slice(2, -2)}
+			</span>,
 		},
 		{
 			check: /\*(.+?)\*/g,
 			atomic: false,
-			return: match => (
-				<span style={{ fontStyle: 'italic', display: 'inline-block' }}>
-					{match.slice(1, -1)}
-				</span>
-			),
+			return: match => <span style={{ fontStyle: 'italic', display: 'inline-block' }}>
+				{match.slice(1, -1)}
+			</span>,
 		},
 	];
 
