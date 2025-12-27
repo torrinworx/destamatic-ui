@@ -7,9 +7,19 @@ import Slider from '../Slider/Slider.jsx';
 import Theme from '../../utils/Theme/Theme.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
+/*
+TODO:
+- Keep transition effect on slider focused theme while continuing to remove it from the color of the sliderthumb.
+- Add focused effect to colorPicker_viewThumb and colorPicker_view outlined/focused thing like in Button/Slider.
+- Add hovered effect.
+
+*/
+
+
 Theme.define({
 	colorPicker: {
-		transition: 'unset',
+		extends: 'radius',
+		cursor: 'pointer',
 	},
 
 	colorPicker_base: {
@@ -38,11 +48,11 @@ Theme.define({
 		pointerEvents: 'none',
 	},
 
-	colorPicker_alpha_slider_track: {
+	colorPicker_alpha_slidertrack: {
 		background: 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQAWJ84A0+ScZRAxiGSRgQSAb40wkoDAgBvAlt1AAGcEIiBGgbiAAgXwixcH9GzgAAAABJRU5ErkJggg==") left center',
 	},
 
-	colorPicker_alpha_slider_track_hovered: {
+	colorPicker_alpha_slidertrack_hovered: {
 		background: 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQAWJ84A0+ScZRAxiGSRgQSAb40wkoDAgBvAlt1AAGcEIiBGgbiAAgXwixcH9GzgAAAABJRU5ErkJggg==") left center',
 	},
 });
@@ -55,7 +65,7 @@ let hsvCurve = Array(7).fill(null).map((_, i) => {
 const clamp = v => Math.max(Math.min(v, 1), 0);
 
 export default ThemeContext.use(h => {
-	const ColorPicker = ({value: valueRGB, hasAlpha = true}, cleanup) => {
+	const ColorPicker = ({ value: valueRGB, hasAlpha = true }, cleanup) => {
 		// covert the value (which is default rgb to hsv)
 		const value = Observer.mutable();
 
@@ -101,8 +111,8 @@ export default ThemeContext.use(h => {
 			handler(clicked);
 
 			const cancel = () => viewClicked.set(false);
-			window.addEventListener('mousemove', handler, {signal});
-			window.addEventListener('mouseup', cancel, {signal});
+			window.addEventListener('mousemove', handler, { signal });
+			window.addEventListener('mouseup', cancel, { signal });
 		})));
 
 		return <div theme={['colorPicker', 'base']}>
@@ -110,9 +120,9 @@ export default ThemeContext.use(h => {
 				e.preventDefault();
 				viewClicked.set(e);
 			}}>
-				<div style={{position: 'absolute', inset: 0, transition: 'unset', background: primary}} />
-				<div style={{position: 'absolute', inset: 0, background: 'linear-gradient(to right, white, rgba(0, 0, 0, 0))'}} />
-				<div style={{position: 'absolute', inset: 0, background: 'linear-gradient(to top, black, rgba(0, 0, 0, 0))'}} />
+				<div style={{ position: 'absolute', inset: 0, transition: 'unset', background: primary }} />
+				<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, white, rgba(0, 0, 0, 0))' }} />
+				<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, black, rgba(0, 0, 0, 0))' }} />
 				<div theme={['colorPicker', 'viewThumb']} style={{
 					left: value.map(hsv => Math.round(hsv[1] * 100) + '%'),
 					top: value.map(hsv => Math.round((1 - hsv[2]) * 100) + '%'),
@@ -128,8 +138,9 @@ export default ThemeContext.use(h => {
 				})}
 				min={0}
 				max={1}
-				styleThumb={{background: primary}}
-				styleTrack={{background: `linear-gradient(to right, ${hsvCurve})`}}
+				cover={false}
+				styleThumb={{ background: primary }}
+				styleTrack={{ background: `linear-gradient(to right, ${hsvCurve})` }}
 			/>
 
 			{hasAlpha ? <Slider
@@ -140,10 +151,11 @@ export default ThemeContext.use(h => {
 				})}
 				min={0}
 				max={1}
-				styleThumb={{background: fullColor}}
-				styleTrack={{background: null}}
+				cover={false}
+				styleThumb={{ background: fullColor }}
+				styleTrack={{ background: null }}
 			>
-				<div style={{
+				<div theme='colorPicker_alpha' style={{
 					inset: 0,
 					position: 'absolute',
 					borderRadius: 'inherit',
