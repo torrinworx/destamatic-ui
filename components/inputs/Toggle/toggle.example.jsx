@@ -15,7 +15,6 @@ const Example = () => {
 			<Toggle value={disable_toggles} />
 		</div>
 
-
 		<div theme='divider' />
 		<div theme='row_center_wrap'>
 			<Toggle type={type} value={Observer.mutable(false)} disabled={disable_toggles} />
