@@ -8,7 +8,8 @@ Theme.define({
 	checkbox: {
 		accentColor: '$color',
 		height: '20px',
-		width: '20px'
+		width: '20px',
+		cursor: 'pointer',
 	},
 	checkboxoverlay: {
 		position: 'absolute',
@@ -24,6 +25,8 @@ Theme.define({
 		flexWrap: 'wrap',
 	},
 	checkboxspan: {
+		cursor: 'pointer',
+
 		padding: "8px",
 		overflow: 'clip',
 		borderRadius: '50%',
