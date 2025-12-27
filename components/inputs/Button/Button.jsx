@@ -109,7 +109,7 @@ when appearing during a promise.
 export default ThemeContext.use(h => {
 	const Button = ({
 		label = '',
-		type = 'text',
+		type = 'contained',
 		onClick = () => { },
 		inline,
 		onMouseDown,
