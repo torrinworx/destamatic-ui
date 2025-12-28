@@ -18,6 +18,7 @@ Theme.define({
 		whiteSpace: 'pre',
 		overflowWrap: 'normal',
 		wordBreak: 'normal',
+		color: '$color_top'
 	},
 
 	richarea_typography: {
