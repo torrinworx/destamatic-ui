@@ -45,7 +45,7 @@ Theme.define({
 	radio_ring_3: {
 		// Use a scale transform instead of explicit width/height expansions.
 		// This helps avoid jitter and feels more fluid.
-		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
+		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1)',
 		background: '$color',
 		borderRadius: '50%',
 		width: '100%',
