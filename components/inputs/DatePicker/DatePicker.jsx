@@ -104,7 +104,7 @@ const month = [
 ];
 
 export default ThemeContext.use(h => {
-	const DateElem = ({value, min, max, theme, ...props}, cleanup, mounted) => {
+	const DatePicker = ({value, min, max, theme, ...props}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(min instanceof Observer)) min = Observer.immutable(min);
 		if (!(max instanceof Observer)) max = Observer.immutable(max);
@@ -262,5 +262,5 @@ export default ThemeContext.use(h => {
 		</div>;
 	};
 
-	return DateElem;
+	return DatePicker;
 });

@@ -22,7 +22,7 @@ export { default as Button } from './components/inputs/Button/Button.jsx';
 export { default as Checkbox } from './components/inputs/Checkbox/Checkbox.jsx';
 export { default as ColorPicker } from './components/inputs/ColorPicker/ColorPicker.jsx';
 export { default as Country } from './components/inputs/Country/Country.jsx';
-export { default as Date } from './components/inputs/Date/Date.jsx';
+export { default as DatePicker } from './components/inputs/DatePicker/DatePicker.jsx';
 export { default as Radio } from './components/inputs/Radio/Radio.jsx';
 export { default as RichArea } from './components/inputs/RichArea/RichArea.jsx';
 export { default as RichField } from './components/inputs/RichField/RichField.jsx';
