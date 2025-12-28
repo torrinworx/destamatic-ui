@@ -14,7 +14,7 @@ Theme.define({
 		overflow: 'auto',
 		minHeight: '1.2em',
 		userSelect: 'text',
-
+		color: '$color_top'
 	},
 
 	richtext_typography: {
