@@ -1,4 +1,4 @@
-import { Theme, Button, ColorPicker, Typography } from 'destamatic-ui';
+import { Theme, Button, ColorPicker, Typography, TextField, Observer } from 'destamatic-ui';
 import color from 'destamatic-ui/util/color';
 
 const Example = ({ globalTheme }) => {
@@ -35,6 +35,7 @@ const Example = ({ globalTheme }) => {
 			transform: 'translateY(-1px)',
 			boxShadow: '0 10px 24px $alpha($color, 0.7)',
 		},
+
 		button_outlined: {
 			extends: 'button',
 			borderWidth: 2,
@@ -49,11 +50,40 @@ const Example = ({ globalTheme }) => {
 			borderColor: '$color_alt',
 			color: '$color_alt',
 		},
-	}
+	};
+
+	const primaryColor = globalTheme.observer.path(['primary', '$color']);
+	const hexInput = Observer.mutable().def(primaryColor.get());
+
+	const handleSubmit = () => {
+		let val = hexInput.get().trim();
+
+		if (val && !val.startsWith('#')) {
+			val = `#${val}`;
+		}
+
+		primaryColor.set(val);
+	};
+
+	primaryColor.watch(() => hexInput.set(primaryColor.get()));
 
 	return <div style={{ margin: 10 }}>
 		<div theme='column_center'>
-			<ColorPicker value={globalTheme.observer.path(['primary', '$color']).setter((val, set) => set(color.toCSS(val)))} />
+			<ColorPicker
+				value={primaryColor.setter((val, set) => set(color.toCSS(val)))}
+			/>
+			<div theme='row_wrap' style={{ gap: 8, marginTop: 8 }}>
+				<TextField
+					label="Hex"
+					value={hexInput}
+					placeholder="color hex code"
+				/>
+				<Button
+					type="contained"
+					label="Apply"
+					onClick={handleSubmit}
+				/>
+			</div>
 		</div>
 
 		<Typography type='h2' label='Custom sub theme:' />
@@ -63,6 +93,7 @@ const Example = ({ globalTheme }) => {
 			<Button type='contained' label='Click Me' />
 			<Button type='outlined' label='Click Me' />
 		</div>
+
 		<Theme value={custom}>
 			<div theme='row_wrap_fill_center'>
 				<Typography type='h2' label='Candy: ' />
@@ -70,10 +101,11 @@ const Example = ({ globalTheme }) => {
 				<Button type='outlined' label='Click Me' />
 			</div>
 		</Theme>
-	</div>
+	</div>;
 };
 
 export default {
+	open: true,
 	example: Example,
 	header: 'Theme',
 };
