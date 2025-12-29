@@ -63,6 +63,7 @@ export default ThemeContext.use(h => {
 		hover,
 		focused,
 		type = 'contained',
+		autoType = false,
 		style,
 		onClick,
 		ref,
@@ -72,6 +73,10 @@ export default ThemeContext.use(h => {
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(!!disabled);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
+
+		const effectiveType = autoType
+			? value.map(v => v ? 'contained' : 'outlined')
+			: type;
 
 		const handleClick = (event) => {
 			if (disabled.get()) return;
@@ -85,11 +90,11 @@ export default ThemeContext.use(h => {
 
 		return <Button
 			ref={ref}
-			type={type}
+			type={effectiveType}
 			icon={<span
 				theme={[
 					'togglethumb',
-					type,
+					effectiveType,
 					value.map(v => v ? 'checked' : 'unchecked'),
 					disabled.map(d => d ? 'disabled' : null),
 				]}
