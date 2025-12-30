@@ -69,6 +69,7 @@ Theme.define({
 	},
 
 	button_link: {
+		userSelect: 'text',
 		extends: 'typography_p1_regular',
 		borderRadius: 'none',
 		padding: 1,
