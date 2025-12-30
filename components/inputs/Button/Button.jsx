@@ -158,7 +158,9 @@ export default ThemeContext.use(h => {
 		const showLeftIcon = icon && iconPosition === 'left';
 		const showRightIcon = icon && iconPosition === 'right';
 
-		return <button ref
+		return <button
+			ref
+			aria-label={props['aria-label'] ?? props.title}
 			onClick={(event) => {
 				if (disabled.get()) return;
 				if (!clicked.get()) clicked.set(true);
