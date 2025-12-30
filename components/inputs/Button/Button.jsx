@@ -214,10 +214,10 @@ export default ThemeContext.use(h => {
 					<LoadingDots />
 				</mark:then>
 				<mark:else>
-					{iconPosition === 'left' ? icon : null}
+					{iconPosition === 'left' ? <div style={{ marginRight: 4 }}>{icon}</div> : null}
 					{label}
 					{children}
-					{iconPosition === 'right' ? icon : null}
+					{iconPosition === 'right' ? <div style={{ marginLeft: 4 }}>{icon}</div> : null}
 					{type.map(t => t === 'link' ? null : ripples)}
 				</mark:else>
 			</Shown>
