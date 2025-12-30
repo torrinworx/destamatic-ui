@@ -146,12 +146,17 @@ export default ThemeContext.use(h => {
 		if (!hover.isImmutable()) props.isHovered = hover;
 
 		const handleLoading = (value) => {
-			// if the value is a promise, replace the button with a loading animation.
 			if (value && value.then && !loading.isImmutable()) {
 				loading.set(true);
 				value.catch(console.error).then(() => loading.set(false));
 			}
 		};
+
+		const hasTextOrChildren = !!label ||
+			(Array.isArray(children) ? children.length > 0 : !!children);
+
+		const showLeftIcon = icon && iconPosition === 'left';
+		const showRightIcon = icon && iconPosition === 'right';
 
 		return <button ref
 			onClick={(event) => {
@@ -214,10 +219,15 @@ export default ThemeContext.use(h => {
 					<LoadingDots />
 				</mark:then>
 				<mark:else>
-					{iconPosition === 'left' ? <div style={{ marginRight: 4 }}>{icon}</div> : null}
+					{showLeftIcon
+						? <div style={hasTextOrChildren ? { marginRight: 4 } : null}>{icon}</div>
+						: null}
 					{label}
 					{children}
-					{iconPosition === 'right' ? <div style={{ marginLeft: 4 }}>{icon}</div> : null}
+					{showRightIcon
+						? <div style={hasTextOrChildren ? { marginLeft: 4 } : null}>{icon}</div>
+						: null}
+
 					{type.map(t => t === 'link' ? null : ripples)}
 				</mark:else>
 			</Shown>
