@@ -78,10 +78,6 @@ Theme.define({
 		textDecoration: 'underline',
 	},
 
-	button_link_focused: {
-		boxShadow: 'none',
-	},
-
 	button_link_hovered: {
 		textDecorationThickness: '3px'
 	},
@@ -105,6 +101,8 @@ Theme.define({
 /*
 TODO: Make LoadingDots style consistent with typography so that it doesn't adjust the size of the button
 when appearing during a promise.
+
+TODO: On mobile, button taps feel really slow and laggy. Something needs to change be improved somehow, maybe onPointerDown? or some other event listener should be used? the current onClick is really slow on mobile touch screens.
 */
 
 export default ThemeContext.use(h => {
