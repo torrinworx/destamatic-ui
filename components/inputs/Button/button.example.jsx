@@ -62,13 +62,6 @@ const Example = () => {
 			/>
 			<Button
 				type={type}
-				label="Shine"
-				disabled={disable_buttons}
-				onClick={() => { }}
-				shine
-			/>
-			<Button
-				type={type}
 				iconPosition={icon_position.map(p => p ? 'right' : 'left')}
 				disabled={disable_buttons}
 				label={doneCheck.map(c => (c ? "Done!" : "Delay"))}

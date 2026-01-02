@@ -227,13 +227,11 @@ export default ThemeContext.use(h => {
 						: null)}
 					{label}
 					{children}
-					{ripples}
+					{type.map(t => t === 'link' ? null : ripples)}
 					{iconPosition.map(s => s === 'right' && icon
 						? <div style={hasTextOrChildren ? { marginLeft: 4 } : null}>{icon}</div>
 						: null)}
 
-					{type.map(t => t === 'link' ? null : <>
-					</>)}
 				</mark:else>
 			</Shown>
 			<Shown value={href}>
