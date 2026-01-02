@@ -26,7 +26,7 @@ export default ThemeContext.use(h => {
 		focused,
 		children,
 		iconPosition = 'left',
-		loading = true,
+		loading,
 		href,
 		...props
 	}) => {
