@@ -24,6 +24,11 @@ Theme.define({
 	}
 });
 
+/*
+TODO: Update validate parameters to that the user is able to run live validation in a validaiton context.
+
+*/
+
 const validators = {
 	phone: (value) => {
 		let val = value.get() || '';
