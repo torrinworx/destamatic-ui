@@ -4,6 +4,7 @@ const Example = () => {
 	const type = Observer.mutable('contained')
 	const SelectRadio = Radio(type);
 	const disable_buttons = Observer.mutable(false);
+	const icon_position = Observer.mutable(false)
 	const doneCheck = Observer.mutable(false);
 	doneCheck.watch(() => {
 		if (doneCheck.get()) {
@@ -24,6 +25,10 @@ const Example = () => {
 			<Typography type='p1' label='Disable: ' />
 			<Toggle value={disable_buttons} />
 		</div>
+		<div theme='row_fill_center_warp'>
+			<Typography type='p1' label='Icon Position: ' />
+			<Toggle value={icon_position} />
+		</div>
 
 		<div theme='divider' />
 
@@ -37,15 +42,7 @@ const Example = () => {
 			<Button
 				type={type}
 				disabled={disable_buttons}
-				iconPosition="right"
-				label="Click Me"
-				icon={<Icon name="feather:external-link" />}
-				onClick={() => { }}
-			/>
-			<Button
-				type={type}
-				disabled={disable_buttons}
-				iconPosition="left"
+				iconPosition={icon_position.map(p => p ? 'right' : 'left')}
 				label="Click Me"
 				icon={<Icon name="feather:external-link" />}
 				onClick={() => { }}
@@ -65,7 +62,14 @@ const Example = () => {
 			/>
 			<Button
 				type={type}
-				iconPosition="right"
+				label="Shine"
+				disabled={disable_buttons}
+				onClick={() => { }}
+				shine
+			/>
+			<Button
+				type={type}
+				iconPosition={icon_position.map(p => p ? 'right' : 'left')}
 				disabled={disable_buttons}
 				label={doneCheck.map(c => (c ? "Done!" : "Delay"))}
 				icon={doneCheck.map(c =>
