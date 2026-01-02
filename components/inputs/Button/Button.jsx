@@ -5,6 +5,7 @@ import { mark } from '../../utils/h/h.jsx';
 import Theme from '../../utils/Theme/Theme.jsx';
 import Shown from '../../utils/Shown/Shown.jsx';
 import LoadingDots from '../../utils/LoadingDots/LoadingDots.jsx';
+import useShine from '../../utils/Shine/Shine.jsx';
 import useRipples from '../../utils/Ripple/Ripple.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
@@ -96,6 +97,10 @@ Theme.define({
 		extends: 'typography_p1_regular',
 		borderRadius: '50%',
 	},
+
+	button_loading: {
+		cursor: 'wait',
+	},
 });
 
 /*
@@ -124,8 +129,9 @@ export default ThemeContext.use(h => {
 		loading = true,
 		href,
 		clicked = false,
+		shine = false,
 		...props
-	}) => {
+	}, _, mounted) => {
 		if (!(clicked instanceof Observer)) clicked = Observer.mutable(clicked);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
@@ -140,6 +146,7 @@ export default ThemeContext.use(h => {
 		disabled = Observer.all([disabled, loading]).map(([dis, lod]) => !!dis || lod);
 
 		const [ripples, createRipple] = useRipples();
+		const [shines, createShine] = useShine();
 
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
@@ -156,6 +163,10 @@ export default ThemeContext.use(h => {
 
 		const showLeftIcon = icon && iconPosition === 'left';
 		const showRightIcon = icon && iconPosition === 'right';
+
+		mounted(() => {
+			if (shine) createShine();
+		});
 
 		return <button
 			ref
@@ -201,7 +212,7 @@ export default ThemeContext.use(h => {
 			isFocused={focused}
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
-				...style
+				...style,
 			}}
 			disabled={disabled}
 			{...props}
@@ -210,8 +221,9 @@ export default ThemeContext.use(h => {
 				type,
 				round.bool('round', null),
 				hover.bool('hovered', null),
-				disabled.bool('disabled', null),
 				focused.bool('focused', null),
+				loading.bool('loading', null),
+				disabled.bool('disabled', null),
 				Observer.all([disabled, clicked]).map(([d, c]) => c && !d ? 'clicked' : null),
 			]}
 		>
@@ -229,7 +241,10 @@ export default ThemeContext.use(h => {
 						? <div style={hasTextOrChildren ? { marginLeft: 4 } : null}>{icon}</div>
 						: null}
 
-					{type.map(t => t === 'link' ? null : ripples)}
+					{type.map(t => t === 'link' ? null : <>
+						{shines}
+						{ripples}
+					</>)}
 				</mark:else>
 			</Shown>
 			<Shown value={href}>
