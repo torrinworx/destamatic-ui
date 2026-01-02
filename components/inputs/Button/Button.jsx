@@ -5,7 +5,6 @@ import { mark } from '../../utils/h/h.jsx';
 import Theme from '../../utils/Theme/Theme.jsx';
 import Shown from '../../utils/Shown/Shown.jsx';
 import LoadingDots from '../../utils/LoadingDots/LoadingDots.jsx';
-import useShine from '../../utils/Shine/Shine.jsx';
 import useRipples from '../../utils/Ripple/Ripple.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
@@ -126,27 +125,25 @@ export default ThemeContext.use(h => {
 		hover,
 		focused,
 		children,
-		loading = true,
+		loading,
 		href,
 		clicked = false,
-		shine = false,
 		...props
 	}, _, mounted) => {
 		if (!(clicked instanceof Observer)) clicked = Observer.mutable(clicked);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
+		if (!(loading instanceof Observer) && loading != false) loading = Observer.mutable(loading);
+		else loading = Observer.immutable(false);
+		if (!(iconPosition instanceof Observer)) iconPosition = Observer.mutable(iconPosition);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
 		if (!(type instanceof Observer)) type = Observer.immutable(type);
 		if (!(round instanceof Observer)) round = Observer.immutable(round);
 
-		if (!loading) loading = Observer.immutable(loading)
-		else loading = Observer.mutable(false)
-
 		disabled = Observer.all([disabled, loading]).map(([dis, lod]) => !!dis || lod);
 
 		const [ripples, createRipple] = useRipples();
-		const [shines, createShine] = useShine();
 
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
@@ -160,13 +157,6 @@ export default ThemeContext.use(h => {
 
 		const hasTextOrChildren = !!label ||
 			(Array.isArray(children) ? children.length > 0 : !!children);
-
-		const showLeftIcon = icon && iconPosition === 'left';
-		const showRightIcon = icon && iconPosition === 'right';
-
-		mounted(() => {
-			if (shine) createShine();
-		});
 
 		return <button
 			ref
@@ -232,18 +222,17 @@ export default ThemeContext.use(h => {
 					<LoadingDots />
 				</mark:then>
 				<mark:else>
-					{showLeftIcon
+					{iconPosition.map(s => s === 'left' && icon
 						? <div style={hasTextOrChildren ? { marginRight: 4 } : null}>{icon}</div>
-						: null}
+						: null)}
 					{label}
 					{children}
-					{showRightIcon
+					{ripples}
+					{iconPosition.map(s => s === 'right' && icon
 						? <div style={hasTextOrChildren ? { marginLeft: 4 } : null}>{icon}</div>
-						: null}
+						: null)}
 
 					{type.map(t => t === 'link' ? null : <>
-						{shines}
-						{ripples}
 					</>)}
 				</mark:else>
 			</Shown>
