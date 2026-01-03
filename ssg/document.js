@@ -335,8 +335,8 @@ if (typeof global.window.scroll !== 'function') {
 
 if (typeof global.window.requestAnimationFrame !== 'function') {
     global.window.requestAnimationFrame = function (cb) {
-        // Use setTimeout to simulate ~60fps
-        return setTimeout(() => cb(Date.now()), 16);
+        cb(Date.now());
+        return 0;
     };
 }
 
