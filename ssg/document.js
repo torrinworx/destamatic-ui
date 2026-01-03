@@ -323,6 +323,37 @@ if (typeof global.window === 'undefined') {
     };
 }
 
+if (typeof global.window.scrollTo !== 'function') {
+    global.window.scrollTo = function scrollTo(x, y) {
+        // no-op for SSG
+    };
+}
+
+if (typeof global.window.scroll !== 'function') {
+    global.window.scroll = global.window.scrollTo;
+}
+
+if (typeof global.window.requestAnimationFrame !== 'function') {
+    global.window.requestAnimationFrame = function (cb) {
+        // Use setTimeout to simulate ~60fps
+        return setTimeout(() => cb(Date.now()), 16);
+    };
+}
+
+if (typeof global.window.cancelAnimationFrame !== 'function') {
+    global.window.cancelAnimationFrame = function (id) {
+        clearTimeout(id);
+    };
+}
+
+if (typeof global.requestAnimationFrame !== 'function') {
+    global.requestAnimationFrame = global.window.requestAnimationFrame;
+}
+
+if (typeof global.cancelAnimationFrame !== 'function') {
+    global.cancelAnimationFrame = global.window.cancelAnimationFrame;
+}
+
 // minimal location so routing code doesn't explode
 if (!global.window.location) {
     global.window.location = {
