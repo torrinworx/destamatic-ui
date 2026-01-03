@@ -15,7 +15,6 @@ const BUILD_DIR = path.resolve(process.cwd(), BUILD_DIR_ARG);
 const OUT_DIR = path.join(BUILD_DIR, 'dist');
 const BUILD_FILE = path.join(BUILD_DIR, 'dist', 'index.ssg.js');
 
-
 const SITE_BASE_URL = process.argv[4] || 'https://example.com';
 
 const build = async () => {
@@ -41,6 +40,15 @@ const build = async () => {
 		baseUrl: SITE_BASE_URL,
 	});
 
+	console.log('SSG: about to inspect active handles...');
+	const inspector = await import('node:inspector').catch(() => null);
+	if (inspector) {
+		// or use process._getActiveHandles in Node <22
+		// eslint-disable-next-line no-underscore-dangle
+		const handles = process._getActiveHandles();
+		console.log('Active handles:', handles);
+	}
+
 	try {
 		await fs.unlink(BUILD_FILE);
 		console.log('SSG: removed', BUILD_FILE);
@@ -49,7 +57,14 @@ const build = async () => {
 	}
 };
 
-build().catch((err) => {
+build().then(() => {
+	console.log("BUILD DONE, checking handles...");
+	// give it a tiny timeout to flush logs
+	setTimeout(() => {
+		console.log("Forcing exit");
+		process.exit(0);
+	}, 500);
+}).catch((err) => {
 	console.error(err);
 	process.exit(1);
 });
