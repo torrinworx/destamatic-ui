@@ -2,6 +2,7 @@ import { Observer } from 'destam-dom';
 
 import Theme from '../../utils/Theme/Theme.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+import InputContext from '../../utils/InputContext/InputContext.jsx';
 
 Theme.define({
 	slider: {
@@ -111,7 +112,7 @@ Theme.define({
 	},
 });
 
-export default ThemeContext.use(h => {
+export default InputContext.use(input => ThemeContext.use(h => {
 	const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
 	const snapToStep = (v, min, step) => {
@@ -152,6 +153,8 @@ export default ThemeContext.use(h => {
 	};
 
 	const Slider = ({
+		id = null,
+		track = true,
 		value,
 		disabled,
 		min,
@@ -182,6 +185,7 @@ export default ThemeContext.use(h => {
 		if (!(expand instanceof Observer)) expand = Observer.immutable(!!expand);
 		if (!(cover instanceof Observer)) cover = Observer.immutable(cover !== false);
 		if (!(disabled instanceof Observer)) disabled = Observer.immutable(!!disabled);
+		if (!(track instanceof Observer)) track = Observer.immutable(track);
 
 		const isVertical = type.map(t => {
 			if (t === 'vertical') return true;
@@ -203,6 +207,17 @@ export default ThemeContext.use(h => {
 			if (mx === mn) return 0;
 			return clamp((v - mn) / (mx - mn), 0, 1);
 		});
+
+		const dragStartValue = Observer.mutable(null);
+
+		const fire = (type, payload) => {
+			if (!track.get()) return;
+			InputContext.fire(input, type, {
+				id,
+				component: 'Slider',
+				...payload,
+			});
+		};
 
 		const setFromEvent = (event) => {
 			const el = railRef.get();
@@ -235,6 +250,22 @@ export default ThemeContext.use(h => {
 				stopWindowDrag.fn();
 				stopWindowDrag.fn = null;
 			}
+
+			// treat "pointer up" as slide end
+			const start = dragStartValue.get();
+			const end = value.get();
+
+			if (start !== null) {
+				fire('slide', {
+					start,
+					end,
+					min: safeMin.get(),
+					max: safeMax.get(),
+					step: step.get(),
+				});
+			}
+
+			dragStartValue.set(null);
 		};
 
 		mounted(() => cleanup(stopDrag));
@@ -252,7 +283,7 @@ export default ThemeContext.use(h => {
 			if (next !== v) value.set(next);
 		})));
 
-		const applyStep = (dir, event) => {
+		const applyStep = (dir, event, key) => {
 			if (!dir) return;
 
 			if (disabled.get()) return;
@@ -271,8 +302,15 @@ export default ThemeContext.use(h => {
 			event.preventDefault();
 			event.stopPropagation();
 
+			const before = value.get();
+
 			focused.set(true);
 			value.set(normalize(v + dir * st, mn, mx, st));
+
+			const after = value.get();
+			if (before !== after) {
+				fire('slideKey', { key, start: before, end: after, event });
+			}
 		};
 
 		const handleKeyDown = (event) => {
@@ -280,6 +318,8 @@ export default ThemeContext.use(h => {
 
 			if (key === 'ArrowRight' || key === 'ArrowUp') return applyStep(1, event);
 			if (key === 'ArrowLeft' || key === 'ArrowDown') return applyStep(-1, event);
+
+			const before = value.get();
 
 			if (disabled.get() || value.isImmutable()) return;
 
@@ -305,6 +345,11 @@ export default ThemeContext.use(h => {
 
 			focused.set(true);
 			value.set(normalize(next, mn, mx, st));
+
+			const after = value.get();
+			if (before !== after) {
+				fire('slideKey', { key, start: before, end: after, event });
+			}
 		};
 
 		return <div
@@ -321,6 +366,9 @@ export default ThemeContext.use(h => {
 				if (disabled.get()) return;
 				if (value.isImmutable()) return;
 				if (event.button !== undefined && event.button !== 0) return;
+
+				dragStartValue.set(value.get());
+				fire('slideStart', { start: value.get(), event });
 
 				focused.set(true);
 				rootRef.get()?.focus?.();
@@ -405,4 +453,4 @@ export default ThemeContext.use(h => {
 	};
 
 	return Slider;
-});
+}));
