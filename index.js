@@ -48,6 +48,7 @@ export { default as Detached } from './components/utils/Detached/Detached.jsx';
 export { default as Attached } from './components/utils/Attached/Attached.jsx';
 export { default as Gradient } from './components/utils/Gradient/Gradient.jsx';
 export * from './components/utils/h/h.jsx';
+export { default as InputContext} from './components/utils/InputContext/InputContext.jsx';
 export { default as LoadingDots } from './components/utils/LoadingDots/LoadingDots.jsx';
 export { default as Popup } from './components/utils/Popup/Popup.jsx';
 export { PopupContext } from './components/utils/Popup/Popup.jsx';
