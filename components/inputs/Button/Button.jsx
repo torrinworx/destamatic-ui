@@ -7,6 +7,7 @@ import Shown from '../../utils/Shown/Shown.jsx';
 import LoadingDots from '../../utils/LoadingDots/LoadingDots.jsx';
 import useRipples from '../../utils/Ripple/Ripple.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+import InputContext from '../../utils/InputContext/InputContext.jsx';
 
 Theme.define({
 	button: {
@@ -109,8 +110,10 @@ when appearing during a promise.
 TODO: On mobile, button taps feel really slow and laggy. Something needs to change be improved somehow, maybe onPointerDown? or some other event listener should be used? the current onClick is really slow on mobile touch screens.
 */
 
-export default ThemeContext.use(h => {
+export default InputContext.use(input => ThemeContext.use(h => {
 	const Button = ({
+		id = null,                 // <-- add (manual id is best)
+		track = true,              // <-- add (opt-out)
 		label = '',
 		type = 'contained',
 		onClick = () => { },
@@ -129,7 +132,7 @@ export default ThemeContext.use(h => {
 		href,
 		clicked = false,
 		...props
-	}, _, mounted) => {
+	}) => {
 		if (!(clicked instanceof Observer)) clicked = Observer.mutable(clicked);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
@@ -140,6 +143,7 @@ export default ThemeContext.use(h => {
 
 		if (!(type instanceof Observer)) type = Observer.immutable(type);
 		if (!(round instanceof Observer)) round = Observer.immutable(round);
+		if (!(track instanceof Observer)) track = Observer.immutable(track);
 
 		disabled = Observer.all([disabled, loading]).map(([dis, lod]) => !!dis || lod);
 
@@ -158,12 +162,26 @@ export default ThemeContext.use(h => {
 		const hasTextOrChildren = !!label ||
 			(Array.isArray(children) ? children.length > 0 : !!children);
 
+		const trackClick = (event) => {
+			if (!track.get()) return;
+			InputContext.fire(input, 'click', {
+				id,
+				component: 'Button',
+				label,
+				title: props.title,
+				href,
+				event,
+			});
+		};
+
 		return <button
 			ref
 			aria-label={props['aria-label'] ?? props.title}
 			onClick={(event) => {
 				if (disabled.get()) return;
 				if (!clicked.get()) clicked.set(true);
+
+				trackClick(event);
 
 				if (onClick) {
 					createRipple(event);
@@ -175,6 +193,16 @@ export default ThemeContext.use(h => {
 				if (!clicked.get()) clicked.set(true);
 
 				focused.set(true);
+
+				if (track.get()) {
+					InputContext.fire(input, 'press', {
+						id,
+						component: 'Button',
+						label,
+						event,
+					});
+				}
+
 				if (onMouseDown) {
 					createRipple(event);
 					onMouseDown(event);
@@ -182,6 +210,15 @@ export default ThemeContext.use(h => {
 			}}
 			onMouseUp={(event) => {
 				if (disabled.get()) return;
+
+				if (track.get()) {
+					InputContext.fire(input, 'release', {
+						id,
+						component: 'Button',
+						label,
+						event,
+					});
+				}
 
 				if (onMouseUp) {
 					createRipple(event);
@@ -193,6 +230,15 @@ export default ThemeContext.use(h => {
 					event.preventDefault();
 					focused.set(true);
 					createRipple(event);
+
+					if (track.get()) {
+						InputContext.fire(input, 'enter', {
+							id,
+							component: 'Button',
+							label,
+							event,
+						});
+					}
 
 					if (onClick) handleLoading(onClick(event));
 					if (onMouseDown) handleLoading(onMouseDown(event))
@@ -250,4 +296,4 @@ export default ThemeContext.use(h => {
 	};
 
 	return Button;
-});
+}));
