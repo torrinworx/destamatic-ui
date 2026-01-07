@@ -41,16 +41,12 @@ const Example = () => {
 				</div>
 			</div>
 
-			<div theme='center_fill'>
-				<Typography label='logs: ' type='p1' />
-			</div>
-
 			<div theme='divider' />
 
 			<div theme='row_wrap'>
 				<div theme='fill' style={{ flex: '1' }} >
-					<Button track={tracking} type='contained' label='test' onClick={() => { console.log('button clicked') }} />
-					<Slider track={tracking} value={Observer.mutable(0.5)} />
+					<Button id='custom-button-id' track={tracking} type='contained' label='test' onClick={() => { console.log('button clicked') }} />
+					<Slider id='custom-slider-id' track={tracking} value={Observer.mutable(0.5)} />
 				</div>
 				<div theme='column_center_fill' style={{ flex: '1' }}>
 					<LogEntry each={log} />
@@ -61,7 +57,6 @@ const Example = () => {
 };
 
 export default {
-	open: true,
 	example: Example,
 	header: 'InputContext',
 };
