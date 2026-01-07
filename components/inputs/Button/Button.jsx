@@ -112,8 +112,8 @@ TODO: On mobile, button taps feel really slow and laggy. Something needs to chan
 
 export default InputContext.use(input => ThemeContext.use(h => {
 	const Button = ({
-		id = null,                 // <-- add (manual id is best)
-		track = true,              // <-- add (opt-out)
+		id = null,
+		track = true,
 		label = '',
 		type = 'contained',
 		onClick = () => { },
