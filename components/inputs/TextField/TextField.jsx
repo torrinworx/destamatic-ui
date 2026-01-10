@@ -10,6 +10,7 @@ Theme.define({
 		padding: 10,
 		border: 'none',
 		color: '$color',
+		background: 'none',
 	},
 
 	field_contained: {
@@ -23,9 +24,8 @@ Theme.define({
 	},
 
 	field_contained_disabled: {
-		$bg: '$saturate($color, -1)',
-		background: '$bg',
-		color: '$contrast_text($bg)',
+		background: '$color_disabled',
+		color: '$contrast_text($color_disabled)',
 	},
 
 	field_outlined: {
@@ -35,11 +35,11 @@ Theme.define({
 	},
 
 	field_outlined_hovered: {
-		background: 'rgb(0, 0, 0, 0.1)',
+		background: '$color_hover',
 	},
 
 	field_outlined_disabled: {
-		color: '$saturate($color, -1)',
+		color: '$color_disabled',
 	},
 
 	field_text: {
@@ -47,11 +47,11 @@ Theme.define({
 	},
 
 	field_text_hovered: {
-		background: 'rgb(0, 0, 0, 0.1)',
+		background: '$color_hover',
 	},
 
 	field_text_disabled: {
-		color: '$saturate($color, -1)',
+		color: '$color_disabled',
 	},
 });
 
