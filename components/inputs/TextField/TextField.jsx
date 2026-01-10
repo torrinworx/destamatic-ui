@@ -66,12 +66,14 @@ export default ThemeContext.use(h => {
 		error,
 		focused,
 		disabled,
+		password,
 		hover,
 		...props
 	}, cleanup, mounted) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(error instanceof Observer)) error = Observer.immutable(error);
 		if (!(expand instanceof Observer)) expand = Observer.immutable(expand);
+		if (!(password instanceof Observer)) password = Observer.immutable(password);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
@@ -97,7 +99,7 @@ export default ThemeContext.use(h => {
 				}
 				value.set(e.target.value);
 			}}
-			type='text'
+			type={password.bool('password', 'text')}
 			onKeyDown={e => {
 				if (disabled.get()) return;
 
