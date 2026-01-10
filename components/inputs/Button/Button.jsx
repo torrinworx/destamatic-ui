@@ -38,9 +38,8 @@ Theme.define({
 	},
 
 	button_contained_disabled: {
-		$bg: '$saturate($color, -1)',
-		background: '$bg',
-		color: '$contrast_text($bg)',
+		background: '$color_disabled',
+		color: '$contrast_text($color_disabled)',
 	},
 
 	button_outlined: {
@@ -54,7 +53,7 @@ Theme.define({
 	},
 
 	button_outlined_disabled: {
-		color: '$saturate($color, -1)',
+		color: '$color_disabled',
 	},
 
 	button_text: {
@@ -66,7 +65,7 @@ Theme.define({
 	},
 
 	button_text_disabled: {
-		color: '$saturate($color, -1)',
+		color: '$color_disabled',
 	},
 
 	button_link: {
@@ -84,7 +83,7 @@ Theme.define({
 	},
 
 	button_link_disabled: {
-		color: '$saturate($color, -1)',
+		color: '$color_disabled',
 	},
 
 	// TODO: Somehow disable transition for just clicked? it feels weird on mobile when clicking a link and it takes a second to transition to the clicked state
