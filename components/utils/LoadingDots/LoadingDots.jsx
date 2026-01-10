@@ -23,14 +23,18 @@ Theme.define({
 		animationTimingFunction: 'ease-in-out',
 		margin: '0px 4px',
 	},
+
+	loadingDots_dot_contained: {
+		background: '$color_top',
+	},
 });
 
 export default ThemeContext.use(h => {
-	const LoadingDots = () => {
+	const LoadingDots = ({ type }) => {
 		return <div ref theme='loadingDots'>
-			<span theme='loadingDots_dot' style={{ animationDelay: '0s' }}></span>
-			<span theme='loadingDots_dot' style={{ animationDelay: '.2s' }}></span>
-			<span theme='loadingDots_dot' style={{ animationDelay: '.4s' }}></span>
+			<span theme={['loadingDots', 'dot', type]} style={{ animationDelay: '0s' }}></span>
+			<span theme={['loadingDots', 'dot', type]} style={{ animationDelay: '.2s' }}></span>
+			<span theme={['loadingDots', 'dot', type]} style={{ animationDelay: '.4s' }}></span>
 		</div>;
 	};
 

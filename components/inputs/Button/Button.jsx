@@ -265,7 +265,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		>
 			<Shown value={loading}>
 				<mark:then>
-					<LoadingDots />
+					<LoadingDots type={type} />
 				</mark:then>
 				<mark:else>
 					{iconPosition.map(s => s === 'left' && icon
