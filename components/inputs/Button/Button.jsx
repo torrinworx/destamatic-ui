@@ -70,12 +70,12 @@ Theme.define({
 	},
 
 	button_link: {
-		userSelect: 'text',
 		extends: 'typography_p1_regular',
+		userSelect: 'text',
 		borderRadius: 'none',
 		padding: 1,
 		overflow: 'visible',
-		color: 'blue',
+		color: '$color',
 		textDecoration: 'underline',
 	},
 
