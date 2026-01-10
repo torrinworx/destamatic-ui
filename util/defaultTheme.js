@@ -123,6 +123,7 @@ export default {
 		$color_hover: '$shiftBrightness($color, 0.1)',
 		$color_error: 'red',
 		$color_top: 'black',
+		$color_disabled: '$saturate($color, -1)',
 	},
 
 	center: {
