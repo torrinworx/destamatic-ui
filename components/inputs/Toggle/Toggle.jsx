@@ -31,17 +31,12 @@ Theme.define({
 		background: '$contrast_text($color_top)',
 	},
 
-	togglethumb_contained_disabled: {
-		$bg: '$saturate($contrast_text($color_top), -1)',
-		background: '$bg',
-	},
-
 	togglethumb_outlined: {
 		background: '$color',
 	},
 
 	togglethumb_outlined_disabled: {
-		background: '$saturate($color, -1)',
+		background: '$color_disabled',
 	},
 
 	togglethumb_outlined_unchecked: {
