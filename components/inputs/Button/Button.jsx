@@ -94,10 +94,10 @@ Theme.define({
 	},
 
 	button_round: {
-		extends: 'typography_p1_regular',
 		borderRadius: '50%',
 	},
 
+	// not working right now because disabled=true prop in button overwrites any css cursor we define.
 	button_loading: {
 		cursor: 'wait',
 	},
