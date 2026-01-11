@@ -313,7 +313,7 @@ global.document.body = new Node('body');
 global.document.documentElement.append(global.document.head);
 global.document.documentElement.append(global.document.body);
 
-// --- window stub (new) ---
+// --- window stub ---
 
 if (typeof global.window === 'undefined') {
     global.window = {
@@ -389,6 +389,30 @@ if (typeof global.window.addEventListener !== 'function') {
         const arr = listeners[event.type] || [];
         arr.forEach(fn => fn.call(global.window, event));
     };
+}
+
+if (typeof global.window.matchMedia !== 'function') {
+    global.window.matchMedia = function matchMedia(query) {
+        // super minimal MediaQueryList mock
+        const mql = {
+            media: String(query ?? ''),
+            matches: false,
+            onchange: null,
+
+            addListener() { },      // deprecated
+            removeListener() { },   // deprecated
+            addEventListener() { }, // modern
+            removeEventListener() { },
+            dispatchEvent() { return false; },
+        };
+
+        return mql;
+    };
+}
+
+// optional: some libs call globalThis.matchMedia directly
+if (typeof globalThis.matchMedia !== 'function') {
+    globalThis.matchMedia = global.window.matchMedia;
 }
 
 if (typeof globalThis !== 'undefined') {
