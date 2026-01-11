@@ -85,9 +85,6 @@ export default ThemeContext.use(h => {
 			else ref.get().blur();
 		})));
 
-		if (!focused.isImmutable()) props.isFocused = focused;
-		if (!hover.isImmutable()) props.isHovered = hover;
-
 		return <input ref={ref}
 			$value={value.def('')}
 			onInput={(e) => {
@@ -114,10 +111,9 @@ export default ThemeContext.use(h => {
 					}
 				}
 			}}
-			isFocused={focused}
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
-				...style
+				...style,
 			}}
 			disabled={disabled}
 			{...props}
