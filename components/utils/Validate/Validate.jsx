@@ -26,7 +26,6 @@ Theme.define({
 
 /*
 TODO: Update validate parameters to that the user is able to run live validation in a validaiton context.
-
 */
 
 const validators = {
@@ -154,18 +153,13 @@ const validators = {
 	},
 
 	date: (value) => {
-		// Get the raw user input, default to empty string if null/undefined:
 		let val = value.get() || '';
-
-		// Strip out any non-digit characters:
 		const digits = val.replace(/\D/g, '');
 
-		// Extract the potential dd, mm, and yyyy:
 		const dd = digits.slice(0, 2);
 		const mm = digits.slice(2, 4);
 		const yyyy = digits.slice(4, 8);
 
-		// Build the formatted string with slashes:
 		let formatted = dd;
 		if (mm) {
 			formatted += `/${mm}`;
@@ -174,7 +168,6 @@ const validators = {
 			formatted += `/${yyyy}`;
 		}
 
-		// Update the underlying observable with the formatted value:
 		value.set(formatted);
 
 		if (digits.length < 8) {
@@ -185,7 +178,6 @@ const validators = {
 		const month = parseInt(mm, 10);
 		const year = parseInt(yyyy, 10);
 
-		// Simple validations: day 1–31, month 1–12, naive year range check:
 		if (month < 1 || month > 12) {
 			return 'Invalid month (must be between 01 and 12).';
 		}
@@ -194,7 +186,6 @@ const validators = {
 		}
 
 		const testDate = new Date(year, month - 1, day);
-		// Month/day check after construction to ensure it didn’t roll over:
 		if (
 			testDate.getFullYear() !== year ||
 			testDate.getMonth() !== month - 1 ||
@@ -203,7 +194,6 @@ const validators = {
 			return 'This date is invalid—please check day/month/year.';
 		}
 
-		// If no errors, return an empty string:
 		return '';
 	},
 
@@ -229,9 +219,10 @@ const validators = {
 };
 
 export const ValidateContext = createContext(() => null, (value) => {
-	const values = Observer.mutable([])
+	const values = Observer.mutable([]);
+
 	Observer.all(values).watch(() => {
-		const result = values.get().every(value => value.get() === true);
+		const result = values.get().every(v => v.get() === true);
 		value.set(result);
 	});
 
@@ -239,10 +230,22 @@ export const ValidateContext = createContext(() => null, (value) => {
 });
 
 export const Validate = ValidateContext.use(v => ThemeContext.use(h => {
-	return ({ value = true, validate, valid = true, signal, error = '' }, cleanup) => {
+	return ({
+		value = true,
+		validate,
+		valid = true,
+		signal,
+		error = '',
+		icon = <Icon name="feather:alert-circle" theme="validate_icon" />
+	}, cleanup) => {
 		if (!(valid instanceof Observer)) valid = Observer.mutable(valid);
 		if (!(error instanceof Observer)) error = Observer.mutable(error);
-		if (v instanceof Observer) v.set([...v.get(), valid]);
+		if (v instanceof Observer) {
+			v.set([...v.get(), valid]);
+			cleanup(() => {
+				v.set(v.get().filter(x => x !== valid));
+			});
+		}
 
 		const runValidation = (val) => {
 			let result = '';
@@ -263,22 +266,34 @@ export const Validate = ValidateContext.use(v => ThemeContext.use(h => {
 			}
 		};
 
+		// if a signal is provided, we start "submission mode", but after the first submit-trigger we switch into live mode.
 		if (!signal || !(signal instanceof Observer)) {
 			cleanup(value.watch(() => {
 				runValidation(value);
 			}));
 		} else {
-			cleanup(signal.watch(trigger => {
-				if (trigger.value) {
+			const liveAfterSubmit = Observer.mutable(false);
+
+			// When submit happens: validate and enable live validation for future edits
+			cleanup(signal.watch(ev => {
+				if (ev?.value) {
+					liveAfterSubmit.set(true);
 					runValidation(value);
 					signal.set(false);
+				}
+			}));
+
+			// After first submit: validate on every change too
+			cleanup(value.watch(() => {
+				if (liveAfterSubmit.get()) {
+					runValidation(value);
 				}
 			}));
 		}
 
 		return <Shown value={error}>
 			<div theme="row_validate_wrapper">
-				<Icon name="alert-circle" theme="validate_icon" />
+				{icon}
 				<Typography type="validate" label={Observer.immutable(error)} />
 			</div>
 		</Shown>;
