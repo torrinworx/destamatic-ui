@@ -38,6 +38,7 @@ Theme.define({
 	},
 
 	button_contained_disabled: {
+		$bg: '$saturate($color, -1)',
 		background: '$color_disabled',
 		color: '$contrast_text($color_disabled)',
 	},
@@ -57,7 +58,7 @@ Theme.define({
 	},
 
 	button_text: {
-		extends: 'typography_p1_regular',
+		extends: 'typography_p1_regular_bold',
 	},
 
 	button_text_hovered: {
