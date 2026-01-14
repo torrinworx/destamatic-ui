@@ -1,9 +1,7 @@
-import { mount, Observer } from 'destam-dom';
-import FeatherIcons from "destamatic-ui/components/icons/FeatherIcons";
-import { Button, Stage, StageContext, TextField, Typography, Icons, Popup, PopupContext } from 'destamatic-ui';
+import { Button, Stage, StageContext, TextField, Typography, Popup, PopupContext, Observer } from 'destamatic-ui';
 
 const pages = {
-    stages: {
+    acts: {
         Home: ({ }) => {
             return <div style={{ background: 'red' }}>
                 Home page content
@@ -36,7 +34,8 @@ const pages = {
             </div>
             {children}
         </div>;
-    }
+    },
+    urlRouting: true,
 };
 
 const Pages = StageContext.use(s => (_, __, mounted) => {
@@ -80,7 +79,7 @@ const Pages = StageContext.use(s => (_, __, mounted) => {
 const timer = Observer.timer(1000);
 
 const modals = {
-    stages: {
+    acts: {
         // basic modal
         basic: ({ }) => {
             return <div style={{ width: '500px', height: '500px', background: 'red' }}>
@@ -178,19 +177,24 @@ const Modals = StageContext.use(s => () => <>
     }} />
 </>);
 
-mount(document.body, <div>
-    <Icons value={[FeatherIcons]}>
-        <PopupContext>
-            <Typography type='h1' label='Stage' />
-            <Typography type='p1' label='A Stage allows you to display, transition between, template, and control different components.' />
-            <StageContext value={pages}>
-                <Pages />
-            </StageContext>
-            <StageContext value={modals}>
-                <Modals />
-                <Stage />
-                <Popup />
-            </StageContext>
-        </PopupContext>
-    </Icons>
-</div >);
+const Example = () => {
+    return <PopupContext>
+        <Typography type='h1' label='Stage' />
+        <Typography type='p1' label='A Stage allows you to display, transition between, template, and control different components.' />
+        <StageContext value={pages}>
+            <Pages />
+        </StageContext>
+        <StageContext value={modals}>
+            <Modals />
+            <Stage />
+            <Popup />
+        </StageContext>
+    </PopupContext>;
+};
+
+export default {
+    open: true,
+    example: Example,
+    header: 'Stage',
+};
+
