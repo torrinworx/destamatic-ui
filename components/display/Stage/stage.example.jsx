@@ -193,7 +193,6 @@ const Example = () => {
 };
 
 export default {
-    open: true,
     example: Example,
     header: 'Stage',
 };
