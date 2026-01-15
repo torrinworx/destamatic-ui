@@ -128,6 +128,7 @@ export const Icon = Icons.use(iconPack => ThemeContext.use(svg => {
 		}));
 
 		return <svg:svg ref={ref}
+			aria-label={`Icon: ${name}`}
 			class={libClass}
 			style={{ width: size, height: size, ...style }}
 			{...props}
