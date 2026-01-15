@@ -119,6 +119,7 @@ export default ThemeContext.use(h => {
 				...style,
 			}}
 			disabled={disabled}
+			aria-label={props['aria-label'] ?? props.placeholder}
 			{...props}
 			theme={[
 				'field',
