@@ -35,7 +35,7 @@ Theme.define({
 	},
 
 	field_outlined_hovered: {
-		background: '$color_hover',
+		background: 'rgb(0, 0, 0, 0.1)',
 	},
 
 	field_outlined_disabled: {
@@ -47,7 +47,7 @@ Theme.define({
 	},
 
 	field_text_hovered: {
-		background: '$color_hover',
+		background: 'rgb(0, 0, 0, 0.1)',
 	},
 
 	field_text_disabled: {
