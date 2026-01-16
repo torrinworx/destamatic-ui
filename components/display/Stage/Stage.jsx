@@ -41,17 +41,16 @@ export const StageContext = createContext(
 
 		const isRoot = !parent || typeof parent !== 'object';
 
-		// stage-local warning
-		if (isRoot && urlRouting && truncateInitial) {
-			console.warn(
-				'[StageContext] urlRouting on the root + truncateInitial=true is usually incompatible. ' +
-				'Truncating means the URL can\'t represent deeper state past initial.'
-			);
-		}
+		// FIX THIS WARNING: only show warning if it's detected that the truncated initial has a child stage. 
+		// if (isRoot && urlRouting && truncateInitial) {
+		// 	console.warn(
+		// 		'[StageContext] urlRouting on the root + truncateInitial=true is usually incompatible. ' +
+		// 		'Truncating means the URL can\'t represent deeper state past initial.'
+		// 	);
+		// }
 
 		// descendant warning (when root uses routing)
 		if (!isRoot && truncateInitial) {
-			// walk up to find root + whether routing is enabled there
 			let p = parent;
 			while (p?.parent && typeof p.parent === 'object') p = p.parent;
 			const root = p;
@@ -69,12 +68,12 @@ export const StageContext = createContext(
 			acts,
 			template,
 			props: globalProps,
+
+			// IMPORTANT: urlProps belong to the *leaf* stage only.
+			// Intermediate stages should clear urlProps to prevent leaking.
 			urlProps: {},
 
-			/*
-			name: Can be either a / separated list of 'act' names, or an array of 'act' names. aka keys in the act lists of various stages in a stage tree.
-			*/
-			open: ({ name, template = Stage.template, onClose, urlProps, ...props }) => {
+			open: ({ name, template = Stage.template, onClose, urlProps = {}, ...props }) => {
 				if (typeof name === 'string') {
 					name = name.includes("/")
 						? name.split("/").filter(Boolean)
@@ -102,28 +101,49 @@ export const StageContext = createContext(
 
 				Object.assign(Stage.props, props);
 				Stage.template = template;
-				if (urlProps !== undefined) Stage.urlProps = urlProps || {};
 
+				const opened = name[0];
+				const tail = name.slice(1);
 
-				const opened = name.shift();
 				Stage.current = opened;
 
-				if (name.length > 0) {
+				// Leaf-only query ownership:
+				Stage.urlProps = tail.length ? {} : (urlProps || {});
+
+				if (tail.length > 0) {
 					if (children.length > 1) {
 						console.warn(
-							`Expected only 1 child stage for route ${name[0]}, found ${children.length}. Stage trees assume a single child StageContext per act.\n`,
+							`Expected only 1 child stage for route ${tail[0]}, found ${children.length}. Stage trees assume a single child StageContext per act.\n`,
 							children
 						);
 					}
-					// child context isn't garunteed to be mounted yet because current is fed into a signaled delay with anti current in Stage:
+
+					// child context isn't guaranteed to be mounted yet
 					queueMicrotask(() => {
-						children[0].value.open({ name, urlProps, ...globalProps, ...props });
+						children[0]?.value?.open({
+							name: tail,
+							urlProps,
+							...globalProps,
+							...props
+						});
 					});
 				} else {
+					// Route ends here: clear ALL descendant urlProps so they can't leak back into the URL.
 					queueMicrotask(() => {
-						children[0]?.value.observer
+						const child = children[0]?.value;
+						if (!child) return;
+
+						const clearDescendants = (stg) => {
+							stg.urlProps = {};
+							const next = stg.children?.[0]?.value;
+							if (next) clearDescendants(next);
+						};
+
+						clearDescendants(child);
+
+						child.observer
 							.path('current')
-							.set(children[0].value.initial ? children[0].value.initial : null);
+							.set(child.initial ? child.initial : null);
 					});
 				}
 
@@ -131,41 +151,22 @@ export const StageContext = createContext(
 					Stage.observer.path('current').defined(val => val !== opened).then(onClose);
 				}
 			},
-			/**
-			 * Close the currently active act on this Stage.
-			 */
+
 			close: () => {
 				Stage.current = null;
+				Stage.urlProps = {};
 			},
 
-			/**
-			 * Reset transient Stage state after an act finishes.
-			 *
-			 * Currently restores `Stage.template` back to the original
-			 * `template` captured when this Stage was created.
-			 */
 			cleanup: () => {
 				Stage.template = template;
 			},
 
-			/**
-			 * Register this Stage in the global `stageRegistry`.
-			 *
-			 * Adds the Stage once (by identity) so external tooling can
-			 * inspect or control all active stages.
-			 */
 			register: () => {
 				if (!stageRegistry.includes(Stage)) {
 					stageRegistry.push(Stage);
 				}
 			},
 
-			/**
-			 * Unregister this Stage from the global `stageRegistry`.
-			 *
-			 * Removes the Stage by matching its `id`. Typically called
-			 * during cleanup/unmount.
-			 */
 			unregister: () => {
 				const idx = stageRegistry.findIndex(
 					entry => entry && entry.id === Stage.id
@@ -174,6 +175,7 @@ export const StageContext = createContext(
 					stageRegistry.splice(idx, 1);
 				}
 			},
+
 			parentRoute: parent ? parent?.current : null,
 			current: initial ? initial : null,
 			currentDelay: 150,
@@ -191,8 +193,6 @@ export const StageContext = createContext(
 		Stage.fallbackAct = Stage.observer.path('fallback').map(f => {
 			if (f && Stage.acts && f in Stage.acts) return Stage.acts[f];
 
-			// If this stage has a local fallback string, and it's in this stage's acts, use it
-			// Otherwise, walk up the parents
 			let current = parent;
 			while (current) {
 				if (current.fallback && current.acts && current.fallback in current.acts) {
@@ -201,7 +201,6 @@ export const StageContext = createContext(
 				current = current.parent;
 			}
 
-			// No fallback found anywhere
 			return null;
 		});
 
@@ -256,50 +255,109 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 		if (s.urlRouting && typeof s.parent !== 'object') {
 			let isPopState = false;
 
-			// '/blog/post-1/' -> ['blog', 'post-1']
 			const urlToSegments = (pathname) =>
 				pathname.split('/').filter(Boolean);
 
-			// '?id=123&foo=bar' -> { id: '123', foo: 'bar' }
 			const urlToQuery = (search) =>
 				Object.fromEntries(new URLSearchParams(search).entries());
 
-			// Walk a stage chain and set .current along the way
-			// segments: remaining route parts for this and child stages
 			const applySegmentsToStageChain = (stage, segments, urlProps) => {
 				if (!segments.length) {
-					// If truncating, stop routing here.
-					// Keep whatever `current` already is (usually the parent act that mounted this stage),
-					// or if nothing is open, fall back to initial.
 					if (!stage.current && stage.initial) {
-						stage.open({ name: [stage.initial], urlProps });
+						stage.open({ name: [stage.initial], urlProps: {} });
 					}
 					return;
 				}
 
-				// We do NOT want to accidentally treat an initial as explicit route
-				// initial is implicit: if a segment equals stage.initial but we still
-				// have more segments, it's ambiguous / probably invalid.
-				// For now: treat segments[0] as the explicit target act.
 				const [head, ...tail] = segments;
-
-				// Open this stage at `head`
 				stage.open({ name: [head, ...tail], urlProps });
-				// `Stage.open` implementation will forward remaining tail
-				// into the child stage for us.
 			};
 
-			// URL → Stage tree (root)
+			const buildPathFromStage = (root) => {
+				const segs = [];
+
+				let stg = root;
+				let leaf = root;
+
+				while (stg && stg.current) {
+					leaf = stg;
+
+					// truncateInitial means "do not include this segment and stop representing deeper state"
+					if (stg.initial && stg.truncateInitial && stg.current === stg.initial) {
+						break;
+					}
+
+					segs.push(stg.current);
+
+					const child = stg.children?.[0]?.value;
+					if (!child) break;
+					stg = child;
+				}
+
+				const qs = new URLSearchParams(leaf?.urlProps || {}).toString();
+				const path = '/' + segs.join('/');
+				return qs ? `${path}?${qs}` : path;
+			};
+
+			let urlWriteScheduled = false;
+			let pendingUrl = null;
+
+			// track last committed pathname so query-only changes don't create new entries
+			let lastCommittedPathname = window.location.pathname;
+
+			const commitUrl = () => {
+				urlWriteScheduled = false;
+
+				const path = pendingUrl || '/';
+				pendingUrl = null;
+
+				const current = window.location.pathname + window.location.search;
+				if (current === path) return;
+
+				const u = new URL(path, window.location.origin);
+				const nextPathname = u.pathname;
+				const nextFull = u.pathname + u.search;
+
+				// If only the query changed (same pathname), replace (don't push).
+				// This prevents the "/gig" then "/gig?id=123" double-entry problem.
+				const samePathname = nextPathname === lastCommittedPathname;
+
+				if (samePathname) {
+					history.replaceState({ route: nextFull }, document.title || nextFull, nextFull);
+				} else {
+					history.pushState({ route: nextFull }, document.title || nextFull, nextFull);
+					lastCommittedPathname = nextPathname;
+				}
+			};
+
+			const syncUrl = () => {
+				if (isPopState) return;
+
+				pendingUrl = buildPathFromStage(s) || '/';
+
+				if (!urlWriteScheduled) {
+					urlWriteScheduled = true;
+					queueMicrotask(commitUrl);
+				}
+			};
+
 			const syncStage = () => {
 				isPopState = true;
 
 				const segments = urlToSegments(window.location.pathname);
+				lastCommittedPathname = window.location.pathname;
+
 				const urlProps = urlToQuery(window.location.search);
 
 				if (segments.length === 0) {
-					// No path segments: go to root initial chain
+					// If history has a polluted "/?something", nuke it without adding a new entry
+					if (window.location.search) {
+						history.replaceState(history.state, document.title, window.location.pathname);
+					}
+
 					if (s.initial) {
-						s.open({ name: [s.initial], urlProps });
+						// Root should NOT inherit old query params.
+						s.open({ name: [s.initial], urlProps: {} });
 					} else {
 						s.close();
 					}
@@ -307,72 +365,30 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 					applySegmentsToStageChain(s, segments, urlProps);
 				}
 
-				queueMicrotask(() => {
+				// Keep lock longer to cover queued stage updates that happen after popstate.
+				requestAnimationFrame(() => requestAnimationFrame(() => {
 					isPopState = false;
-				});
-			};
-
-			// Stage tree → URL
-			const buildPathFromStage = (stage) => {
-				const segs = [];
-				const query = {};
-
-				const walk = (stg) => {
-					const cur = stg.current;
-					if (!cur) return;
-
-					if (stg.initial && stg.truncateInitial && cur === stg.initial) return;
-
-					segs.push(cur);
-					// merge urlProps along the chain (child can override parent keys)
-					if (stg.urlProps && typeof stg.urlProps === 'object') {
-						Object.assign(query, stg.urlProps);
-					}
-
-					// otherwise continue walking
-					const child = stg.children?.[0]?.value;
-					if (child) walk(child);
-				};
-
-				walk(stage);
-				const qs = new URLSearchParams(query).toString();
-				const path = '/' + segs.join('/');
-				return qs ? `${path}?${qs}` : path;
-			};
-
-			const syncUrl = () => {
-				if (isPopState) return;
-
-				const path = buildPathFromStage(s) || '/';
-				const current = window.location.pathname + window.location.search;
-				if (current !== path) {
-					history.pushState({ route: path }, document.title || path, path);
-				}
+				}));
 			};
 
 			// Initial URL -> Stage
 			syncStage();
 
-			// Any nested stage, including root, .current Change -> Change URL
+			// Stage tree -> URL
 			cleanup(
 				s.observer
 					.tree('children')
 					.path('value')
 					.path('current')
-					.effect(() => {
-						syncUrl();
-					})
+					.effect(() => syncUrl())
 			);
 
 			cleanup(
 				s.observer
 					.path('current')
-					.effect(() => {
-						syncUrl();
-					})
+					.effect(() => syncUrl())
 			);
 
-			// urlProps changes should also update URL
 			cleanup(
 				s.observer
 					.tree('children')
@@ -380,6 +396,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 					.path('urlProps')
 					.effect(() => syncUrl())
 			);
+
 			cleanup(
 				s.observer
 					.path('urlProps')
@@ -395,25 +412,28 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 
 	cleanup(() => s.unregister());
 
-	return Observer.all([s.observer.path('template').unwrap(), aniCurrent, s.observer.path('urlProps').unwrap()])
-		.map(([Template, c, urlProps]) => {
-			if (!c) return null;
+	return Observer.all([
+		s.observer.path('template').unwrap(),
+		aniCurrent,
+		s.observer.path('urlProps').unwrap()
+	]).map(([Template, c, urlProps]) => {
+		if (!c) return null;
 
-			const closeSignal = s.observer.path('current').map(current => {
-				if (!current) return true;
-				else return current !== c;
-			});
-
-			let Stage = null;
-			if (s && s.acts && typeof c === 'string' && c in s.acts) {
-				Stage = s.acts[c];
-			} else {
-				Stage = s.fallbackAct.get();
-				console.error(`Stage component with '${c}' does not exist in acts list.`);
-			}
-
-			return <Template closeSignal={closeSignal} s={s} m={s}>
-				<Stage stage={s} urlProps={urlProps} {...urlProps} {...s.props} />
-			</Template>;
+		const closeSignal = s.observer.path('current').map(current => {
+			if (!current) return true;
+			else return current !== c;
 		});
+
+		let StageComp = null;
+		if (s && s.acts && typeof c === 'string' && c in s.acts) {
+			StageComp = s.acts[c];
+		} else {
+			StageComp = s.fallbackAct.get();
+			console.error(`Stage component with '${c}' does not exist in acts list.`);
+		}
+
+		return <Template closeSignal={closeSignal} s={s} m={s}>
+			<StageComp stage={s} urlProps={urlProps || {}} {...(urlProps || {})} {...s.props} />
+		</Template>;
+	});
 }));
