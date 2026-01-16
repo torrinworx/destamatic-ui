@@ -69,11 +69,12 @@ export const StageContext = createContext(
 			acts,
 			template,
 			props: globalProps,
+			urlProps: {},
 
 			/*
 			name: Can be either a / separated list of 'act' names, or an array of 'act' names. aka keys in the act lists of various stages in a stage tree.
 			*/
-			open: ({ name, template = Stage.template, onClose, ...props }) => {
+			open: ({ name, template = Stage.template, onClose, urlProps, ...props }) => {
 				if (typeof name === 'string') {
 					name = name.includes("/")
 						? name.split("/").filter(Boolean)
@@ -101,6 +102,8 @@ export const StageContext = createContext(
 
 				Object.assign(Stage.props, props);
 				Stage.template = template;
+				if (urlProps !== undefined) Stage.urlProps = urlProps || {};
+
 
 				const opened = name.shift();
 				Stage.current = opened;
@@ -114,7 +117,7 @@ export const StageContext = createContext(
 					}
 					// child context isn't garunteed to be mounted yet because current is fed into a signaled delay with anti current in Stage:
 					queueMicrotask(() => {
-						children[0].value.open({ name, ...globalProps });
+						children[0].value.open({ name, urlProps, ...globalProps, ...props });
 					});
 				} else {
 					queueMicrotask(() => {
@@ -227,9 +230,10 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 
 			const Template = s.template;
 			const closeSignal = s.observer.path('current').map((current) => current !== c);
+			const urlProps = s.urlProps || {};
 
 			return <Template closeSignal={closeSignal} s={s} m={s}>
-				<StageComp stage={s} modal={s} {...s.props} />
+				<StageComp stage={s} modal={s} urlProps={urlProps} {...urlProps} {...s.props} />
 			</Template>;
 		});
 	}
@@ -256,15 +260,19 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 			const urlToSegments = (pathname) =>
 				pathname.split('/').filter(Boolean);
 
+			// '?id=123&foo=bar' -> { id: '123', foo: 'bar' }
+			const urlToQuery = (search) =>
+				Object.fromEntries(new URLSearchParams(search).entries());
+
 			// Walk a stage chain and set .current along the way
 			// segments: remaining route parts for this and child stages
-			const applySegmentsToStageChain = (stage, segments) => {
+			const applySegmentsToStageChain = (stage, segments, urlProps) => {
 				if (!segments.length) {
 					// If truncating, stop routing here.
 					// Keep whatever `current` already is (usually the parent act that mounted this stage),
 					// or if nothing is open, fall back to initial.
 					if (!stage.current && stage.initial) {
-						stage.open({ name: [stage.initial] });
+						stage.open({ name: [stage.initial], urlProps });
 					}
 					return;
 				}
@@ -276,7 +284,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 				const [head, ...tail] = segments;
 
 				// Open this stage at `head`
-				stage.open({ name: [head, ...tail] });
+				stage.open({ name: [head, ...tail], urlProps });
 				// `Stage.open` implementation will forward remaining tail
 				// into the child stage for us.
 			};
@@ -286,16 +294,17 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 				isPopState = true;
 
 				const segments = urlToSegments(window.location.pathname);
+				const urlProps = urlToQuery(window.location.search);
 
 				if (segments.length === 0) {
 					// No path segments: go to root initial chain
 					if (s.initial) {
-						s.open({ name: [s.initial] });
+						s.open({ name: [s.initial], urlProps });
 					} else {
 						s.close();
 					}
 				} else {
-					applySegmentsToStageChain(s, segments);
+					applySegmentsToStageChain(s, segments, urlProps);
 				}
 
 				queueMicrotask(() => {
@@ -306,6 +315,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 			// Stage tree → URL
 			const buildPathFromStage = (stage) => {
 				const segs = [];
+				const query = {};
 
 				const walk = (stg) => {
 					const cur = stg.current;
@@ -314,6 +324,10 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 					if (stg.initial && stg.truncateInitial && cur === stg.initial) return;
 
 					segs.push(cur);
+					// merge urlProps along the chain (child can override parent keys)
+					if (stg.urlProps && typeof stg.urlProps === 'object') {
+						Object.assign(query, stg.urlProps);
+					}
 
 					// otherwise continue walking
 					const child = stg.children?.[0]?.value;
@@ -321,14 +335,17 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 				};
 
 				walk(stage);
-				return '/' + segs.join('/');
+				const qs = new URLSearchParams(query).toString();
+				const path = '/' + segs.join('/');
+				return qs ? `${path}?${qs}` : path;
 			};
 
 			const syncUrl = () => {
 				if (isPopState) return;
 
 				const path = buildPathFromStage(s) || '/';
-				if (window.location.pathname !== path) {
+				const current = window.location.pathname + window.location.search;
+				if (current !== path) {
 					history.pushState({ route: path }, document.title || path, path);
 				}
 			};
@@ -355,6 +372,20 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 					})
 			);
 
+			// urlProps changes should also update URL
+			cleanup(
+				s.observer
+					.tree('children')
+					.path('value')
+					.path('urlProps')
+					.effect(() => syncUrl())
+			);
+			cleanup(
+				s.observer
+					.path('urlProps')
+					.effect(() => syncUrl())
+			);
+
 			// URL Change -> Stage Change
 			const onPop = () => syncStage();
 			window.addEventListener('popstate', onPop);
@@ -364,8 +395,8 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 
 	cleanup(() => s.unregister());
 
-	return Observer.all([s.observer.path('template').unwrap(), aniCurrent])
-		.map(([Template, c]) => {
+	return Observer.all([s.observer.path('template').unwrap(), aniCurrent, s.observer.path('urlProps').unwrap()])
+		.map(([Template, c, urlProps]) => {
 			if (!c) return null;
 
 			const closeSignal = s.observer.path('current').map(current => {
@@ -382,7 +413,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 			}
 
 			return <Template closeSignal={closeSignal} s={s} m={s}>
-				<Stage stage={s} {...s.props} />
+				<Stage stage={s} urlProps={urlProps} {...urlProps} {...s.props} />
 			</Template>;
 		});
 }));
