@@ -28,6 +28,7 @@ const selectFile = (extensions, multiple = true) => new Promise((ok) => {
 
 Theme.define({
 	fileDrop_base: {
+		extends: 'primary_radius',
 		$borderSize: '2px',
 		border: '$borderSize solid rgba(0, 0, 0, 0)',
 	},
@@ -66,7 +67,7 @@ const FileDropContext = Context(null);
 const Listing = FileDropContext.use(({ files }) => () => {
 	const File = ({ each: file }) => {
 		return <Paper type='fileDrop'>
-			<Icon name="file" style={{ margin: 10 }} />
+			<Icon name="feather:file" style={{ margin: 10 }} />
 			<Typography type="fileDrop_expand" label={file.observer.path('name')} />
 			{file.observer.path('status').map(status => {
 				if (status === 'loading') {
@@ -85,7 +86,7 @@ const Listing = FileDropContext.use(({ files }) => () => {
 				const i = files.indexOf(file);
 				files.splice(i, 1);
 			}}>
-				<Icon name="x" />
+				<Icon name="feather:x" />
 			</Button>
 		</Paper>
 	};
