@@ -313,6 +313,28 @@ global.document.body = new Node('body');
 global.document.documentElement.append(global.document.head);
 global.document.documentElement.append(global.document.body);
 
+// Event listener stuff:
+const docListeners = {};
+
+global.document.addEventListener = (type, handler) => {
+    if (!docListeners[type]) docListeners[type] = [];
+    docListeners[type].push(handler);
+};
+
+global.document.removeEventListener = (type, handler) => {
+    const arr = docListeners[type];
+    if (!arr) return;
+    const i = arr.indexOf(handler);
+    if (i !== -1) arr.splice(i, 1);
+};
+
+// optional: only needed if something actually dispatches document events during SSG
+global.document.dispatchEvent = (event) => {
+    const arr = docListeners[event.type] || [];
+    arr.forEach(fn => fn.call(global.document, event));
+    return true;
+};
+
 // --- window stub ---
 
 if (typeof global.window === 'undefined') {
