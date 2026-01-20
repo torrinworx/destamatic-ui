@@ -191,8 +191,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 			onMouseDown={(event) => {
 				if (disabled.get()) return;
 				if (!clicked.get()) clicked.set(true);
-
-				focused.set(true);
+				if (!focused.isImmutable()) focused.set(true);
 
 				if (track.get()) {
 					InputContext.fire(input, 'press', {
@@ -244,8 +243,9 @@ export default InputContext.use(input => ThemeContext.use(h => {
 					if (onMouseDown) handleLoading(onMouseDown(event))
 				}
 			}}
-			onMouseLeave={() => focused.set(false)}
-			isFocused={focused}
+			onMouseLeave={() => {
+				if (!focused.isImmutable()) focused.set(false);
+			}}
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
 				...style,
