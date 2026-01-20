@@ -36,8 +36,8 @@ const Examples = () => {
             <PopupContext>
                 <div theme='primary' style={{
                     background: '$color_background',
-                    height: '100%',
-                    minHeight: '100vh'
+                    height: '100vh',
+                    overflowY: 'auto',
                 }}>
                     <ExampleWrapper each:example={example_array} />
                 </div>
