@@ -1,4 +1,4 @@
-import { mount, DropDown, Typography, Icon, Icons, OObject, Theme } from 'destamatic-ui';
+import { mount, DropDown, Typography, Icon, Icons, OObject, Theme, PopupContext } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
 
 const globalTheme = OObject({
@@ -33,13 +33,15 @@ const Examples = () => {
 
     return <Theme value={globalTheme}>
         <Icons value={[IconifyIcons]}>
-            <div theme='primary' style={{
-                background: '$color_background',
-                height: '100%',
-                minHeight: '100vh'
-            }}>
-                <ExampleWrapper each:example={example_array} />
-            </div>
+            <PopupContext>
+                <div theme='primary' style={{
+                    background: '$color_background',
+                    height: '100vh',
+                    overflowY: 'auto',
+                }}>
+                    <ExampleWrapper each:example={example_array} />
+                </div>
+            </PopupContext>
         </Icons>
     </Theme>;
 };

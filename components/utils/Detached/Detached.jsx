@@ -121,6 +121,7 @@ const Detached = ThemeContext.use(h => {
 
 				// an impossible orientation - ignore
 				if (!calc) continue;
+
 				if ('right' in calc) calc.left = ww - calc.right - Math.min(bounds.width, calc.maxWidth);
 				if ('left' in calc) calc.right = ww - calc.left - Math.min(bounds.width, calc.maxWidth);
 				if ('bottom' in calc) calc.top = wh - calc.bottom - Math.min(bounds.height, calc.maxHeight);

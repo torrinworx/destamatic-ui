@@ -48,7 +48,7 @@
   "license": "MIT",
   "peerDependencies": {
     "destam": "^0.8.0",
-    "destam-dom": "^0.14.0"
+    "destam-dom": "^0.14.4"
   },
   "optionalDependencies": {
     "@iconify-json/feather": "^1.2.1",

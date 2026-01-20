@@ -141,7 +141,6 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		if (!(iconPosition instanceof Observer)) iconPosition = Observer.mutable(iconPosition);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
-		if (!(type instanceof Observer)) type = Observer.immutable(type);
 		if (!(round instanceof Observer)) round = Observer.immutable(round);
 		if (!(track instanceof Observer)) track = Observer.immutable(track);
 
@@ -191,8 +190,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 			onMouseDown={(event) => {
 				if (disabled.get()) return;
 				if (!clicked.get()) clicked.set(true);
-
-				focused.set(true);
+				if (!focused.isImmutable()) focused.set(true);
 
 				if (track.get()) {
 					InputContext.fire(input, 'press', {
@@ -244,8 +242,9 @@ export default InputContext.use(input => ThemeContext.use(h => {
 					if (onMouseDown) handleLoading(onMouseDown(event))
 				}
 			}}
-			onMouseLeave={() => focused.set(false)}
-			isFocused={focused}
+			onMouseLeave={() => {
+				if (!focused.isImmutable()) focused.set(false);
+			}}
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
 				...style,
@@ -273,7 +272,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 						: null)}
 					{label}
 					{children}
-					{type.map(t => t === 'link' ? null : ripples)}
+					{Observer.immutable(type).map(t => t === 'link' ? null : ripples)}
 					{iconPosition.map(s => s === 'right' && icon
 						? <div style={hasTextOrChildren ? { marginLeft: 4 } : null}>{icon}</div>
 						: null)}
