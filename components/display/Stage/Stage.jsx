@@ -105,10 +105,11 @@ export const StageContext = createContext(
 				const opened = name[0];
 				const tail = name.slice(1);
 
-				Stage.current = opened;
-
 				// Leaf-only query ownership:
 				Stage.urlProps = tail.length ? {} : (urlProps || {});
+
+				Stage.current = opened;
+
 
 				if (tail.length > 0) {
 					if (children.length > 1) {
