@@ -184,7 +184,7 @@ export default {
 		extends: 'primary',
 		width: '100%',
 		height: '2px',
-		background: '$color_top',
+		background: '$color',
 	},
 
 	cursor: {
