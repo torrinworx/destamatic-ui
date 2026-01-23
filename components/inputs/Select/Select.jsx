@@ -215,7 +215,6 @@ export default ThemeContext.use(h => {
 				<div theme="select_icon">
 					<Icon
 						name='chevron-down'
-						size={16}
 						rot={focused.bool(180, 0)}
 					/>
 				</div>
