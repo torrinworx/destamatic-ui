@@ -42,7 +42,7 @@ const Popup = ThemeContext.use(h => RawContext.use(context => ({ children, style
     };
 
     const dom = <div ref={ref} style={{
-        position: 'absolute',
+        position: 'fixed',
         left: getter('left'),
         top: getter('top'),
         right: getter('right'),
