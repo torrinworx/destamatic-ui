@@ -12,7 +12,7 @@ const size = Observer.timer(500).map(t => t % 2 === 0 ? 25 : 100)
 const name = Observer.timer(500).map(t => t % 2 === 0 ? 'logo' : 'feather')
 mount(document.body, <>
 	<Icons value={icons}>
-		<div theme='row'>
+		<div theme='row' style={{ color: '$color' }}>
 			{/* Reactive name with styles */}
 			<Icon name={name} size={48} style={{ color: 'red', fill: 'blue' }}
 			/>

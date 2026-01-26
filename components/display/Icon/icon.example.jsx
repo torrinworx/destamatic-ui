@@ -30,7 +30,7 @@ const Example = () => {
 			{ name: 'camera', label: 'camera' },
 			{ name: 'search', label: 'search' },
 			{ name: 'heart', label: 'heart' },
-			{ name: 'cog', label: 'cog' },
+			{ name: 'cog', label: 'settings' },
 			{ name: 'user', label: 'user' },
 		],
 		tabler: [
@@ -71,7 +71,7 @@ const Example = () => {
 					{icons.map((icon) => (
 						<div
 							key={icon.name}
-							theme="column_center"
+							theme="column_center_primary"
 							style={{ gap: 8, minWidth: 80 }}
 						>
 							<Icon
@@ -79,7 +79,7 @@ const Example = () => {
 								size={50}
 								style={{
 									fill: 'none',
-									color: '$color_top',
+									color: '$color',
 								}}
 							/>
 							<Typography
