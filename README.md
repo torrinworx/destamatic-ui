@@ -9,6 +9,7 @@
 - 🌐 **Site & docs:** https://torrin.me/destamatic-ui  
 - 🧪 **Playground & examples:** https://torrin.me/destamatic-ui/playground  
 - 📦 **Template starter:** https://github.com/torrinworx/destamatic-template  
+- **Discord** https://discord.gg/BJMPpVwdhz
 
 ## What is destamatic‑ui?
 
