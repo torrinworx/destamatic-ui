@@ -87,8 +87,6 @@ Theme.define({
 		color: '$color_disabled',
 	},
 
-	// TODO: Somehow disable transition for just clicked? it feels weird on mobile when clicking a link and it takes a second to transition to the clicked state
-
 	button_link_clicked: {
 		color: 'purple',
 	},
@@ -97,18 +95,10 @@ Theme.define({
 		borderRadius: '50%',
 	},
 
-	// not working right now because disabled=true prop in button overwrites any css cursor we define.
 	button_loading: {
 		cursor: 'wait',
 	},
 });
-
-/*
-TODO: Make LoadingDots style consistent with typography so that it doesn't adjust the size of the button
-when appearing during a promise.
-
-TODO: On mobile, button taps feel really slow and laggy. Something needs to change be improved somehow, maybe onPointerDown? or some other event listener should be used? the current onClick is really slow on mobile touch screens.
-*/
 
 export default InputContext.use(input => ThemeContext.use(h => {
 	const Button = ({
@@ -116,7 +106,10 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		track = true,
 		label = '',
 		type = 'contained',
-		onClick = () => { },
+
+		// IMPORTANT: default null so we can detect "user provided onClick"
+		onClick = null,
+
 		inline,
 		onMouseDown,
 		onMouseUp,
@@ -130,9 +123,14 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		children,
 		loading,
 		href,
+		hrefNewTab = true,
 		clicked = false,
 		...props
 	}) => {
+		// enforce "hrefNewTab is the only control prop"
+		if ('target' in props) delete props.target;
+		if ('rel' in props) delete props.rel;
+
 		if (!(clicked instanceof Observer)) clicked = Observer.mutable(clicked);
 		if (!(disabled instanceof Observer)) disabled = Observer.mutable(disabled);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
@@ -144,12 +142,16 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		if (!(round instanceof Observer)) round = Observer.immutable(round);
 		if (!(track instanceof Observer)) track = Observer.immutable(track);
 
+		if (!(hrefNewTab instanceof Observer)) hrefNewTab = Observer.immutable(hrefNewTab);
+
 		disabled = Observer.all([disabled, loading]).map(([dis, lod]) => !!dis || lod);
 
 		const [ripples, createRipple] = useRipples();
 
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
+
+		const hasUserOnClick = typeof onClick === 'function';
 
 		const handleLoading = (value) => {
 			if (value && value.then && !loading.isImmutable()) {
@@ -173,20 +175,65 @@ export default InputContext.use(input => ThemeContext.use(h => {
 			});
 		};
 
-		return <button
+		const activate = (event) => {
+			if (disabled.get()) return;
+			if (!clicked.get()) clicked.set(true);
+
+			trackClick(event);
+
+			if (hasUserOnClick) {
+				createRipple(event);
+				handleLoading(onClick(event));
+			}
+		};
+
+		// If href exists, we render a real <a> for crawlers + right click / middle click.
+		// If the user ALSO provided onClick, we prevent default only for normal left-click,
+		// and run onClick instead (SPA navigation).
+		const onLinkClick = (event) => {
+			if (disabled.get()) {
+				event.preventDefault();
+				return;
+			}
+
+			// let the browser handle: middle click, cmd/ctrl click, open-in-new-tab, etc
+			if (
+				event.button !== 0 ||
+				event.metaKey ||
+				event.ctrlKey ||
+				event.shiftKey ||
+				event.altKey
+			) return;
+
+			if (hasUserOnClick) event.preventDefault();
+
+			// run SPA click (or just tracking)
+			if (hasUserOnClick) activate(event);
+			else trackClick(event);
+		};
+
+		const resolveTag = (href) => href ? 'a' : 'button';
+		const TagName = resolveTag(href);
+
+		return <TagName
 			ref
 			aria-label={props['aria-label'] ?? props.title}
+
+			href={href || undefined}
+			target={href ? hrefNewTab.map(n => n ? '_blank' : undefined) : undefined}
+			rel={href ? hrefNewTab.map(n => n ? 'noopener noreferrer' : undefined) : undefined}
+
+			aria-disabled={href ? disabled : undefined}
+			tabIndex={href ? disabled.map(d => d ? -1 : (props.tabIndex ?? 0)) : props.tabIndex}
+
+			role={href ? (props.role ?? 'link') : props.role}
+			type={!href ? (props.type ?? 'button') : undefined}
+
 			onClick={(event) => {
-				if (disabled.get()) return;
-				if (!clicked.get()) clicked.set(true);
-
-				trackClick(event);
-
-				if (onClick) {
-					createRipple(event);
-					handleLoading(onClick(event));
-				}
+				if (href) return onLinkClick(event);
+				activate(event);
 			}}
+
 			onMouseDown={(event) => {
 				if (disabled.get()) return;
 				if (!clicked.get()) clicked.set(true);
@@ -201,11 +248,13 @@ export default InputContext.use(input => ThemeContext.use(h => {
 					});
 				}
 
+				// back to old behavior: only ripple here if user provided onMouseDown
 				if (onMouseDown) {
 					createRipple(event);
-					onMouseDown(event);
+					handleLoading(onMouseDown(event));
 				}
 			}}
+
 			onMouseUp={(event) => {
 				if (disabled.get()) return;
 
@@ -218,38 +267,42 @@ export default InputContext.use(input => ThemeContext.use(h => {
 					});
 				}
 
-				if (onMouseUp) {
-					createRipple(event);
-					onMouseUp(event);
-				}
+				if (onMouseUp) handleLoading(onMouseUp(event));
 			}}
+
 			onKeyDown={(event) => {
 				if (!disabled.get() && (event.key === "Enter" || event.key === " ")) {
-					event.preventDefault();
-					focused.set(true);
-					createRipple(event);
+					// keep button-like keyboard behavior for actual buttons only
+					if (!href) {
+						event.preventDefault();
+						focused.set(true);
+						createRipple(event);
 
-					if (track.get()) {
-						InputContext.fire(input, 'enter', {
-							id,
-							component: 'Button',
-							label,
-							event,
-						});
+						if (track.get()) {
+							InputContext.fire(input, 'enter', {
+								id,
+								component: 'Button',
+								label,
+								event,
+							});
+						}
+
+						if (hasUserOnClick) handleLoading(onClick(event));
+						if (onMouseDown) handleLoading(onMouseDown(event));
 					}
-
-					if (onClick) handleLoading(onClick(event));
-					if (onMouseDown) handleLoading(onMouseDown(event))
 				}
 			}}
+
 			onMouseLeave={() => {
 				if (!focused.isImmutable()) focused.set(false);
 			}}
+
 			style={{
 				display: inline ? 'inline-flex' : 'flex',
 				...style,
 			}}
-			disabled={disabled}
+
+			disabled={!href ? disabled : undefined}
 			{...props}
 			theme={[
 				'button',
@@ -278,19 +331,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 						: null)}
 				</mark:else>
 			</Shown>
-			<Shown value={href}>
-				<a
-					href={href}
-					aria-hidden="true"
-					onClick={e => e.preventDefault()}
-					style={{
-						all: "unset",
-						pointerEvents: "none",
-						display: "contents"
-					}}
-				/>
-			</Shown>
-		</button>;
+		</TagName>;
 	};
 
 	return Button;
