@@ -276,7 +276,6 @@ export default InputContext.use(input => ThemeContext.use(h => {
 					{iconPosition.map(s => s === 'right' && icon
 						? <div style={hasTextOrChildren ? { marginLeft: 4 } : null}>{icon}</div>
 						: null)}
-
 				</mark:else>
 			</Shown>
 			<Shown value={href}>
