@@ -93,7 +93,7 @@ Theme.define({
 export const TextModifiers = createContext(() => null, (value) => value);
 
 export const Typography = ThemeContext.use(h => {
-	const applyModifiers = (label, modifiers, displayMap) => {
+	const applyModifiers = (label, modifiers, displayMap, ctx) => {
 		label = label || '';
 		const indexMode = !!displayMap;
 		if (indexMode && displayMap.length > 0) displayMap.splice(0, displayMap.length);
@@ -107,6 +107,7 @@ export const Typography = ThemeContext.use(h => {
 			const pattern = typeof mod.check === 'string'
 				? new RegExp(mod.check.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
 				: mod.check;
+
 			let m;
 			while ((m = pattern.exec(label)) !== null) {
 				matches.push({ start: m.index, end: m.index + m[0].length, match: m[0], mod, order });
@@ -121,37 +122,27 @@ export const Typography = ThemeContext.use(h => {
 			if (m.start >= lastEnd) { filtered.push(m); lastEnd = m.end; }
 		}
 
-		// create a span with optional data-* only in index mode
-		const makeSpan = (children, attrs) => {
-			if (indexMode) {
-				return <span {...attrs}>{children}</span>;
-			} else {
-				// If attrs are only for indexing, omit them for perf
-				return <span>{children}</span>;
-			}
-		};
+		const makeSpan = (children, attrs) =>
+			indexMode ? <span {...attrs}>{children}</span> : <span>{children}</span>;
 
 		for (let i = 0; i <= filtered.length; i++) {
 			const next = filtered[i];
 			const end = next ? next.start : label.length;
 
-			// gap text (plain text between matches)
+			// gap text
 			if (end > cursor) {
 				const text = label.slice(cursor, end);
 
 				if (!indexMode) {
-					// minimal DOM, no indexing
-					result.push(text); // or makeSpan(text) if you need a span for styling
+					result.push(text);
 				} else {
 					const displayId = UUID().toHex();
-					const span = makeSpan(text, {
+					result.push(makeSpan(text, {
 						'data-display-id': displayId,
 						'data-kind': 'fragment',
 						'data-atomic': 'false',
-					});
-					result.push(span);
+					}));
 
-					// push per-char segments referencing this single span
 					for (let j = 0; j < text.length; j++) {
 						const start = cursor + j;
 						displayMap.push({
@@ -171,22 +162,20 @@ export const Typography = ThemeContext.use(h => {
 			// matched range
 			if (next) {
 				const { return: renderFn, check: _ignored, atomic, ...props } = next.mod;
-				const rendered = renderFn?.(next.match);
+
+				const rendered = renderFn?.(next.match, ctx);
 
 				if (!indexMode) {
-					const span = <raw:span>{rendered}</raw:span>;
-					result.push(span);
+					result.push(<raw:span>{rendered}</raw:span>);
 				} else {
 					const displayId = UUID().toHex();
-					const span = makeSpan(rendered, {
+					result.push(makeSpan(rendered, {
 						'data-display-id': displayId,
 						'data-atomic': String(atomic),
 						'data-kind': atomic === false ? 'fragment' : 'atomic',
-					});
-					result.push(span);
+					}));
 
 					if (atomic === false) {
-						// Always fragment per character for non-atomic
 						for (let k = 0; k < next.match.length; k++) {
 							const start = next.start + k;
 							displayMap.push({
@@ -200,7 +189,6 @@ export const Typography = ThemeContext.use(h => {
 							});
 						}
 					} else {
-						// True atomic – single segment
 						displayMap.push({
 							kind: 'atomic',
 							start: next.start,
@@ -210,9 +198,11 @@ export const Typography = ThemeContext.use(h => {
 						});
 					}
 				}
+
 				cursor = next.end;
 			}
 		}
+
 		return result;
 	};
 
@@ -221,10 +211,8 @@ export const Typography = ThemeContext.use(h => {
 		if (!type) return 'span';
 
 		const [first] = type.split('_');
-
 		if (/^h[1-6]$/i.test(first)) return first.toLowerCase();
 		if (first === 'p1' || first === 'p2' || first === 'p') return 'p';
-
 		return 'span';
 	};
 
@@ -238,17 +226,25 @@ export const Typography = ThemeContext.use(h => {
 	}) => {
 		if (!(type instanceof Observer)) type = Observer.immutable(type);
 
+		// context passed to modifiers
+		const typographyTheme = ['typography', type];
+		const modifierCtx = {
+			type,
+			theme,
+			typographyTheme,
+			themer,
+		};
+
 		let display;
 
 		if (children.length > 0) {
 			display = children;
 		} else if (displayMap || modifiers.length > 0) {
-			display = label.map(l => applyModifiers(l, modifiers, displayMap || null));
+			display = label.map(l => applyModifiers(l, modifiers, displayMap || null, modifierCtx));
 		} else {
 			display = label;
 		}
-		
-		// TODO: make reactive, currently we only render the first instance of whatever type is as the tag.
+
 		const TagName = resolveTag(type);
 
 		if (!(display instanceof Observer)) display = Observer.immutable(display);
@@ -257,11 +253,12 @@ export const Typography = ThemeContext.use(h => {
 			return <TagName
 				ref
 				{...props}
-				theme={['typography', type]}
+				theme={typographyTheme}
 			>
 				{display}
 			</TagName>;
 		} else {
+			// (unchanged editable branch)
 			const editing = Observer.mutable(false);
 			const width = Observer.mutable(0);
 
