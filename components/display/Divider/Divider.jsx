@@ -6,12 +6,12 @@ import { mark } from '../../utils/h/h.jsx';
 import useAbort from '../../../util/abort.js';
 
 Theme.define({
-	divider_base: {
+	dividerComp_base: {
 		position: 'relative',
 		display: 'flex',
 		flexDirection: 'row',
 	},
-	divider_handle: {
+	dividerComp_handle: {
 		$width: 4,
 		width: '$width$px',
 		cursor: 'ew-resize',
@@ -19,31 +19,16 @@ Theme.define({
 		userSelect: 'none',
 	},
 
-	divider_left: {
+	dividerComp_left: {
 		overflow: 'auto',
 	},
 
-	divider_right: {
+	dividerComp_right: {
 		overflow: 'auto',
 	},
 });
 
 export default ThemeContext.use(h => {
-	/**
-	 * Draggable divider component to split windows into two.
-	 * The parent div should have flex display.
-	 * The Divider Component should be in between the two sibling windows components within the parent div
-	 * The left window div should have style={{width: leftWindowPercentage.map(w => `${w * 100}%`) }}
-	 * The right window div should have style={{width: leftWindowPercentage.map(w => `${100 - w * 100}%`) }}
-	 *
-	 * @param {Object} props - The properties object.
-	 * @param {Observer<number>} [props.value] - Observable number from 0 to 1 to determine tiling window sizes on render and during dragging.
-	 * @param {number} [props.min=20] - Number from 0 to 1 representing the minimum width percentage taken up by the left tile.
-	 * @param {number} [props.max=80] - Number from 0 to 1 representing the maximum width percentage taken up by the left tile.
-	 * @param {Object} [props.style] - Custom styles to apply to the button.
-	 *
-	 * @returns {JSX.Element} The rendered draggable window divider element.
-	 */
 	const Divider = Theme.use(themer => ({
 		value = 0.5,
 		min = 0.2,
@@ -53,7 +38,6 @@ export default ThemeContext.use(h => {
 	}, cleanup) => {
 		if (!(value instanceof Observer)) value = Observer.mutable(value);
 
-		let resizingWindow = false;
 		const Container = <raw:div />;
 
 		const resizing = Observer.mutable(false);
@@ -67,11 +51,11 @@ export default ThemeContext.use(h => {
 				left = Math.min(left, max);
 				left = Math.max(left, min);
 				value.set(left);
-			}, {signal});
+			}, { signal });
 
 			document.addEventListener('mouseup', () => {
 				resizing.set(false);
-			}, {signal});
+			}, { signal });
 		})));
 
 		const left = [], right = [];
@@ -89,15 +73,15 @@ export default ThemeContext.use(h => {
 			throw new Error("Divider expects children of <mark:left> or <mark:right>");
 		}
 
-		const handleWidth = themer('divider_handle').vars('width');
+		const handleWidth = themer('dividerComp_handle').vars('width');
 		const styleData = Observer.all([value, handleWidth]);
 
-		return <Container {...props} theme="divider_base">
-			<div theme="divider_left" style={{width: styleData.map(([p, w]) => `calc(${p * 100}% - ${w / 2}px)`)}}>
+		return <Container {...props} theme="dividerComp_base">
+			<div theme="dividerComp_left" style={{ width: styleData.map(([p, w]) => `calc(${p * 100}% - ${w / 2}px)`) }}>
 				{left}
 			</div>
-			<div theme='divider_handle' onMouseDown={() => resizing.set(true)} />
-			<div theme="divider_right" style={{width: styleData.map(([p, w]) => `calc(${(1 - p) * 100}% - ${w / 2}px)`)}}>
+			<div theme='dividerComp_handle' onMouseDown={() => resizing.set(true)} />
+			<div theme="dividerComp_right" style={{ width: styleData.map(([p, w]) => `calc(${(1 - p) * 100}% - ${w / 2}px)`) }}>
 				{right}
 			</div>
 		</Container>
