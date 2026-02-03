@@ -181,6 +181,7 @@ export default ThemeContext.use(h => {
 				]}
 				onMouseDown={e => {
 					e.preventDefault()
+					e.stopPropagation();
 					if (!value.isImmutable()) value.set(option);
 					focused.set(false);
 				}}
