@@ -36,6 +36,7 @@ export const StageContext = createContext(
 			register = true,
 			urlRouting = false,
 			truncateInitial = false,
+			currentDelay = 150,
 			...globalProps
 		} = raw || {};
 
@@ -179,7 +180,7 @@ export const StageContext = createContext(
 
 			parentRoute: parent ? parent?.current : null,
 			current: initial ? initial : null,
-			currentDelay: 150,
+			currentDelay,
 			onOpen,
 			initial,
 			fallback,
