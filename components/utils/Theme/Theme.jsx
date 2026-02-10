@@ -371,9 +371,10 @@ const createTheme = theme => {
 							break;
 
 						case 'cssProp':
-							raw.push('.', nameItem, ':', key, ' {\n', ...Object.entries(val).flatMap(([key, val]) => {
-								return buildProperty(key, val, index);
-							}), '\n}\n');
+							raw.push('.', nameItem, '::', key, ' {\n',
+								...Object.entries(val).flatMap(([key, val]) => buildProperty(key, val, index)),
+								'\n}\n'
+							);
 							break;
 
 						case 'import': // not a complete implementation of import: https://developer.mozilla.org/en-US/docs/Web/CSS/@import
