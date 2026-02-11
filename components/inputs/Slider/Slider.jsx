@@ -162,6 +162,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		step,
 		type = 'horizontal',
 		cover = true,
+		thumb = true,
 		expand = false,
 		hover,
 		focused,
@@ -176,7 +177,6 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		if (!(hover instanceof Observer)) hover = Observer.mutable(false);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(false);
 
-		// Slider deafults
 		if (!(min instanceof Observer)) min = Observer.immutable(0);
 		if (!(max instanceof Observer)) max = Observer.immutable(1);
 		if (!(step instanceof Observer)) step = Observer.immutable(0.01);
@@ -184,6 +184,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		if (!(type instanceof Observer)) type = Observer.immutable(type);
 		if (!(expand instanceof Observer)) expand = Observer.immutable(!!expand);
 		if (!(cover instanceof Observer)) cover = Observer.immutable(cover !== false);
+		if (!(thumb instanceof Observer)) thumb = Observer.immutable(thumb !== false); // <-- NEW
 		if (!(disabled instanceof Observer)) disabled = Observer.immutable(!!disabled);
 		if (!(track instanceof Observer)) track = Observer.immutable(track);
 
@@ -251,7 +252,6 @@ export default InputContext.use(input => ThemeContext.use(h => {
 				stopWindowDrag.fn = null;
 			}
 
-			// treat "pointer up" as slide end
 			const start = dragStartValue.get();
 			const end = value.get();
 
@@ -436,6 +436,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 
 				<span
 					style={{
+						display: thumb.map(t => t ? null : 'none'),
 						...styleThumb,
 						left: Observer.all([isVertical, percent]).map(([v, p]) => v ? null : `${p * 100}%`),
 						top: Observer.all([isVertical, percent]).map(([v, p]) => v ? `${(1 - p) * 100}%` : null),
