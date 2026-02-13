@@ -239,19 +239,6 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 		});
 	}
 
-	const aniCurrent = Observer.mutable(null);
-	cleanup(s.observer.path('current').effect(current => {
-		if (current) aniCurrent.set(current);
-		else {
-			const timeout = setTimeout(() => {
-				s.cleanup();
-				aniCurrent.set(null);
-			}, s.currentDelay);
-
-			return () => clearTimeout(timeout);
-		}
-	}));
-
 	mounted(() => {
 		// Only the root Stage of a tree should manage URL routing
 		if (s.urlRouting && typeof s.parent !== 'object') {
@@ -414,12 +401,26 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 
 	cleanup(() => s.unregister());
 
-	return Observer.all([
+	const aniCurrent = Observer.mutable(null);
+	cleanup(Observer.all([
 		s.observer.path('template').unwrap(),
-		aniCurrent,
+		s.observer.path('current'),
 		s.observer.path('urlProps').unwrap()
-	]).map(([Template, c, urlProps]) => {
-		if (!c) return null;
+	]).effect(([template, current, urlProps]) => {
+		if (current) aniCurrent.set([template, current, urlProps]);
+		else {
+			const timeout = setTimeout(() => {
+				s.cleanup();
+				aniCurrent.set(null);
+			}, s.currentDelay);
+
+			return () => clearTimeout(timeout);
+		}
+	}));
+
+	return aniCurrent.map(state => {
+		if (!state) return null;
+		const [Template, c, urlProps] = state;
 
 		const closeSignal = s.observer.path('current').map(current => {
 			if (!current) return true;
