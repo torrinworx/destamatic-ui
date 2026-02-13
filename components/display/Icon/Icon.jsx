@@ -1,16 +1,7 @@
 import { Observer, OArray } from 'destam';
 
-import Theme from '../../utils/Theme/Theme.jsx';
 import createContext from '../../utils/Context/Context.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
-
-Theme.define({
-	icon: {
-		width: 'clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem)',
-		height: 'clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem)',
-	},
-});
-
 
 const parser = new DOMParser();
 
