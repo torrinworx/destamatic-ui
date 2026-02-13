@@ -5,7 +5,7 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	field: {
-		extends: 'radius_typography_p1_regular',
+		extends: 'radius',
 		outline: 0,
 		padding: 10,
 		border: 'none',
