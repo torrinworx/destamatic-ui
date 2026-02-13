@@ -19,49 +19,42 @@ Theme.define({
 	},
 
 	typography_h1: {
-		extends: 'typography',
 		fontSize: 'clamp(2.4rem, 1.8rem + 2.6vw, 3.2rem)',
 		lineHeight: '$lh_head',
 		fontWeight: '500'
 	},
 
 	typography_h2: {
-		extends: 'typography',
 		fontSize: 'clamp(1.45rem, 1.2rem + 1.1vw, 1.9rem)',
 		lineHeight: '$lh_head',
 		fontWeight: '500'
 	},
 
 	typography_h3: {
-		extends: 'typography',
 		fontSize: 'clamp(1.25rem, 1.1rem + 0.9vw, 1.6rem)',
 		lineHeight: '$lh_head',
 		fontWeight: '500',
 	},
 
 	typography_h4: {
-		extends: 'typography',
 		fontSize: 'clamp(1.15rem, 1.05rem + 0.6vw, 1.4rem)',
 		lineHeight: '$lh_head',
 		fontWeight: '500',
 	},
 
 	typography_h5: {
-		extends: 'typography',
 		fontSize: 'clamp(1.05rem, 1.0rem + 0.45vw, 1.25rem)',
 		lineHeight: '$lh_head',
 		fontWeight: '500',
 	},
 
 	typography_h6: {
-		extends: 'typography',
 		fontSize: 'clamp(0.98rem, 0.95rem + 0.35vw, 1.15rem)',
 		lineHeight: '$lh_head',
 		fontWeight: '500',
 	},
 
 	typography_p1: {
-		extends: 'typography',
 		fontSize: 'clamp(1.0rem, 0.95rem + 0.35vw, 1.15rem)',
 		lineHeight: '$lh_body',
 		maxWidth: '$measure',
@@ -69,7 +62,6 @@ Theme.define({
 	},
 
 	typography_p2: {
-		extends: 'typography',
 		fontSize: 'clamp(0.85rem, 0.8rem + 0.25vw, 0.95rem)',
 		lineHeight: '$lh_body',
 		maxWidth: '$measure',
