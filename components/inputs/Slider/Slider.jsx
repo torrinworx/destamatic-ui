@@ -280,7 +280,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 			if (!Number.isFinite(v) || !Number.isFinite(mn) || !Number.isFinite(mx)) return;
 
 			const next = normalize(v, mn, mx, st);
-			if (next !== v) value.set(next);
+			if (Math.abs(next - v) > 1e-5) value.set(next);
 		})));
 
 		const applyStep = (dir, event, key) => {
