@@ -1,5 +1,5 @@
 import { mount } from 'destam-dom';
-import { Button } from 'destamatic-ui';
+import { Button } from '@destamatic/ui';
 import { describe, it, expect, vi } from 'vitest';
 
 // Provide a minimal event object that won't crash Ripple (ripple throws a hissy fit)

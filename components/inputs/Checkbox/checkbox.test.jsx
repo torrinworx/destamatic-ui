@@ -1,5 +1,5 @@
 import { mount } from 'destam-dom';
-import { Checkbox } from 'destamatic-ui';
+import { Checkbox } from '@destamatic/ui';
 import { describe, it, expect, vi } from 'vitest';
 import { Observer } from 'destam-dom';
 

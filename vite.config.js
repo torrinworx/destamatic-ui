@@ -25,8 +25,8 @@ const plugins = [];
 
 plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {
 	jsx_auto_import: {
-		h: 'destamatic-ui',
-		'mark': 'destamatic-ui',
+		h: '@destamatic/ui',
+		'mark': '@destamatic/ui',
 		raw: {
 			name: 'h',
 			location: 'destam-dom'
@@ -62,7 +62,7 @@ export default defineConfig({
 	},
 	optimizeDeps: {
 		include: ['@babel/parser', '@babel/generator', '@babel/types', 'util'],
-		exclude: ['destamatic-ui', 'destam-dom', 'destam'],
+		exclude: ['@destamatic/ui', 'destam-dom', 'destam'],
 	},
 	build: {
 		target: 'esnext',
