@@ -33,6 +33,8 @@ jobs:
       - name: Update package.json Version
         run: |
           npm pkg set version=${{ env.VERSION }}
+  
+      - run: npm install --package-lock-only
 
       - name: Verify package.json Version
         run: |
@@ -43,5 +45,3 @@ jobs:
 
       - name: Publish to NPM
         run: npm publish
-        # env:
-        #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,13 +1,14 @@
 {
-  "name": "destamatic-ui",
+  "name": "@destamatic/ui",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/destamatic/ui.git"
+  },
   "description": "",
   "type": "module",
   "main": "index.js",
   "module": "index.js",
-  "repository": {
-    "url": "https://github.com/torrinworx/destamatic-ui"
-  },
   "exports": {
     ".": {
       "import": "./index.js",
