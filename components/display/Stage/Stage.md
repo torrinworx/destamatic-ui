@@ -13,7 +13,7 @@ Stages can be nested into a **stage tree**, and the root stage can optionally sy
 Global observable registry of active stages (mostly for debugging/tooling).
 
 ```js
-import { stageRegistry } from 'destamatic-ui';
+import { stageRegistry } from '@destamatic/ui';
 ```
 
 Type: `OArray<Stage>`
@@ -301,7 +301,7 @@ Assumption:
 ### Example
 
 ```jsx
-import { Stage, StageContext, Default } from 'destamatic-ui';
+import { Stage, StageContext, Default } from '@destamatic/ui';
 
 const BlogHome = () => <>Blog home</>;
 const Post1 = () => <>Post 1</>;
@@ -358,7 +358,7 @@ import {
   Default,
   Paper,
   Typography,
-} from 'destamatic-ui';
+} from '@destamatic/ui';
 
 const fetchIndex = async () => {
   const res = await fetch('/examples/index.json');

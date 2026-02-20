@@ -1,4 +1,4 @@
-import { Scroll, Button, Paper } from 'destamatic-ui';
+import { Scroll, Button, Paper } from '@destamatic/ui';
 import { Observer, mount } from 'destam-dom';
 
 const width = Observer.mutable(100);

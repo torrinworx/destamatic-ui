@@ -1,4 +1,4 @@
-import { Button, Typography, Validate, ValidateContext, TextField, Paper, Observer } from 'destamatic-ui';
+import { Button, Typography, Validate, ValidateContext, TextField, Paper, Observer } from '@destamatic/ui';
 
 const Example = () => {
 	const phone = Observer.mutable('');

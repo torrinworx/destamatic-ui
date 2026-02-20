@@ -1,5 +1,5 @@
 import { mount, Observer } from 'destam-dom';
-import { Country, Select, Typography, Shown, PopupContext, Popup } from 'destamatic-ui';
+import { Country, Select, Typography, Shown, PopupContext, Popup } from '@destamatic/ui';
 
 const value = Observer.mutable(null);
 const country = Observer.mutable(null);

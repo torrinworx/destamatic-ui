@@ -1,4 +1,4 @@
-import { Typography, DatePicker, Button, Observer } from 'destamatic-ui';
+import { Typography, DatePicker, Button, Observer } from '@destamatic/ui';
 
 const Example = () => {
 	const date = Observer.mutable(new Date());

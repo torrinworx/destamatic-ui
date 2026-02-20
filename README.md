@@ -81,7 +81,7 @@ Basic usage:
 ```jsx
 import { Observer } from 'destam';
 import { mount } from 'destam-dom';
-import { h, Paper, Button, Typography } from 'destamatic-ui';
+import { h, Paper, Button, Typography } from '@destamatic/ui';
 
 const count = Observer.mutable(0);
 

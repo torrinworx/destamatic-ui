@@ -1,5 +1,5 @@
 import { mount, Observer} from 'destam-dom';
-import { Switch, Button, Toggle } from 'destamatic-ui';
+import { Switch, Button, Toggle } from '@destamatic/ui';
 
 const value = Observer.mutable('red');
 

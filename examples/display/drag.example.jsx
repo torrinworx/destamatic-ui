@@ -1,4 +1,4 @@
-import { Drag, Icon, Button, Paper, Theme, Shown } from 'destamatic-ui';
+import { Drag, Icon, Button, Paper, Theme, Shown } from '@destamatic/ui';
 import { mount, OArray, Observer } from 'destam-dom';
 
 const array = OArray([

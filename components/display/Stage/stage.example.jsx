@@ -1,4 +1,4 @@
-import { Button, Stage, StageContext, TextField, Typography, Popup, PopupContext, Observer } from 'destamatic-ui';
+import { Button, Stage, StageContext, TextField, Typography, Popup, PopupContext, Observer } from '@destamatic/ui';
 
 const pages = {
     acts: {

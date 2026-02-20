@@ -39,7 +39,7 @@ Theme.define({
 ```
 - all destam, destam-dom, and destamatic-ui exports are exported via destamatic-ui, prefer to use this import syntax, unless working with internal destamatic-ui components directly:
 ```javascript
-import { mount, Observer, Button } from 'destamatic-ui';
+import { mount, Observer, Button } from '@destamatic/ui';
 ```
 
 # `h`
@@ -49,7 +49,7 @@ destamatic-ui uses a custom `h` on top of `destam-dom` with a few extras:
 - JSX is compiled to `h(name, props, ...children)`
 - You usually don’t call `h` directly — you write JSX and import `h` from destamatic-ui:
   ```js
-  import { h, mount } from 'destamatic-ui';
+  import { h, mount } from '@destamatic/ui';
   ```
 - With destamatic-ui setup with Vite, we usually have an 'include' that automatically imports h into all components at compile time, so syntax wise it's not recommended to import everywhere when working on a user made component that is setup with Vite jsx_auto_import for 'h',
 'mark', and 'raw'.
@@ -213,7 +213,7 @@ You can’t use both `each` and `each:foo` at the same time.
 `h` returns a handler compatible with `destam-dom`’s `mount`:
 
 ```js
-import { h, mount } from 'destamatic-ui';
+import { h, mount } from '@destamatic/ui';
 
 const App = () =>
   <div theme={['primary']}>
@@ -234,7 +234,7 @@ Under the hood, when extra features (events, theme, reactive styles) are used, `
 Use `svg` for SVG elements, it’s the same API minus themes:
 
 ```js
-import { svg } from 'destamatic-ui';
+import { svg } from '@destamatic/ui';
 
 const Icon = () =>
   <raw:svg viewBox="0 0 24 24">
@@ -256,7 +256,7 @@ export const svg = (name, props, ...children) => {
 `mark` is a way for children to carry structured metadata up to a parent component.
 
 ```js
-import { mark } from 'destamatic-ui';
+import { mark } from '@destamatic/ui';
 
 const Toolbar = ({ children }) => {
   const actions = [];
@@ -298,7 +298,7 @@ destamatic-ui has a CSS-in-JS style theme system that generates real CSS classes
   - A global `Theme` object is created from `defaultTheme` and extended by internal destamatic-ui components.
   - New theme entries are added with:
     ```js
-    import { Theme } from 'destamatic-ui'; // internal components actually use relative paths to directly access files, but this is just a representation.
+    import { Theme } from '@destamatic/ui'; // internal components actually use relative paths to directly access files, but this is just a representation.
 
     Theme.define({
       button_contained: {

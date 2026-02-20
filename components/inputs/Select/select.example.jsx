@@ -1,4 +1,4 @@
-import { Typography, Observer, Select } from 'destamatic-ui';
+import { Typography, Observer, Select } from '@destamatic/ui';
 
 const Example = () => {
 	const input = Observer.mutable('');

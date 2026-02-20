@@ -1,4 +1,4 @@
-import { Typography, Icon, } from 'destamatic-ui';
+import { Typography, Icon, } from '@destamatic/ui';
 
 const Example = () => {
 	const libraryLabels = {

@@ -1,4 +1,4 @@
-import { Button, Typography, Toggle, Observer, Icon, Radio } from 'destamatic-ui';
+import { Button, Typography, Toggle, Observer, Icon, Radio } from '@destamatic/ui';
 
 const Example = () => {
 	const type = Observer.mutable('contained')

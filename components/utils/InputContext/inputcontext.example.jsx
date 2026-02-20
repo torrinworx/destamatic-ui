@@ -1,4 +1,4 @@
-import { Button, Typography, Toggle, Observer, OArray, InputContext, Slider } from 'destamatic-ui';
+import { Button, Typography, Toggle, Observer, OArray, InputContext, Slider } from '@destamatic/ui';
 
 const Example = () => {
 	const log = OArray([]);

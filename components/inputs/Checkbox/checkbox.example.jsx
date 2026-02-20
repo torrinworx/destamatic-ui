@@ -1,4 +1,4 @@
-import { Checkbox, Typography, Toggle, Observer } from 'destamatic-ui';
+import { Checkbox, Typography, Toggle, Observer } from '@destamatic/ui';
 
 const Example = () => {
 	const checkboxCount = Observer.mutable(0);

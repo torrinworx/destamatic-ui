@@ -1,5 +1,5 @@
-import { mount, DropDown, Typography, Icon, Icons, OObject, Theme, PopupContext } from 'destamatic-ui';
-import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
+import { mount, DropDown, Typography, Icon, Icons, OObject, Theme, PopupContext } from '@destamatic/ui';
+import IconifyIcons from "@destamatic/ui/components/icons/IconifyIcons/IconifyIcons";
 
 const globalTheme = OObject({
     primary: OObject({

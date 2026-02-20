@@ -4,7 +4,7 @@ import 'prismjs/themes/prism.css'
 
 import { Observer } from 'destam';
 import { mount } from 'destam-dom';
-import { Button, TextModifiers, Typography, PopupContext, RichField } from 'destamatic-ui';
+import { Button, TextModifiers, Typography, PopupContext, RichField } from '@destamatic/ui';
 
 const value = Observer.mutable('hello world there!?!?!?!?!?! :frog: atomic non-atomic');
 

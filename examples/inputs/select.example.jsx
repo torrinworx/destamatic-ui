@@ -1,5 +1,5 @@
 import { Observer, mount } from 'destam-dom';
-import { Select, Typography, PopupContext, Popup } from 'destamatic-ui';
+import { Select, Typography, PopupContext, Popup } from '@destamatic/ui';
 
 const input = Observer.mutable('');
 

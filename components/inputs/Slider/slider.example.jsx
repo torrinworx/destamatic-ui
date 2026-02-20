@@ -1,4 +1,4 @@
-import { Typography, Slider, Toggle, TextField, Observer } from 'destamatic-ui'
+import { Typography, Slider, Toggle, TextField, Observer } from '@destamatic/ui'
 
 
 

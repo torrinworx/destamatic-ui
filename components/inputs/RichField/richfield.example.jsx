@@ -1,4 +1,4 @@
-import { Observer, Typography, Paper, TextModifiers, RichField } from 'destamatic-ui';
+import { Observer, Typography, Paper, TextModifiers, RichField } from '@destamatic/ui';
 
 const Example = () => {
 	const value = Observer.mutable('Try typing: TODO, @mention, #tag, *emphasis*, or !!strong!! text.');

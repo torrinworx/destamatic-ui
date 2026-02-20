@@ -1,4 +1,4 @@
-import { Toggle, Typography, Observer, Radio } from 'destamatic-ui';
+import { Toggle, Typography, Observer, Radio } from '@destamatic/ui';
 
 const Example = () => {
 	const type = Observer.mutable('outlined')

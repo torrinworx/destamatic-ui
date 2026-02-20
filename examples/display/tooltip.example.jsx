@@ -1,4 +1,4 @@
-import { Tooltip, Detached, PopupContext, Popup } from 'destamatic-ui';
+import { Tooltip, Detached, PopupContext, Popup } from '@destamatic/ui';
 import { mount, Observer } from 'destam-dom';
 
 const Comp = ({ style }) => {

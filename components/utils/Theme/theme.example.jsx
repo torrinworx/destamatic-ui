@@ -1,5 +1,5 @@
-import { Theme, Button, ColorPicker, Typography, TextField, Observer } from 'destamatic-ui';
-import color from 'destamatic-ui/util/color';
+import { Theme, Button, ColorPicker, Typography, TextField, Observer } from '@destamatic/ui';
+import color from '@destamatic/ui/util/color';
 
 const Example = ({ globalTheme }) => {
 	const custom = {

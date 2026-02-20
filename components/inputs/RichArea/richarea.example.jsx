@@ -1,4 +1,4 @@
-import { Observer, Typography, Paper, TextModifiers, RichArea } from 'destamatic-ui';
+import { Observer, Typography, Paper, TextModifiers, RichArea } from '@destamatic/ui';
 
 const Example = () => {
 	const value = Observer.mutable(

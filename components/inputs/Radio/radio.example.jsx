@@ -1,4 +1,4 @@
-import { Radio, Observer, Typography, Toggle, TextField } from 'destamatic-ui';
+import { Radio, Observer, Typography, Toggle, TextField } from '@destamatic/ui';
 
 const Example = () => {
 	const selected = Observer.mutable(1);

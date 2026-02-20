@@ -1,7 +1,7 @@
 import { mount, Observer } from 'destam-dom';
-import { Icon, Icons } from 'destamatic-ui';
-import FeatherIcons from 'destamatic-ui/components/icons/FeatherIcons';
-import MaterialIcons from 'destamatic-ui/components/icons/MaterialIcons';
+import { Icon, Icons } from '@destamatic/ui';
+import FeatherIcons from '@destamatic/ui/components/icons/FeatherIcons';
+import MaterialIcons from '@destamatic/ui/components/icons/MaterialIcons';
 
 const icons = {
 	feather: FeatherIcons('feather'),
