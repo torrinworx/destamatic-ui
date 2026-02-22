@@ -5,6 +5,21 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import Button from '../Button/Button.jsx';
 
 Theme.define({
+	toggle: {
+		position: 'relative',
+		alignItems: 'center',
+		justifyContent: 'center',
+		userSelect: 'none',
+		width: 60,
+		minWidth: 60,
+		height: 30,
+		borderRadius: 37.5,
+		padding: 0,
+		boxSizing: 'border-box',
+		flexShrink: 0,
+		flexGrow: 0,
+	},
+
 	togglethumb: {
 		position: 'absolute',
 		top: '50%',
@@ -69,9 +84,7 @@ export default ThemeContext.use(h => {
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 
-		const effectiveType = autoType
-			? value.map(v => v ? 'contained' : 'outlined')
-			: type;
+
 
 		const handleClick = (event) => {
 			if (disabled.get()) return;
@@ -85,11 +98,10 @@ export default ThemeContext.use(h => {
 
 		return <Button
 			ref={ref}
-			type={effectiveType}
+			type={type + '_toggle'}
 			icon={<span
 				theme={[
 					'togglethumb',
-					effectiveType,
 					value.map(v => v ? 'checked' : 'unchecked'),
 					disabled.map(d => d ? 'disabled' : null),
 				]}
@@ -101,21 +113,7 @@ export default ThemeContext.use(h => {
 			role="switch"
 			aria-checked={value}
 			aria-disabled={disabled}
-			style={{
-				...style,
-				position: 'relative',
-				alignItems: 'center',
-				justifyContent: 'center',
-				userSelect: 'none',
-				width: 60,
-				minWidth: 60,
-				height: 30,
-				borderRadius: 37.5,
-				padding: 0,
-				boxSizing: 'border-box',
-				flexShrink: 0,
-				flexGrow: 0,
-			}}
+			style={style}
 			{...props}
 		/>;
 	};
