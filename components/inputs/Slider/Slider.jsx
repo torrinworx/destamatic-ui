@@ -119,9 +119,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		step = parseFloat(step);
 		if (!Number.isFinite(step) || step <= 0) return v;
 
-		const snapped = min + Math.round((v - min) / step) * step;
-		const decimals = (String(step).split('.')[1] || '').length;
-		return parseFloat(snapped.toFixed(decimals));
+		return min + Math.round((v - min) / step) * step;
 	};
 
 	const normalize = (v, min, max, step) => clamp(snapToStep(v, min, step), min, max);
@@ -179,7 +177,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 
 		if (!(min instanceof Observer)) min = Observer.immutable(0);
 		if (!(max instanceof Observer)) max = Observer.immutable(1);
-		if (!(step instanceof Observer)) step = Observer.immutable(0.01);
+		if (!(step instanceof Observer)) step = Observer.immutable(0);
 
 		if (!(type instanceof Observer)) type = Observer.immutable(type);
 		if (!(expand instanceof Observer)) expand = Observer.immutable(!!expand);
