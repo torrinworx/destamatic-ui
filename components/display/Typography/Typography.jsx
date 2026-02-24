@@ -225,6 +225,7 @@ export const Typography = ThemeContext.use(h => {
 			theme,
 			typographyTheme,
 			themer,
+			modifiers,
 		};
 
 		let display;
