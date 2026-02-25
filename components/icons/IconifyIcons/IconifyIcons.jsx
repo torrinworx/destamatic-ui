@@ -13,7 +13,16 @@ const libraries = {
 };
 
 const IconifyDriver = (name) => {
+    if (!name) {
+        throw new Error('Icon name is required in format "collection:name"');
+    }
+    if (typeof name !== 'string') {
+        throw new Error('Icon name must be a string');
+    }
     const [pack, iconName] = name.split(':');
+    if (!iconName) {
+        throw new Error('Invalid icon format: expected format "collection:name"');
+    }
     const lib = libraries[pack];
     if (!lib) return null;
 
