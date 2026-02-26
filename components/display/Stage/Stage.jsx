@@ -308,7 +308,6 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 				const nextFull = u.pathname + u.search;
 
 				// If only the query changed (same pathname), replace (don't push).
-				// This prevents the "/gig" then "/gig?id=123" double-entry problem.
 				const samePathname = nextPathname === lastCommittedPathname;
 
 				if (samePathname) {
