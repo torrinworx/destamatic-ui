@@ -1,10 +1,23 @@
 import { mount } from 'destam-dom';
-import { Stage, StageContext } from '@destamatic/ui';
 import { describe, it, expect, vi, afterEach } from 'vitest';
+
+let isNode = true;
+
+vi.mock('../../../ssg/is_node.js', () => ({
+	default: () => isNode,
+}));
+
+const { Stage, StageContext } = await import('./Stage.jsx');
 
 const flushMicrotasks = async (count = 1) => {
 	for (let i = 0; i < count; i += 1) {
 		await new Promise(resolve => queueMicrotask(resolve));
+	}
+};
+
+const waitForAnimationFrames = async (count = 2) => {
+	for (let i = 0; i < count; i += 1) {
+		await new Promise(resolve => requestAnimationFrame(resolve));
 	}
 };
 
@@ -21,6 +34,8 @@ const Template = ({ children }) => <div>{children}</div>;
 
 afterEach(() => {
 	vi.restoreAllMocks();
+	isNode = true;
+	window.history.replaceState({}, '', '/');
 });
 
 describe('Stage', () => {
@@ -176,6 +191,7 @@ describe('Stage', () => {
 	});
 
 	it('Should log an error when current is missing in node mode', () => {
+		isNode = true;
 		const elem = document.createElement('body');
 		const acts = {
 			ok: () => <div>Fallback</div>,
@@ -191,5 +207,105 @@ describe('Stage', () => {
 		const tree = elem.tree();
 		expect(findText(tree, 'Fallback')).toBe(false);
 		expect(errorSpy).toHaveBeenCalled();
+	});
+
+	it('Should sync URL segments and query into stage chain', async () => {
+		isNode = false;
+		const elem = document.createElement('body');
+		window.history.replaceState({}, '', '/parent/child?q=hello');
+
+		const acts = {
+			parent: () => <div>Parent</div>,
+		};
+		const childActs = {
+			child: () => <div>Child</div>,
+		};
+
+		let rootStage = null;
+		let childStage = null;
+
+		const ChildCapture = StageContext.use(s => () => {
+			childStage = s;
+			return <Stage />;
+		});
+
+		const RootCapture = StageContext.use(s => () => {
+			rootStage = s;
+			return <div>
+				<Stage />
+				<StageContext value={{
+					acts: childActs,
+					template: Template,
+					register: false,
+				}}>
+					<ChildCapture />
+				</StageContext>
+			</div>;
+		});
+
+		mount(elem, (
+			<StageContext value={{
+				acts,
+				template: Template,
+				urlRouting: true,
+				register: false,
+			}}>
+				<RootCapture />
+			</StageContext>
+		));
+
+		await flushMicrotasks(2);
+
+		expect(rootStage.current).toBe('parent');
+		expect(childStage.current).toBe('child');
+		expect(rootStage.urlProps).toEqual({});
+		expect(childStage.urlProps).toEqual({ q: 'hello' });
+	});
+
+	it('Should push and replace history based on path changes', async () => {
+		isNode = false;
+		const elem = document.createElement('body');
+		window.history.replaceState({}, '', '/');
+
+		const acts = {
+			home: () => <div>Home</div>,
+			profile: () => <div>Profile</div>,
+		};
+
+		let rootStage = null;
+		const Capture = StageContext.use(s => () => {
+			rootStage = s;
+			return <Stage />;
+		});
+
+		const pushSpy = vi.spyOn(history, 'pushState');
+		const replaceSpy = vi.spyOn(history, 'replaceState');
+
+		mount(elem, (
+			<StageContext value={{
+				acts,
+				initial: 'home',
+				template: Template,
+				urlRouting: true,
+				register: false,
+			}}>
+				<Capture />
+			</StageContext>
+		));
+
+		await flushMicrotasks(2);
+		await waitForAnimationFrames(2);
+		pushSpy.mockClear();
+		replaceSpy.mockClear();
+
+		rootStage.open({ name: 'profile' });
+		await flushMicrotasks(2);
+
+		expect(pushSpy).toHaveBeenCalled();
+
+		rootStage.open({ name: 'profile', urlProps: { page: '2' } });
+		await flushMicrotasks(2);
+
+		expect(replaceSpy).toHaveBeenCalled();
 	});
 });
