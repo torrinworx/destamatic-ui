@@ -142,6 +142,12 @@ global.Node = class Node {
 		document.activeElement = this;
 	}
 
+	blur() {
+		if (document.activeElement === this) {
+			document.activeElement = null;
+		}
+	}
+
 	tree() {
 		if (this.name === '') {
 			return this.textContent_;
