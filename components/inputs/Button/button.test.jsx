@@ -3,14 +3,25 @@ import { Button } from '@destamatic/ui';
 import { describe, it, expect, vi } from 'vitest';
 
 // Provide a minimal event object that won't crash Ripple (ripple throws a hissy fit)
-const fakeEvent = {
+const createFakeEvent = () => ({
 	currentTarget: {
 		getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
 	},
 	target: {
 		getBoundingClientRect: () => ({ width: 50, height: 50, top: 0, left: 0 })
-	}
-};
+	},
+	preventDefault: vi.fn(),
+});
+
+const createLinkEvent = (overrides = {}) => ({
+	...createFakeEvent(),
+	button: 0,
+	metaKey: false,
+	ctrlKey: false,
+	shiftKey: false,
+	altKey: false,
+	...overrides,
+});
 
 describe('Button', () => {
 	it('Should render a Button.', () => {
@@ -75,8 +86,106 @@ describe('Button', () => {
 		});
 	});
 
+	it('Should render as a link with href behavior', () => {
+		const elem = document.createElement('body');
+		mount(elem, <Button href="/docs" />);
+
+		const tree = elem.tree();
+		const button = tree.children[0];
+
+		expect(button.name).toBe('a');
+		expect(button.attributes.href).toBe('/docs');
+		expect(button.attributes.role).toBe('link');
+		expect(button.attributes.target).toBe('_blank');
+		expect(button.attributes.rel).toContain('noopener');
+	});
+
+	it('Should omit target and rel when hrefNewTab is false', () => {
+		const elem = document.createElement('body');
+		mount(elem, <Button href="/docs" hrefNewTab={false} />);
+
+		const tree = elem.tree();
+		const button = tree.children[0];
+
+		expect(button.name).toBe('a');
+		expect(button.attributes.href).toBe('/docs');
+		expect(button.attributes.target).toBeUndefined();
+		expect(button.attributes.rel).toBeUndefined();
+	});
+
+	it('Should prevent default and call onClick for left-click on link', () => {
+		const elem = document.createElement('body');
+		const onClickMock = vi.fn();
+		const event = createLinkEvent();
+
+		mount(elem, <Button href="/docs" onClick={onClickMock} />);
+
+		const tree = elem.tree();
+		const button = tree.children[0];
+
+		button.eventListeners.click.forEach(handler => handler(event));
+
+		expect(event.preventDefault).toHaveBeenCalled();
+		expect(onClickMock).toHaveBeenCalled();
+	});
+
+	it('Should allow modified link clicks without calling onClick', () => {
+		const elem = document.createElement('body');
+		const onClickMock = vi.fn();
+		const event = createLinkEvent({ metaKey: true });
+
+		mount(elem, <Button href="/docs" onClick={onClickMock} />);
+
+		const tree = elem.tree();
+		const button = tree.children[0];
+
+		button.eventListeners.click.forEach(handler => handler(event));
+
+		expect(event.preventDefault).not.toHaveBeenCalled();
+		expect(onClickMock).not.toHaveBeenCalled();
+	});
+
+	it('Should call onClick on Enter/Space for button only', () => {
+		const elem = document.createElement('body');
+		const onClickMock = vi.fn();
+		const event = {
+			...createFakeEvent(),
+			key: 'Enter',
+		};
+
+		mount(elem, <Button onClick={onClickMock} />);
+
+		const tree = elem.tree();
+		const button = tree.children[0];
+
+		button.eventListeners.keydown.forEach(handler => handler(event));
+
+		expect(event.preventDefault).toHaveBeenCalled();
+		expect(onClickMock).toHaveBeenCalled();
+	});
+
+	it('Should not call onClick on Enter/Space for link', () => {
+		const elem = document.createElement('body');
+		const onClickMock = vi.fn();
+		const event = {
+			...createFakeEvent(),
+			key: 'Enter',
+		};
+
+		mount(elem, <Button href="/docs" onClick={onClickMock} />);
+
+		const tree = elem.tree();
+		const button = tree.children[0];
+
+		button.eventListeners.keydown.forEach(handler => handler(event));
+
+		expect(event.preventDefault).not.toHaveBeenCalled();
+		expect(onClickMock).not.toHaveBeenCalled();
+	});
+
 	it('Should call onMouseDown, onMouseUp, and onClick when triggered', () => {
 		const elem = document.createElement('body');
+		const fakeEvent = createFakeEvent();
 
 		// Create mock functions
 		const onMouseDownMock = vi.fn();
@@ -109,6 +218,7 @@ describe('Button', () => {
 
 	it('Should not call onMouseDown, onMouseUp, and onClick when disabled', () => {
 		const elem = document.createElement('body');
+		const fakeEvent = createFakeEvent();
 
 		// Create mock functions
 		const onMouseDownMock = vi.fn();
@@ -137,6 +247,30 @@ describe('Button', () => {
 		// Check if our mock functions were NOT called
 		expect(onMouseDownMock).not.toHaveBeenCalled();
 		expect(onMouseUpMock).not.toHaveBeenCalled();
+		expect(onClickMock).not.toHaveBeenCalled();
+	});
+
+	it('Should treat loading as disabled for clicks', () => {
+		const elem = document.createElement('body');
+		const fakeEvent = createFakeEvent();
+		const onMouseDownMock = vi.fn();
+		const onClickMock = vi.fn();
+
+		mount(elem, (
+			<Button
+				loading={true}
+				onMouseDown={onMouseDownMock}
+				onClick={onClickMock}
+			/>
+		));
+
+		const tree = elem.tree();
+		const button = tree.children[0];
+
+		button.eventListeners.mousedown.forEach(handler => handler(fakeEvent));
+		button.eventListeners.click.forEach(handler => handler(fakeEvent));
+
+		expect(onMouseDownMock).not.toHaveBeenCalled();
 		expect(onClickMock).not.toHaveBeenCalled();
 	});
 });
