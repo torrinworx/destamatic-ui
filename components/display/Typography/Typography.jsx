@@ -226,6 +226,21 @@ export const Typography = ThemeContext.use(h => {
 			typographyTheme,
 			themer,
 			modifiers,
+			parentModifier: null,
+		};
+
+		modifierCtx.renderWithModifiers = (value, overrides) => {
+			if (!modifiers || modifiers.length === 0) return value;
+			if (typeof value !== 'string') return value;
+
+			const nextCtx = {
+				...modifierCtx,
+				...overrides,
+			};
+
+			const rendered = applyModifiers(value, modifiers, null, nextCtx);
+
+			return rendered.length === 1 ? rendered[0] : rendered;
 		};
 
 		let display;
