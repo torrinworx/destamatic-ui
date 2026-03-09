@@ -298,6 +298,18 @@ global.document = {
         node.textContent = text;
         return node;
     },
+    querySelector: (selector) => {
+        if (!selector) return null;
+        const metaMatch = selector.match(/^meta\[name=["'](.+?)["']\]$/i);
+        if (!metaMatch) return null;
+        const name = metaMatch[1];
+        const nodes = global.document.head?.childNodes || [];
+        for (const node of nodes) {
+            if (node?.name !== 'meta') continue;
+            if (node.attributes?.name === name) return node;
+        }
+        return null;
+    },
 };
 
 global.document.dummy = {
@@ -345,6 +357,8 @@ if (typeof global.window === 'undefined') {
     };
 }
 
+global.window.__SSG__ = true;
+
 if (typeof global.window.scrollTo !== 'function') {
     global.window.scrollTo = function scrollTo(x, y) {
         // no-op for SSG
@@ -387,6 +401,7 @@ if (!global.window.location) {
         pathname: '/',
         search: '',
         hash: '',
+        origin: 'http://localhost',
     };
 }
 
