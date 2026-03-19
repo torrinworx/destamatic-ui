@@ -155,9 +155,9 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		track = true,
 		value,
 		disabled,
-		min,
-		max,
-		step,
+		min = 0,
+		max = 1,
+		step = 0,
 		type = 'horizontal',
 		cover = true,
 		thumb = true,
@@ -175,9 +175,9 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		if (!(hover instanceof Observer)) hover = Observer.mutable(false);
 		if (!(focused instanceof Observer)) focused = Observer.mutable(false);
 
-		if (!(min instanceof Observer)) min = Observer.immutable(0);
-		if (!(max instanceof Observer)) max = Observer.immutable(1);
-		if (!(step instanceof Observer)) step = Observer.immutable(0);
+		if (!(min instanceof Observer)) min = Observer.immutable(min);
+		if (!(max instanceof Observer)) max = Observer.immutable(max);
+		if (!(step instanceof Observer)) step = Observer.immutable(step);
 
 		if (!(type instanceof Observer)) type = Observer.immutable(type);
 		if (!(expand instanceof Observer)) expand = Observer.immutable(!!expand);
