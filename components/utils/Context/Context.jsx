@@ -158,7 +158,7 @@ createContext.all = (...values) => {
 	return (props, cleanup, mounted) => {
 		return (elem, _, before, context) => {
 			const contextValues = contexts.map(con => {
-				return con.fromContext(context, props);
+				return con.fromContext(context, props, cleanup);
 			});
 
 			return mount(

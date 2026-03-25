@@ -1,10 +1,12 @@
 import { assert } from 'destam/util';
 import Observer from 'destam/Observer';
+import { mount } from 'destam-dom';
 
 import { h } from '../h/h.jsx';
 import createContext from '../Context/Context.jsx';
 
 const ThemeContext = createContext('primary');
+export const FocusableContext = createContext();
 
 const createNode = (name, namespace) => {
 	if (namespace) {
@@ -14,8 +16,9 @@ const createNode = (name, namespace) => {
 	}
 };
 
-const create = (props, context, namespace) => {
-	const theme = props.theme ?? context;
+const fromContext = ThemeContext.fromContext;
+const create = (props, context, cleanup, namespace) => {
+	const theme = props.theme ?? fromContext(context);
 	const ref = props.ref;
 	assert(!ref || ref instanceof Node || ref instanceof Observer, "ref must either be a node or an observer");
 
@@ -50,8 +53,17 @@ const create = (props, context, namespace) => {
 						delete props[o];
 					}
 
-					const name = o[2].toLowerCase() + o.substring(3);
-					enabledThemes.push(props[o].bool(name, null));
+					const eventName = o[2].toLowerCase() + o.substring(3);
+					if (eventName === 'focused') {
+						const focusable = FocusableContext.fromContext(context);
+						if (focusable) {
+							cleanup(focusable(props[o], name));
+
+							continue;
+						}
+					}
+
+					enabledThemes.push(props[o].bool(eventName, null));
 				}
 			}
 
@@ -73,20 +85,29 @@ const create = (props, context, namespace) => {
 
 const use = ThemeContext.use;
 ThemeContext.use = (component, namespace) => {
+	return (props, cleanup, mounted) => {
+		return (elem, _, before, context) => {
+			return mount(
+				elem,
+				component(create(props, context, cleanup, namespace))(props, cleanup, mounted),
+				before,
+				context,
+			);
+		};
+	};
+
 	return use(context => (props, cleanup, mounted) => {
-		const h = create(props, context, namespace);
 		return component(h)(props, cleanup, mounted);
 	});
 };
 
-const fromContext = ThemeContext.fromContext;
-ThemeContext.fromContext = (context, props) => {
-	return create(props, fromContext(context));
+ThemeContext.fromContext = (context, props, cleanup) => {
+	return create(props, context, cleanup);
 };
 
 ThemeContext.namespace = namespace => {
 	return {
-		fromContext: (context, props) => create(props, fromContext(context), namespace),
+		fromContext: (context, props, cleanup) => create(props, context, cleanup, namespace),
 	};
 };
 
