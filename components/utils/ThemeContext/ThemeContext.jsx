@@ -19,7 +19,6 @@ const create = (props, context, namespace) => {
 	const ref = props.ref;
 	assert(!ref || ref instanceof Node || ref instanceof Observer, "ref must either be a node or an observer");
 
-	let lastElement = null;
 	const themedH = (name, props = {}, ...children) => {
 		const enabledThemes = [];
 
@@ -54,6 +53,11 @@ const create = (props, context, namespace) => {
 					const name = o[2].toLowerCase() + o.substring(3);
 					enabledThemes.push(props[o].bool(name, null));
 				}
+			}
+
+			if (props.isDisabled) {
+				props.disabled = props.isDisabled;
+				delete props.isDisabled;
 			}
 
 			delete props.ref;

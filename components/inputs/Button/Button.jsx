@@ -300,16 +300,15 @@ export default Context.all(InputContext, ThemeContext, (input, h) => {
 				...style,
 			}}
 
-			disabled={!href ? disabled : undefined}
 			isFocused={focused}
 			isHovered={hover}
+			isLoading={loading}
+			isDisabled={disabled}
 			{...props}
 			theme={[
 				'button',
 				type,
 				round.bool('round', null),
-				loading.bool('loading', null),
-				disabled.bool('disabled', null),
 				Observer.all([disabled, clicked]).map(([d, c]) => c && !d ? 'clicked' : null),
 			]}
 		>

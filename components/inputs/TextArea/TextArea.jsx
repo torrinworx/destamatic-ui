@@ -144,13 +144,13 @@ export default ThemeContext.use(h => {
             }}
             isFocused={focused}
             isHovered={hover}
+            isDisabled={disabled}
             style={{
                 height,
                 overflowY,
                 display: inline ? 'inline-flex' : 'flex',
                 ...style,
             }}
-            disabled={disabled}
             {...props}
             theme={[
                 'field',
@@ -158,7 +158,6 @@ export default ThemeContext.use(h => {
                 type,
                 error.map(v => v ? 'error' : null),
                 expand.map(v => v ? 'expand' : null),
-                disabled.bool('disabled', null),
             ]}
         />;
     };

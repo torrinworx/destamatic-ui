@@ -18,6 +18,13 @@ import { sizeProperties } from '../../../util/index.js';
 // 3. Numbers in the style will be interpreted as pxs
 // From: https://github.com/Nefsen402/destam-dom/blob/main/examples/custom-h.jsx
 
+const handlers = {
+	Focused: ['focus', 'blur'],
+	Hovered: ['mouseenter', 'mouseleave'],
+	Clicked: ['mousedown', 'mouseup'],
+	Touched: ['touchstart', 'touchend'],
+};
+
 const hypertext = (useThemes, name, props = {}, ...children) => {
 	if (typeof name === 'string') {
 		name = document.createElement(name);
@@ -110,17 +117,10 @@ const hypertext = (useThemes, name, props = {}, ...children) => {
 				continue;
 			}
 
-			const handlers = {
-				Focused: ['focus', 'blur'],
-				Hovered: ['mouseenter', 'mouseleave'],
-				Clicked: ['mousedown', 'mouseup'],
-				Touched: ['touchstart', 'touchend'],
-			};
-
 			const handlerName = o.substring(2);
 			const handler = handlers[handlerName];
 			if (!handler) {
-				throw new Error("No handler for " + handlerName);
+				continue;
 			}
 
 			delete props[o];

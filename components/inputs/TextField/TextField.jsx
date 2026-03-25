@@ -115,18 +115,16 @@ export default ThemeContext.use(h => {
 				display: inline ? 'inline-flex' : 'flex',
 				...style,
 			}}
-			disabled={disabled}
 			aria-label={props['aria-label'] ?? props.placeholder}
 			isFocused={focused}
 			isHovered={hover}
+			isDisabled={disabled}
 			{...props}
 			theme={[
 				'field',
 				type,
 				error.map(e => e ? 'error' : null),
 				expand.map(e => e ? 'expand' : null),
-				disabled.bool('disabled', null),
-
 			]}
 		/>;
 	};
