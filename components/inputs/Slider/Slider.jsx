@@ -3,6 +3,7 @@ import { Observer } from 'destam-dom';
 import Theme from '../../utils/Theme/Theme.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import InputContext from '../../utils/InputContext/InputContext.jsx';
+import Context from '../../utils/Context/Context.jsx';
 
 Theme.define({
 	slider: {
@@ -112,7 +113,7 @@ Theme.define({
 	},
 });
 
-export default InputContext.use(input => ThemeContext.use(h => {
+export default Context.all(InputContext, ThemeContext, (input, h) => {
 	const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
 	const snapToStep = (v, min, step) => {
@@ -452,4 +453,4 @@ export default InputContext.use(input => ThemeContext.use(h => {
 	};
 
 	return Slider;
-}));
+});

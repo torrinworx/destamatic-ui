@@ -2,6 +2,7 @@ import { Observer, OArray } from 'destam';
 
 import createContext from '../../utils/Context/Context.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
+import Context from '../../utils/Context/Context.jsx';
 
 const parser = new DOMParser();
 
@@ -59,7 +60,7 @@ export const Icons = createContext(() => null, (next, prev) => {
  * 
  * @returns {JSX.Element} The rendered SVG icon element.
  */
-export const Icon = Icons.use(iconPack => ThemeContext.use(svg => {
+export const Icon = Context.all(Icons, ThemeContext.namespace('http://www.w3.org/2000/svg'), (iconPack, svg) => {
 	return ({ name, size = null, style = {}, rot, ...props }, cleanup) => {
 		if (!(name instanceof Observer)) name = Observer.immutable(name);
 		if (!(size instanceof Observer)) size = Observer.immutable(size);
@@ -128,6 +129,6 @@ export const Icon = Icons.use(iconPack => ThemeContext.use(svg => {
 			{children}
 		</svg:svg>;
 	};
-}, 'http://www.w3.org/2000/svg'));
+});
 
 export default Icon;

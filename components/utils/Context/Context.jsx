@@ -151,4 +151,23 @@ const createContext = (def, transform = x => x) => {
 	return Context;
 };
 
+createContext.all = (...values) => {
+	const component = values.pop();
+	const contexts = values;
+
+	return (props, cleanup, mounted) => {
+		return (elem, _, before, context) => {
+			const contextValues = contexts.map(con => {
+				return con.fromContext(context, props);
+			});
+
+			return mount(
+				elem,
+				component(...contextValues)(props, cleanup, mounted),
+				before,
+				context,
+			);
+		};
+	};
+};
 export default createContext;
