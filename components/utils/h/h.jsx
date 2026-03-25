@@ -105,6 +105,11 @@ const hypertext = (useThemes, name, props = {}, ...children) => {
 				name.addEventListener(handlerName, handler, { signal });
 			}));
 		} else if (o.length >= 3 && o.startsWith('is') && o[2].toLowerCase() !== o[2]) {
+			const obs = props[o];
+			if (obs.isImmutable()) {
+				continue;
+			}
+
 			const handlers = {
 				Focused: ['focus', 'blur'],
 				Hovered: ['mouseenter', 'mouseleave'],
@@ -118,7 +123,6 @@ const hypertext = (useThemes, name, props = {}, ...children) => {
 				throw new Error("No handler for " + handlerName);
 			}
 
-			const obs = props[o];
 			delete props[o];
 
 			signals.push(useAbort(signal => {

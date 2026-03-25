@@ -149,9 +149,6 @@ export default Context.all(InputContext, ThemeContext, (input, h) => {
 
 		const [ripples, createRipple] = useRipples();
 
-		if (!focused.isImmutable()) props.isFocused = focused;
-		if (!hover.isImmutable()) props.isHovered = hover;
-
 		const hasUserOnClick = typeof onClick === 'function';
 
 		const handleLoading = (value) => {
@@ -304,13 +301,13 @@ export default Context.all(InputContext, ThemeContext, (input, h) => {
 			}}
 
 			disabled={!href ? disabled : undefined}
+			isFocused={focused}
+			isHovered={hover}
 			{...props}
 			theme={[
 				'button',
 				type,
 				round.bool('round', null),
-				hover.bool('hovered', null),
-				focused.bool('focused', null),
 				loading.bool('loading', null),
 				disabled.bool('disabled', null),
 				Observer.all([disabled, clicked]).map(([d, c]) => c && !d ? 'clicked' : null),

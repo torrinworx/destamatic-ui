@@ -269,9 +269,6 @@ export default Context.all(InputContext, ThemeContext, (input, h) => {
 
 		mounted(() => cleanup(stopDrag));
 
-		if (!focused.isImmutable()) props.isFocused = focused;
-		if (!hover.isImmutable()) props.isHovered = hover;
-
 		mounted(() => cleanup(Observer.all([value, safeMin, safeMax, step]).effect(([v, mn, mx, st]) => {
 			if (disabled.get() || value.isImmutable()) return;
 
@@ -409,12 +406,12 @@ export default Context.all(InputContext, ThemeContext, (input, h) => {
 			<div ref={railRef} theme={['sliderrail']}>
 				<span
 					style={styleTrack}
+					isHovered={hover}
+					isFocused={Observer.all([disabled, focused]).map(([d, f]) => !d && f).setter(val => focused.set(val))}
 					theme={[
 						'slidertrack',
 						isVertical.map(v => v ? 'vertical' : null),
-						hover.bool('hovered', null),
 						disabled.bool('disabled', null),
-						Observer.all([disabled, focused]).map(([d, f]) => !d && f ? 'focused' : null),
 					]}
 				>
 					<span

@@ -21,6 +21,8 @@ const create = (props, context, namespace) => {
 
 	let lastElement = null;
 	const themedH = (name, props = {}, ...children) => {
+		const enabledThemes = [];
+
 		if (typeof name === 'string') {
 			if (!ref || !props.ref) {
 				name = createNode(name, namespace);
@@ -43,10 +45,21 @@ const create = (props, context, namespace) => {
 				props.ref.set(name);
 			}
 
+			for (const o in props) {
+				if (o.length >= 3 && o.startsWith('is') && o[2].toLowerCase() !== o[2]) {
+					if (!props[o]) {
+						delete props[o];
+					}
+
+					const name = o[2].toLowerCase() + o.substring(3);
+					enabledThemes.push(props[o].bool(name, null));
+				}
+			}
+
 			delete props.ref;
 		}
 
-		if (props.theme) props.theme = [theme, props.theme];
+		if (props.theme) props.theme = [theme, props.theme, ...enabledThemes];
 		return h(name, props, ...children);
 	};
 
