@@ -6,11 +6,6 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/torrinworx/destamatic-ui/build.yml?branch=main)](https://github.com/torrinworx/destamatic-ui/actions)
 [![npm version](https://img.shields.io/npm/v/destamatic-ui)](https://www.npmjs.com/package/destamatic-ui)
 
-- 🌐 **Site & docs:** https://torrin.me/destamatic-ui  
-- 🧪 **Playground & examples:** https://torrin.me/destamatic-ui/playground  
-- 📦 **Template starter:** https://github.com/torrinworx/destamatic-template  
-- **Discord** https://discord.gg/BJMPpVwdhz
-
 ## What is destamatic‑ui?
 
 destamatic‑ui is the top layer of the **destam stack**:
