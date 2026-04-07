@@ -236,10 +236,12 @@ export const Validate = ValidateContext.use(v => ThemeContext.use(h => {
 		valid = true,
 		signal,
 		error = '',
+		showError = true,
 		icon = <Icon name="feather:alert-circle" theme="validate_icon" />
 	}, cleanup) => {
 		if (!(valid instanceof Observer)) valid = Observer.mutable(valid);
 		if (!(error instanceof Observer)) error = Observer.mutable(error);
+		if (!(showError instanceof Observer)) showError = Observer.mutable(showError);
 		if (v instanceof Observer) {
 			v.set([...v.get(), valid]);
 			cleanup(() => {
@@ -291,7 +293,7 @@ export const Validate = ValidateContext.use(v => ThemeContext.use(h => {
 			}));
 		}
 
-		return <Shown value={error}>
+		return <Shown value={Observer.all([showError, error]).map(([show, err]) => show ? err : '')}>
 			<div theme="row_validate_wrapper">
 				{icon}
 				<Typography type="validate" label={Observer.immutable(error)} />
