@@ -34,7 +34,7 @@ export default ThemeContext.use(h => {
 		if (!(focused instanceof Observer)) focused = Observer.mutable(focused);
 		if (!(hover instanceof Observer)) hover = Observer.mutable(hover);
 
-		return <div style={style}>
+		return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', ...style }}>
 			<Button
 				type={type}
 				iconPosition={arrow === 'right' ? 'right' : 'left'}
@@ -57,7 +57,11 @@ export default ThemeContext.use(h => {
 					maxWidth: 'none',
 					display: 'flex',
 					justifyContent: 'space-between',
-					width: '100%', height: '100%'
+					alignItems: 'center',
+					width: '100%',
+					height: 'auto',
+					minWidth: 0,
+					boxSizing: 'border-box',
 				}}
 			/>
 			<Shown value={open}>
