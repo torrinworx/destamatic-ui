@@ -129,7 +129,7 @@ export const StageContext = createContext(
 							...props
 						});
 					});
-				} else {
+				} else if (urlRouting) {
 					// Route ends here: clear ALL descendant urlProps so they can't leak back into the URL.
 					queueMicrotask(() => {
 						const child = children[0]?.value;
@@ -143,9 +143,7 @@ export const StageContext = createContext(
 
 						clearDescendants(child);
 
-						child.observer
-							.path('current')
-							.set(child.initial ? child.initial : null);
+						child.current = child.initial;
 					});
 				}
 
