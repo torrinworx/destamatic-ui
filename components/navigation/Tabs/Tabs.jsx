@@ -7,8 +7,12 @@ import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
 Theme.define({
 	button_tab: {
-		width: '100%',
+		flex: 1,
 		borderRadius: 0,
+	},
+
+	button_tab_focused: {
+		boxShadow: 'none',
 	},
 
 	tab_body: {
