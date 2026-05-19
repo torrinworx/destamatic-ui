@@ -5,6 +5,7 @@ import Shown from '../../utils/Shown/Shown.jsx';
 import RichEngine from '../../utils/RichEngine/RichEngine.js';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import { Typography } from '../../display/Typography/Typography.jsx';
+import Context from '../../utils/Context/Context.jsx';
 
 Theme.define({
 	richarea: {
@@ -39,8 +40,8 @@ Theme.define({
 	},
 });
 
-export default ThemeContext.use(h => {
-	const RichArea = Theme.use(themer => ({
+export default Context.all(ThemeContext, Theme, (h, themer) => {
+	const RichArea = ({
 		value,
 		tabIndex = 0,
 		autoFocus = false,
@@ -373,7 +374,7 @@ export default ThemeContext.use(h => {
 				/>
 			</Shown>
 		</div>;
-	});
+	};
 
 	return RichArea;
 });

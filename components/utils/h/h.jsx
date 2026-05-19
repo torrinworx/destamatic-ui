@@ -18,6 +18,13 @@ import { sizeProperties } from '../../../util/index.js';
 // 3. Numbers in the style will be interpreted as pxs
 // From: https://github.com/Nefsen402/destam-dom/blob/main/examples/custom-h.jsx
 
+const handlers = {
+	Focused: ['focus', 'blur'],
+	Hovered: ['mouseenter', 'mouseleave'],
+	Clicked: ['mousedown', 'mouseup'],
+	Touched: ['touchstart', 'touchend'],
+};
+
 const hypertext = (useThemes, name, props = {}, ...children) => {
 	if (typeof name === 'string') {
 		name = document.createElement(name);
@@ -105,20 +112,17 @@ const hypertext = (useThemes, name, props = {}, ...children) => {
 				name.addEventListener(handlerName, handler, { signal });
 			}));
 		} else if (o.length >= 3 && o.startsWith('is') && o[2].toLowerCase() !== o[2]) {
-			const handlers = {
-				Focused: ['focus', 'blur'],
-				Hovered: ['mouseenter', 'mouseleave'],
-				Clicked: ['mousedown', 'mouseup'],
-				Touched: ['touchstart', 'touchend'],
-			};
+			const obs = props[o];
+			if (obs.isImmutable()) {
+				continue;
+			}
 
 			const handlerName = o.substring(2);
 			const handler = handlers[handlerName];
 			if (!handler) {
-				throw new Error("No handler for " + handlerName);
+				continue;
 			}
 
-			const obs = props[o];
 			delete props[o];
 
 			signals.push(useAbort(signal => {

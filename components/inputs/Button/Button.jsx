@@ -8,6 +8,7 @@ import LoadingDots from '../../utils/LoadingDots/LoadingDots.jsx';
 import useRipples from '../../utils/Ripple/Ripple.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import InputContext from '../../utils/InputContext/InputContext.jsx';
+import Context from '../../utils/Context/Context.jsx';
 
 Theme.define({
 	button: {
@@ -100,7 +101,7 @@ Theme.define({
 	},
 });
 
-export default InputContext.use(input => ThemeContext.use(h => {
+export default Context.all(InputContext, ThemeContext, (input, h) => {
 	const Button = ({
 		id = null,
 		track = true,
@@ -147,9 +148,6 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		disabled = Observer.all([disabled, loading]).map(([dis, lod]) => !!dis || lod);
 
 		const [ripples, createRipple] = useRipples();
-
-		if (!focused.isImmutable()) props.isFocused = focused;
-		if (!hover.isImmutable()) props.isHovered = hover;
 
 		const hasUserOnClick = typeof onClick === 'function';
 
@@ -302,16 +300,15 @@ export default InputContext.use(input => ThemeContext.use(h => {
 				...style,
 			}}
 
-			disabled={!href ? disabled : undefined}
+			isFocused={focused}
+			isHovered={hover}
+			isLoading={loading}
+			isDisabled={disabled}
 			{...props}
 			theme={[
 				'button',
 				type,
 				round.bool('round', null),
-				hover.bool('hovered', null),
-				focused.bool('focused', null),
-				loading.bool('loading', null),
-				disabled.bool('disabled', null),
 				Observer.all([disabled, clicked]).map(([d, c]) => c && !d ? 'clicked' : null),
 			]}
 		>
@@ -335,4 +332,4 @@ export default InputContext.use(input => ThemeContext.use(h => {
 	};
 
 	return Button;
-}));
+});

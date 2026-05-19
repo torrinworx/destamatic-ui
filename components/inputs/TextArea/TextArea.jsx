@@ -116,9 +116,6 @@ export default ThemeContext.use(h => {
             else el.blur();
         })));
 
-        if (!focused.isImmutable()) props.isFocused = focused;
-        if (!hover.isImmutable()) props.isHovered = hover;
-
         return <textarea
             ref={ref}
             rows={1}
@@ -146,23 +143,21 @@ export default ThemeContext.use(h => {
                 if (e.key === 'Enter' && onEnter) onEnter(e);
             }}
             isFocused={focused}
+            isHovered={hover}
+            isDisabled={disabled}
             style={{
                 height,
                 overflowY,
                 display: inline ? 'inline-flex' : 'flex',
                 ...style,
             }}
-            disabled={disabled}
             {...props}
             theme={[
                 'field',
                 'area',
                 type,
-                focused.map(v => v ? 'focused' : null),
                 error.map(v => v ? 'error' : null),
                 expand.map(v => v ? 'expand' : null),
-                hover.bool('hovered', null),
-                disabled.bool('disabled', null),
             ]}
         />;
     };

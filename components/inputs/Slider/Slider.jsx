@@ -3,6 +3,7 @@ import { Observer } from 'destam-dom';
 import Theme from '../../utils/Theme/Theme.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import InputContext from '../../utils/InputContext/InputContext.jsx';
+import Context from '../../utils/Context/Context.jsx';
 
 Theme.define({
 	slider: {
@@ -112,7 +113,7 @@ Theme.define({
 	},
 });
 
-export default InputContext.use(input => ThemeContext.use(h => {
+export default Context.all(InputContext, ThemeContext, (input, h) => {
 	const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 
 	const snapToStep = (v, min, step) => {
@@ -268,9 +269,6 @@ export default InputContext.use(input => ThemeContext.use(h => {
 
 		mounted(() => cleanup(stopDrag));
 
-		if (!focused.isImmutable()) props.isFocused = focused;
-		if (!hover.isImmutable()) props.isHovered = hover;
-
 		mounted(() => cleanup(Observer.all([value, safeMin, safeMax, step]).effect(([v, mn, mx, st]) => {
 			if (disabled.get() || value.isImmutable()) return;
 
@@ -408,12 +406,12 @@ export default InputContext.use(input => ThemeContext.use(h => {
 			<div ref={railRef} theme={['sliderrail']}>
 				<span
 					style={styleTrack}
+					isHovered={hover}
+					isFocused={Observer.all([disabled, focused]).map(([d, f]) => !d && f).setter(val => focused.set(val))}
 					theme={[
 						'slidertrack',
 						isVertical.map(v => v ? 'vertical' : null),
-						hover.bool('hovered', null),
 						disabled.bool('disabled', null),
-						Observer.all([disabled, focused]).map(([d, f]) => !d && f ? 'focused' : null),
 					]}
 				>
 					<span
@@ -452,4 +450,4 @@ export default InputContext.use(input => ThemeContext.use(h => {
 	};
 
 	return Slider;
-}));
+});

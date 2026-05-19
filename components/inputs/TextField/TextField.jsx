@@ -80,9 +80,6 @@ export default ThemeContext.use(h => {
 
 		const ref = Observer.mutable(null);
 
-		if (!focused.isImmutable() && !props.isFocused) props.isFocused = focused;
-		if (!hover.isImmutable() && !props.isHovered) props.isHovered = hover;
-
 		mounted(() => cleanup(focused.effect(e => {
 			if (e) ref.get().focus();
 			else ref.get().blur();
@@ -118,18 +115,16 @@ export default ThemeContext.use(h => {
 				display: inline ? 'inline-flex' : 'flex',
 				...style,
 			}}
-			disabled={disabled}
 			aria-label={props['aria-label'] ?? props.placeholder}
+			isFocused={focused}
+			isHovered={hover}
+			isDisabled={disabled}
 			{...props}
 			theme={[
 				'field',
 				type,
-				focused.map(e => e ? 'focused' : null),
 				error.map(e => e ? 'error' : null),
 				expand.map(e => e ? 'expand' : null),
-				hover.bool('hovered', null),
-				disabled.bool('disabled', null),
-
 			]}
 		/>;
 	};
