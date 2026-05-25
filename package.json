@@ -48,8 +48,8 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "destam": "^0.8.0",
-    "destam-dom": "^0.14.4"
+    "destam": "^0.9.0",
+    "destam-dom": "^0.15.0"
   },
   "optionalDependencies": {
     "@iconify-json/feather": "^1.2.1",
