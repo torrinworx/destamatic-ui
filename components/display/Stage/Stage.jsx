@@ -323,8 +323,6 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 
 				if (!urlWriteScheduled) {
 					urlWriteScheduled = true;
-					// Macrotask, not microtask: coalesce chained child opens into one
-					// history entry (deferred child open() runs on a microtask).
 					setTimeout(commitUrl, 0);
 				}
 			};
