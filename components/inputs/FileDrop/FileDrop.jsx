@@ -7,7 +7,7 @@ import Shown from '../../utils/Shown/Shown.jsx';
 import Paper from '../../display/Paper/Paper.jsx';
 import Button from '../../inputs/Button/Button.jsx';
 import Context from '../../utils/Context/Context.jsx';
-import LoadingDots from '../../utils/LoadingDots/LoadingDots.jsx';
+import LoaderContext from '../../utils/LoaderContext/LoaderContext.jsx';
 import { Typography } from '../../display/Typography/Typography.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 
@@ -64,14 +64,14 @@ Theme.define({
 
 const FileDropContext = Context(null);
 
-const Listing = FileDropContext.use(({ files }) => () => {
+const Listing = FileDropContext.use(({ files }) => LoaderContext.use(Loader => () => {
 	const File = ({ each: file }) => {
 		return <Paper type='fileDrop'>
 			<Icon name="feather:file" style={{ margin: 10 }} />
 			<Typography type="fileDrop_expand" label={file.observer.path('name')} />
 			{file.observer.path('status').map(status => {
 				if (status === 'loading') {
-					return <LoadingDots />;
+					return <Loader />;
 				} else if (status === 'error') {
 					return file.observer.path('error');
 				}/* else if (status === 'ready') {
@@ -92,7 +92,7 @@ const Listing = FileDropContext.use(({ files }) => () => {
 	};
 
 	return <File each={files} />;
-});
+}));
 
 const UploadButton = FileDropContext.use(({ files, handleFiles, extensions, multiple }) => props => {
 	return <Button {...props} onClick={event => {

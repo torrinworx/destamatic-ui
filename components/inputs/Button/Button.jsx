@@ -4,10 +4,10 @@ import { mark } from '../../utils/h/h.jsx';
 
 import Theme from '../../utils/Theme/Theme.jsx';
 import Shown from '../../utils/Shown/Shown.jsx';
-import LoadingDots from '../../utils/LoadingDots/LoadingDots.jsx';
 import useRipples from '../../utils/Ripple/Ripple.jsx';
 import ThemeContext from '../../utils/ThemeContext/ThemeContext.jsx';
 import InputContext from '../../utils/InputContext/InputContext.jsx';
+import LoaderContext from '../../utils/LoaderContext/LoaderContext.jsx';
 
 Theme.define({
 	button: {
@@ -100,12 +100,16 @@ Theme.define({
 	},
 });
 
-export default InputContext.use(input => ThemeContext.use(h => {
+export default InputContext.use(input => ThemeContext.use(h => LoaderContext.use(defaultLoader => {
 	const Button = ({
 		id = null,
 		track = true,
 		label = '',
 		type = 'contained',
+
+		// Loading indicator. Defaults to the app-wide LoaderContext (LoadingDots
+		// unless overridden); pass `loader` to override it for this button only.
+		loader = null,
 
 		// IMPORTANT: default null so we can detect "user provided onClick"
 		onClick = null,
@@ -147,6 +151,8 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		disabled = Observer.all([disabled, loading]).map(([dis, lod]) => !!dis || lod);
 
 		const [ripples, createRipple] = useRipples();
+
+		const Loader = loader ?? defaultLoader;
 
 		if (!focused.isImmutable()) props.isFocused = focused;
 		if (!hover.isImmutable()) props.isHovered = hover;
@@ -317,7 +323,7 @@ export default InputContext.use(input => ThemeContext.use(h => {
 		>
 			<Shown value={loading}>
 				<mark:then>
-					<LoadingDots type={type} />
+					<Loader type={type} />
 				</mark:then>
 				<mark:else>
 					{iconPosition.map(s => s === 'left' && icon
@@ -335,4 +341,4 @@ export default InputContext.use(input => ThemeContext.use(h => {
 	};
 
 	return Button;
-}));
+})));
