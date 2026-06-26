@@ -132,8 +132,6 @@ export default ThemeContext.use(h => {
 						}
 
 						value.set(options.get()[index]);
-					} else if (e.key === 'Enter') {
-						focused.set(false);
 					} else if (e.key.length === 1) {
 						const key = e.key;
 						// advance existing keys
