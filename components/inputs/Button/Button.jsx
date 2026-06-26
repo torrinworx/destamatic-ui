@@ -281,7 +281,7 @@ export default InputContext.use(input => ThemeContext.use(h => LoaderContext.use
 					// keep button-like keyboard behavior for actual buttons only
 					if (!href) {
 						event.preventDefault();
-						focused.set(true);
+						if (!focused.isImmutable()) focused.set(true);
 						createRipple(event);
 
 						if (track.get()) {
