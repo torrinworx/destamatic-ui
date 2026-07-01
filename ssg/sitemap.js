@@ -81,6 +81,15 @@ export const generateSitemap = async ({ outDir, baseUrl }) => {
     for (const file of files) {
         const route = htmlPathToRoute(file, outDir);
         if (!route) continue;
+
+        // A sitemap must not advertise noindex URLs: Search Console flags them and
+        // it wastes crawl budget on private routes (auth-gated dashboards, token
+        // utility pages, 404s). The per-page robots meta is the single source of
+        // truth for indexability, so the sitemap simply skips any page that opts
+        // out with a noindex robots directive.
+        const html = await fs.readFile(file, 'utf8');
+        if (/<meta[^>]+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html)) continue;
+
         routeSet.add(route);
     }
 
