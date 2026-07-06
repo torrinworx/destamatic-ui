@@ -14,7 +14,7 @@ Theme.define({
 
 export default ThemeContext.use(h => {
 	const Column = ({ children, type, inline, gap, style, ...props }) => {
-		if (gap) style = {
+		if (gap != null) style = {
 			gap: gap,
 			...style,
 		};
