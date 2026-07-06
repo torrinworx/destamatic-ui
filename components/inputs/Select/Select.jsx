@@ -61,7 +61,7 @@ Theme.define({
 });
 
 export default ThemeContext.use(h => {
-	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None', theme }) => {
+	const Select = ({ value, options, display, style, type = 'text', placeholder = 'None', theme, focused: focusedProp, children = [] }) => {
 		if (!(value instanceof Observer)) value = Observer.immutable(value);
 		if (!(options instanceof Observer)) options = Observer.immutable(options);
 
@@ -70,7 +70,11 @@ export default ThemeContext.use(h => {
 			display = a => arr[options.get().indexOf(a)];
 		} else if (!display) display = a => a;
 
-		const [preFocus, focused] = Observer.mutable(false).memo(2);
+		// Optional so a caller can drive open/close externally (e.g. opening on
+		// an anchor's own focus event) - mirrors Button.jsx's `focused` handling.
+		if (!(focusedProp instanceof Observer)) focusedProp = Observer.mutable(focusedProp);
+
+		const [preFocus, focused] = focusedProp.memo(2);
 		const selector = value.selector('selected', null);
 		const refPopup = <raw:div />;
 
@@ -98,7 +102,11 @@ export default ThemeContext.use(h => {
 				}));
 			});
 
-			cleanup(useAbort(signal => {
+			// This blind type-ahead (jump to the option starting with whatever's
+			// typed) intercepts and prevents every keydown while open, which would
+			// swallow real typing into a `children`-supplied input - so it's only
+			// wired up for the default (non-editable) anchor.
+			if (!children.length) cleanup(useAbort(signal => {
 				const currentKeys = [];
 
 				// TODO: Fix search so it instead removes all options that don't match the search from the options array while remaining open.
@@ -197,26 +205,34 @@ export default ThemeContext.use(h => {
 			<mark:anchor
 				type={['select', 'base', type]}
 				onMouseDown={e => {
-					e.preventDefault();
+					// The default anchor has nothing focusable worth keeping browser
+					// focus off of, so this normally blocks the click from also
+					// focusing the underlying (invisible) button. A `children` anchor
+					// may contain a real input that needs that same click to focus it
+					// (e.g. to let the user start typing immediately), so it's skipped
+					// there.
+					if (!children.length) e.preventDefault();
 					focused.set(!focused.get());
 				}}
 				style={style}
 			>
-				<Typography type='p1'>
-					{Observer.all([value, options]).map(([val, opt]) => {
-						if (opt.includes(val)) {
-							return display(val);
-						} else {
-							return placeholder;
-						}
-					})}
-				</Typography>
-				<div theme="select_icon">
-					<Icon
-						name='chevron-down'
-						rot={focused.bool(180, 0)}
-					/>
-				</div>
+				{children.length ? children : <>
+					<Typography type='p1'>
+						{Observer.all([value, options]).map(([val, opt]) => {
+							if (opt.includes(val)) {
+								return display(val);
+							} else {
+								return placeholder;
+							}
+						})}
+					</Typography>
+					<div theme="select_icon">
+						<Icon
+							name='chevron-down'
+							rot={focused.bool(180, 0)}
+						/>
+					</div>
+				</>}
 			</mark:anchor>
 
 			<mark:popup ref={refPopup}>
