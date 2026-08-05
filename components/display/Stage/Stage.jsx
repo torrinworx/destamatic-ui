@@ -287,6 +287,7 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 			};
 
 			let urlWriteScheduled = false;
+			let urlWriteHandle = null;
 			let pendingUrl = null;
 
 			// track last committed pathname so query-only changes don't create new entries
@@ -323,9 +324,23 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 
 				if (!urlWriteScheduled) {
 					urlWriteScheduled = true;
-					setTimeout(commitUrl, 0);
+					urlWriteHandle = setTimeout(commitUrl, 0);
 				}
 			};
+
+			// Tearing this Stage down is not a navigation. destam-dom removes the DOM subtree
+			// BEFORE running a component's own cleanups, so a child StageContext splices itself
+			// out of `children` while these effects are still live. buildPathFromStage then
+			// walks a tree that is mid-teardown, finds no child, and treats the route as ending
+			// at the parent, writing a truncated path (/s rather than /s/<slug>) as a pushState.
+			// The next load of that short path has no tail to restore, so the deep link is lost
+			// and Back lands on the phantom entry.
+			//
+			// The write is already deferred to a macrotask and teardown is synchronous, so
+			// cancelling here always beats it. A Stage that is still mounted never reaches this,
+			// which is what keeps a legitimate truncation working: a conditionally mounted child
+			// stage going away under a live root SHOULD shorten the URL, and still does.
+			cleanup(() => clearTimeout(urlWriteHandle));
 
 			const syncStage = () => {
 				isPopState = true;
