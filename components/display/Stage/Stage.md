@@ -132,11 +132,25 @@ Default: `false`
 
 When building a URL from the stage chain, omit a segment when `stage.current === stage.initial`.
 
-This is convenient, but can make some deep states implicit/ambiguous.
+This is what a parameterised route wants: `/app/<uuid>` rather than `/app/<uuid>/home`, and the
+initial act costs no history entry, so Back reaches the screen before it instead of bouncing off
+a segment the stage immediately rewrites.
 
-Warnings you may see:
-- Root stage with `urlRouting && truncateInitial` is usually incompatible for deep routing.
-- Child stage using `truncateInitial` under a routed root can make routes URL-implicit.
+**One warning, and it is narrow.** A stage nested under a truncated one, opening something other
+than its own initial act, while that parent is showing the act it truncates. There is then no
+segment to hang the state off, so a refresh comes back on the initial act. Using
+`truncateInitial` does not warn by itself; nesting under it does not warn by itself.
+
+#### `config.fallback`
+Type: `string`
+
+The act to render when `current` names something that is not in `acts`. Resolution walks up the
+parent chain, so a child stage with no `fallback` of its own uses the nearest ancestor's.
+
+**A segment that is not an act name is the normal case, not an error.** `/s/<slug>`,
+`/app/<uuid>` and `/newsletter/<issue>` all put data where an act goes, and `fallback` is what
+renders it. Stage only logs when nothing in the chain can render the segment, because then the
+stage shows nothing at all.
 
 #### `config.[forwardedProp]`
 Type: `any`

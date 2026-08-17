@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>destamatic-ui | Stage routing scratchpad</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body style="margin: 0; inset: 0; font-family: ui-monospace, monospace;">
+	<div id="app"></div>
+	<!-- ABSOLUTE, not './routing.jsx'. This page is served at every path so it can be deep
+	     linked, and a relative src at /s/velocity resolves to /s/routing.jsx and 404s. Exactly
+	     the failure the dashboard fixes by injecting <base href="/"> into its built shell. -->
+	<script type="module" src="/routing.jsx"></script>
+</body>
+
+</html>

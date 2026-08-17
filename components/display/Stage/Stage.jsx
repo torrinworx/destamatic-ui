@@ -22,6 +22,21 @@ Theme.define({
 
 export const stageRegistry = OArray([]);
 
+// A route tail whose child stage did not exist yet, kept until one does.
+//
+// `open({ name: ['admin', 'news'] })` hands 'news' to `children[0]` on a microtask, which
+// assumes the child StageContext is already mounted. It often is not: the usual shape is a
+// child stage living INSIDE an act that renders behind an async gate (an auth check, a fetch),
+// so it appears a tick or a second later and the tail was dropped long before. Two apps grew
+// independent workarounds for that (seeding the child's `initial` from window.location,
+// restructuring the component to dodge it), which is what makes it worth fixing rather than
+// documenting.
+//
+// A WeakMap rather than a field on the Stage OObject: this is delivery state, not stage state.
+// Putting it on the object would publish it to every observer of the stage and put it in reach
+// of anything walking the tree, for a value that is meaningless a tick after it is set.
+const pendingTails = new WeakMap();
+
 export const StageContext = createContext(
 	() => null,
 	(raw, parent, children) => {
@@ -42,28 +57,19 @@ export const StageContext = createContext(
 
 		const isRoot = !parent || typeof parent !== 'object';
 
-		// FIX THIS WARNING: only show warning if it's detected that the truncated initial has a child stage. 
-		// if (isRoot && urlRouting && truncateInitial) {
-		// 	console.warn(
-		// 		'[StageContext] urlRouting on the root + truncateInitial=true is usually incompatible. ' +
-		// 		'Truncating means the URL can\'t represent deeper state past initial.'
-		// 	);
-		// }
-
-		// descendant warning (when root uses routing)
-		if (!isRoot && truncateInitial) {
-			let p = parent;
-			while (p?.parent && typeof p.parent === 'object') p = p.parent;
-			const root = p;
-
-			if (root?.urlRouting) {
-				console.warn(
-					'[StageContext] truncateInitial=true on a child stage while root urlRouting is enabled. ' +
-					"This stage's initial will be URL-implicit and routing won't be able to represent child state under it.",
-					{ stageConfig: raw, root }
-				);
-			}
-		}
+		// THE truncateInitial WARNING LIVES IN open(), NOT HERE. See the note there.
+		//
+		// It used to fire from this spot, on any stage that set the flag under a routed root. But
+		// `truncateInitial` means "my initial act contributes no URL segment", which is exactly
+		// what a parameterised route wants (/app/<uuid>, not /app/<uuid>/home), so that warned on
+		// every correct use. It fired on every /newsletter visit in one app, and the agent-facing
+		// docs had to tell people to ignore it, which is the point at which a warning is worse
+		// than silence.
+		//
+		// Moving it one level down, to the child, was not enough either: at construction time a
+		// parent is ALWAYS still on its initial act, because routing is applied a microtask
+		// later, so the question cannot be answered yet. Measured in a browser on
+		// /app/<uuid>/settings/profile, which warned twice while routing perfectly.
 
 		const Stage = OObject({
 			acts,
@@ -75,10 +81,17 @@ export const StageContext = createContext(
 			urlProps: {},
 
 			open: ({ name, template = Stage.template, onClose, urlProps = {}, ...props }) => {
+				// AN EXACT ACT WINS OVER THE SEPARATOR. `open('a/b')` is the documented way to
+				// reach a nested route, so '/' has to split. But an act may legitimately be NAMED
+				// with a slash in it (a package name, a path-shaped key), and splitting those made
+				// them unreachable by their own name: `open('@destamatic/ui')` opened
+				// '@destamatic', found no such act, and rendered the fallback. Checking the acts
+				// map first costs nothing and is unambiguous, because a name that IS an act is
+				// never also a route through one.
 				if (typeof name === 'string') {
-					name = name.includes("/")
-						? name.split("/").filter(Boolean)
-						: [name];
+					name = Stage.acts && name in Stage.acts
+						? [name]
+						: (name.includes("/") ? name.split("/").filter(Boolean) : [name]);
 				} else if (!Array.isArray(name)) {
 					throw new Error(`Stage.open: "name" must be string or array, got ${typeof name}`);
 				}
@@ -111,6 +124,35 @@ export const StageContext = createContext(
 
 				Stage.current = opened;
 
+				// The only arrangement where a stage holds state the URL cannot represent: this
+				// stage is nested under one that truncates, that parent is sitting on the very
+				// act it truncates (so it contributes no segment), and this stage has moved off
+				// its own initial act (so it has something to lose). A refresh drops it.
+				//
+				// Asked here rather than at construction because only here is the parent's route
+				// settled: a parent sets its own `current` synchronously and hands the tail down
+				// on a microtask, so by the time this runs the answer is real.
+				if (!isRoot && parent.truncateInitial && parent.current === parent.initial
+					&& Stage.initial && opened !== Stage.initial) {
+					let p = parent;
+					while (p?.parent && typeof p.parent === 'object') p = p.parent;
+
+					if (p?.urlRouting) {
+						console.warn(
+							`[StageContext] '${opened}' cannot be represented in the address bar. `
+							+ `This stage is nested under one with truncateInitial=true that is `
+							+ `currently on its initial act, so there is no segment to hang this `
+							+ `state off and a refresh will lose it.`,
+							{ stage: Stage, parent }
+						);
+					}
+				}
+
+
+				// Any tail parked for a child that never arrived belongs to the route we are
+				// leaving. Dropping it here is what stops a late child opening a screen the user
+				// navigated away from.
+				pendingTails.delete(Stage);
 
 				if (tail.length > 0) {
 					if (children.length > 1) {
@@ -120,14 +162,17 @@ export const StageContext = createContext(
 						);
 					}
 
-					// child context isn't guaranteed to be mounted yet
+					const deliver = { name: tail, urlProps, ...globalProps, ...props };
+
+					// The child context is not guaranteed to be mounted yet, and when it is not,
+					// the tail is KEPT rather than dropped. A child stage that appears later reads
+					// it on creation (see the end of this factory). The microtask is still the
+					// common path: an act that renders its child stage synchronously has it by the
+					// time this runs.
 					queueMicrotask(() => {
-						children[0]?.value?.open({
-							name: tail,
-							urlProps,
-							...globalProps,
-							...props
-						});
+						const child = children[0]?.value;
+						if (child) child.open(deliver);
+						else pendingTails.set(Stage, deliver);
 					});
 				} else if (urlRouting) {
 					// Route ends here: clear ALL descendant urlProps so they can't leak back into the URL.
@@ -206,6 +251,20 @@ export const StageContext = createContext(
 
 		if (register) Stage.register();
 
+		// The other half of the parked tail. A stage that mounts after its parent routed picks
+		// the tail up here, which is the whole fix for a child stage behind an async gate.
+		//
+		// Read once and deleted, so a later sibling cannot replay it, and deferred so this
+		// factory finishes returning before anything opens: `open` touches Stage.props and
+		// Stage.current, and the context value is not in the tree yet.
+		if (!isRoot) {
+			const parked = pendingTails.get(parent);
+			if (parked) {
+				pendingTails.delete(parent);
+				queueMicrotask(() => Stage.open(parked));
+			}
+		}
+
 		return Stage;
 	}
 );
@@ -215,16 +274,24 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 		return s.observer.path('current').map((c) => {
 			if (!c) return null;
 
+			// Same rule as the browser path below, and it has to be the same or a parameterised
+			// route renders the fallback in the browser and NOTHING when prerendered. This path
+			// used to ignore `fallback` outright, so every SSG'd /s/<slug> page came out empty
+			// and only filled in once the client took over.
 			let StageComp = null;
 			if (s && s.acts && typeof c === 'string' && c in s.acts) {
 				StageComp = s.acts[c];
 			} else {
-				console.error(
-					`Stage component with '${c}' does not exist in acts list.`,
-					'available=',
-					Object.keys(s.acts || {})
-				);
-				return null;
+				StageComp = s.fallbackAct.get();
+				if (!StageComp) {
+					console.error(
+						`Stage component with '${c}' does not exist in acts list, `
+						+ `and no stage in this chain declares a usable fallback.`,
+						'available=',
+						Object.keys(s.acts || {})
+					);
+					return null;
+				}
 			}
 
 			const Template = s.template;
@@ -444,8 +511,26 @@ export const Stage = StageContext.use(s => ThemeContext.use(h => (_, cleanup, mo
 			StageComp = s.acts[c];
 		} else {
 			StageComp = s.fallbackAct.get();
-			console.error(`Stage component with '${c}' does not exist in acts list.`);
+			// THE FALLBACK IS THE HAPPY PATH, not a failure. A parameterised segment is never an
+			// act name: /s/<slug>, /app/<uuid> and /newsletter/<issue> all put DATA where an act
+			// goes, and `fallback` is the documented mechanism for rendering it. Logging that as
+			// an error meant a correct page load printed one, which trains you to ignore the
+			// console on exactly the screens where routing bugs show up.
+			//
+			// It is still an error when there is nothing to fall back to, because then the stage
+			// renders nothing at all and the segment really was a mistake.
+			if (!StageComp) {
+				console.error(`Stage component with '${c}' does not exist in acts list, `
+					+ `and no stage in this chain declares a usable fallback.`);
+			}
 		}
+
+		// Render nothing rather than throwing. Without this the null falls through to
+		// `<StageComp />` and destam-dom raises "Tag name cannot be null or undefined", so the
+		// one case that is genuinely a developer error took the whole page down instead of
+		// leaving an empty stage and a console message. The prerender path above already
+		// returned null here; this is the same answer on the browser side.
+		if (!StageComp) return null;
 
 		return <Template closeSignal={closeSignal} s={s} m={s}>
 			<StageComp stage={s} urlProps={urlProps || {}} {...(urlProps || {})} {...s.props} />
